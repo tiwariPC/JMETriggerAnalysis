@@ -1,9 +1,10 @@
+### configuration file to re-run customized HLT Menu on RAW
 from HLT_JetMETPFlowWithoutPreselV4_cfg import cms, process
 
-# remove RECO step (EDM output file will not be produced)
+### remove RECO step (EDM output file will not be produced)
 process.schedule.remove(process.RECOSIMoutput_step)
 
-# analysis sequence (JMETrigger NTuple)
+### analysis sequence (JMETrigger NTuple)
 process.jmeTriggerNTuplizer = cms.EDAnalyzer('NTuplizer',
 
   recoPFCandidateCollections = cms.PSet(
@@ -37,10 +38,26 @@ process.analysis_step = cms.EndPath(process.analysisSequence)
 
 process.schedule.extend([process.analysis_step])
 
+### command-line arguments
+import FWCore.ParameterSet.VarParsing as vpo
+opts = vpo.VarParsing('analysis')
+
+opts.register('n', -1,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'max number of events to process')
+
+opts.register('output', 'out.root',
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'Path to output ROOT file')
+
+opts.parseArguments()
+
 # create TFileService to be accessed by NTuplizer plugin
-process.TFileService = cms.Service('TFileService', fileName = cms.string( 'out.root' ))
+process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
 #import FWCore.PythonUtilities.LumiList as LumiList
 #process.source.lumisToProcess = LumiList.LumiList(filename = 'goodList.json').getVLuminosityBlockRange()
 
-process.maxEvents.input = 10
+process.maxEvents.input = opts.n
