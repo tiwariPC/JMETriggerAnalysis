@@ -4,8 +4,15 @@ from HLT_JetMETPFlowWithoutPreselV4_cfg import cms, process
 ### remove RECO step (EDM output file will not be produced)
 process.schedule.remove(process.RECOSIMoutput_step)
 
-### analysis sequence (JMETrigger NTuple)
-process.jmeTriggerNTuplizer = cms.EDAnalyzer('NTuplizer',
+### add analysis sequence (JMETrigger NTuple)
+process.JMETriggerNTuple = cms.EDAnalyzer('NTuplizer',
+
+  recoVertexCollections = cms.PSet(
+
+    hltPixelVertices = cms.InputTag('hltPixelVertices'+'::'+process.name_()),
+    hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'+'::'+process.name_()),
+    offlineSlimmedPrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
+  ),
 
   recoPFCandidateCollections = cms.PSet(
 
@@ -31,7 +38,7 @@ process.jmeTriggerNTuplizer = cms.EDAnalyzer('NTuplizer',
 )
 
 process.analysisSequence = cms.Sequence(
-  process.jmeTriggerNTuplizer
+  process.JMETriggerNTuple
 )
 
 process.analysis_step = cms.EndPath(process.analysisSequence)
