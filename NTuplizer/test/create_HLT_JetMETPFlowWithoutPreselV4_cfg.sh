@@ -1,56 +1,24 @@
+#!/bin/bash
 
-* Golden JSON for 2018 (PromptReco):
+printf "\n%s\n\n" " >>> cff of simplified HLT Menu to run unbiased PF@HLT"
+hltGetConfiguration --cff --unprescale --paths HLTriggerFirstPath,HLTriggerFinalPath /dev/CMSSW_10_6_0/GRun > HLT_JetMETPFlowWithoutPreselV4_cff.py
+hltGetConfiguration --cff --unprescale --globaltag auto:run2_hlt_GRun /users/missirol/testing/2018/JMEPFlow/JetMETPFlowWithoutPresel/V4 >> HLT_JetMETPFlowWithoutPreselV4_cff.py
 
-/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt
+# comment duplicates of "import FWCore.ParameterSet.Config as cms" and "fragment = cms.ProcessFragment"
+sed -i -e 's|import FWCore.ParameterSet.Config as cms|#import FWCore.ParameterSet.Config as cms|g' \
+       -e '0,/#import FWCore.ParameterSet.Config as cms/{s/#import FWCore.ParameterSet.Config as cms/import FWCore.ParameterSet.Config as cms/}' \
+       -e 's|fragment = cms.ProcessFragment|#fragment = cms.ProcessFragment|g' \
+       -e '0,/#fragment = cms.ProcessFragment/{s/#fragment = cms.ProcessFragment/fragment = cms.ProcessFragment/}' \
+ HLT_JetMETPFlowWithoutPreselV4_cff.py
 
-* Golden JSON for 2018 (ABC-ReReco + D-PromptReco):
-
-/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt
-
-* Input Samples:
-
-  - Data:
-
-dasgoclient --query="file dataset=/SingleMuon/Run2018D-v1/RAW"
-  process HLT (release CMSSW_10_1_10)
-     HLT menu:   '/cdaq/physics/Run2018/2e34/v3.6.1/HLT/V2'
-     global tag: '101X_dataRun2_HLT_v7'
-
-dasgoclient --query="file dataset=/SingleMuon/Run2018D-22Jan2019-v2/MINIAOD"
-
- hltInfo root://cms-xrd-global.cern.ch//store/data/Run2018D/SingleMuon/MINIAOD/22Jan2019-v2/110000/12952201-BFB3-4142-B24C-983B753A4300.root
-
-  - MC (special TSG samples in 10_2_X): dasgoclient --query="dataset dataset=/*/*102X_upgrade2018_realistic_v15*/GEN-SIM-RAW"
-
-
-
-Collections:
- hltParticleFlow
- hltAK4PFJets
- hltPFMet
- hltPFMETTypeOne
-
-
-
-
-# set up CMSSW area
-cmsrel CMSSW_10_6_1_patch3
-cd CMSSW_10_6_1_patch3/src
-cmsenv
-git cms-addpkg HLTrigger/Configuration
-scram b
-
-# set up VOMS proxy
-voms-proxy-init --voms cms
-
-# cff of simplified HLT Menu to run unbiased PF@HLT
-hltGetConfiguration /users/missirol/testing/2018/JMEPFlow/JetMETPFlowWithoutPresel/V4 --cff --unprescale --globaltag auto:run2_hlt_GRun > HLT_JetMETPFlowWithoutPreselV4_cff.py
-
-# copy HLT-cff to HLTrigger/Configuration/python/ to access it via cmsDriver.py
+printf "\n%s\n\n" " >>> copy HLT-cff to HLTrigger/Configuration/python/ to access it via cmsDriver.py"
 cp HLT_JetMETPFlowWithoutPreselV4_cff.py ${CMSSW_BASE}/src/HLTrigger/Configuration/python
 
-# cfg file to re-run HLT menu on RAW Data
-cmsDriver.py HLT2 --python_filename HLT_JetMETPFlowWithoutPreselV4_cfg.py \
+printf "\n%s\n\n" " >>> cfg file to re-run HLT menu on RAW Data"
+cmsDriver.py HLT2 \
+ --processName HLT2 \
+ -n 100 --no_exec \
+ --python_filename HLT_JetMETPFlowWithoutPreselV4_cfg.py \
  --step HLT:JetMETPFlowWithoutPreselV4 \
  --era Run2_2018 --data \
  --conditions auto:run2_hlt_GRun \

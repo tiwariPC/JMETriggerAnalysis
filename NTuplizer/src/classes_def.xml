@@ -1,0 +1,5 @@
+<lcgdict>
+  <class name="RecoCaloMETCollectionContainer" />
+  <class name="RecoPFMETCollectionContainer" />
+  <class name="RecoPFCandidateCollectionContainer" />
+</lcgdict>
