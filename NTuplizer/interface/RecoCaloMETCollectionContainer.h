@@ -15,10 +15,12 @@ class RecoCaloMETCollectionContainer : public VCollectionContainer<reco::CaloMET
 
   std::vector<float>& vec_pt(){ return pt_; }
   std::vector<float>& vec_phi(){ return phi_; }
+  std::vector<float>& vec_sumEt(){ return sumEt_; }
 
  protected:
   std::vector<float> pt_;
   std::vector<float> phi_;
+  std::vector<float> sumEt_;
 };
 
 #endif

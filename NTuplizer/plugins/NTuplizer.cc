@@ -739,6 +739,7 @@ void NTuplizer::beginJob(){
 
     ttree_->Branch((recoCaloMETCollectionContainer_i.name()+"_pt").c_str(), &recoCaloMETCollectionContainer_i.vec_pt());
     ttree_->Branch((recoCaloMETCollectionContainer_i.name()+"_phi").c_str(), &recoCaloMETCollectionContainer_i.vec_phi());
+    ttree_->Branch((recoCaloMETCollectionContainer_i.name()+"_sumEt").c_str(), &recoCaloMETCollectionContainer_i.vec_sumEt());
   }
 
   for(auto& recoPFMETCollectionContainer_i : v_recoPFMETCollectionContainer_){
