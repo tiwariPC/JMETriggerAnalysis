@@ -14,6 +14,7 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloMETCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoPFMETCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/PATMETCollectionContainer.h>
 
 #include <string>
 #include <vector>
@@ -55,12 +56,7 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
   std::vector<PATPackedCandidateCollectionContainer> v_patPackedCandidateCollectionContainer_;
   std::vector<RecoCaloMETCollectionContainer> v_recoCaloMETCollectionContainer_;
   std::vector<RecoPFMETCollectionContainer> v_recoPFMETCollectionContainer_;
-
-//!! muons
-//!! electrons
-//!! offline PF
-//!! online jets
-//!! offline jets
+  std::vector<PATMETCollectionContainer> v_patMETCollectionContainer_;
 };
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
@@ -177,6 +173,27 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<reco::PFMETCollection>(inputTag)));
+    }
+  }
+
+  // pat::METCollection
+  v_patMETCollectionContainer_.clear();
+
+  if(iConfig.exists("patMETCollections")){
+
+    const edm::ParameterSet& pset_patMETCollections = iConfig.getParameter<edm::ParameterSet>("patMETCollections");
+
+    const auto& inputTagLabels_patMETCollections = pset_patMETCollections.getParameterNamesForType<edm::InputTag>();
+
+    v_patMETCollectionContainer_.reserve(inputTagLabels_patMETCollections.size());
+
+    for(const std::string& label : inputTagLabels_patMETCollections){
+
+      const auto& inputTag = pset_patMETCollections.getParameter<edm::InputTag>(label);
+
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::METCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+
+      v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<pat::METCollection>(inputTag)));
     }
   }
 }
@@ -316,16 +333,24 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     else {
 
       recoPFMETCollectionContainer_i.fill(*i_handle);
+    }
+  }
 
-//!!      for(uint idx=0; idx<recoPFMETCollectionContainer_i.vec_pt().size(); ++idx){
-//!!
-//!!
-//!!<< " PHI=" << i_handle->at(idx).phi()
-//!!<< " VX=" << i_handle->at(idx).vx()
-//!!<< " VY=" << i_handle->at(idx).vy()
-//!!<< " VZ=" << i_handle->at(idx).vz();
-//!!      }
+  // fill patMETCollectionContainers
+  for(auto& patMETCollectionContainer_i : v_patMETCollectionContainer_){
 
+    edm::Handle<pat::METCollection> i_handle;
+    iEvent.getByToken(patMETCollectionContainer_i.token(), i_handle);
+
+    if(not i_handle.isValid()){
+
+      edm::LogWarning("JMETriggerNTuple::analyze")
+        << "invalid handle for input collection: \"" << patMETCollectionContainer_i.inputTagLabel()
+        << "\" (NTuple branches: \"" << patMETCollectionContainer_i.name() << "_*\")";
+    }
+    else {
+
+      patMETCollectionContainer_i.fill(*i_handle);
     }
   }
 
@@ -406,13 +431,33 @@ void JMETriggerNTuple::beginJob(){
     this->addBranch(recoPFMETCollectionContainer_i.name()+"_pt", &recoPFMETCollectionContainer_i.vec_pt());
     this->addBranch(recoPFMETCollectionContainer_i.name()+"_phi", &recoPFMETCollectionContainer_i.vec_phi());
     this->addBranch(recoPFMETCollectionContainer_i.name()+"_sumEt", &recoPFMETCollectionContainer_i.vec_sumEt());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_photonEtFraction", &recoPFMETCollectionContainer_i.vec_photonEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_neutralHadronEtFraction", &recoPFMETCollectionContainer_i.vec_neutralHadronEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_electronEtFraction", &recoPFMETCollectionContainer_i.vec_electronEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_chargedHadronEtFraction", &recoPFMETCollectionContainer_i.vec_chargedHadronEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_muonEtFraction", &recoPFMETCollectionContainer_i.vec_muonEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_HFHadronEtFraction", &recoPFMETCollectionContainer_i.vec_HFHadronEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_HFEMEtFraction", &recoPFMETCollectionContainer_i.vec_HFEMEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_NeutralEMFraction", &recoPFMETCollectionContainer_i.vec_NeutralEMFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &recoPFMETCollectionContainer_i.vec_NeutralHadEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &recoPFMETCollectionContainer_i.vec_ChargedEMEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &recoPFMETCollectionContainer_i.vec_ChargedHadEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_MuonEtFraction", &recoPFMETCollectionContainer_i.vec_MuonEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_Type6EtFraction", &recoPFMETCollectionContainer_i.vec_Type6EtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_Type7EtFraction", &recoPFMETCollectionContainer_i.vec_Type7EtFraction());
+  }
+
+  for(auto& patMETCollectionContainer_i : v_patMETCollectionContainer_){
+
+    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_pt", &patMETCollectionContainer_i.vec_Raw_pt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_phi", &patMETCollectionContainer_i.vec_Raw_phi());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_sumEt", &patMETCollectionContainer_i.vec_Raw_sumEt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_pt", &patMETCollectionContainer_i.vec_Type1_pt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_phi", &patMETCollectionContainer_i.vec_Type1_phi());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_sumEt", &patMETCollectionContainer_i.vec_Type1_sumEt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_pt", &patMETCollectionContainer_i.vec_Type1XY_pt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_phi", &patMETCollectionContainer_i.vec_Type1XY_phi());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_sumEt", &patMETCollectionContainer_i.vec_Type1XY_sumEt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_NeutralEMFraction", &patMETCollectionContainer_i.vec_NeutralEMFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &patMETCollectionContainer_i.vec_NeutralHadEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &patMETCollectionContainer_i.vec_ChargedEMEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &patMETCollectionContainer_i.vec_ChargedHadEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_MuonEtFraction", &patMETCollectionContainer_i.vec_MuonEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type6EtFraction", &patMETCollectionContainer_i.vec_Type6EtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type7EtFraction", &patMETCollectionContainer_i.vec_Type7EtFraction());
   }
 }
 

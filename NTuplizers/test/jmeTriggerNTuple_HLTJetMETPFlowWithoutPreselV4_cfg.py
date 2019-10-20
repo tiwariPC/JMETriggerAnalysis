@@ -63,17 +63,26 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMetTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
   ),
 
+  patMETCollections = cms.PSet(
+
+    slimmedMETs = cms.InputTag('slimmedMETs'),
+    slimmedMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
+  ),
+
   outputBranchesToBeDropped = cms.vstring(
 
     'hltPixelVertices_isFake',
     'hltPixelVertices_chi2',
     'hltPixelVertices_ndof',
+
     'hltTrimmedPixelVertices_isFake',
     'hltTrimmedPixelVertices_chi2',
     'hltTrimmedPixelVertices_ndof',
+
     'offlineSlimmedPrimaryVertices_tracksSize',
-    'hltPFMet_electronEtFraction',
-    'hltPFMetTypeOne_electronEtFraction',
+
+    'hltPFMet_ChargedEMEtFraction',
+    'hltPFMetTypeOne_ChargedEMEtFraction',
   ),
 )
 
