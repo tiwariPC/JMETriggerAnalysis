@@ -41,6 +41,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('NTuplizer',
     hltParticleFlow = cms.InputTag('hltParticleFlow'+'::'+process.name_()),
   ),
 
+  patPackedCandidateCollections = cms.PSet(
+
+    packedPFCandidates = cms.InputTag('packedPFCandidates'),
+  ),
+
 #  recoPFJetCollections = cms.PSet(
 #
 #    hltAK4PFJets = cms.InputTag('hltAK4PFJets'+'::'+process.name_()),
@@ -94,12 +99,62 @@ opts.register('output', 'out.root',
               vpo.VarParsing.varType.string,
               'Path to output ROOT file')
 
+opts.register('lumis', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'Path to .json with list of luminosity sections')
+
 opts.parseArguments()
+
+# max number of events to be processed
+process.maxEvents.input = opts.n
 
 # create TFileService to be accessed by NTuplizer plugin
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
-#import FWCore.PythonUtilities.LumiList as LumiList
-#process.source.lumisToProcess = LumiList.LumiList(filename = 'goodList.json').getVLuminosityBlockRange()
+# select luminosity sections from .json file
+if opts.lumis is not None:
+   import FWCore.PythonUtilities.LumiList as LumiList
+   process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
 
-process.maxEvents.input = opts.n
+# MessageLogger
+process.MessageLogger = cms.Service('MessageLogger',
+
+  destinations = cms.untracked.vstring(
+
+    'cerr',
+    'logError',
+    'logDebug',
+  ),
+
+  debugModules = cms.untracked.vstring(
+
+    'JMETriggerNTuple'.
+  ),
+
+  cerr = cms.untracked.PSet(
+
+    threshold = cms.untracked.string('WARNING'),
+
+    eventNumber = cms.untracked.PSet(
+
+      reportEvery = cms.untracked.int32(1),
+    ),
+  ),
+
+  logError = cms.untracked.PSet(
+
+    threshold = cms.untracked.string('ERROR'),
+    extension = cms.untracked.string('.txt'),
+  ),
+
+  logDebug = cms.untracked.PSet(
+
+    threshold = cms.untracked.string('DEBUG'),
+    extension = cms.untracked.string('.txt'),
+    eventNumber = cms.untracked.PSet(
+
+      reportEvery = cms.untracked.int32(1),
+    ),
+  ),
+)

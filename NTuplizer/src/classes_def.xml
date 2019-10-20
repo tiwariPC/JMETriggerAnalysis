@@ -2,6 +2,7 @@
   <class name="TriggerResultsContainer"/>
   <class name="RecoVertexCollectionContainer"/>
   <class name="RecoPFCandidateCollectionContainer"/>
+  <class name="PATPackedCandidateCollectionContainer"/>
   <class name="RecoCaloMETCollectionContainer"/>
   <class name="RecoPFMETCollectionContainer"/>
 </lcgdict>

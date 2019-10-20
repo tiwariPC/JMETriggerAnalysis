@@ -10,6 +10,7 @@
 #include <JMETriggerAnalysis/NTuplizer/interface/TriggerResultsContainer.h>
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoVertexCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoPFCandidateCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizer/interface/PATPackedCandidateCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoCaloMETCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoPFMETCollectionContainer.h>
 
@@ -50,6 +51,7 @@ class NTuplizer : public edm::EDAnalyzer {
   std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
   std::vector<RecoVertexCollectionContainer> v_recoVertexCollectionContainer_;
   std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
+  std::vector<PATPackedCandidateCollectionContainer> v_patPackedCandidateCollectionContainer_;
   std::vector<RecoCaloMETCollectionContainer> v_recoCaloMETCollectionContainer_;
   std::vector<RecoPFMETCollectionContainer> v_recoPFMETCollectionContainer_;
 
@@ -109,6 +111,27 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
       LogDebug("NTuplizer::NTuplizer") << "adding reco::PFCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<reco::PFCandidateCollection>(inputTag)));
+    }
+  }
+
+  // pat::PackedCandidateCollection
+  v_patPackedCandidateCollectionContainer_.clear();
+
+  if(iConfig.exists("patPackedCandidateCollections")){
+
+    const edm::ParameterSet& pset_patPackedCandidateCollections = iConfig.getParameter<edm::ParameterSet>("patPackedCandidateCollections");
+
+    const auto& inputTagLabels_patPackedCandidateCollections = pset_patPackedCandidateCollections.getParameterNamesForType<edm::InputTag>();
+
+    v_patPackedCandidateCollectionContainer_.reserve(inputTagLabels_patPackedCandidateCollections.size());
+
+    for(const std::string& label : inputTagLabels_patPackedCandidateCollections){
+
+      const auto& inputTag = pset_patPackedCandidateCollections.getParameter<edm::InputTag>(label);
+
+      LogDebug("NTuplizer::NTuplizer") << "adding pat::PackedCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+
+      v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<pat::PackedCandidateCollection>(inputTag)));
     }
   }
 
@@ -239,6 +262,24 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   }
 
+  // fill patPackedCandidateCollectionContainers
+  for(auto& patPackedCandidateCollectionContainer_i : v_patPackedCandidateCollectionContainer_){
+
+    edm::Handle<pat::PackedCandidateCollection> i_handle;
+    iEvent.getByToken(patPackedCandidateCollectionContainer_i.token(), i_handle);
+
+    if(not i_handle.isValid()){
+
+      edm::LogWarning("NTuplizer::analyze")
+        << "invalid handle for input collection: \"" << patPackedCandidateCollectionContainer_i.inputTagLabel()
+        << "\" (NTuple branches: \"" << patPackedCandidateCollectionContainer_i.name() << "_*\")";
+    }
+    else {
+
+      patPackedCandidateCollectionContainer_i.fill(*i_handle);
+    }
+  }
+
   // fill recoCaloMETCollectionContainers
   for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
 
@@ -335,6 +376,19 @@ void NTuplizer::beginJob(){
     this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vx", &recoPFCandidateCollectionContainer_i.vec_vx());
     this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vy", &recoPFCandidateCollectionContainer_i.vec_vy());
     this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vz", &recoPFCandidateCollectionContainer_i.vec_vz());
+  }
+
+  for(auto& patPackedCandidateCollectionContainer_i : v_patPackedCandidateCollectionContainer_){
+
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_pdgId", &patPackedCandidateCollectionContainer_i.vec_pdgId());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_pt", &patPackedCandidateCollectionContainer_i.vec_pt());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_eta", &patPackedCandidateCollectionContainer_i.vec_eta());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_phi", &patPackedCandidateCollectionContainer_i.vec_phi());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_mass", &patPackedCandidateCollectionContainer_i.vec_mass());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vx", &patPackedCandidateCollectionContainer_i.vec_vx());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vy", &patPackedCandidateCollectionContainer_i.vec_vy());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vz", &patPackedCandidateCollectionContainer_i.vec_vz());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_fromPV", &patPackedCandidateCollectionContainer_i.vec_fromPV());
   }
 
   for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
