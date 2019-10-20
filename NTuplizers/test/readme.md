@@ -5,7 +5,7 @@
 ```
   This will create the file `HLT_JetMETPFlowWithoutPreselV4_cfg.py`
 
-**Step 2**: a produce test NTuple
+**Step 2**: produce a test NTuple
 ```
-cmsRun jmeTriggerNTuple_HLTJetMETPFlowWithoutPreselV4_cfg.py
+cmsRun jmeTriggerNTuple_HLTJetMETPFlowWithoutPreselV4_cfg.py n=10
 ```
