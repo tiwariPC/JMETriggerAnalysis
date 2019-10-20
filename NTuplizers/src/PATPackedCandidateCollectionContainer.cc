@@ -1,4 +1,4 @@
-#include <JMETriggerAnalysis/NTuplizer/interface/PATPackedCandidateCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h>
 
 #include <numeric>
 #include <algorithm>

@@ -1,4 +1,4 @@
-#include <JMETriggerAnalysis/NTuplizer/interface/RecoPFMETCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFMETCollectionContainer.h>
 #include <DataFormats/METReco/interface/PFMET.h>
 
 RecoPFMETCollectionContainer::RecoPFMETCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)

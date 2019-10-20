@@ -1,4 +1,4 @@
-#include <JMETriggerAnalysis/NTuplizer/interface/RecoPFCandidateCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h>
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
 
 #include <numeric>

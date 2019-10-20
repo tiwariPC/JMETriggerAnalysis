@@ -21,7 +21,7 @@ voms-proxy-init --voms cms
 
 Create configuration file to run customized HLT menu on RAW
 ```
-cd JMETriggerAnalysis/NTuplizer/test
+cd JMETriggerAnalysis/NTuplizers/test
 ./create_HLT_JetMETPFlowWithoutPreselV4_cfg.py
 ```
 

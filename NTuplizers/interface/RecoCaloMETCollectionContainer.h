@@ -1,7 +1,7 @@
 #ifndef JMETriggerAnalysis_RecoCaloMETCollectionContainer_h
 #define JMETriggerAnalysis_RecoCaloMETCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
 #include <DataFormats/METReco/interface/CaloMETFwd.h>
 
 #include <vector>

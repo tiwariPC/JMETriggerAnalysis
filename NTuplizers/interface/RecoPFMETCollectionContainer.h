@@ -1,7 +1,7 @@
 #ifndef JMETriggerAnalysis_RecoPFMETCollectionContainer_h
 #define JMETriggerAnalysis_RecoPFMETCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
 #include <DataFormats/METReco/interface/PFMETFwd.h>
 
 #include <vector>

@@ -5,7 +5,7 @@ from HLT_JetMETPFlowWithoutPreselV4_cfg import cms, process
 process.schedule.remove(process.RECOSIMoutput_step)
 
 ### add analysis sequence (JMETrigger NTuple)
-process.JMETriggerNTuple = cms.EDAnalyzer('NTuplizer',
+process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TTreeName = cms.string('Events'),
 
@@ -127,7 +127,7 @@ process.maxEvents.input = opts.n
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
 
-# create TFileService to be accessed by NTuplizer plugin
+# create TFileService to be accessed by JMETriggerNTuple plugin
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
 # select luminosity sections from .json file

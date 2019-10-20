@@ -1,4 +1,4 @@
-#include <JMETriggerAnalysis/NTuplizer/interface/TriggerResultsContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h>
 #include <FWCore/MessageLogger/interface/MessageLogger.h>
 
 TriggerResultsContainer::TriggerResultsContainer(const std::vector<std::string>& names, const std::string& inputTagLabel, const edm::EDGetToken& token)

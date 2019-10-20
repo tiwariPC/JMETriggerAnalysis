@@ -3,16 +3,17 @@
 #include <FWCore/Framework/interface/Event.h>
 #include <FWCore/Framework/interface/MakerMacros.h>
 #include <FWCore/ParameterSet/interface/ParameterSet.h>
+#include <FWCore/MessageLogger/interface/MessageLogger.h>
 #include <FWCore/ServiceRegistry/interface/Service.h>
 #include <CommonTools/UtilAlgos/interface/TFileService.h>
 #include <FWCore/Common/interface/TriggerNames.h>
 #include <DataFormats/Common/interface/TriggerResults.h>
-#include <JMETriggerAnalysis/NTuplizer/interface/TriggerResultsContainer.h>
-#include <JMETriggerAnalysis/NTuplizer/interface/RecoVertexCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizer/interface/RecoPFCandidateCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizer/interface/PATPackedCandidateCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizer/interface/RecoCaloMETCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizer/interface/RecoPFMETCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloMETCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFMETCollectionContainer.h>
 
 #include <string>
 #include <vector>
@@ -21,11 +22,11 @@
 
 #include <TTree.h>
 
-class NTuplizer : public edm::EDAnalyzer {
+class JMETriggerNTuple : public edm::EDAnalyzer {
 
  public:
-  explicit NTuplizer(const edm::ParameterSet&);
-  virtual ~NTuplizer() {}
+  explicit JMETriggerNTuple(const edm::ParameterSet&);
+  virtual ~JMETriggerNTuple() {}
 
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
@@ -62,7 +63,7 @@ class NTuplizer : public edm::EDAnalyzer {
 //!! offline jets
 };
 
-NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
+JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   : TTreeName_(iConfig.getParameter<std::string>("TTreeName"))
   , HLTPathsFilterOR_(iConfig.getParameter<std::vector<std::string> >("HLTPathsFilterOR"))
   , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string> >("outputBranchesToBeDropped")) {
@@ -87,7 +88,7 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
 
       const auto& inputTag = pset_recoVertexCollections.getParameter<edm::InputTag>(label);
 
-      LogDebug("NTuplizer::NTuplizer") << "adding reco::VertexCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::VertexCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<reco::VertexCollection>(inputTag)));
     }
@@ -108,7 +109,7 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
 
       const auto& inputTag = pset_recoPFCandidateCollections.getParameter<edm::InputTag>(label);
 
-      LogDebug("NTuplizer::NTuplizer") << "adding reco::PFCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<reco::PFCandidateCollection>(inputTag)));
       v_recoPFCandidateCollectionContainer_.back().orderByHighestPt(true);
@@ -130,7 +131,7 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
 
       const auto& inputTag = pset_patPackedCandidateCollections.getParameter<edm::InputTag>(label);
 
-      LogDebug("NTuplizer::NTuplizer") << "adding pat::PackedCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::PackedCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<pat::PackedCandidateCollection>(inputTag)));
       v_patPackedCandidateCollectionContainer_.back().orderByHighestPt(true);
@@ -152,7 +153,7 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
 
       const auto& inputTag = pset_recoCaloMETCollections.getParameter<edm::InputTag>(label);
 
-      LogDebug("NTuplizer::NTuplizer") << "adding reco::CaloMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::CaloMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<reco::CaloMETCollection>(inputTag)));
     }
@@ -173,14 +174,14 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
 
       const auto& inputTag = pset_recoPFMETCollections.getParameter<edm::InputTag>(label);
 
-      LogDebug("NTuplizer::NTuplizer") << "adding reco::PFMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<reco::PFMETCollection>(inputTag)));
     }
   }
 }
 
-void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
   run_ = iEvent.id().run();
   luminosityBlock_ = iEvent.id().luminosityBlock();
@@ -192,7 +193,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(not triggerResults_handle.isValid()){
 
-    edm::LogWarning("NTuplizer::analyze")
+    edm::LogWarning("JMETriggerNTuple::analyze")
       << "invalid handle for input collection: \"" << triggerResultsContainer_ptr_->inputTagLabel() << "\" (NTuple branches for HLT paths)";
   }
   else {
@@ -213,7 +214,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
         if(triggerEntry_i.accept){
 
-          LogDebug("NTuplizer::analyze") << "event fired HLT path \"" << triggerEntry_i.name << "\", output collections will be saved to TTree";
+          LogDebug("JMETriggerNTuple::analyze") << "event fired HLT path \"" << triggerEntry_i.name << "\", output collections will be saved to TTree";
 
           keep_event = true;
           break;
@@ -236,7 +237,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if(not i_handle.isValid()){
 
-      edm::LogWarning("NTuplizer::analyze")
+      edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << recoVertexCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoVertexCollectionContainer_i.name() << "_*\")";
     }
@@ -254,7 +255,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if(not i_handle.isValid()){
 
-      edm::LogWarning("NTuplizer::analyze")
+      edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << recoPFCandidateCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoPFCandidateCollectionContainer_i.name() << "_*\")";
     }
@@ -272,7 +273,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if(not i_handle.isValid()){
 
-      edm::LogWarning("NTuplizer::analyze")
+      edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << patPackedCandidateCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << patPackedCandidateCollectionContainer_i.name() << "_*\")";
     }
@@ -290,7 +291,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if(not i_handle.isValid()){
 
-      edm::LogWarning("NTuplizer::analyze")
+      edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: " << recoCaloMETCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoCaloMETCollectionContainer_i.name() << "_*\")";
     }
@@ -308,7 +309,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if(not i_handle.isValid()){
 
-      edm::LogWarning("NTuplizer::analyze")
+      edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << recoPFMETCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoPFMETCollectionContainer_i.name() << "_*\")";
     }
@@ -332,7 +333,7 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   ttree_->Fill();
 }
 
-void NTuplizer::beginJob(){
+void JMETriggerNTuple::beginJob(){
 
   edm::Service<TFileService> fileService;
 
@@ -416,7 +417,7 @@ void NTuplizer::beginJob(){
 }
 
 template <typename... Args>
-void NTuplizer::addBranch(const std::string& branch_name, Args... args){
+void JMETriggerNTuple::addBranch(const std::string& branch_name, Args... args){
 
   if(ttree_){
 
@@ -426,17 +427,17 @@ void NTuplizer::addBranch(const std::string& branch_name, Args... args){
     }
     else {
 
-      edm::LogInfo("NTuplizer::addBranch") << "output branch \"" << branch_name
+      edm::LogInfo("JMETriggerNTuple::addBranch") << "output branch \"" << branch_name
         << "\" will not be created (string appears in data member \"outputBranchesToBeDropped\")";
     }
   }
   else {
 
-    edm::LogWarning("NTuplizer::addBranch") << "pointer to TTree is null, output branch \"" << branch_name << "\" will not be created";
+    edm::LogWarning("JMETriggerNTuple::addBranch") << "pointer to TTree is null, output branch \"" << branch_name << "\" will not be created";
   }
 }
 
-void NTuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
+void JMETriggerNTuple::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
 
   edm::ParameterSetDescription desc;
   desc.setUnknown();
@@ -448,7 +449,7 @@ void NTuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
 
 //  edm::ParameterSetDescription recoCaloMETCollections;
 //  desc.add<edm::ParameterSetDescription>("recoCaloMETCollections", recoCaloMETCollections);
-  descriptions.add("jmeTriggerNTuplizer", desc);
+  descriptions.add("jmeTriggerNTuple", desc);
 }
 
-DEFINE_FWK_MODULE(NTuplizer);
+DEFINE_FWK_MODULE(JMETriggerNTuple);

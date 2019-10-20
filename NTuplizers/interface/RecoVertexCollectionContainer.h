@@ -1,7 +1,7 @@
 #ifndef JMETriggerAnalysis_RecoVertexCollectionContainer_h
 #define JMETriggerAnalysis_RecoVertexCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
 
 #include <vector>

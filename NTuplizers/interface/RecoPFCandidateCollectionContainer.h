@@ -1,7 +1,7 @@
 #ifndef JMETriggerAnalysis_RecoPFCandidateCollectionContainer_h
 #define JMETriggerAnalysis_RecoPFCandidateCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h>
 
 #include <vector>

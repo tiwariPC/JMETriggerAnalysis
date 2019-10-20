@@ -1,4 +1,4 @@
-#include <JMETriggerAnalysis/NTuplizer/interface/RecoVertexCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h>
 #include <DataFormats/VertexReco/interface/Vertex.h>
 
 RecoVertexCollectionContainer::RecoVertexCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)

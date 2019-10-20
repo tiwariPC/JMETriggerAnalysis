@@ -1,7 +1,7 @@
 #ifndef JMETriggerAnalysis_PATPackedCandidateCollectionContainer_h
 #define JMETriggerAnalysis_PATPackedCandidateCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
 #include <DataFormats/PatCandidates/interface/PackedCandidate.h>
 
 #include <vector>

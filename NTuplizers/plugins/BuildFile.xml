@@ -1,0 +1,14 @@
+<export>
+</export>
+<library  name="JMETriggerAnalysisNTuplizers_plugins" file="*.cc">
+    <use name="JMETriggerAnalysis/NTuplizers"/>
+    <use name="FWCore/Framework"/>
+    <use name="FWCore/ParameterSet"/>
+    <use name="FWCore/MessageLogger"/>
+    <use name="FWCore/ServiceRegistry"/>
+    <use name="CommonTools/UtilAlgos"/>
+    <use name="FWCore/Common"/>
+    <use name="DataFormats/Common"/>
+    <use name="rootmath"/>
+    <use name="root"/>
+</library>
