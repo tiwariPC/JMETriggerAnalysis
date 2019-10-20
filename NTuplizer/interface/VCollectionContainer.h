@@ -2,6 +2,7 @@
 #define JMETriggerAnalysis_VCollectionContainer_h
 
 #include <FWCore/Utilities/interface/EDGetToken.h>
+
 #include <string>
 
 template <class T>
@@ -11,7 +12,8 @@ class VCollectionContainer {
   explicit VCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&);
   virtual ~VCollectionContainer() {}
 
-  virtual void fill(const T&) = 0;
+  virtual void clear() = 0;
+  virtual void fill(const T&, const bool clear_before_filling=true) = 0;
 
   void setName(const std::string& str) { name_ = str; }
 
@@ -27,9 +29,6 @@ class VCollectionContainer {
 
 template<class T>
 VCollectionContainer<T>::VCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)
- : name_(name), inputTagLabel_(inputTagLabel), token_(token) {
-
-//  edm::LogWarning("CaloMETCollectionContainer") << label_ << " " << inputTag_.label();
-}
+  : name_(name), inputTagLabel_(inputTagLabel), token_(token) {}
 
 #endif

@@ -7,6 +7,28 @@ process.schedule.remove(process.RECOSIMoutput_step)
 ### add analysis sequence (JMETrigger NTuple)
 process.JMETriggerNTuple = cms.EDAnalyzer('NTuplizer',
 
+  TTreeName = cms.string('Events'),
+
+  TriggerResults = cms.InputTag('TriggerResults'+'::'+process.name_()),
+
+  HLTPathsWithoutVersion = cms.vstring(
+
+    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
+    'HLT_Ele32_WPTight_Gsf',
+    'HLT_IsoMu24',
+    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL',
+    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8',
+    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',
+    'HLT_PFJet80NoCaloJetCut',
+    'HLT_PFMET200NoCaloMETCut_NotCleaned',
+    'HLT_PFMETTypeOne200NoCaloMETCut_HBHE_BeamHaloCleaned',
+  ),
+
+  HLTPathsFilterOR = cms.vstring(
+
+    'HLT_IsoMu24',
+  ),
+
   recoVertexCollections = cms.PSet(
 
     hltPixelVertices = cms.InputTag('hltPixelVertices'+'::'+process.name_()),
@@ -33,7 +55,20 @@ process.JMETriggerNTuple = cms.EDAnalyzer('NTuplizer',
   recoPFMETCollections = cms.PSet(
 
     hltPFMet = cms.InputTag('hltPFMETProducer'+'::'+process.name_()),
-    hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
+    hltPFMetTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
+  ),
+
+  outputBranchesToBeDropped = cms.vstring(
+
+    'hltPixelVertices_isFake',
+    'hltPixelVertices_chi2',
+    'hltPixelVertices_ndof',
+    'hltTrimmedPixelVertices_isFake',
+    'hltTrimmedPixelVertices_chi2',
+    'hltTrimmedPixelVertices_ndof',
+    'offlineSlimmedPrimaryVertices_tracksSize',
+    'hltPFMet_electronEtFraction',
+    'hltPFMetTypeOne_electronEtFraction',
   ),
 )
 

@@ -4,6 +4,8 @@
 #include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
 #include <DataFormats/METReco/interface/PFMETFwd.h>
 
+#include <vector>
+
 class RecoPFMETCollectionContainer : public VCollectionContainer<reco::PFMETCollection> {
 
  public:
@@ -11,7 +13,7 @@ class RecoPFMETCollectionContainer : public VCollectionContainer<reco::PFMETColl
   virtual ~RecoPFMETCollectionContainer() {}
 
   void clear();
-  void fill(const reco::PFMETCollection&);
+  void fill(const reco::PFMETCollection&, const bool clear_before_filling=true);
 
   std::vector<float>& vec_pt(){ return pt_; }
   std::vector<float>& vec_phi(){ return phi_; }

@@ -4,6 +4,8 @@
 #include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
 #include <DataFormats/METReco/interface/CaloMETFwd.h>
 
+#include <vector>
+
 class RecoCaloMETCollectionContainer : public VCollectionContainer<reco::CaloMETCollection> {
 
  public:
@@ -11,7 +13,7 @@ class RecoCaloMETCollectionContainer : public VCollectionContainer<reco::CaloMET
   virtual ~RecoCaloMETCollectionContainer() {}
 
   void clear();
-  void fill(const reco::CaloMETCollection&);
+  void fill(const reco::CaloMETCollection&, const bool clear_before_filling=true);
 
   std::vector<float>& vec_pt(){ return pt_; }
   std::vector<float>& vec_phi(){ return phi_; }

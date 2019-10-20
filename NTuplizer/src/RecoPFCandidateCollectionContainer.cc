@@ -19,7 +19,12 @@ void RecoPFCandidateCollectionContainer::clear(){
   vz_.clear();
 }
 
-void RecoPFCandidateCollectionContainer::fill(const reco::PFCandidateCollection& coll){
+void RecoPFCandidateCollectionContainer::fill(const reco::PFCandidateCollection& coll, const bool clear_before_filling){
+
+  if(clear_before_filling){
+
+    this->clear();
+  }
 
   pdgId_.reserve(coll.size());
   pt_.reserve(coll.size());

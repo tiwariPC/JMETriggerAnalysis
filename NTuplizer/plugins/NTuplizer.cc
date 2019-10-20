@@ -5,20 +5,9 @@
 #include <FWCore/ParameterSet/interface/ParameterSet.h>
 #include <FWCore/ServiceRegistry/interface/Service.h>
 #include <CommonTools/UtilAlgos/interface/TFileService.h>
-#include <SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h>
-#include <SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h>
-#include <SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h>
 #include <FWCore/Common/interface/TriggerNames.h>
 #include <DataFormats/Common/interface/TriggerResults.h>
-#include <DataFormats/Common/interface/EDCollection.h>
-#include <DataFormats/Candidate/interface/Candidate.h>
-#include <DataFormats/VertexReco/interface/Vertex.h>
-#include <DataFormats/HepMCCandidate/interface/GenParticle.h>
-#include <DataFormats/PatCandidates/interface/Muon.h>
-#include <DataFormats/PatCandidates/interface/Electron.h>
-#include <DataFormats/PatCandidates/interface/Jet.h>
-#include <DataFormats/PatCandidates/interface/MET.h>
-
+#include <JMETriggerAnalysis/NTuplizer/interface/TriggerResultsContainer.h>
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoVertexCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoPFCandidateCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoCaloMETCollectionContainer.h>
@@ -43,7 +32,14 @@ class NTuplizer : public edm::EDAnalyzer {
   virtual void beginJob();
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
 
+  template <typename... Args>
+  void addBranch(const std::string&, Args...);
+
   const std::string TTreeName_;
+
+  const std::vector<std::string> HLTPathsFilterOR_;
+
+  const std::vector<std::string> outputBranchesToBeDropped_;
 
   TTree* ttree_ = nullptr;
 
@@ -51,23 +47,28 @@ class NTuplizer : public edm::EDAnalyzer {
   unsigned int luminosityBlock_;
   unsigned long long event_;
 
-//!! triggers
+  std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
+  std::vector<RecoVertexCollectionContainer> v_recoVertexCollectionContainer_;
+  std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
+  std::vector<RecoCaloMETCollectionContainer> v_recoCaloMETCollectionContainer_;
+  std::vector<RecoPFMETCollectionContainer> v_recoPFMETCollectionContainer_;
 
 //!! muons
 //!! electrons
 //!! offline PF
 //!! online jets
 //!! offline jets
-
-  std::vector<RecoVertexCollectionContainer> v_recoVertexCollectionContainer_;
-  std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
-  std::vector<RecoCaloMETCollectionContainer> v_recoCaloMETCollectionContainer_;
-  std::vector<RecoPFMETCollectionContainer> v_recoPFMETCollectionContainer_;
 };
 
-NTuplizer::NTuplizer(const edm::ParameterSet& iConfig) : TTreeName_("Events") {
+NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
+  : TTreeName_(iConfig.getParameter<std::string>("TTreeName"))
+  , HLTPathsFilterOR_(iConfig.getParameter<std::vector<std::string> >("HLTPathsFilterOR"))
+  , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string> >("outputBranchesToBeDropped")) {
 
-//!!  src_hlt_        = consumes<edm::TriggerResults>            (edm::InputTag("TriggerResults::HLT2"));
+  const auto& TriggerResultsInputTag = iConfig.getParameter<edm::InputTag>("TriggerResults");
+  const auto& HLTPathsWithoutVersion = iConfig.getParameter<std::vector<std::string> >("HLTPathsWithoutVersion");
+
+  triggerResultsContainer_ptr_.reset(new TriggerResultsContainer(HLTPathsWithoutVersion, TriggerResultsInputTag.label(), this->consumes<edm::TriggerResults>(TriggerResultsInputTag)));
 
   // reco::VertexCollection
   v_recoVertexCollectionContainer_.clear();
@@ -160,6 +161,49 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   luminosityBlock_ = iEvent.id().luminosityBlock();
   event_ = iEvent.id().event();
 
+  // fill TriggerResultsContainer
+  edm::Handle<edm::TriggerResults> triggerResults_handle;
+  iEvent.getByToken(triggerResultsContainer_ptr_->token(), triggerResults_handle);
+
+  if(not triggerResults_handle.isValid()){
+
+    edm::LogWarning("NTuplizer::analyze")
+      << "invalid handle for input collection: \"" << triggerResultsContainer_ptr_->inputTagLabel() << "\" (NTuple branches for HLT paths)";
+  }
+  else {
+
+    const auto& triggerNames = iEvent.triggerNames(*triggerResults_handle).triggerNames();
+
+    triggerResultsContainer_ptr_->fill(*triggerResults_handle, triggerNames);
+  }
+
+  // exit method for events that do not pass the logical OR of the specified HLT paths (if any)
+  if(HLTPathsFilterOR_.size() > 0){
+
+    bool keep_event(false);
+
+    for(const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()){
+
+      if(std::find(HLTPathsFilterOR_.begin(), HLTPathsFilterOR_.end(), triggerEntry_i.name) != HLTPathsFilterOR_.end()){
+
+        if(triggerEntry_i.accept){
+
+          LogDebug("NTuplizer::analyze") << "event fired HLT path \"" << triggerEntry_i.name << "\", output collections will be saved to TTree";
+
+          keep_event = true;
+          break;
+        }
+      }
+    }
+
+    // if none of the specified HLT paths is fired, return
+    if(not keep_event){
+
+      return;
+    }
+  }
+
+  // fill recoVertexCollectionContainers
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
 
     edm::Handle<reco::VertexCollection> i_handle;
@@ -173,11 +217,11 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     else {
 
-      recoVertexCollectionContainer_i.clear();
       recoVertexCollectionContainer_i.fill(*i_handle);
     }
   }
 
+  // fill recoPFCandidateCollectionContainers
   for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){
 
     edm::Handle<reco::PFCandidateCollection> i_handle;
@@ -191,11 +235,11 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     else {
 
-      recoPFCandidateCollectionContainer_i.clear();
       recoPFCandidateCollectionContainer_i.fill(*i_handle);
     }
   }
 
+  // fill recoCaloMETCollectionContainers
   for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
 
     edm::Handle<reco::CaloMETCollection> i_handle;
@@ -209,11 +253,11 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     else {
 
-      recoCaloMETCollectionContainer_i.clear();
       recoCaloMETCollectionContainer_i.fill(*i_handle);
     }
   }
 
+  // fill recoPFMETCollectionContainers
   for(auto& recoPFMETCollectionContainer_i : v_recoPFMETCollectionContainer_){
 
     edm::Handle<reco::PFMETCollection> i_handle;
@@ -227,16 +271,15 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     else {
 
-      recoPFMETCollectionContainer_i.clear();
       recoPFMETCollectionContainer_i.fill(*i_handle);
 
 //!!      for(uint idx=0; idx<recoPFMETCollectionContainer_i.vec_pt().size(); ++idx){
 //!!
 //!!
-//!!	<< " PHI=" << i_handle->at(idx).phi()
-//!!	<< " VX=" << i_handle->at(idx).vx()
-//!!	<< " VY=" << i_handle->at(idx).vy()
-//!!	<< " VZ=" << i_handle->at(idx).vz();
+//!!<< " PHI=" << i_handle->at(idx).phi()
+//!!<< " VX=" << i_handle->at(idx).vx()
+//!!<< " VY=" << i_handle->at(idx).vy()
+//!!<< " VZ=" << i_handle->at(idx).vz();
 //!!      }
 
     }
@@ -245,17 +288,6 @@ void NTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // fill TTree
   ttree_->Fill();
 }
-
-//!!void NTuplizer::fill_HLT(llj::HLT& hlt_, const edm::TriggerResults& trg_, const edm::Event& evt_) const {
-//!!
-//!!  const std::vector<std::string>& trgNames = evt_.triggerNames(trg_).triggerNames();
-//!!
-//!!  for(unsigned int i=0; i<trg_.size(); ++i){
-//!!    if(trgNames.at(i).find(std::string(#PATH)+"_v") != std::string::npos) hlt_.PATH = trg_.at(i).accept();
-//!!  }
-//!!
-//!!  return;
-//!!}
 
 void NTuplizer::beginJob(){
 
@@ -273,60 +305,91 @@ void NTuplizer::beginJob(){
     throw edm::Exception(edm::errors::Configuration, "failed to create TTree via TFileService::make<TTree>");
   }
 
-  ttree_->Branch("run", &run_);
-  ttree_->Branch("luminosityBlock", &luminosityBlock_);
-  ttree_->Branch("event", &event_);
+  this->addBranch("run", &run_);
+  this->addBranch("luminosityBlock", &luminosityBlock_);
+  this->addBranch("event", &event_);
+
+  for(const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()){
+
+    this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
+  }
 
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
 
-    ttree_->Branch((recoVertexCollectionContainer_i.name()+"_tracksSize").c_str(), &recoVertexCollectionContainer_i.vec_tracksSize());
-    ttree_->Branch((recoVertexCollectionContainer_i.name()+"_isFake").c_str(), &recoVertexCollectionContainer_i.vec_isFake());
-    ttree_->Branch((recoVertexCollectionContainer_i.name()+"_chi2").c_str(), &recoVertexCollectionContainer_i.vec_chi2());
-    ttree_->Branch((recoVertexCollectionContainer_i.name()+"_ndof").c_str(), &recoVertexCollectionContainer_i.vec_ndof());
-    ttree_->Branch((recoVertexCollectionContainer_i.name()+"_x").c_str(), &recoVertexCollectionContainer_i.vec_x());
-    ttree_->Branch((recoVertexCollectionContainer_i.name()+"_y").c_str(), &recoVertexCollectionContainer_i.vec_y());
-    ttree_->Branch((recoVertexCollectionContainer_i.name()+"_z").c_str(), &recoVertexCollectionContainer_i.vec_z());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_tracksSize", &recoVertexCollectionContainer_i.vec_tracksSize());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_isFake", &recoVertexCollectionContainer_i.vec_isFake());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_chi2", &recoVertexCollectionContainer_i.vec_chi2());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_ndof", &recoVertexCollectionContainer_i.vec_ndof());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_x", &recoVertexCollectionContainer_i.vec_x());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_y", &recoVertexCollectionContainer_i.vec_y());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_z", &recoVertexCollectionContainer_i.vec_z());
   }
 
   for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){
 
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_pdgId").c_str(), &recoPFCandidateCollectionContainer_i.vec_pdgId());
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_pt").c_str(), &recoPFCandidateCollectionContainer_i.vec_pt());
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_eta").c_str(), &recoPFCandidateCollectionContainer_i.vec_eta());
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_phi").c_str(), &recoPFCandidateCollectionContainer_i.vec_phi());
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_mass").c_str(), &recoPFCandidateCollectionContainer_i.vec_mass());
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_vx").c_str(), &recoPFCandidateCollectionContainer_i.vec_vx());
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_vy").c_str(), &recoPFCandidateCollectionContainer_i.vec_vy());
-    ttree_->Branch((recoPFCandidateCollectionContainer_i.name()+"_vz").c_str(), &recoPFCandidateCollectionContainer_i.vec_vz());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_pdgId", &recoPFCandidateCollectionContainer_i.vec_pdgId());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_pt", &recoPFCandidateCollectionContainer_i.vec_pt());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_eta", &recoPFCandidateCollectionContainer_i.vec_eta());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_phi", &recoPFCandidateCollectionContainer_i.vec_phi());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_mass", &recoPFCandidateCollectionContainer_i.vec_mass());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vx", &recoPFCandidateCollectionContainer_i.vec_vx());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vy", &recoPFCandidateCollectionContainer_i.vec_vy());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vz", &recoPFCandidateCollectionContainer_i.vec_vz());
   }
 
   for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
 
-    ttree_->Branch((recoCaloMETCollectionContainer_i.name()+"_pt").c_str(), &recoCaloMETCollectionContainer_i.vec_pt());
-    ttree_->Branch((recoCaloMETCollectionContainer_i.name()+"_phi").c_str(), &recoCaloMETCollectionContainer_i.vec_phi());
-    ttree_->Branch((recoCaloMETCollectionContainer_i.name()+"_sumEt").c_str(), &recoCaloMETCollectionContainer_i.vec_sumEt());
+    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_pt", &recoCaloMETCollectionContainer_i.vec_pt());
+    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_phi", &recoCaloMETCollectionContainer_i.vec_phi());
+    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_sumEt", &recoCaloMETCollectionContainer_i.vec_sumEt());
   }
 
   for(auto& recoPFMETCollectionContainer_i : v_recoPFMETCollectionContainer_){
 
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_pt").c_str(), &recoPFMETCollectionContainer_i.vec_pt());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_phi").c_str(), &recoPFMETCollectionContainer_i.vec_phi());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_sumEt").c_str(), &recoPFMETCollectionContainer_i.vec_sumEt());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_photonEtFraction").c_str(), &recoPFMETCollectionContainer_i.vec_photonEtFraction());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_neutralHadronEtFraction").c_str(), &recoPFMETCollectionContainer_i.vec_neutralHadronEtFraction());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_electronEtFraction").c_str(), &recoPFMETCollectionContainer_i.vec_electronEtFraction());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_chargedHadronEtFraction").c_str(), &recoPFMETCollectionContainer_i.vec_chargedHadronEtFraction());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_muonEtFraction").c_str(), &recoPFMETCollectionContainer_i.vec_muonEtFraction());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_HFHadronEtFraction").c_str(), &recoPFMETCollectionContainer_i.vec_HFHadronEtFraction());
-    ttree_->Branch((recoPFMETCollectionContainer_i.name()+"_HFEMEtFraction").c_str(), &recoPFMETCollectionContainer_i.vec_HFEMEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_pt", &recoPFMETCollectionContainer_i.vec_pt());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_phi", &recoPFMETCollectionContainer_i.vec_phi());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_sumEt", &recoPFMETCollectionContainer_i.vec_sumEt());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_photonEtFraction", &recoPFMETCollectionContainer_i.vec_photonEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_neutralHadronEtFraction", &recoPFMETCollectionContainer_i.vec_neutralHadronEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_electronEtFraction", &recoPFMETCollectionContainer_i.vec_electronEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_chargedHadronEtFraction", &recoPFMETCollectionContainer_i.vec_chargedHadronEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_muonEtFraction", &recoPFMETCollectionContainer_i.vec_muonEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_HFHadronEtFraction", &recoPFMETCollectionContainer_i.vec_HFHadronEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_HFEMEtFraction", &recoPFMETCollectionContainer_i.vec_HFEMEtFraction());
+  }
+}
+
+template <typename... Args>
+void NTuplizer::addBranch(const std::string& branch_name, Args... args){
+
+  if(ttree_){
+
+    if(std::find(outputBranchesToBeDropped_.begin(), outputBranchesToBeDropped_.end(), branch_name) == outputBranchesToBeDropped_.end()){
+
+      ttree_->Branch(branch_name.c_str(), args...);
+    }
+    else {
+
+      edm::LogInfo("NTuplizer::addBranch") << "output branch \"" << branch_name
+        << "\" will not be created (string appears in data member \"outputBranchesToBeDropped\")";
+    }
+  }
+  else {
+
+    edm::LogWarning("NTuplizer::addBranch") << "pointer to TTree is null, output branch \"" << branch_name << "\" will not be created";
   }
 }
 
 void NTuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
 
   edm::ParameterSetDescription desc;
-//  desc.add<edm::InputTag>("hltMet", edm::InputTag("hltMet", "", "HLT2"))->setComment("HLT collection \"hltMet\"");
   desc.setUnknown();
+//  desc.add<std::string>("TTreeName", "TTreeName")->setComment("Name of TTree");
+//  desc.add<std::vector<std::string> >("HLTPathsFilterOR")->setComment("List of HLT paths (without version) used in OR to select events in the output TTree");
+//  desc.add<std::vector<std::string> >("outputBranchesToBeDropped")->setComment("Names of branches not to be included in the output TTree");
+//  desc.add<edm::InputTag>("TriggerResults", edm::InputTag("TriggerResults"))->setComment("edm::InputTag for edm::TriggerResults");
+//  desc.add<std::vector<std::string> >("HLTPathsWithoutVersion")->setComment("List of HLT paths (without version) to be saved in the output TTree");
+
 //  edm::ParameterSetDescription recoCaloMETCollections;
 //  desc.add<edm::ParameterSetDescription>("recoCaloMETCollections", recoCaloMETCollections);
   descriptions.add("jmeTriggerNTuplizer", desc);

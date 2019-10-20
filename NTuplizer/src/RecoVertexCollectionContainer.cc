@@ -18,7 +18,12 @@ void RecoVertexCollectionContainer::clear(){
   z_.clear();
 }
 
-void RecoVertexCollectionContainer::fill(const reco::VertexCollection& coll){
+void RecoVertexCollectionContainer::fill(const reco::VertexCollection& coll, const bool clear_before_filling){
+
+  if(clear_before_filling){
+
+    this->clear();
+  }
 
   tracksSize_.reserve(coll.size());
   isFake_.reserve(coll.size());

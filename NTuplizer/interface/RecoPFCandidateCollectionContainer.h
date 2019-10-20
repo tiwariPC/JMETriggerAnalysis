@@ -4,6 +4,8 @@
 #include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h>
 
+#include <vector>
+
 class RecoPFCandidateCollectionContainer : public VCollectionContainer<reco::PFCandidateCollection> {
 
  public:
@@ -11,7 +13,7 @@ class RecoPFCandidateCollectionContainer : public VCollectionContainer<reco::PFC
   virtual ~RecoPFCandidateCollectionContainer() {}
 
   void clear();
-  void fill(const reco::PFCandidateCollection&);
+  void fill(const reco::PFCandidateCollection&, const bool clear_before_filling=true);
 
   std::vector<int>& vec_pdgId(){ return pdgId_; }
   std::vector<float>& vec_pt(){ return pt_; }

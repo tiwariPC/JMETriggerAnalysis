@@ -1,4 +1,5 @@
 <lcgdict>
+  <class name="TriggerResultsContainer"/>
   <class name="RecoVertexCollectionContainer"/>
   <class name="RecoPFCandidateCollectionContainer"/>
   <class name="RecoCaloMETCollectionContainer"/>

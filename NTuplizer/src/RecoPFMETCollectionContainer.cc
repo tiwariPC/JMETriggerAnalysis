@@ -21,7 +21,12 @@ void RecoPFMETCollectionContainer::clear(){
   HFEMEtFraction_.clear();
 }
 
-void RecoPFMETCollectionContainer::fill(const reco::PFMETCollection& coll){
+void RecoPFMETCollectionContainer::fill(const reco::PFMETCollection& coll, const bool clear_before_filling){
+
+  if(clear_before_filling){
+
+    this->clear();
+  }
 
   pt_.reserve(coll.size());
   phi_.reserve(coll.size());

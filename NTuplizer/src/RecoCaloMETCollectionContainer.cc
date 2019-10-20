@@ -14,7 +14,12 @@ void RecoCaloMETCollectionContainer::clear(){
   sumEt_.clear();
 }
 
-void RecoCaloMETCollectionContainer::fill(const reco::CaloMETCollection& coll){
+void RecoCaloMETCollectionContainer::fill(const reco::CaloMETCollection& coll, const bool clear_before_filling){
+
+  if(clear_before_filling){
+
+    this->clear();
+  }
 
   pt_.reserve(coll.size());
   phi_.reserve(coll.size());

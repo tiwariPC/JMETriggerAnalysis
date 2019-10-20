@@ -4,6 +4,8 @@
 #include <JMETriggerAnalysis/NTuplizer/interface/VCollectionContainer.h>
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
 
+#include <vector>
+
 class RecoVertexCollectionContainer : public VCollectionContainer<reco::VertexCollection> {
 
  public:
@@ -11,7 +13,7 @@ class RecoVertexCollectionContainer : public VCollectionContainer<reco::VertexCo
   virtual ~RecoVertexCollectionContainer() {}
 
   void clear();
-  void fill(const reco::VertexCollection&);
+  void fill(const reco::VertexCollection&, const bool clear_before_filling=true);
 
   std::vector<uint>& vec_tracksSize(){ return tracksSize_; }
   std::vector<bool>& vec_isFake(){ return isFake_; }
