@@ -1,9 +1,13 @@
 #include <JMETriggerAnalysis/NTuplizer/interface/RecoPFCandidateCollectionContainer.h>
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
 
-RecoPFCandidateCollectionContainer::RecoPFCandidateCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)
- : VCollectionContainer(name, inputTagLabel, token) {
+#include <numeric>
+#include <algorithm>
 
+RecoPFCandidateCollectionContainer::RecoPFCandidateCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)
+  : VCollectionContainer(name, inputTagLabel, token), orderByHighestPt_(false) {
+
+  idxs_.clear();
   this->clear();
 }
 
@@ -35,7 +39,24 @@ void RecoPFCandidateCollectionContainer::fill(const reco::PFCandidateCollection&
   vy_.reserve(coll.size());
   vz_.reserve(coll.size());
 
-  for(const auto& i_obj : coll){
+  if(orderByHighestPt_){
+
+    idxs_.clear();
+    idxs_.reserve(coll.size());
+
+    // initialize indeces
+    for(uint idx=0; idx<coll.size(); ++idx){
+
+      idxs_.emplace_back(idx);
+    }
+
+    // sort indeces based on pt-ordering
+    std::sort(idxs_.begin(), idxs_.end(), [&coll](const size_t& i1, const size_t& i2){ return coll.at(i1).pt() > coll.at(i2).pt(); });
+  }
+
+  for(uint idx=0; idx<coll.size(); ++idx){
+
+    const auto& i_obj = coll.at(orderByHighestPt_ ? idxs_.at(idx) : idx);
 
     pdgId_.emplace_back(i_obj.pdgId());
     pt_.emplace_back(i_obj.pt());

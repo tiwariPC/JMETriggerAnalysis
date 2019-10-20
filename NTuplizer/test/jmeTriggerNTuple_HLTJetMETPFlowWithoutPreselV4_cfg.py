@@ -89,7 +89,7 @@ process.schedule.extend([process.analysis_step])
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
 
-opts.register('n', -1,
+opts.register('n', 10,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
               'max number of events to process')
@@ -104,10 +104,28 @@ opts.register('lumis', None,
               vpo.VarParsing.varType.string,
               'Path to .json with list of luminosity sections')
 
+opts.register('logs', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'create log files configured via MessageLogger')
+
+opts.register('wantSummary', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'show cmsRun summary at job completion')
+
+opts.register('dumpPython', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'Path to python file with content of cms.Process')
+
 opts.parseArguments()
 
 # max number of events to be processed
 process.maxEvents.input = opts.n
+
+# show cmsRun summary at job completion
+process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
 
 # create TFileService to be accessed by NTuplizer plugin
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
@@ -118,43 +136,49 @@ if opts.lumis is not None:
    process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
 
 # MessageLogger
-process.MessageLogger = cms.Service('MessageLogger',
+if opts.logs:
+   process.MessageLogger = cms.Service('MessageLogger',
+     destinations = cms.untracked.vstring(
+       'cerr',
+       'logError',
+       'logInfo',
+       'logDebug',
+     ),
+     debugModules = cms.untracked.vstring(
+       'JMETriggerNTuple',
+     ),
+     categories = cms.untracked.vstring(
+       'FwkReport',
+     ),
+     cerr = cms.untracked.PSet(
+       threshold = cms.untracked.string('WARNING'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+     logError = cms.untracked.PSet(
+       threshold = cms.untracked.string('ERROR'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+     logInfo = cms.untracked.PSet(
+       threshold = cms.untracked.string('INFO'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+     logDebug = cms.untracked.PSet(
+       threshold = cms.untracked.string('DEBUG'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(1),
+       ),
+     ),
+   )
 
-  destinations = cms.untracked.vstring(
-
-    'cerr',
-    'logError',
-    'logDebug',
-  ),
-
-  debugModules = cms.untracked.vstring(
-
-    'JMETriggerNTuple'.
-  ),
-
-  cerr = cms.untracked.PSet(
-
-    threshold = cms.untracked.string('WARNING'),
-
-    eventNumber = cms.untracked.PSet(
-
-      reportEvery = cms.untracked.int32(1),
-    ),
-  ),
-
-  logError = cms.untracked.PSet(
-
-    threshold = cms.untracked.string('ERROR'),
-    extension = cms.untracked.string('.txt'),
-  ),
-
-  logDebug = cms.untracked.PSet(
-
-    threshold = cms.untracked.string('DEBUG'),
-    extension = cms.untracked.string('.txt'),
-    eventNumber = cms.untracked.PSet(
-
-      reportEvery = cms.untracked.int32(1),
-    ),
-  ),
-)
+# dump content of cms.Process to python file
+if opts.dumpPython is not None:
+   open(opts.dumpPython, 'w').write(process.dumpPython())

@@ -111,6 +111,7 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
       LogDebug("NTuplizer::NTuplizer") << "adding reco::PFCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<reco::PFCandidateCollection>(inputTag)));
+      v_recoPFCandidateCollectionContainer_.back().orderByHighestPt(true);
     }
   }
 
@@ -132,6 +133,7 @@ NTuplizer::NTuplizer(const edm::ParameterSet& iConfig)
       LogDebug("NTuplizer::NTuplizer") << "adding pat::PackedCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<pat::PackedCandidateCollection>(inputTag)));
+      v_patPackedCandidateCollectionContainer_.back().orderByHighestPt(true);
     }
   }
 
