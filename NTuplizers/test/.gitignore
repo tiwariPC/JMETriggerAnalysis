@@ -1,3 +1,5 @@
 HLT_*_cff.py
 HLT_*_cfg.py
 log*.txt
+crab.log
+crab_*/

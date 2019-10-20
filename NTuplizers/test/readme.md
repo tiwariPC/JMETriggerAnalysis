@@ -1,4 +1,3 @@
-
 **Step 1**: create configuration file to run customized HLT menu on RAW Data:
 ```
 ./create_HLT_JetMETPFlowWithoutPreselV4_cfg.sh
