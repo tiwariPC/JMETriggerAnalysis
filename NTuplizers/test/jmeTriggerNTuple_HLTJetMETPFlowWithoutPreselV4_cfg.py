@@ -5,6 +5,52 @@ from HLT_JetMETPFlowWithoutPreselV4_cfg import cms, process
 process.schedule.remove(process.RECOSIMoutput_step)
 
 ### add analysis sequence (JMETrigger NTuple)
+process.analysisCollectionsSequence = cms.Sequence()
+
+## Muons
+process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
+process.analysisCollectionsSequence *= process.userMuonsSequence
+
+## Electrons
+#from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+#setupEgammaPostRecoSeq(process, runVID=True, runEnergyCorrections=False, era='2018-Prompt', phoIDModules=[])
+#process.analysisCollectionsSequence *= process.egammaPostRecoSeq
+
+process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
+process.analysisCollectionsSequence *= process.userElectronsSequence
+
+### Event Selection
+#from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
+#
+#process.eventSelMuons = selectedPatMuons.clone(
+#  src = 'userIsolatedMuons',
+#  cut = 'pt>27 && userInt("IDMedium") && userFloat("pfIsoR04") < 0.25',
+#)
+#
+#from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
+#
+#process.eventSelElectrons = selectedPatElectrons.clone(
+#  src = 'userIsolatedElectrons',
+#  cut = 'pt>35 && userInt("IDCutBasedMedium")',
+#)
+#
+#process.eventSelLeptons = cms.EDProducer('CandViewMerger',
+#  src = cms.VInputTag('eventSelMuons', 'eventSelElectrons'),
+#)
+#
+#process.eventSelOneLepton = cms.EDFilter('CandViewCountFilter',
+#  src = cms.InputTag('eventSelLeptons'),
+#  minNumber = cms.uint32(1),
+#)
+#
+#process.analysisCollectionsSequence *= cms.Sequence(
+#    process.eventSelMuons
+#  * process.eventSelElectrons
+#  * process.eventSelLeptons
+#  * process.eventSelOneLepton
+#)
+
+## JMETrigger NTuple
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TTreeName = cms.string('Events'),
@@ -27,13 +73,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   HLTPathsFilterOR = cms.vstring(
 
     'HLT_IsoMu24',
+    'HLT_Ele32_WPTight_Gsf',
   ),
 
   recoVertexCollections = cms.PSet(
 
     hltPixelVertices = cms.InputTag('hltPixelVertices'+'::'+process.name_()),
     hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'+'::'+process.name_()),
-    offlineSlimmedPrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
   ),
 
   recoPFCandidateCollections = cms.PSet(
@@ -43,7 +90,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patPackedCandidateCollections = cms.PSet(
 
-    packedPFCandidates = cms.InputTag('packedPFCandidates'),
+    offlinePFCandidates = cms.InputTag('packedPFCandidates'),
   ),
 
 #  recoPFJetCollections = cms.PSet(
@@ -65,8 +112,18 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patMETCollections = cms.PSet(
 
-    slimmedMETs = cms.InputTag('slimmedMETs'),
-    slimmedMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
+    offlineMETs = cms.InputTag('slimmedMETs'),
+    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
+  ),
+
+  patMuonCollections = cms.PSet(
+
+    offlineIsolatedMuons = cms.InputTag('userIsolatedMuons'),
+  ),
+
+  patElectronCollections = cms.PSet(
+
+    offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
@@ -79,20 +136,19 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'hltTrimmedPixelVertices_chi2',
     'hltTrimmedPixelVertices_ndof',
 
-    'offlineSlimmedPrimaryVertices_tracksSize',
+    'offlinePrimaryVertices_tracksSize',
 
     'hltPFMet_ChargedEMEtFraction',
     'hltPFMetTypeOne_ChargedEMEtFraction',
   ),
 )
 
-process.analysisSequence = cms.Sequence(
-  process.JMETriggerNTuple
-)
+process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
+process.analysisCollectionsSchedule = cms.Schedule(process.analysisCollectionsPath)
+process.schedule.extend(process.analysisCollectionsSchedule)
 
-process.analysis_step = cms.EndPath(process.analysisSequence)
-
-process.schedule.extend([process.analysis_step])
+process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
+process.schedule.extend([process.analysisNTupleEndPath])
 
 ### command-line arguments
 import FWCore.ParameterSet.VarParsing as vpo
