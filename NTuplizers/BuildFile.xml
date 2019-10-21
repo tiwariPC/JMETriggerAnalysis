@@ -2,6 +2,7 @@
 <use name="DataFormats/VertexReco"/>
 <use name="DataFormats/ParticleFlowCandidate"/>
 <use name="DataFormats/PatCandidates"/>
+<use name="DataFormats/JetReco"/>
 <use name="DataFormats/METReco"/>
 <use name="rootmath"/>
 <use name="root"/>

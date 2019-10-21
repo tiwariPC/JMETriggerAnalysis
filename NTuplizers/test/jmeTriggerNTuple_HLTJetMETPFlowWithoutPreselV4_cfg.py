@@ -19,6 +19,10 @@ process.analysisCollectionsSequence *= process.userMuonsSequence
 process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
 process.analysisCollectionsSequence *= process.userElectronsSequence
 
+## Jets
+process.load('JMETriggerAnalysis.NTuplizers.userJets_cff')
+process.analysisCollectionsSequence *= process.userJetsSequence
+
 ### Event Selection
 #from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
 #
@@ -72,8 +76,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   HLTPathsFilterOR = cms.vstring(
 
-    'HLT_IsoMu24',
-    'HLT_Ele32_WPTight_Gsf',
+#    'HLT_IsoMu24',
+#    'HLT_Ele32_WPTight_Gsf',
   ),
 
   recoVertexCollections = cms.PSet(
@@ -93,10 +97,15 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlinePFCandidates = cms.InputTag('packedPFCandidates'),
   ),
 
-#  recoPFJetCollections = cms.PSet(
-#
-#    hltAK4PFJets = cms.InputTag('hltAK4PFJets'+'::'+process.name_()),
-#  ),
+  recoPFJetCollections = cms.PSet(
+
+    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'+'::'+process.name_()),
+  ),
+
+  patJetCollections = cms.PSet(
+
+    offlineAK4PFCHSJetsCorrectedPt10 = cms.InputTag('userAK4PFCHSJetsPt10'+'::'+process.name_()),
+  ),
 
   recoCaloMETCollections = cms.PSet(
 
@@ -118,12 +127,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patMuonCollections = cms.PSet(
 
-    offlineIsolatedMuons = cms.InputTag('userIsolatedMuons'),
+    offlineIsolatedMuons = cms.InputTag('userIsolatedMuons'+'::'+process.name_()),
   ),
 
   patElectronCollections = cms.PSet(
 
-    offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'),
+    offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'+'::'+process.name_()),
   ),
 
   outputBranchesToBeDropped = cms.vstring(

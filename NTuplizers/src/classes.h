@@ -2,6 +2,8 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFJetCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/PATJetCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloMETCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoPFMETCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/PATMETCollectionContainer.h>
@@ -16,6 +18,8 @@ namespace {
     RecoVertexCollectionContainer RecoVertexCollectionContainer1;
     RecoPFCandidateCollectionContainer RecoPFCandidateCollectionContainer1;
     PATPackedCandidateCollectionContainer PATPackedCandidateCollectionContainer1;
+    RecoPFJetCollectionContainer RecoPFJetCollectionContainer1;
+    PATJetCollectionContainer PATJetCollectionContainer1;
     RecoCaloMETCollectionContainer RecoCaloMETCollectionContainer1;
     RecoPFMETCollectionContainer RecoPFMETCollectionContainer1;
     PATMETCollectionContainer PATMETCollectionContainer1;
