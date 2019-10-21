@@ -3,7 +3,7 @@ JMETriggerAnalysis
 
 CMSSW Packages for JetMET Trigger Studies
 
-# Setup
+### Setup
 
 Set up CMSSW area:
 
@@ -31,7 +31,7 @@ cd JMETriggerAnalysis/NTuplizers/test
 ./create_HLT_JetMETPFlowWithoutPreselV4_cfg.py
 ```
 
-# Notes
+### Notes
 
 * Golden JSON for 2018 (PromptReco):
 ```shell
