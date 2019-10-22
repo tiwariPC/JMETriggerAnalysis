@@ -1,21 +1,18 @@
 #ifndef JMETriggerAnalysis_PATPackedCandidateCollectionContainer_h
 #define JMETriggerAnalysis_PATPackedCandidateCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VRecoCandidateCollectionContainer.h>
 #include <DataFormats/PatCandidates/interface/PackedCandidate.h>
 
-#include <vector>
-
-class PATPackedCandidateCollectionContainer : public VCollectionContainer<pat::PackedCandidateCollection> {
+class PATPackedCandidateCollectionContainer : public VRecoCandidateCollectionContainer<pat::PackedCandidate> {
 
  public:
-  explicit PATPackedCandidateCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&);
+  explicit PATPackedCandidateCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
   virtual ~PATPackedCandidateCollectionContainer() {}
 
   void clear();
-  void fill(const pat::PackedCandidateCollection&, const bool clear_before_filling=true);
-
-  void orderByHighestPt(const bool foo){ orderByHighestPt_ = foo; }
+  void reserve(const size_t);
+  void emplace_back(const pat::PackedCandidate&);
 
   std::vector<int>& vec_pdgId(){ return pdgId_; }
   std::vector<float>& vec_pt(){ return pt_; }
@@ -28,11 +25,6 @@ class PATPackedCandidateCollectionContainer : public VCollectionContainer<pat::P
   std::vector<int>& vec_fromPV(){ return fromPV_; }
 
  protected:
-  bool orderByHighestPt_;
-
-  // vector of indeces (used for ordering)
-  std::vector<size_t> idxs_;
-
   std::vector<int> pdgId_;
   std::vector<float> pt_;
   std::vector<float> eta_;

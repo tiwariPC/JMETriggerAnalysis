@@ -1,19 +1,18 @@
 #ifndef JMETriggerAnalysis_PATMETCollectionContainer_h
 #define JMETriggerAnalysis_PATMETCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VRecoCandidateCollectionContainer.h>
 #include <DataFormats/PatCandidates/interface/MET.h>
 
-#include <vector>
-
-class PATMETCollectionContainer : public VCollectionContainer<pat::METCollection> {
+class PATMETCollectionContainer : public VRecoCandidateCollectionContainer<pat::MET> {
 
  public:
-  explicit PATMETCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&);
+  explicit PATMETCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
   virtual ~PATMETCollectionContainer() {}
 
   void clear();
-  void fill(const pat::METCollection&, const bool clear_before_filling=true);
+  void reserve(const size_t);
+  void emplace_back(const pat::MET&);
 
   std::vector<float>& vec_Raw_pt(){ return Raw_pt_; }
   std::vector<float>& vec_Raw_phi(){ return Raw_phi_; }

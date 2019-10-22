@@ -4,6 +4,7 @@
 #include <FWCore/Framework/interface/MakerMacros.h>
 #include <FWCore/ParameterSet/interface/ParameterSet.h>
 #include <FWCore/MessageLogger/interface/MessageLogger.h>
+#include <FWCore/Utilities/interface/Exception.h>
 #include <FWCore/ServiceRegistry/interface/Service.h>
 #include <CommonTools/UtilAlgos/interface/TFileService.h>
 #include <FWCore/Common/interface/TriggerNames.h>
@@ -94,7 +95,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::VertexCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<reco::VertexCollection>(inputTag)));
+      v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<reco::Vertex>(inputTag)));
     }
   }
 
@@ -115,7 +116,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<reco::PFCandidateCollection>(inputTag)));
+      v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<reco::PFCandidate>(inputTag)));
       v_recoPFCandidateCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -137,7 +138,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::PackedCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<pat::PackedCandidateCollection>(inputTag)));
+      v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<pat::PackedCandidate>(inputTag)));
       v_patPackedCandidateCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -159,7 +160,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFJetCollectionContainer_.emplace_back(RecoPFJetCollectionContainer(label, inputTag.label(), this->consumes<reco::PFJetCollection>(inputTag)));
+      v_recoPFJetCollectionContainer_.emplace_back(RecoPFJetCollectionContainer(label, inputTag.label(), this->consumes<reco::PFJet>(inputTag)));
     }
   }
 
@@ -180,7 +181,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::JetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patJetCollectionContainer_.emplace_back(PATJetCollectionContainer(label, inputTag.label(), this->consumes<pat::JetCollection>(inputTag)));
+      v_patJetCollectionContainer_.emplace_back(PATJetCollectionContainer(label, inputTag.label(), this->consumes<pat::Jet>(inputTag)));
     }
   }
 
@@ -201,7 +202,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::CaloMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<reco::CaloMETCollection>(inputTag)));
+      v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<reco::CaloMET>(inputTag)));
     }
   }
 
@@ -222,7 +223,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<reco::PFMETCollection>(inputTag)));
+      v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<reco::PFMET>(inputTag)));
     }
   }
 
@@ -243,7 +244,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::METCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<pat::METCollection>(inputTag)));
+      v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<pat::MET>(inputTag)));
     }
   }
 
@@ -264,7 +265,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::MuonCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patMuonCollectionContainer_.emplace_back(PATMuonCollectionContainer(label, inputTag.label(), this->consumes<pat::MuonCollection>(inputTag)));
+      v_patMuonCollectionContainer_.emplace_back(PATMuonCollectionContainer(label, inputTag.label(), this->consumes<pat::Muon>(inputTag)));
       v_patMuonCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -286,7 +287,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::ElectronCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patElectronCollectionContainer_.emplace_back(PATElectronCollectionContainer(label, inputTag.label(), this->consumes<pat::ElectronCollection>(inputTag)));
+      v_patElectronCollectionContainer_.emplace_back(PATElectronCollectionContainer(label, inputTag.label(), this->consumes<pat::Electron>(inputTag)));
       v_patElectronCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -345,7 +346,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoVertexCollectionContainers
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
 
-    edm::Handle<reco::VertexCollection> i_handle;
+    edm::Handle<std::vector<reco::Vertex> > i_handle;
     iEvent.getByToken(recoVertexCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -365,7 +366,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoPFCandidateCollectionContainers
   for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){
 
-    edm::Handle<reco::PFCandidateCollection> i_handle;
+    edm::Handle<std::vector<reco::PFCandidate> > i_handle;
     iEvent.getByToken(recoPFCandidateCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -385,7 +386,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patPackedCandidateCollectionContainers
   for(auto& patPackedCandidateCollectionContainer_i : v_patPackedCandidateCollectionContainer_){
 
-    edm::Handle<pat::PackedCandidateCollection> i_handle;
+    edm::Handle<std::vector<pat::PackedCandidate> > i_handle;
     iEvent.getByToken(patPackedCandidateCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -405,7 +406,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoPFJetCollectionContainers
   for(auto& recoPFJetCollectionContainer_i : v_recoPFJetCollectionContainer_){
 
-    edm::Handle<reco::PFJetCollection> i_handle;
+    edm::Handle<std::vector<reco::PFJet> > i_handle;
     iEvent.getByToken(recoPFJetCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -425,7 +426,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patJetCollectionContainers
   for(auto& patJetCollectionContainer_i : v_patJetCollectionContainer_){
 
-    edm::Handle<pat::JetCollection> i_handle;
+    edm::Handle<std::vector<pat::Jet> > i_handle;
     iEvent.getByToken(patJetCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -445,7 +446,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoCaloMETCollectionContainers
   for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
 
-    edm::Handle<reco::CaloMETCollection> i_handle;
+    edm::Handle<std::vector<reco::CaloMET> > i_handle;
     iEvent.getByToken(recoCaloMETCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -465,7 +466,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoPFMETCollectionContainers
   for(auto& recoPFMETCollectionContainer_i : v_recoPFMETCollectionContainer_){
 
-    edm::Handle<reco::PFMETCollection> i_handle;
+    edm::Handle<std::vector<reco::PFMET> > i_handle;
     iEvent.getByToken(recoPFMETCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -485,7 +486,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patMETCollectionContainers
   for(auto& patMETCollectionContainer_i : v_patMETCollectionContainer_){
 
-    edm::Handle<pat::METCollection> i_handle;
+    edm::Handle<std::vector<pat::MET> > i_handle;
     iEvent.getByToken(patMETCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -505,7 +506,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patMuonCollectionContainers
   for(auto& patMuonCollectionContainer_i : v_patMuonCollectionContainer_){
 
-    edm::Handle<pat::MuonCollection> i_handle;
+    edm::Handle<std::vector<pat::Muon> > i_handle;
     iEvent.getByToken(patMuonCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -525,7 +526,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patElectronCollectionContainers
   for(auto& patElectronCollectionContainer_i : v_patElectronCollectionContainer_){
 
-    edm::Handle<pat::ElectronCollection> i_handle;
+    edm::Handle<std::vector<pat::Electron> > i_handle;
     iEvent.getByToken(patElectronCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -705,7 +706,15 @@ void JMETriggerNTuple::addBranch(const std::string& branch_name, Args... args){
 
     if(std::find(outputBranchesToBeDropped_.begin(), outputBranchesToBeDropped_.end(), branch_name) == outputBranchesToBeDropped_.end()){
 
-      ttree_->Branch(branch_name.c_str(), args...);
+      if(ttree_->GetBranch(branch_name.c_str())){
+
+        throw cms::Exception("JMETriggerNTuple::addBranch") << "output branch \"" << branch_name
+          << "\" already exists (there was an attempt to create another TBranch with the same name)";
+      }
+      else {
+
+        ttree_->Branch(branch_name.c_str(), args...);
+      }
     }
     else {
 

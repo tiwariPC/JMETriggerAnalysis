@@ -1,10 +1,8 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloMETCollectionContainer.h>
-#include <DataFormats/METReco/interface/CaloMET.h>
 
-RecoCaloMETCollectionContainer::RecoCaloMETCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)
- : VCollectionContainer(name, inputTagLabel, token) {
-
-  this->clear();
+RecoCaloMETCollectionContainer::RecoCaloMETCollectionContainer(
+  const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token, const std::string& strCut, const bool orderByHighestPt
+) : VRecoCandidateCollectionContainer(name, inputTagLabel, token, strCut, orderByHighestPt) {
 }
 
 void RecoCaloMETCollectionContainer::clear(){
@@ -14,21 +12,16 @@ void RecoCaloMETCollectionContainer::clear(){
   sumEt_.clear();
 }
 
-void RecoCaloMETCollectionContainer::fill(const reco::CaloMETCollection& coll, const bool clear_before_filling){
+void RecoCaloMETCollectionContainer::reserve(const size_t vec_size){
 
-  if(clear_before_filling){
+  pt_.reserve(vec_size);
+  phi_.reserve(vec_size);
+  sumEt_.reserve(vec_size);
+}
 
-    this->clear();
-  }
+void RecoCaloMETCollectionContainer::emplace_back(const reco::CaloMET& obj){
 
-  pt_.reserve(coll.size());
-  phi_.reserve(coll.size());
-  sumEt_.reserve(coll.size());
-
-  for(const auto& i_obj : coll){
-
-    pt_.emplace_back(i_obj.pt());
-    phi_.emplace_back(i_obj.phi());
-    sumEt_.emplace_back(i_obj.sumEt());
-  }
+  pt_.emplace_back(obj.pt());
+  phi_.emplace_back(obj.phi());
+  sumEt_.emplace_back(obj.sumEt());
 }

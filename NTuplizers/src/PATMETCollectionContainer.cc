@@ -1,9 +1,8 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/PATMETCollectionContainer.h>
 
-PATMETCollectionContainer::PATMETCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)
- : VCollectionContainer(name, inputTagLabel, token) {
-
-  this->clear();
+PATMETCollectionContainer::PATMETCollectionContainer(
+  const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token, const std::string& strCut, const bool orderByHighestPt
+) : VRecoCandidateCollectionContainer(name, inputTagLabel, token, strCut, orderByHighestPt) {
 }
 
 void PATMETCollectionContainer::clear(){
@@ -26,47 +25,42 @@ void PATMETCollectionContainer::clear(){
   Type7EtFraction_.clear();
 }
 
-void PATMETCollectionContainer::fill(const pat::METCollection& coll, const bool clear_before_filling){
+void PATMETCollectionContainer::reserve(const size_t vec_size){
 
-  if(clear_before_filling){
+  Raw_pt_.reserve(vec_size);
+  Raw_phi_.reserve(vec_size);
+  Raw_sumEt_.reserve(vec_size);
+  Type1_pt_.reserve(vec_size);
+  Type1_phi_.reserve(vec_size);
+  Type1_sumEt_.reserve(vec_size);
+  Type1XY_pt_.reserve(vec_size);
+  Type1XY_phi_.reserve(vec_size);
+  Type1XY_sumEt_.reserve(vec_size);
+  NeutralEMFraction_.reserve(vec_size);
+  NeutralHadEtFraction_.reserve(vec_size);
+  ChargedEMEtFraction_.reserve(vec_size);
+  ChargedHadEtFraction_.reserve(vec_size);
+  MuonEtFraction_.reserve(vec_size);
+  Type6EtFraction_.reserve(vec_size);
+  Type7EtFraction_.reserve(vec_size);
+}
 
-    this->clear();
-  }
+void PATMETCollectionContainer::emplace_back(const pat::MET& obj){
 
-  Raw_pt_.reserve(coll.size());
-  Raw_phi_.reserve(coll.size());
-  Raw_sumEt_.reserve(coll.size());
-  Type1_pt_.reserve(coll.size());
-  Type1_phi_.reserve(coll.size());
-  Type1_sumEt_.reserve(coll.size());
-  Type1XY_pt_.reserve(coll.size());
-  Type1XY_phi_.reserve(coll.size());
-  Type1XY_sumEt_.reserve(coll.size());
-  NeutralEMFraction_.reserve(coll.size());
-  NeutralHadEtFraction_.reserve(coll.size());
-  ChargedEMEtFraction_.reserve(coll.size());
-  ChargedHadEtFraction_.reserve(coll.size());
-  MuonEtFraction_.reserve(coll.size());
-  Type6EtFraction_.reserve(coll.size());
-  Type7EtFraction_.reserve(coll.size());
-
-  for(const auto& i_obj : coll){
-
-    Raw_pt_.emplace_back(i_obj.shiftedPt(pat::MET::NoShift, pat::MET::Raw));
-    Raw_phi_.emplace_back(i_obj.shiftedPhi(pat::MET::NoShift, pat::MET::Raw));
-    Raw_sumEt_.emplace_back(i_obj.shiftedSumEt(pat::MET::NoShift, pat::MET::Raw));
-    Type1_pt_.emplace_back(i_obj.shiftedPt(pat::MET::NoShift, pat::MET::Type1));
-    Type1_phi_.emplace_back(i_obj.shiftedPhi(pat::MET::NoShift, pat::MET::Type1));
-    Type1_sumEt_.emplace_back(i_obj.shiftedSumEt(pat::MET::NoShift, pat::MET::Type1));
-    Type1XY_pt_.emplace_back(i_obj.shiftedPt(pat::MET::NoShift, pat::MET::Type1XY));
-    Type1XY_phi_.emplace_back(i_obj.shiftedPhi(pat::MET::NoShift, pat::MET::Type1XY));
-    Type1XY_sumEt_.emplace_back(i_obj.shiftedSumEt(pat::MET::NoShift, pat::MET::Type1XY));
-    NeutralEMFraction_.emplace_back(i_obj.NeutralEMFraction());
-    NeutralHadEtFraction_.emplace_back(i_obj.NeutralHadEtFraction());
-    ChargedEMEtFraction_.emplace_back(i_obj.ChargedEMEtFraction());
-    ChargedHadEtFraction_.emplace_back(i_obj.ChargedHadEtFraction());
-    MuonEtFraction_.emplace_back(i_obj.MuonEtFraction());
-    Type6EtFraction_.emplace_back(i_obj.Type6EtFraction());
-    Type7EtFraction_.emplace_back(i_obj.Type7EtFraction());
-  }
+  Raw_pt_.emplace_back(obj.shiftedPt(pat::MET::NoShift, pat::MET::Raw));
+  Raw_phi_.emplace_back(obj.shiftedPhi(pat::MET::NoShift, pat::MET::Raw));
+  Raw_sumEt_.emplace_back(obj.shiftedSumEt(pat::MET::NoShift, pat::MET::Raw));
+  Type1_pt_.emplace_back(obj.shiftedPt(pat::MET::NoShift, pat::MET::Type1));
+  Type1_phi_.emplace_back(obj.shiftedPhi(pat::MET::NoShift, pat::MET::Type1));
+  Type1_sumEt_.emplace_back(obj.shiftedSumEt(pat::MET::NoShift, pat::MET::Type1));
+  Type1XY_pt_.emplace_back(obj.shiftedPt(pat::MET::NoShift, pat::MET::Type1XY));
+  Type1XY_phi_.emplace_back(obj.shiftedPhi(pat::MET::NoShift, pat::MET::Type1XY));
+  Type1XY_sumEt_.emplace_back(obj.shiftedSumEt(pat::MET::NoShift, pat::MET::Type1XY));
+  NeutralEMFraction_.emplace_back(obj.NeutralEMFraction());
+  NeutralHadEtFraction_.emplace_back(obj.NeutralHadEtFraction());
+  ChargedEMEtFraction_.emplace_back(obj.ChargedEMEtFraction());
+  ChargedHadEtFraction_.emplace_back(obj.ChargedHadEtFraction());
+  MuonEtFraction_.emplace_back(obj.MuonEtFraction());
+  Type6EtFraction_.emplace_back(obj.Type6EtFraction());
+  Type7EtFraction_.emplace_back(obj.Type7EtFraction());
 }

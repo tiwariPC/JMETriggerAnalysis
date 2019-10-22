@@ -1,21 +1,20 @@
 #ifndef JMETriggerAnalysis_PATMuonCollectionContainer_h
 #define JMETriggerAnalysis_PATMuonCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VRecoCandidateCollectionContainer.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
 
 #include <vector>
 
-class PATMuonCollectionContainer : public VCollectionContainer<pat::MuonCollection> {
+class PATMuonCollectionContainer : public VRecoCandidateCollectionContainer<pat::Muon> {
 
  public:
-  explicit PATMuonCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&);
+  explicit PATMuonCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
   virtual ~PATMuonCollectionContainer() {}
 
   void clear();
-  void fill(const pat::MuonCollection&, const bool clear_before_filling=true);
-
-  void orderByHighestPt(const bool foo){ orderByHighestPt_ = foo; }
+  void reserve(const size_t);
+  void emplace_back(const pat::Muon&);
 
   std::vector<int>& vec_pdgId(){ return pdgId_; }
   std::vector<float>& vec_pt(){ return pt_; }
@@ -31,11 +30,6 @@ class PATMuonCollectionContainer : public VCollectionContainer<pat::MuonCollecti
   std::vector<float>& vec_pfIso(){ return pfIso_; }
 
  protected:
-  bool orderByHighestPt_;
-
-  // vector of indeces (used for ordering)
-  std::vector<size_t> idxs_;
-
   std::vector<int> pdgId_;
   std::vector<float> pt_;
   std::vector<float> eta_;

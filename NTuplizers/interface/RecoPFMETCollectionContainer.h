@@ -1,19 +1,18 @@
 #ifndef JMETriggerAnalysis_RecoPFMETCollectionContainer_h
 #define JMETriggerAnalysis_RecoPFMETCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
-#include <DataFormats/METReco/interface/PFMETFwd.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VRecoCandidateCollectionContainer.h>
+#include <DataFormats/METReco/interface/PFMET.h>
 
-#include <vector>
-
-class RecoPFMETCollectionContainer : public VCollectionContainer<reco::PFMETCollection> {
+class RecoPFMETCollectionContainer : public VRecoCandidateCollectionContainer<reco::PFMET> {
 
  public:
-  explicit RecoPFMETCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&);
+  explicit RecoPFMETCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
   virtual ~RecoPFMETCollectionContainer() {}
 
   void clear();
-  void fill(const reco::PFMETCollection&, const bool clear_before_filling=true);
+  void reserve(const size_t);
+  void emplace_back(const reco::PFMET&);
 
   std::vector<float>& vec_pt(){ return pt_; }
   std::vector<float>& vec_phi(){ return phi_; }

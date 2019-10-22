@@ -1,21 +1,18 @@
 #ifndef JMETriggerAnalysis_PATElectronCollectionContainer_h
 #define JMETriggerAnalysis_PATElectronCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VRecoCandidateCollectionContainer.h>
 #include <DataFormats/PatCandidates/interface/Electron.h>
 
-#include <vector>
-
-class PATElectronCollectionContainer : public VCollectionContainer<pat::ElectronCollection> {
+class PATElectronCollectionContainer : public VRecoCandidateCollectionContainer<pat::Electron> {
 
  public:
-  explicit PATElectronCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&);
+  explicit PATElectronCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
   virtual ~PATElectronCollectionContainer() {}
 
   void clear();
-  void fill(const pat::ElectronCollection&, const bool clear_before_filling=true);
-
-  void orderByHighestPt(const bool foo){ orderByHighestPt_ = foo; }
+  void reserve(const size_t);
+  void emplace_back(const pat::Electron&);
 
   std::vector<int>& vec_pdgId(){ return pdgId_; }
   std::vector<float>& vec_pt(){ return pt_; }
@@ -32,11 +29,6 @@ class PATElectronCollectionContainer : public VCollectionContainer<pat::Electron
   std::vector<float>& vec_etaSC(){ return etaSC_; }
 
  protected:
-  bool orderByHighestPt_;
-
-  // vector of indeces (used for ordering)
-  std::vector<size_t> idxs_;
-
   std::vector<int> pdgId_;
   std::vector<float> pt_;
   std::vector<float> eta_;

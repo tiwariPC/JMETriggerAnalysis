@@ -1,21 +1,18 @@
 #ifndef JMETriggerAnalysis_RecoPFCandidateCollectionContainer_h
 #define JMETriggerAnalysis_RecoPFCandidateCollectionContainer_h
 
-#include <JMETriggerAnalysis/NTuplizers/interface/VCollectionContainer.h>
-#include <DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/VRecoCandidateCollectionContainer.h>
+#include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
 
-#include <vector>
-
-class RecoPFCandidateCollectionContainer : public VCollectionContainer<reco::PFCandidateCollection> {
+class RecoPFCandidateCollectionContainer : public VRecoCandidateCollectionContainer<reco::PFCandidate> {
 
  public:
-  explicit RecoPFCandidateCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&);
+  explicit RecoPFCandidateCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
   virtual ~RecoPFCandidateCollectionContainer() {}
 
   void clear();
-  void fill(const reco::PFCandidateCollection&, const bool clear_before_filling=true);
-
-  void orderByHighestPt(const bool foo){ orderByHighestPt_ = foo; }
+  void reserve(const size_t);
+  void emplace_back(const reco::PFCandidate&);
 
   std::vector<int>& vec_pdgId(){ return pdgId_; }
   std::vector<float>& vec_pt(){ return pt_; }
@@ -27,11 +24,6 @@ class RecoPFCandidateCollectionContainer : public VCollectionContainer<reco::PFC
   std::vector<float>& vec_vz(){ return vz_; }
 
  protected:
-  bool orderByHighestPt_;
-
-  // vector of indeces (used for ordering)
-  std::vector<size_t> idxs_;
-
   std::vector<int> pdgId_;
   std::vector<float> pt_;
   std::vector<float> eta_;

@@ -1,10 +1,8 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h>
-#include <DataFormats/VertexReco/interface/Vertex.h>
 
-RecoVertexCollectionContainer::RecoVertexCollectionContainer(const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token)
- : VCollectionContainer(name, inputTagLabel, token) {
-
-  this->clear();
+RecoVertexCollectionContainer::RecoVertexCollectionContainer(
+  const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token, const std::string& strCut
+) : VCollectionContainer(name, inputTagLabel, token, strCut) {
 }
 
 void RecoVertexCollectionContainer::clear(){
@@ -18,29 +16,24 @@ void RecoVertexCollectionContainer::clear(){
   z_.clear();
 }
 
-void RecoVertexCollectionContainer::fill(const reco::VertexCollection& coll, const bool clear_before_filling){
+void RecoVertexCollectionContainer::reserve(const size_t vec_size){
 
-  if(clear_before_filling){
+  tracksSize_.reserve(vec_size);
+  isFake_.reserve(vec_size);
+  chi2_.reserve(vec_size);
+  ndof_.reserve(vec_size);
+  x_.reserve(vec_size);
+  y_.reserve(vec_size);
+  z_.reserve(vec_size);
+}
 
-    this->clear();
-  }
+void RecoVertexCollectionContainer::emplace_back(const reco::Vertex& obj){
 
-  tracksSize_.reserve(coll.size());
-  isFake_.reserve(coll.size());
-  chi2_.reserve(coll.size());
-  ndof_.reserve(coll.size());
-  x_.reserve(coll.size());
-  y_.reserve(coll.size());
-  z_.reserve(coll.size());
-
-  for(const auto& i_obj : coll){
-
-    tracksSize_.emplace_back(i_obj.tracksSize());
-    isFake_.emplace_back(i_obj.isFake());
-    chi2_.emplace_back(i_obj.chi2());
-    ndof_.emplace_back(i_obj.ndof());
-    x_.emplace_back(i_obj.x());
-    y_.emplace_back(i_obj.y());
-    z_.emplace_back(i_obj.z());
-  }
+  tracksSize_.emplace_back(obj.tracksSize());
+  isFake_.emplace_back(obj.isFake());
+  chi2_.emplace_back(obj.chi2());
+  ndof_.emplace_back(obj.ndof());
+  x_.emplace_back(obj.x());
+  y_.emplace_back(obj.y());
+  z_.emplace_back(obj.z());
 }
