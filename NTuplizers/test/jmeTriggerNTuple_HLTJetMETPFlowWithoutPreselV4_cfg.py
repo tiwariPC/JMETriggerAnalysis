@@ -141,6 +141,13 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'+'::'+process.name_()),
   ),
 
+  stringCutObjectSelectors = cms.PSet(
+
+#    hltParticleFlow = cms.string('pt>0.5'),
+#    offlineParticleFlow = cms.string('pt>0.5'),
+    hltAK4PFJetsCorrected = cms.string('pt>3'),
+  ),
+
   outputBranchesToBeDropped = cms.vstring(
 
     'hltPixelVertices_isFake',

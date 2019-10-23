@@ -27,6 +27,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <unordered_map>
 
 #include <TTree.h>
 
@@ -55,11 +56,7 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
 
   const std::vector<std::string> outputBranchesToBeDropped_;
 
-  TTree* ttree_ = nullptr;
-
-  unsigned int run_;
-  unsigned int luminosityBlock_;
-  unsigned long long event_;
+  std::unordered_map<std::string, std::string>  stringCutObjectSelectors_map_;
 
   std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
   std::vector<RecoVertexCollectionContainer> v_recoVertexCollectionContainer_;
@@ -74,6 +71,12 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
   std::vector<PATMETCollectionContainer> v_patMETCollectionContainer_;
   std::vector<PATMuonCollectionContainer> v_patMuonCollectionContainer_;
   std::vector<PATElectronCollectionContainer> v_patElectronCollectionContainer_;
+
+  TTree* ttree_ = nullptr;
+
+  unsigned int run_ = 0;
+  unsigned int luminosityBlock_ = 0;
+  unsigned long long event_ = 0;
 };
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
@@ -87,6 +90,21 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
   triggerResultsContainer_ptr_.reset(new TriggerResultsContainer(TriggerResultsCollections, TriggerResultsInputTag.label(), this->consumes<edm::TriggerResults>(TriggerResultsInputTag)));
 
+  // stringCutObjectSelectors
+  stringCutObjectSelectors_map_.clear();
+
+  if(iConfig.exists("stringCutObjectSelectors")){
+
+    const edm::ParameterSet& pset_stringCutObjectSelectors = iConfig.getParameter<edm::ParameterSet>("stringCutObjectSelectors");
+
+    const auto& stringCutObjectSelectors_labels = pset_stringCutObjectSelectors.getParameterNamesForType<std::string>();
+
+    for(const auto& label : stringCutObjectSelectors_labels){
+
+      stringCutObjectSelectors_map_[label] = pset_stringCutObjectSelectors.getParameter<std::string>(label);
+    }
+  }
+
   // reco::VertexCollection
   v_recoVertexCollectionContainer_.clear();
 
@@ -98,13 +116,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_recoVertexCollectionContainer_.reserve(inputTagLabels_recoVertexCollections.size());
 
-    for(const std::string& label : inputTagLabels_recoVertexCollections){
+    for(const auto& label : inputTagLabels_recoVertexCollections){
 
       const auto& inputTag = pset_recoVertexCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::VertexCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::Vertex> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoVertexCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -119,7 +142,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_recoPFCandidateCollectionContainer_.reserve(inputTagLabels_recoPFCandidateCollections.size());
 
-    for(const std::string& label : inputTagLabels_recoPFCandidateCollections){
+    for(const auto& label : inputTagLabels_recoPFCandidateCollections){
 
       const auto& inputTag = pset_recoPFCandidateCollections.getParameter<edm::InputTag>(label);
 
@@ -127,6 +150,11 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFCandidate> >(inputTag)));
       v_recoPFCandidateCollectionContainer_.back().orderByHighestPt(true);
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoPFCandidateCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -141,7 +169,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_patPackedCandidateCollectionContainer_.reserve(inputTagLabels_patPackedCandidateCollections.size());
 
-    for(const std::string& label : inputTagLabels_patPackedCandidateCollections){
+    for(const auto& label : inputTagLabels_patPackedCandidateCollections){
 
       const auto& inputTag = pset_patPackedCandidateCollections.getParameter<edm::InputTag>(label);
 
@@ -149,6 +177,11 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::PackedCandidate> >(inputTag)));
       v_patPackedCandidateCollectionContainer_.back().orderByHighestPt(true);
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_patPackedCandidateCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -163,13 +196,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_recoGenJetCollectionContainer_.reserve(inputTagLabels_recoGenJetCollections.size());
 
-    for(const std::string& label : inputTagLabels_recoGenJetCollections){
+    for(const auto& label : inputTagLabels_recoGenJetCollections){
 
       const auto& inputTag = pset_recoGenJetCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::GenJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoGenJetCollectionContainer_.emplace_back(RecoGenJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::GenJet> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoGenJetCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -184,13 +222,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_recoPFJetCollectionContainer_.reserve(inputTagLabels_recoPFJetCollections.size());
 
-    for(const std::string& label : inputTagLabels_recoPFJetCollections){
+    for(const auto& label : inputTagLabels_recoPFJetCollections){
 
       const auto& inputTag = pset_recoPFJetCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoPFJetCollectionContainer_.emplace_back(RecoPFJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFJet> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoPFJetCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -205,13 +248,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_patJetCollectionContainer_.reserve(inputTagLabels_patJetCollections.size());
 
-    for(const std::string& label : inputTagLabels_patJetCollections){
+    for(const auto& label : inputTagLabels_patJetCollections){
 
       const auto& inputTag = pset_patJetCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::JetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_patJetCollectionContainer_.emplace_back(PATJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Jet> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_patJetCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -226,13 +274,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_recoGenMETCollectionContainer_.reserve(inputTagLabels_recoGenMETCollections.size());
 
-    for(const std::string& label : inputTagLabels_recoGenMETCollections){
+    for(const auto& label : inputTagLabels_recoGenMETCollections){
 
       const auto& inputTag = pset_recoGenMETCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::GenMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoGenMETCollectionContainer_.emplace_back(RecoGenMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::GenMET> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoGenMETCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -247,13 +300,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_recoCaloMETCollectionContainer_.reserve(inputTagLabels_recoCaloMETCollections.size());
 
-    for(const std::string& label : inputTagLabels_recoCaloMETCollections){
+    for(const auto& label : inputTagLabels_recoCaloMETCollections){
 
       const auto& inputTag = pset_recoCaloMETCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::CaloMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::CaloMET> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoCaloMETCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -268,13 +326,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_recoPFMETCollectionContainer_.reserve(inputTagLabels_recoPFMETCollections.size());
 
-    for(const std::string& label : inputTagLabels_recoPFMETCollections){
+    for(const auto& label : inputTagLabels_recoPFMETCollections){
 
       const auto& inputTag = pset_recoPFMETCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFMET> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoPFMETCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -289,13 +352,18 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_patMETCollectionContainer_.reserve(inputTagLabels_patMETCollections.size());
 
-    for(const std::string& label : inputTagLabels_patMETCollections){
+    for(const auto& label : inputTagLabels_patMETCollections){
 
       const auto& inputTag = pset_patMETCollections.getParameter<edm::InputTag>(label);
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::METCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
       v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::MET> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_patMETCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -310,7 +378,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_patMuonCollectionContainer_.reserve(inputTagLabels_patMuonCollections.size());
 
-    for(const std::string& label : inputTagLabels_patMuonCollections){
+    for(const auto& label : inputTagLabels_patMuonCollections){
 
       const auto& inputTag = pset_patMuonCollections.getParameter<edm::InputTag>(label);
 
@@ -318,6 +386,11 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       v_patMuonCollectionContainer_.emplace_back(PATMuonCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Muon> >(inputTag)));
       v_patMuonCollectionContainer_.back().orderByHighestPt(true);
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_patMuonCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 
@@ -332,7 +405,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
     v_patElectronCollectionContainer_.reserve(inputTagLabels_patElectronCollections.size());
 
-    for(const std::string& label : inputTagLabels_patElectronCollections){
+    for(const auto& label : inputTagLabels_patElectronCollections){
 
       const auto& inputTag = pset_patElectronCollections.getParameter<edm::InputTag>(label);
 
@@ -340,6 +413,11 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       v_patElectronCollectionContainer_.emplace_back(PATElectronCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Electron> >(inputTag)));
       v_patElectronCollectionContainer_.back().orderByHighestPt(true);
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_patElectronCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
     }
   }
 }
