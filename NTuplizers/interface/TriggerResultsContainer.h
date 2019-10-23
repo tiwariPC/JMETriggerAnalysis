@@ -2,6 +2,7 @@
 #define JMETriggerAnalysis_TriggerResultsContainer_h
 
 #include <FWCore/Utilities/interface/EDGetToken.h>
+#include <FWCore/Framework/interface/Event.h>
 #include <DataFormats/Common/interface/TriggerResults.h>
 
 #include <string>
@@ -14,7 +15,7 @@ class TriggerResultsContainer {
   virtual ~TriggerResultsContainer() {}
 
   void clear();
-  void fill(const edm::TriggerResults&, const std::vector<std::string>&);
+  void fill(const edm::TriggerResults&, const edm::Event&);
 
   const std::string& inputTagLabel() const { return inputTagLabel_; }
   const edm::EDGetToken& token() const { return token_; }

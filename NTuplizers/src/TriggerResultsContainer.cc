@@ -1,5 +1,6 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h>
 #include <FWCore/MessageLogger/interface/MessageLogger.h>
+#include <FWCore/Common/interface/TriggerNames.h>
 
 TriggerResultsContainer::TriggerResultsContainer(const std::vector<std::string>& names, const std::string& inputTagLabel, const edm::EDGetToken& token)
   : inputTagLabel_(inputTagLabel), token_(token) {
@@ -37,7 +38,12 @@ void TriggerResultsContainer::clear(){
   }
 }
 
-void TriggerResultsContainer::fill(const edm::TriggerResults& triggerResults, const std::vector<std::string>& triggerNames){
+void TriggerResultsContainer::fill(const edm::TriggerResults& triggerResults, const edm::Event& iEvent){
+
+  // reset values to false
+  this->clear();
+
+  const auto& triggerNames = iEvent.triggerNames(triggerResults).triggerNames();
 
   if(triggerResults.size() != triggerNames.size()){
 
@@ -46,9 +52,6 @@ void TriggerResultsContainer::fill(const edm::TriggerResults& triggerResults, co
 
     return;
   }
-
-  // reset values to false
-  this->clear();
 
   for(unsigned int idx=0; idx<triggerResults.size(); ++idx){
 

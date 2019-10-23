@@ -61,7 +61,19 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResults = cms.InputTag('TriggerResults'+'::'+process.name_()),
 
-  HLTPathsWithoutVersion = cms.vstring(
+  TriggerResultsFilterOR = cms.vstring(
+
+#    'HLT_IsoMu24',
+#    'HLT_Ele32_WPTight_Gsf',
+  ),
+
+  TriggerResultsFilterAND = cms.vstring(
+
+#    'HLT_IsoMu24',
+#    'HLT_Ele32_WPTight_Gsf',
+  ),
+
+  TriggerResultsCollections = cms.vstring(
 
     'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
     'HLT_Ele32_WPTight_Gsf',
@@ -72,12 +84,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'HLT_PFJet80NoCaloJetCut',
     'HLT_PFMET200NoCaloMETCut_NotCleaned',
     'HLT_PFMETTypeOne200NoCaloMETCut_HBHE_BeamHaloCleaned',
-  ),
-
-  HLTPathsFilterOR = cms.vstring(
-
-#    'HLT_IsoMu24',
-#    'HLT_Ele32_WPTight_Gsf',
   ),
 
   recoVertexCollections = cms.PSet(

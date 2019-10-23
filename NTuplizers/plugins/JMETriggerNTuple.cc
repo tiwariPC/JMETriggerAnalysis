@@ -7,8 +7,8 @@
 #include <FWCore/Utilities/interface/Exception.h>
 #include <FWCore/ServiceRegistry/interface/Service.h>
 #include <CommonTools/UtilAlgos/interface/TFileService.h>
-#include <FWCore/Common/interface/TriggerNames.h>
 #include <DataFormats/Common/interface/TriggerResults.h>
+#include <FWCore/Common/interface/TriggerNames.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h>
@@ -43,9 +43,13 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
   template <typename... Args>
   void addBranch(const std::string&, Args...);
 
+  bool passesTriggerResults_OR(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&);
+  bool passesTriggerResults_AND(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&);
+
   const std::string TTreeName_;
 
-  const std::vector<std::string> HLTPathsFilterOR_;
+  const std::vector<std::string> TriggerResultsFilterOR_;
+  const std::vector<std::string> TriggerResultsFilterAND_;
 
   const std::vector<std::string> outputBranchesToBeDropped_;
 
@@ -70,13 +74,14 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   : TTreeName_(iConfig.getParameter<std::string>("TTreeName"))
-  , HLTPathsFilterOR_(iConfig.getParameter<std::vector<std::string> >("HLTPathsFilterOR"))
+  , TriggerResultsFilterOR_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterOR"))
+  , TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterAND"))
   , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string> >("outputBranchesToBeDropped")) {
 
   const auto& TriggerResultsInputTag = iConfig.getParameter<edm::InputTag>("TriggerResults");
-  const auto& HLTPathsWithoutVersion = iConfig.getParameter<std::vector<std::string> >("HLTPathsWithoutVersion");
+  const auto& TriggerResultsCollections = iConfig.getParameter<std::vector<std::string> >("TriggerResultsCollections");
 
-  triggerResultsContainer_ptr_.reset(new TriggerResultsContainer(HLTPathsWithoutVersion, TriggerResultsInputTag.label(), this->consumes<edm::TriggerResults>(TriggerResultsInputTag)));
+  triggerResultsContainer_ptr_.reset(new TriggerResultsContainer(TriggerResultsCollections, TriggerResultsInputTag.label(), this->consumes<edm::TriggerResults>(TriggerResultsInputTag)));
 
   // reco::VertexCollection
   v_recoVertexCollectionContainer_.clear();
@@ -95,7 +100,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::VertexCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<reco::Vertex>(inputTag)));
+      v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::Vertex> >(inputTag)));
     }
   }
 
@@ -116,7 +121,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<reco::PFCandidate>(inputTag)));
+      v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFCandidate> >(inputTag)));
       v_recoPFCandidateCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -138,7 +143,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::PackedCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<pat::PackedCandidate>(inputTag)));
+      v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::PackedCandidate> >(inputTag)));
       v_patPackedCandidateCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -160,7 +165,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFJetCollectionContainer_.emplace_back(RecoPFJetCollectionContainer(label, inputTag.label(), this->consumes<reco::PFJet>(inputTag)));
+      v_recoPFJetCollectionContainer_.emplace_back(RecoPFJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFJet> >(inputTag)));
     }
   }
 
@@ -181,7 +186,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::JetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patJetCollectionContainer_.emplace_back(PATJetCollectionContainer(label, inputTag.label(), this->consumes<pat::Jet>(inputTag)));
+      v_patJetCollectionContainer_.emplace_back(PATJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Jet> >(inputTag)));
     }
   }
 
@@ -202,7 +207,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::CaloMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<reco::CaloMET>(inputTag)));
+      v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::CaloMET> >(inputTag)));
     }
   }
 
@@ -223,7 +228,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<reco::PFMET>(inputTag)));
+      v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFMET> >(inputTag)));
     }
   }
 
@@ -244,7 +249,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::METCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<pat::MET>(inputTag)));
+      v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::MET> >(inputTag)));
     }
   }
 
@@ -265,7 +270,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::MuonCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patMuonCollectionContainer_.emplace_back(PATMuonCollectionContainer(label, inputTag.label(), this->consumes<pat::Muon>(inputTag)));
+      v_patMuonCollectionContainer_.emplace_back(PATMuonCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Muon> >(inputTag)));
       v_patMuonCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -287,7 +292,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::ElectronCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patElectronCollectionContainer_.emplace_back(PATElectronCollectionContainer(label, inputTag.label(), this->consumes<pat::Electron>(inputTag)));
+      v_patElectronCollectionContainer_.emplace_back(PATElectronCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Electron> >(inputTag)));
       v_patElectronCollectionContainer_.back().orderByHighestPt(true);
     }
   }
@@ -312,35 +317,25 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   }
   else {
 
-    const auto& triggerNames = iEvent.triggerNames(*triggerResults_handle).triggerNames();
+    // exit method for events that do not pass the logical OR of the specified HLT paths (if any)
+    if(TriggerResultsFilterOR_.size() > 0){
 
-    triggerResultsContainer_ptr_->fill(*triggerResults_handle, triggerNames);
-  }
+      if(not this->passesTriggerResults_OR(*triggerResults_handle, iEvent, TriggerResultsFilterOR_)){
 
-  // exit method for events that do not pass the logical OR of the specified HLT paths (if any)
-  if(HLTPathsFilterOR_.size() > 0){
-
-    bool keep_event(false);
-
-    for(const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()){
-
-      if(std::find(HLTPathsFilterOR_.begin(), HLTPathsFilterOR_.end(), triggerEntry_i.name) != HLTPathsFilterOR_.end()){
-
-        if(triggerEntry_i.accept){
-
-          LogDebug("JMETriggerNTuple::analyze") << "event fired HLT path \"" << triggerEntry_i.name << "\", output collections will be saved to TTree";
-
-          keep_event = true;
-          break;
-        }
+        return;
       }
     }
 
-    // if none of the specified HLT paths is fired, return
-    if(not keep_event){
+    // exit method for events that do not pass the logical AND of the specified HLT paths (if any)
+    if(TriggerResultsFilterAND_.size() > 0){
 
-      return;
+      if(not this->passesTriggerResults_AND(*triggerResults_handle, iEvent, TriggerResultsFilterAND_)){
+
+        return;
+      }
     }
+
+    LogDebug("JMETriggerNTuple::analyze") << "output collections will be saved to TTree";
   }
 
   // fill recoVertexCollectionContainers
@@ -728,15 +723,113 @@ void JMETriggerNTuple::addBranch(const std::string& branch_name, Args... args){
   }
 }
 
+
+bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& triggerResults, const edm::Event& iEvent, const std::vector<std::string>& paths){
+
+  if(paths.size() == 0){
+
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_OR") << "input error: empty list of paths for event selection, will return True";
+
+    return true;
+  }
+
+  const auto& triggerNames = iEvent.triggerNames(triggerResults).triggerNames();
+
+  if(triggerResults.size() != triggerNames.size()){
+
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_OR") << "input error: size of TriggerResults ("
+      << triggerResults.size() << ") and TriggerNames (" << triggerNames.size() << ") differ, exiting function";
+
+    return false;
+  }
+
+  for(unsigned int idx=0; idx<triggerResults.size(); ++idx){
+
+    if(triggerResults.at(idx).accept() == true){
+
+      const auto& triggerName = triggerNames.at(idx);
+
+      if(std::find(paths.begin(), paths.end(), triggerName) != paths.end()){
+
+        LogDebug("JMETriggerNTuple::passesTriggerResults_OR") << "event accepted by path \"" << triggerName << "\"";
+
+        return true;
+      }
+      else {
+
+        const auto triggerName_unv = triggerName.substr(0, triggerName.rfind("_v"));
+
+        if(std::find(paths.begin(), paths.end(), triggerName_unv) != paths.end()){
+
+          LogDebug("JMETriggerNTuple::passesTriggerResults_OR") << "event accepted by path \"" << triggerName_unv << "\"";
+
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+bool JMETriggerNTuple::passesTriggerResults_AND(const edm::TriggerResults& triggerResults, const edm::Event& iEvent, const std::vector<std::string>& paths){
+
+  if(paths.size() == 0){
+
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_AND") << "input error: empty list of paths for event selection, will return True";
+
+    return true;
+  }
+
+  const auto& triggerNames = iEvent.triggerNames(triggerResults).triggerNames();
+
+  if(triggerResults.size() != triggerNames.size()){
+
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_AND") << "input error: size of TriggerResults ("
+      << triggerResults.size() << ") and TriggerNames (" << triggerNames.size() << ") differ, exiting function";
+
+    return false;
+  }
+
+  for(unsigned int idx=0; idx<triggerResults.size(); ++idx){
+
+    if(triggerResults.at(idx).accept() == false){
+
+      const auto& triggerName = triggerNames.at(idx);
+
+      if(std::find(paths.begin(), paths.end(), triggerName) != paths.end()){
+
+        LogDebug("JMETriggerNTuple::passesTriggerResults_AND") << "event not accepted by path \"" << triggerName << "\"";
+
+        return false;
+      }
+      else {
+
+        const auto triggerName_unv = triggerName.substr(0, triggerName.rfind("_v"));
+
+        if(std::find(paths.begin(), paths.end(), triggerName_unv) != paths.end()){
+
+          LogDebug("JMETriggerNTuple::passesTriggerResults_AND") << "event not accepted by path \"" << triggerName_unv << "\"";
+
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 void JMETriggerNTuple::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
 
   edm::ParameterSetDescription desc;
   desc.setUnknown();
 //  desc.add<std::string>("TTreeName", "TTreeName")->setComment("Name of TTree");
-//  desc.add<std::vector<std::string> >("HLTPathsFilterOR")->setComment("List of HLT paths (without version) used in OR to select events in the output TTree");
+//  desc.add<std::vector<std::string> >("TriggerResultsFilterOR")->setComment("List of HLT paths (without version) used in OR to select events in the output TTree");
+//  desc.add<std::vector<std::string> >("TriggerResultsFilterAND")->setComment("List of HLT paths (without version) used in AND to select events in the output TTree");
 //  desc.add<std::vector<std::string> >("outputBranchesToBeDropped")->setComment("Names of branches not to be included in the output TTree");
 //  desc.add<edm::InputTag>("TriggerResults", edm::InputTag("TriggerResults"))->setComment("edm::InputTag for edm::TriggerResults");
-//  desc.add<std::vector<std::string> >("HLTPathsWithoutVersion")->setComment("List of HLT paths (without version) to be saved in the output TTree");
+//  desc.add<std::vector<std::string> >("TriggerResultsCollections")->setComment("List of HLT paths (without version) to be saved in the output TTree");
 
 //  edm::ParameterSetDescription recoCaloMETCollections;
 //  desc.add<edm::ParameterSetDescription>("recoCaloMETCollections", recoCaloMETCollections);

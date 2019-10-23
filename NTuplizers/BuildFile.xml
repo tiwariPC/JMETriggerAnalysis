@@ -1,3 +1,5 @@
+<use name="FWCore/Common"/>
+<use name="FWCore/Framework"/>
 <use name="FWCore/MessageLogger"/>
 <use name="CommonTools/Utils"/>
 <use name="DataFormats/VertexReco"/>
