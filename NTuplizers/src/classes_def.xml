@@ -3,8 +3,10 @@
   <class name="RecoVertexCollectionContainer"/>
   <class name="RecoPFCandidateCollectionContainer"/>
   <class name="PATPackedCandidateCollectionContainer"/>
+  <class name="RecoGenJetCollectionContainer"/>
   <class name="RecoPFJetCollectionContainer"/>
   <class name="PATJetCollectionContainer"/>
+  <class name="RecoGenMETCollectionContainer"/>
   <class name="RecoCaloMETCollectionContainer"/>
   <class name="RecoPFMETCollectionContainer"/>
   <class name="PATMETCollectionContainer"/>
