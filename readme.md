@@ -8,10 +8,9 @@ CMSSW Packages for JetMET Trigger Studies
 Set up CMSSW area:
 
 ```shell
-cmsrel CMSSW_10_6_1_patch3
-cd CMSSW_10_6_1_patch3/src
+cmsrel CMSSW_11_0_0_pre7
+cd CMSSW_11_0_0_pre7/src
 cmsenv
-#git cms-merge-topic cms-egamma:EgammaPostRecoTools
 git cms-addpkg HLTrigger/Configuration
 git clone https://missirol@github.com/missirol/JMETriggerAnalysis.git -o missirol
 scram b

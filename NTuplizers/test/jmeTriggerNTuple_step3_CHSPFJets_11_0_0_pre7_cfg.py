@@ -1,87 +1,22 @@
-
-#keep all events
-#add string selectors
-#add met sequences (pfmet, pfmettype1, puppi)
-#
-#process.ak4PFJets
-#process.ak4PFJetsCorrected
-#process.goodOfflinePrimaryVertices
-#process.pfNoPileUpJME
-#process.ak4PFJetsCHS
-#process.ak4PFJetsCHSCorrected
-#
-#
-#reco::GenJet
-#reco::GenMET
-#
-#ak4GenJets::HLT
-#genMetCalo::HLT
-#genMetTrue::HLT
-
 ### configuration file to re-run customized HLT Menu on RAW
 from step3_CHSPFJets_11_0_0_pre7 import cms, process
 
 ### remove cms.EndPath for EDM output
 del process.HLTOutput
 
-### Sequence for HLT-like PFMET and PFMET-TypeOne
-process.hltPFMetNoPileUpJME = cms.EDProducer( "PFMETProducer",
-    globalThreshold = cms.double( 0.0 ),
-    calculateSignificance = cms.bool( False ),
-    src = cms.InputTag( 'pfNoPileUpJME'+'::'+process.name_() )
-)
-process.hltPFMet = cms.EDProducer( "PFMETProducer",
-    globalThreshold = cms.double( 0.0 ),
-    calculateSignificance = cms.bool( False ),
-    src = cms.InputTag( 'particleFlowTmp'+'::'+process.name_() )
-)
-process.hltAK4PFFastJetCorrector = cms.EDProducer( "L1FastjetCorrectorProducer",
-    srcRho = cms.InputTag( 'fixedGridRhoFastjetAll'+'::'+process.name_() ),
-    algorithm = cms.string( "AK4PFHLT" ),
-    level = cms.string( "L1FastJet" )
-)
-process.hltAK4PFRelativeCorrector = cms.EDProducer( "LXXXCorrectorProducer",
-    algorithm = cms.string( "AK4PFHLT" ),
-    level = cms.string( "L2Relative" )
-)
-process.hltAK4PFAbsoluteCorrector = cms.EDProducer( "LXXXCorrectorProducer",
-    algorithm = cms.string( "AK4PFHLT" ),
-    level = cms.string( "L3Absolute" )
-)
-process.hltAK4PFResidualCorrector = cms.EDProducer( "LXXXCorrectorProducer",
-    algorithm = cms.string( "AK4PFHLT" ),
-    level = cms.string( "L2L3Residual" )
-)
-process.hltAK4PFCorrector = cms.EDProducer( "ChainedJetCorrectorProducer",
-    correctors = cms.VInputTag( 'hltAK4PFFastJetCorrector','hltAK4PFRelativeCorrector','hltAK4PFAbsoluteCorrector','hltAK4PFResidualCorrector' )
-)
-process.hltcorrPFMETTypeOne = cms.EDProducer( "PFJetMETcorrInputProducer",
-    src = cms.InputTag( 'ak4PFJets'+'::'+process.name_() ),
-    type1JetPtThreshold = cms.double( 35.0 ),
-    skipEMfractionThreshold = cms.double( 0.9 ),
-    skipEM = cms.bool( True ),
-    jetCorrLabelRes = cms.InputTag( "hltAK4PFCorrector" ),
-    offsetCorrLabel = cms.InputTag( "hltAK4PFFastJetCorrector" ),
-    skipMuons = cms.bool( True ),
-    skipMuonSelection = cms.string( "isGlobalMuon | isStandAloneMuon" ),
-    jetCorrEtaMax = cms.double( 9.9 ),
-    jetCorrLabel = cms.InputTag( "hltAK4PFCorrector" )
-)
-process.hltPFMETTypeOne = cms.EDProducer( "CorrectedPFMETProducer",
-    src = cms.InputTag( "hltPFMETProducer" ),
-    srcCorrections = cms.VInputTag( 'hltcorrPFMETTypeOne:type1' )
-)
+process.DQMStore.enableMultiThread = False
+process.options.numberOfStreams = 1
+process.options.numberOfThreads = 1
 
-process.reconstruction *= cms.Sequence(
-    process.hltPFMet
-  + process.hltPFMetNoPileUpJME
-  +(process.hltAK4PFFastJetCorrector
-  * process.hltAK4PFRelativeCorrector
-  * process.hltAK4PFAbsoluteCorrector
-  * process.hltAK4PFResidualCorrector
-  * process.hltAK4PFCorrector
-  * process.hltcorrPFMETTypeOne)
+### Sequence for HLT(-like) MET Collections
+from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETSeq
+hltMETSeq(process,
+  particleFlow = 'particleFlowTmp'+'::'+process.name_(),
+  ak4PFJetsForMETTypeOne = 'ak4PFJets'+'::'+process.name_(),
+  primaryVertices = 'goodOfflinePrimaryVertices'+'::'+process.name_(),
+  pfNoPileUpJME = None, #'pfNoPileUpJME'+'::'+process.name_(),
 )
+process.reconstruction *= process.hltMETSeq
 
 ### add analysis sequence (JMETrigger NTuple)
 process.analysisCollectionsSequence = cms.Sequence()
@@ -91,47 +26,10 @@ process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
 process.analysisCollectionsSequence *= process.userMuonsSequence
 
 ## Electrons
-#from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
-#setupEgammaPostRecoSeq(process, runVID=True, runEnergyCorrections=False, era='2018-Prompt', phoIDModules=[])
-#process.analysisCollectionsSequence *= process.egammaPostRecoSeq
-
 process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
 process.analysisCollectionsSequence *= process.userElectronsSequence
 
-## Jets
-process.load('JMETriggerAnalysis.NTuplizers.userJets_cff')
-process.analysisCollectionsSequence *= process.userJetsSequence
-
-### Event Selection
-#from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
-#
-#process.eventSelMuons = selectedPatMuons.clone(
-#  src = 'userIsolatedMuons',
-#  cut = 'pt>27 && userInt("IDMedium") && userFloat("pfIsoR04") < 0.25',
-#)
-#
-#from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
-#
-#process.eventSelElectrons = selectedPatElectrons.clone(
-#  src = 'userIsolatedElectrons',
-#  cut = 'pt>35 && userInt("IDCutBasedMedium")',
-#)
-#
-#process.eventSelLeptons = cms.EDProducer('CandViewMerger',
-#  src = cms.VInputTag('eventSelMuons', 'eventSelElectrons'),
-#)
-#
-#process.eventSelOneLepton = cms.EDFilter('CandViewCountFilter',
-#  src = cms.InputTag('eventSelLeptons'),
-#  minNumber = cms.uint32(1),
-#)
-#
-#process.analysisCollectionsSequence *= cms.Sequence(
-#    process.eventSelMuons
-#  * process.eventSelElectrons
-#  * process.eventSelLeptons
-#  * process.eventSelOneLepton
-#)
+## Event Selection (none yet)
 
 ## JMETrigger NTuple
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
@@ -167,12 +65,15 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoVertexCollections = cms.PSet(
 
-    goodOfflinePrimaryVerticesRECO2 = cms.InputTag('goodOfflinePrimaryVertices'),
+    hltGoodPrimaryVertices = cms.InputTag('goodOfflinePrimaryVertices'+'::'+process.name_()),
+    offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'+'::'+'PAT'),
   ),
 
   recoPFCandidateCollections = cms.PSet(
 
-#    hltParticleFlow = cms.InputTag('hltParticleFlow'+'::'+process.name_()),
+#    particleFlowTmp = cms.InputTag('particleFlowTmp'+'::'+process.name_()),
+#    hltPuppi = cms.InputTag('hltPuppi'+'::'+process.name_()),
+#    hltPuppiForMET = cms.InputTag('hltPuppiForMET'+'::'+process.name_()),
   ),
 
   patPackedCandidateCollections = cms.PSet(
@@ -180,14 +81,25 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 #    offlinePFCandidates = cms.InputTag('packedPFCandidates'),
   ),
 
+  recoGenJetCollections = cms.PSet(
+
+    ak4GenJets = cms.InputTag('ak4GenJets::HLT'),
+  ),
+
   recoPFJetCollections = cms.PSet(
 
-#    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'+'::'+process.name_()),
+    hltAK4PFCHSJetsCorrected = cms.InputTag('ak4PFJetsCHSCorrected'+'::'+process.name_()),
   ),
 
   patJetCollections = cms.PSet(
 
-#    offlineAK4PFCHSJetsCorrectedPt10 = cms.InputTag('userAK4PFCHSJetsPt10'+'::'+process.name_()),
+    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'+'::'+'PAT'),
+  ),
+
+  recoGenMETCollections = cms.PSet(
+
+    genMetCalo = cms.InputTag('genMetCalo::HLT'),
+    genMetTrue = cms.InputTag('genMetTrue::HLT'),
   ),
 
   recoCaloMETCollections = cms.PSet(
@@ -198,24 +110,33 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFMETCollections = cms.PSet(
 
-#    hltPFMet = cms.InputTag('hltPFMETProducer'+'::'+process.name_()),
-#    hltPFMetTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
+    hltPFMET = cms.InputTag('hltPFMET'+'::'+process.name_()),
+    hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
+    hltPuppiMET = cms.InputTag('hltPuppiMET'+'::'+process.name_()),
+    hltPuppiMETWithPuppiForJets = cms.InputTag('hltPuppiMETWithPuppiForJets'+'::'+process.name_()),
   ),
 
   patMETCollections = cms.PSet(
 
-#    offlineMETs = cms.InputTag('slimmedMETs'),
-#    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
+    offlineMETs = cms.InputTag('slimmedMETs::PAT'),
+    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi::PAT'),
   ),
 
   patMuonCollections = cms.PSet(
 
-#    offlineIsolatedMuons = cms.InputTag('userIsolatedMuons'+'::'+process.name_()),
+    offlineIsolatedMuons = cms.InputTag('userIsolatedMuons'+'::'+process.name_()),
   ),
 
   patElectronCollections = cms.PSet(
 
-#    offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'+'::'+process.name_()),
+    offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'+'::'+process.name_()),
+  ),
+
+  stringCutObjectSelectors = cms.PSet(
+
+    ak4GenJets = cms.string('pt>7'),
+    hltAK4PFCHSJetsCorrected = cms.string('pt>7'),
+    offlineAK4PFCHSJetsCorrected = cms.string('pt>7'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
@@ -227,11 +148,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 #    'hltTrimmedPixelVertices_isFake',
 #    'hltTrimmedPixelVertices_chi2',
 #    'hltTrimmedPixelVertices_ndof',
-#
-#    'offlinePrimaryVertices_tracksSize',
-#
+
+    'offlinePrimaryVertices_tracksSize',
+
 #    'hltPFMet_ChargedEMEtFraction',
 #    'hltPFMetTypeOne_ChargedEMEtFraction',
+
+    'genMetCalo_MuonEtFraction',
+    'genMetCalo_InvisibleEtFraction',
   ),
 )
 
