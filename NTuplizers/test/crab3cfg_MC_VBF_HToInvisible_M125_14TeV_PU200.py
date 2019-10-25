@@ -13,6 +13,7 @@ config.JobType.maxMemoryMB = 5000
 config.JobType.psetName = 'jmeTriggerNTuple_step3_CHSPFJets_11_0_0_pre7_cfg.py'
 config.JobType.inputFiles = ['step3_CHSPFJets_11_0_0_pre7.py']
 config.JobType.pyCfgParams = ['output=VBF_HToInvisible_M125_14TeV_PU200.root']
+config.JobType.maxJobRuntimeMin = 2500
 #config.JobType.numCores = 4
 
 config.section_('Data')
