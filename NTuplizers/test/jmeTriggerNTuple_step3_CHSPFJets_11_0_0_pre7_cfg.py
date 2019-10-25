@@ -9,14 +9,14 @@ process.options.numberOfStreams = 1
 process.options.numberOfThreads = 1
 
 ### Sequence for HLT(-like) MET Collections
-from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETSeq
-hltMETSeq(process,
+from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETsSeq
+hltMETsSeq(process,
   particleFlow = 'particleFlowTmp'+'::'+process.name_(),
-  ak4PFJetsForMETTypeOne = 'ak4PFJets'+'::'+process.name_(),
+  ak4PFJetsForPFMETTypeOne = 'ak4PFJets'+'::'+process.name_(),
   primaryVertices = 'goodOfflinePrimaryVertices'+'::'+process.name_(),
   pfNoPileUpJME = None, #'pfNoPileUpJME'+'::'+process.name_(),
 )
-process.reconstruction *= process.hltMETSeq
+process.reconstruction *= process.hltMETsSeq
 
 ### add analysis sequence (JMETrigger NTuple)
 process.analysisCollectionsSequence = cms.Sequence()
@@ -112,7 +112,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     hltPFMET = cms.InputTag('hltPFMET'+'::'+process.name_()),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
+
     hltPuppiMET = cms.InputTag('hltPuppiMET'+'::'+process.name_()),
+    hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'+'::'+process.name_()),
+
     hltPuppiMETWithPuppiForJets = cms.InputTag('hltPuppiMETWithPuppiForJets'+'::'+process.name_()),
   ),
 
