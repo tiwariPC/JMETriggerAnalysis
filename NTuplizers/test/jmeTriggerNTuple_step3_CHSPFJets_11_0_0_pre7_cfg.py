@@ -14,7 +14,7 @@ hltMETsSeq(process,
   particleFlow = 'particleFlowTmp'+'::'+process.name_(),
   ak4PFJetsForPFMETTypeOne = 'ak4PFJets'+'::'+process.name_(),
   primaryVertices = 'goodOfflinePrimaryVertices'+'::'+process.name_(),
-  pfNoPileUpJME = None, #'pfNoPileUpJME'+'::'+process.name_(),
+  pfNoPileUpJME = 'pfNoPileUpJME'+'::'+process.name_(),
 )
 process.reconstruction *= process.hltMETsSeq
 
@@ -111,6 +111,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFMETCollections = cms.PSet(
 
     hltPFMET = cms.InputTag('hltPFMET'+'::'+process.name_()),
+    hltPFMETNoPileUpJME = cms.InputTag('hltPFMETNoPileUpJME'+'::'+process.name_()),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
 
     hltPuppiMET = cms.InputTag('hltPuppiMET'+'::'+process.name_()),
@@ -293,3 +294,25 @@ process.source.secondaryFileNames = [
   '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU140_106X_upgrade2023_realistic_v3-v1/270000/9F5F8751-0C0D-AB49-9C66-B742013E74CA.root',
   '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU140_106X_upgrade2023_realistic_v3-v1/270000/A9937051-2ED4-0E46-87CC-276FB3C7C112.root',
 ]
+
+#process.source.fileNames = [
+#  '/store/mc/PhaseIITDRSpring19MiniAOD/WToLNu_14TeV_TuneCP5_pythia8/MINIAODSIM/PU200_106X_upgrade2023_realistic_v3-v2/260000/79FA3917-7F20-4B43-AB90-3F448402CA84.root',
+#]
+#
+#process.source.secondaryFileNames = [
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/CEA12549-B2EF-7A4E-896B-B02A165C86BA.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/0834C0DF-1E6E-E241-BE33-C0DD804B2E87.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/06DE4B87-8E34-8945-A831-4462A2E219D9.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/CAF80FC9-30F2-494B-B8F4-9DA1471594AD.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/8351EEB7-2AA4-0D4E-B260-EC313AF8394E.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/A396A82E-904C-1E4E-9759-8C5D55A145C5.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/1D897463-F1BA-014F-8FF5-425C2C020902.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/571D81F3-331D-6F43-93AA-B51BAFE543B6.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/76C6C4CD-4F96-C747-A13A-3937CD4E28AF.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/35186ED8-01AA-9941-BAFC-E049A3CAA3EE.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/5F12E0EA-5F34-0D47-91C5-20AF721F50ED.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/EBCAF644-B541-1249-B873-184E70B1DDFA.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/9A340E33-F0E3-AF4E-A7EA-7765600DE872.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/C6F04684-3D78-594E-8277-1AFAAD9917FC.root',
+#  '/store/mc/PhaseIITDRSpring19DR/WToLNu_14TeV_TuneCP5_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v2/260000/25F97FCC-F372-0A46-98BF-D8F65348F937.root',
+#]

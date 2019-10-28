@@ -173,11 +173,20 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
       + proc.hltPuppiMETsSeq
     )
 
-#    # [wip] CHS MET
-#    if pfNoPileUpJME is not None:
-#       proc.hltPFMETNoPileUpJME = cms.EDProducer( 'PFMETProducer',
-#           globalThreshold = cms.double( 0.0 ),
-#           calculateSignificance = cms.bool( False ),
-#           src = cms.InputTag( pfNoPileUpJME ),
-#       )
-#       proc.hltMETSeq += proc.hltPFMETNoPileUpJME
+    # CHS MET
+    if pfNoPileUpJME is not None:
+
+       proc.pfNoPileUpJMECands = cms.EDProducer('FwdPtrRecoPFCandidateConverter',
+         src = cms.InputTag( pfNoPileUpJME ),
+       )
+
+       proc.hltPFMETNoPileUpJME = cms.EDProducer( 'PFMETProducer',
+         src = cms.InputTag( 'pfNoPileUpJMECands' ),
+         calculateSignificance = cms.bool( False ),
+         globalThreshold = cms.double( 0.0 ),
+       )
+
+       proc.hltMETsSeq += cms.Sequence(
+           proc.pfNoPileUpJMECands
+         * proc.hltPFMETNoPileUpJME
+       )
