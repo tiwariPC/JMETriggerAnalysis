@@ -8,9 +8,9 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
 
     ### PF MET
     proc.hltPFMET = cms.EDProducer( 'PFMETProducer',
+        src = cms.InputTag( particleFlow ),
         globalThreshold = cms.double( 0.0 ),
         calculateSignificance = cms.bool( False ),
-        src = cms.InputTag( particleFlow )
     )
 
     ### PF MET Type-1
@@ -55,43 +55,43 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
 
     # Puppi candidates for MET
     proc.pfNoLepPUPPI = cms.EDFilter('PdgIdCandViewSelector',
-      src = cms.InputTag(particleFlow),
-      pdgId = cms.vint32( 1,2,22,111,130,310,2112,211,-211,321,-321,999211,2212,-2212 )
+        src = cms.InputTag( particleFlow ),
+        pdgId = cms.vint32( 1, 2, 22, 111, 130, 310, 2112, 211, -211, 321, -321, 999211, 2212, -2212 )
     )
     proc.pfLeptonsPUPPET = cms.EDFilter('PdgIdCandViewSelector',
-      src = cms.InputTag(particleFlow),
-      pdgId = cms.vint32(-11,11,-13,13),
+        src = cms.InputTag( particleFlow ),
+        pdgId = cms.vint32( -11, 11, -13, 13 ),
     )
     proc.puppiNoLep = puppi.clone(
-      candName = 'pfNoLepPUPPI',
-      vertexName = primaryVertices,
+        candName = 'pfNoLepPUPPI',
+        vertexName = primaryVertices,
     )
     proc.puppiMerged = cms.EDProducer('CandViewMerger',
-      src = cms.VInputTag('puppiNoLep', 'pfLeptonsPUPPET'),
+        src = cms.VInputTag('puppiNoLep', 'pfLeptonsPUPPET'),
     )
     proc.hltPuppiForMET = puppiPhoton.clone(
-      candName = particleFlow,
-      # Line below points puppi-MET to puppi-no-lepton, which increases the response
-      puppiCandName = 'puppiMerged',
-      # Line below replaces reference linking with delta-R matching
-      # because the puppi references after merging are not consistent with those of the original PF collection
-      useRefs = False,
+        candName = particleFlow,
+        # Line below points puppi-MET to puppi-no-lepton, which increases the response
+        puppiCandName = 'puppiMerged',
+        # Line below replaces reference linking with delta-R matching
+        # because the puppi references after merging are not consistent with those of the original PF collection
+        useRefs = False,
     )
     proc.hltPuppiMET = cms.EDProducer( 'PFMETProducer',
+        src = cms.InputTag( 'hltPuppiForMET' ),
         globalThreshold = cms.double( 0.0 ),
         calculateSignificance = cms.bool( False ),
-        src = cms.InputTag( 'hltPuppiForMET' )
     )
 
     ### Puppi MET Type-1
 
     # Puppi candidates for Jets
     proc.hltPuppi = puppi.clone(
-      candName = particleFlow,
-      vertexName = primaryVertices,
+        candName = particleFlow,
+        vertexName = primaryVertices,
     )
     proc.ak4PuppiJetsForPuppiMETTypeOne = ak4PFJetsPuppi.clone(
-      src = 'hltPuppi',
+        src = 'hltPuppi',
     )
     proc.hltAK4PuppiFastJetCorrector = cms.EDProducer( 'L1FastjetCorrectorProducer',
         srcRho = cms.InputTag( 'fixedGridRhoFastjetAll'+'::'+proc.name_() ),
@@ -130,14 +130,14 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
         srcCorrections = cms.VInputTag( 'hltcorrPuppiMETTypeOne:type1' )
     )
 
-    # Puppi MET with Puppi-For-Jets inputs [testing]
+    # Puppi MET with Puppi-For-Jets inputs
     proc.hltPuppiMETWithPuppiForJets = cms.EDProducer( 'PFMETProducer',
+        src = cms.InputTag( 'hltPuppi' ),
         globalThreshold = cms.double( 0.0 ),
         calculateSignificance = cms.bool( False ),
-        src = cms.InputTag( 'hltPuppi' )
     )
 
-    ## Puppi METs Sequence
+    # Puppi METs Sequence
     proc.hltPuppiMETsSeq = cms.Sequence(
        (proc.pfNoLepPUPPI
       * proc.puppiNoLep
@@ -146,7 +146,6 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
       * proc.hltPuppiForMET
       * proc.hltPuppiMET
     )
-
     proc.hltPuppiMETsSeq += cms.Sequence(
         proc.hltPuppi
       *(proc.ak4PuppiJetsForPuppiMETTypeOne
@@ -173,20 +172,34 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
       + proc.hltPuppiMETsSeq
     )
 
-    # CHS MET
+    ### CHS MET
     if pfNoPileUpJME is not None:
 
        proc.pfNoPileUpJMECands = cms.EDProducer('FwdPtrRecoPFCandidateConverter',
-         src = cms.InputTag( pfNoPileUpJME ),
+           src = cms.InputTag( pfNoPileUpJME ),
        )
-
        proc.hltPFMETNoPileUpJME = cms.EDProducer( 'PFMETProducer',
-         src = cms.InputTag( 'pfNoPileUpJMECands' ),
-         calculateSignificance = cms.bool( False ),
-         globalThreshold = cms.double( 0.0 ),
+           src = cms.InputTag( 'pfNoPileUpJMECands' ),
+           globalThreshold = cms.double( 0.0 ),
+           calculateSignificance = cms.bool( False ),
        )
-
        proc.hltMETsSeq += cms.Sequence(
            proc.pfNoPileUpJMECands
          * proc.hltPFMETNoPileUpJME
        )
+
+    ### SoftKiller MET
+    proc.hltSoftKiller = cms.EDProducer('SoftKillerProducer',
+        PFCandidates = cms.InputTag(particleFlow),
+        Rho_EtaMax = cms.double( 5.0 ),
+        rParam = cms.double( 0.4 )
+    )
+    proc.hltSoftKillerMET = cms.EDProducer( 'PFMETProducer',
+        src = cms.InputTag( 'hltSoftKiller' ),
+        globalThreshold = cms.double( 0.0 ),
+        calculateSignificance = cms.bool( False ),
+    )
+    proc.hltMETsSeq += cms.Sequence(
+        proc.hltSoftKiller
+      * proc.hltSoftKillerMET
+    )

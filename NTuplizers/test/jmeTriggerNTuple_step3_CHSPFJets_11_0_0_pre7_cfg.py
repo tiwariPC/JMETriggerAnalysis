@@ -114,6 +114,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMETNoPileUpJME = cms.InputTag('hltPFMETNoPileUpJME'+'::'+process.name_()),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
 
+    hltSoftKillerMET = cms.InputTag('hltSoftKillerMET'+'::'+process.name_()),
+
     hltPuppiMET = cms.InputTag('hltPuppiMET'+'::'+process.name_()),
     hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'+'::'+process.name_()),
 
