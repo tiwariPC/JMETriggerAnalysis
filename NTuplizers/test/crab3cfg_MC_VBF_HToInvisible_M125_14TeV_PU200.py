@@ -1,9 +1,15 @@
 from WMCore.Configuration import Configuration
 
+store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/v2/191029'
+sample_name = 'VBF_HToInvisible_M125_14TeV_PU200'
+
+MIN_DSET = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19MiniAOD-PU200_106X_upgrade2023_realistic_v3-v1/MINIAODSIM'
+RAW_DSET = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19DR-PU200_106X_upgrade2023_realistic_v3-v1/GEN-SIM-DIGI-RAW'
+
 config = Configuration()
 
 config.section_('General')
-config.General.requestName = 'jmeTriggerNTuple_VBF_HToInvisible_M125_14TeV_PU200'
+config.General.requestName = 'jmeTriggerNTuple_'+sample_name
 config.General.transferOutputs = True
 config.General.transferLogs = True
 
@@ -12,7 +18,7 @@ config.JobType.pluginName  = 'Analysis'
 config.JobType.maxMemoryMB = 5000
 config.JobType.psetName = 'jmeTriggerNTuple_step3_CHSPFJets_11_0_0_pre7_cfg.py'
 config.JobType.inputFiles = ['step3_CHSPFJets_11_0_0_pre7.py']
-config.JobType.pyCfgParams = ['output=VBF_HToInvisible_M125_14TeV_PU200.root']
+config.JobType.pyCfgParams = ['output='+sample_name+'.root']
 config.JobType.maxJobRuntimeMin = 2500
 #config.JobType.numCores = 4
 
@@ -20,9 +26,9 @@ config.section_('Data')
 config.Data.publication = False
 config.Data.ignoreLocality = False
 config.Data.splitting = 'EventAwareLumiBased'
-config.Data.inputDataset = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19MiniAOD-PU200_106X_upgrade2023_realistic_v3-v1/MINIAODSIM'
-config.Data.secondaryInputDataset = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19DR-PU200_106X_upgrade2023_realistic_v3-v1/GEN-SIM-DIGI-RAW'
-config.Data.outLFNDirBase = '/store/user/missirol/jme_trigger/jmeTriggerNtuples/Phase2/191024_v01/VBF_HToInvisible_M125_14TeV_PU200'
+config.Data.inputDataset = MIN_DSET
+config.Data.secondaryInputDataset = RAW_DSET
+config.Data.outLFNDirBase = '/store/user/missirol/'+store_dir+'/'+sample_name
 config.Data.unitsPerJob = 100
 config.Data.totalUnits = -1
 

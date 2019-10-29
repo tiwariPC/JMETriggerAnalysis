@@ -1,10 +1,10 @@
 from WMCore.Configuration import Configuration
 
 store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/v2/191029'
-sample_name = 'VBF_HToInvisible_M125_14TeV_NoPU'
+sample_name = 'QCD_Pt_0_1000_14TeV_NoPU'
 
-MIN_DSET = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19MiniAOD-NoPU_106X_upgrade2023_realistic_v3-v2/MINIAODSIM'
-RAW_DSET = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19DR-NoPU_106X_upgrade2023_realistic_v3-v2/GEN-SIM-DIGI-RAW'
+MIN_DSET = '/QCD_Pt_0_1000_14TeV_TuneCUETP8M1/PhaseIITDRSpring19MiniAOD-NoPU_106X_upgrade2023_realistic_v3-v1/MINIAODSIM'
+RAW_DSET = '/QCD_Pt_0_1000_14TeV_TuneCUETP8M1/PhaseIITDRSpring19DR-NoPU_106X_upgrade2023_realistic_v3-v1/GEN-SIM-DIGI-RAW'
 
 config = Configuration()
 
