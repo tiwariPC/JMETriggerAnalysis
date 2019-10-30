@@ -587,3 +587,6 @@ process.DQMFileSaverOutput = cms.EndPath( process.fastTimerServiceClient + proce
 #from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 #process = customiseEarlyDelete(process)
 # End adding early deletion
+
+from SLHCUpgradeSimulations.Configuration.aging import customise_aging_1000
+process = customise_aging_1000(process)
