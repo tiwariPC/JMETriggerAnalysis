@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/v2/191029'
+store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/v2/191030'
 sample_name = 'VBF_HToInvisible_M125_14TeV_PU200'
 
 MIN_DSET = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19MiniAOD-PU200_106X_upgrade2023_realistic_v3-v1/MINIAODSIM'
