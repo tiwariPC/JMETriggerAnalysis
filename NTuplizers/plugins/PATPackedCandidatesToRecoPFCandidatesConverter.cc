@@ -10,11 +10,11 @@
 #include <DataFormats/PatCandidates/interface/PackedCandidate.h>
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
 
-class RecoPFCandidatesToPATPackedCandidatesConverter : public edm::EDProducer {
+class PATPackedCandidatesToRecoPFCandidatesConverter : public edm::EDProducer {
 
  public:
-  explicit RecoPFCandidatesToPATPackedCandidatesConverter(const edm::ParameterSet&);
-  virtual ~RecoPFCandidatesToPATPackedCandidatesConverter() {}
+  explicit PATPackedCandidatesToRecoPFCandidatesConverter(const edm::ParameterSet&);
+  virtual ~PATPackedCandidatesToRecoPFCandidatesConverter() {}
 
  private:
   void produce(edm::Event&, const edm::EventSetup&);
@@ -22,14 +22,14 @@ class RecoPFCandidatesToPATPackedCandidatesConverter : public edm::EDProducer {
   edm::EDGetTokenT<pat::PackedCandidateCollection> src_;
 };
 
-RecoPFCandidatesToPATPackedCandidatesConverter::RecoPFCandidatesToPATPackedCandidatesConverter(const edm::ParameterSet& iConfig){
+PATPackedCandidatesToRecoPFCandidatesConverter::PATPackedCandidatesToRecoPFCandidatesConverter(const edm::ParameterSet& iConfig){
 
   src_ = consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("src"));
 
   produces<reco::PFCandidateCollection>();
 }
 
-void RecoPFCandidatesToPATPackedCandidatesConverter::produce(edm::Event& iEvent,const edm::EventSetup& iSetup){
+void PATPackedCandidatesToRecoPFCandidatesConverter::produce(edm::Event& iEvent,const edm::EventSetup& iSetup){
 
   edm::Handle<pat::PackedCandidateCollection> packedCands_;
   iEvent.getByToken(src_, packedCands_);
@@ -48,4 +48,4 @@ void RecoPFCandidatesToPATPackedCandidatesConverter::produce(edm::Event& iEvent,
   return;
 }
 
-DEFINE_FWK_MODULE(RecoPFCandidatesToPATPackedCandidatesConverter);
+DEFINE_FWK_MODULE(PATPackedCandidatesToRecoPFCandidatesConverter);
