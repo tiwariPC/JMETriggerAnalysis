@@ -77,6 +77,35 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
   unsigned int run_ = 0;
   unsigned int luminosityBlock_ = 0;
   unsigned long long event_ = 0;
+
+  class FillCollectionConditionsMap {
+
+   public:
+    FillCollectionConditionsMap();
+    FillCollectionConditionsMap(const edm::ParameterSet&);
+
+    void clear();
+    int init(const edm::ParameterSet&);
+
+    struct condition {
+
+      condition(const std::string& a_path, const bool a_accept=false) : path(a_path), accept(a_accept) {}
+
+      const std::string path;
+      bool accept;
+    };
+
+    bool has(const std::string&) const;
+    const condition& at(const std::string&) const;
+    bool accept(const std::string&) const;
+    int update(const edm::TriggerResults&, const edm::Event&);
+
+   protected:
+
+    std::map<std::string, condition> condMap_;
+  };
+
+  FillCollectionConditionsMap fillCollectionConditionMap_;
 };
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
@@ -89,6 +118,14 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   const auto& TriggerResultsCollections = iConfig.getParameter<std::vector<std::string> >("TriggerResultsCollections");
 
   triggerResultsContainer_ptr_.reset(new TriggerResultsContainer(TriggerResultsCollections, TriggerResultsInputTag.label(), this->consumes<edm::TriggerResults>(TriggerResultsInputTag)));
+
+  // fillCollectionConditions
+  fillCollectionConditionMap_.clear();
+
+  if(iConfig.exists("fillCollectionConditions")){
+
+    fillCollectionConditionMap_.init(iConfig.getParameter<edm::ParameterSet>("fillCollectionConditions"));
+  }
 
   // stringCutObjectSelectors
   stringCutObjectSelectors_map_.clear();
@@ -460,10 +497,20 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     }
 
     LogDebug("JMETriggerNTuple::analyze") << "output collections will be saved to TTree";
+
+    // update fill-collection conditions
+    fillCollectionConditionMap_.update(*triggerResults_handle, iEvent);
   }
 
   // fill recoVertexCollectionContainers
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
+
+    recoVertexCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(recoVertexCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoVertexCollectionContainer_i.name()))){
+
+      continue;
+    }
 
     edm::Handle<std::vector<reco::Vertex> > i_handle;
     iEvent.getByToken(recoVertexCollectionContainer_i.token(), i_handle);
@@ -473,8 +520,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << recoVertexCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoVertexCollectionContainer_i.name() << "_*\")";
-
-      recoVertexCollectionContainer_i.clear();
     }
     else {
 
@@ -485,6 +530,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoPFCandidateCollectionContainers
   for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){
 
+    recoPFCandidateCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(recoPFCandidateCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoPFCandidateCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<reco::PFCandidate> > i_handle;
     iEvent.getByToken(recoPFCandidateCollectionContainer_i.token(), i_handle);
 
@@ -493,8 +545,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << recoPFCandidateCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoPFCandidateCollectionContainer_i.name() << "_*\")";
-
-      recoPFCandidateCollectionContainer_i.clear();
     }
     else {
 
@@ -505,6 +555,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patPackedCandidateCollectionContainers
   for(auto& patPackedCandidateCollectionContainer_i : v_patPackedCandidateCollectionContainer_){
 
+    patPackedCandidateCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(patPackedCandidateCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(patPackedCandidateCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<pat::PackedCandidate> > i_handle;
     iEvent.getByToken(patPackedCandidateCollectionContainer_i.token(), i_handle);
 
@@ -513,8 +570,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << patPackedCandidateCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << patPackedCandidateCollectionContainer_i.name() << "_*\")";
-
-      patPackedCandidateCollectionContainer_i.clear();
     }
     else {
 
@@ -527,6 +582,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
     for(auto& recoGenJetCollectionContainer_i : v_recoGenJetCollectionContainer_){
 
+      recoGenJetCollectionContainer_i.clear();
+
+      if(fillCollectionConditionMap_.has(recoGenJetCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoGenJetCollectionContainer_i.name()))){
+
+        continue;
+      }
+
       edm::Handle<std::vector<reco::GenJet> > i_handle;
       iEvent.getByToken(recoGenJetCollectionContainer_i.token(), i_handle);
 
@@ -535,8 +597,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         edm::LogWarning("JMETriggerNTuple::analyze")
           << "invalid handle for input collection: \"" << recoGenJetCollectionContainer_i.inputTagLabel()
           << "\" (NTuple branches: \"" << recoGenJetCollectionContainer_i.name() << "_*\")";
-
-        recoGenJetCollectionContainer_i.clear();
       }
       else {
 
@@ -548,6 +608,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoPFJetCollectionContainers
   for(auto& recoPFJetCollectionContainer_i : v_recoPFJetCollectionContainer_){
 
+    recoPFJetCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(recoPFJetCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoPFJetCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<reco::PFJet> > i_handle;
     iEvent.getByToken(recoPFJetCollectionContainer_i.token(), i_handle);
 
@@ -556,8 +623,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << recoPFJetCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoPFJetCollectionContainer_i.name() << "_*\")";
-
-      recoPFJetCollectionContainer_i.clear();
     }
     else {
 
@@ -568,6 +633,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patJetCollectionContainers
   for(auto& patJetCollectionContainer_i : v_patJetCollectionContainer_){
 
+    patJetCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(patJetCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(patJetCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<pat::Jet> > i_handle;
     iEvent.getByToken(patJetCollectionContainer_i.token(), i_handle);
 
@@ -576,8 +648,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << patJetCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << patJetCollectionContainer_i.name() << "_*\")";
-
-      patJetCollectionContainer_i.clear();
     }
     else {
 
@@ -590,6 +660,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
     for(auto& recoGenMETCollectionContainer_i : v_recoGenMETCollectionContainer_){
 
+      recoGenMETCollectionContainer_i.clear();
+
+      if(fillCollectionConditionMap_.has(recoGenMETCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoGenMETCollectionContainer_i.name()))){
+
+        continue;
+      }
+
       edm::Handle<std::vector<reco::GenMET> > i_handle;
       iEvent.getByToken(recoGenMETCollectionContainer_i.token(), i_handle);
 
@@ -598,8 +675,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         edm::LogWarning("JMETriggerNTuple::analyze")
           << "invalid handle for input collection: \"" << recoGenMETCollectionContainer_i.inputTagLabel()
           << "\" (NTuple branches: \"" << recoGenMETCollectionContainer_i.name() << "_*\")";
-
-        recoGenMETCollectionContainer_i.clear();
       }
       else { 
 
@@ -611,6 +686,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoCaloMETCollectionContainers
   for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
 
+    recoCaloMETCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(recoCaloMETCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoCaloMETCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<reco::CaloMET> > i_handle;
     iEvent.getByToken(recoCaloMETCollectionContainer_i.token(), i_handle);
 
@@ -619,8 +701,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: " << recoCaloMETCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoCaloMETCollectionContainer_i.name() << "_*\")";
-
-      recoCaloMETCollectionContainer_i.clear();
     }
     else {
 
@@ -631,6 +711,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill recoPFMETCollectionContainers
   for(auto& recoPFMETCollectionContainer_i : v_recoPFMETCollectionContainer_){
 
+    recoPFMETCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(recoPFMETCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoPFMETCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<reco::PFMET> > i_handle;
     iEvent.getByToken(recoPFMETCollectionContainer_i.token(), i_handle);
 
@@ -639,8 +726,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << recoPFMETCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << recoPFMETCollectionContainer_i.name() << "_*\")";
-
-      recoPFMETCollectionContainer_i.clear();
     }
     else {
 
@@ -651,6 +736,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patMETCollectionContainers
   for(auto& patMETCollectionContainer_i : v_patMETCollectionContainer_){
 
+    patMETCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(patMETCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(patMETCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<pat::MET> > i_handle;
     iEvent.getByToken(patMETCollectionContainer_i.token(), i_handle);
 
@@ -659,8 +751,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << patMETCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << patMETCollectionContainer_i.name() << "_*\")";
-
-      patMETCollectionContainer_i.clear();
     }
     else {
 
@@ -671,6 +761,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patMuonCollectionContainers
   for(auto& patMuonCollectionContainer_i : v_patMuonCollectionContainer_){
 
+    patMuonCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(patMuonCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(patMuonCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<pat::Muon> > i_handle;
     iEvent.getByToken(patMuonCollectionContainer_i.token(), i_handle);
 
@@ -679,8 +776,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << patMuonCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << patMuonCollectionContainer_i.name() << "_*\")";
-
-      patMuonCollectionContainer_i.clear();
     }
     else {
 
@@ -691,6 +786,13 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // fill patElectronCollectionContainers
   for(auto& patElectronCollectionContainer_i : v_patElectronCollectionContainer_){
 
+    patElectronCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(patElectronCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(patElectronCollectionContainer_i.name()))){
+
+      continue;
+    }
+
     edm::Handle<std::vector<pat::Electron> > i_handle;
     iEvent.getByToken(patElectronCollectionContainer_i.token(), i_handle);
 
@@ -699,8 +801,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << patElectronCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << patElectronCollectionContainer_i.name() << "_*\")";
-
-      patElectronCollectionContainer_i.clear();
     }
     else {
 
@@ -1009,6 +1109,109 @@ bool JMETriggerNTuple::passesTriggerResults_AND(const edm::TriggerResults& trigg
   }
 
   return true;
+}
+
+JMETriggerNTuple::FillCollectionConditionsMap::FillCollectionConditionsMap(){
+
+  this->clear();
+}
+
+JMETriggerNTuple::FillCollectionConditionsMap::FillCollectionConditionsMap(const edm::ParameterSet& pset){
+
+  this->init(pset);
+}
+
+int JMETriggerNTuple::FillCollectionConditionsMap::init(const edm::ParameterSet& pset){
+
+  this->clear();
+
+  const auto& pset_strings = pset.getParameterNamesForType<std::string>();
+
+  for(const auto& name : pset_strings){
+
+    if(not this->has(name)){
+
+      condMap_.insert({name, condition(pset.getParameter<std::string>(name))});
+    }
+  }
+
+  return 0;
+}
+
+void JMETriggerNTuple::FillCollectionConditionsMap::clear(){
+
+  condMap_.clear();
+}
+
+bool JMETriggerNTuple::FillCollectionConditionsMap::has(const std::string& name) const {
+
+  return (condMap_.find(name) != condMap_.end());
+}
+
+const JMETriggerNTuple::FillCollectionConditionsMap::condition& JMETriggerNTuple::FillCollectionConditionsMap::at(const std::string& name) const {
+
+  if(not this->has(name)){
+
+    throw cms::Exception("LogicError") << "internal map has no entry associated to key \"" << name << "\"";
+  }
+
+  return condMap_.at(name);
+}
+
+bool JMETriggerNTuple::FillCollectionConditionsMap::accept(const std::string& name) const {
+
+  if(not this->has(name)){
+
+    throw cms::Exception("LogicError") << "internal map has no entry associated to key \"" << name << "\"";
+  }
+
+  return this->at(name).accept;
+}
+
+int JMETriggerNTuple::FillCollectionConditionsMap::update(const edm::TriggerResults& triggerResults, const edm::Event& iEvent){
+
+  for(auto& map_entry : condMap_){
+
+    map_entry.second.accept = false;
+  }
+
+  const auto& triggerNames = iEvent.triggerNames(triggerResults).triggerNames();
+
+  if(triggerResults.size() != triggerNames.size()){
+
+    edm::LogWarning("InputError") << "size of TriggerResults (" << triggerResults.size()
+      << ") and TriggerNames (" << triggerNames.size() << ") differ, exiting function";
+
+    return 1;
+  }
+
+  for(unsigned int idx=0; idx<triggerResults.size(); ++idx){
+
+    LogDebug("FillCollectionConditionsMap::update") << "path = " << triggerNames.at(idx) << ", accept = " << triggerResults.at(idx).accept();
+
+    // since default value of condition::accept is false,
+    // the value needs to be changed only for accepted paths
+    if(triggerResults.at(idx).accept()){
+
+      const auto& triggerName = triggerNames.at(idx);
+      const auto triggerName_unv = triggerName.substr(0, triggerName.rfind("_v"));
+
+      for(auto& map_entry : condMap_){
+
+        // require match either full name or name without version
+        if((map_entry.second.path == triggerName_unv) || (map_entry.second.path == triggerName)){
+
+          map_entry.second.accept = triggerResults.at(idx).accept();
+
+	  LogDebug("FillCollectionConditionsMap::update") << "triggerResults entry \"" << triggerNames.at(idx)
+            << "\" matches condition \"" << map_entry.second.path << "\" for collection \"" << map_entry.first
+            << "\" (accept=" << map_entry.second.accept << ")";
+        }
+      }
+    }
+  }
+
+  return 0;
 }
 
 void JMETriggerNTuple::fillDescriptions(edm::ConfigurationDescriptions& descriptions){

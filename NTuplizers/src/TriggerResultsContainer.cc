@@ -69,8 +69,6 @@ void TriggerResultsContainer::fill(const edm::TriggerResults& triggerResults, co
         if((entry_i.name == triggerName_unv) || (entry_i.name == triggerName)){
 
           entry_i.accept = triggerResults.at(idx).accept();
-
-          break;
         }
       }
     }

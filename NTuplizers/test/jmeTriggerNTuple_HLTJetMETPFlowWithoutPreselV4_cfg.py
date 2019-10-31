@@ -19,40 +19,46 @@ process.analysisCollectionsSequence *= process.userMuonsSequence
 process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
 process.analysisCollectionsSequence *= process.userElectronsSequence
 
-## Jets
-process.load('JMETriggerAnalysis.NTuplizers.userJets_cff')
-process.analysisCollectionsSequence *= process.userJetsSequence
+## Event Selection
+from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
 
-### Event Selection
-#from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
-#
-#process.eventSelMuons = selectedPatMuons.clone(
-#  src = 'userIsolatedMuons',
-#  cut = 'pt>27 && userInt("IDMedium") && userFloat("pfIsoR04") < 0.25',
-#)
-#
-#from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
-#
-#process.eventSelElectrons = selectedPatElectrons.clone(
-#  src = 'userIsolatedElectrons',
-#  cut = 'pt>35 && userInt("IDCutBasedMedium")',
-#)
-#
-#process.eventSelLeptons = cms.EDProducer('CandViewMerger',
-#  src = cms.VInputTag('eventSelMuons', 'eventSelElectrons'),
-#)
-#
-#process.eventSelOneLepton = cms.EDFilter('CandViewCountFilter',
-#  src = cms.InputTag('eventSelLeptons'),
-#  minNumber = cms.uint32(1),
-#)
-#
-#process.analysisCollectionsSequence *= cms.Sequence(
-#    process.eventSelMuons
-#  * process.eventSelElectrons
-#  * process.eventSelLeptons
-#  * process.eventSelOneLepton
-#)
+process.eventSelMuons = selectedPatMuons.clone(
+  src = 'userIsolatedMuons',
+  cut = 'pt>27 && userInt("IDMedium") && userFloat("pfIsoR04") < 0.25',
+)
+
+from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
+
+process.eventSelElectrons = selectedPatElectrons.clone(
+  src = 'userIsolatedElectrons',
+  cut = 'pt>35 && userInt("IDCutBasedMedium")',
+)
+
+process.eventSelLeptons = cms.EDProducer('CandViewMerger',
+  src = cms.VInputTag('eventSelMuons', 'eventSelElectrons'),
+)
+
+process.eventSelOneLepton = cms.EDFilter('CandViewCountFilter',
+  src = cms.InputTag('eventSelLeptons'),
+  minNumber = cms.uint32(1),
+)
+
+process.analysisCollectionsSequence *= cms.Sequence(
+    process.eventSelMuons
+  * process.eventSelElectrons
+  * process.eventSelLeptons
+  * process.eventSelOneLepton
+)
+
+process.METMinDeltaPtHLTwrtOfflinePFMETRaw = cms.EDFilter('METMinDeltaPt',
+
+  online = cms.InputTag('hltPFMETProducer'),
+
+  offline = cms.InputTag('slimmedMETs'),
+  offlineCorrectionLevel = cms.string('Raw'),
+
+  minRelDiff = cms.double(0.5),
+)
 
 ## JMETrigger NTuple
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
@@ -63,14 +69,13 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResultsFilterOR = cms.vstring(
 
-#    'HLT_IsoMu24',
-#    'HLT_Ele32_WPTight_Gsf',
+    'HLT_IsoMu24',
+    'HLT_Ele32_WPTight_Gsf',
   ),
 
   TriggerResultsFilterAND = cms.vstring(
 
-#    'HLT_IsoMu24',
-#    'HLT_Ele32_WPTight_Gsf',
+    'offlineEventSelectionPath',
   ),
 
   TriggerResultsCollections = cms.vstring(
@@ -84,6 +89,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'HLT_PFJet80NoCaloJetCut',
     'HLT_PFMET200NoCaloMETCut_NotCleaned',
     'HLT_PFMETTypeOne200NoCaloMETCut_HBHE_BeamHaloCleaned',
+  ),
+
+  fillCollectionConditions = cms.PSet(
+
+    hltParticleFlow = cms.string('METMinDeltaPtHLTwrtOfflinePFMETRawPath'),
+    offlinePFCandidates = cms.string('METMinDeltaPtHLTwrtOfflinePFMETRawPath'),
   ),
 
   recoVertexCollections = cms.PSet(
@@ -110,7 +121,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patJetCollections = cms.PSet(
 
-    offlineAK4PFCHSJetsCorrectedPt10 = cms.InputTag('userAK4PFCHSJetsPt10'+'::'+process.name_()),
+    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
   ),
 
   recoCaloMETCollections = cms.PSet(
@@ -121,8 +132,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFMETCollections = cms.PSet(
 
-    hltPFMet = cms.InputTag('hltPFMETProducer'+'::'+process.name_()),
-    hltPFMetTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
+    hltPFMET = cms.InputTag('hltPFMETProducer'+'::'+process.name_()),
+    hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
   ),
 
   patMETCollections = cms.PSet(
@@ -146,6 +157,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 #    hltParticleFlow = cms.string('pt>0.5'),
 #    offlineParticleFlow = cms.string('pt>0.5'),
     hltAK4PFJetsCorrected = cms.string('pt>3'),
+    offlineAK4PFCHSJetsCorrected = cms.string('pt>10'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
@@ -165,9 +177,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 )
 
-process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
-process.analysisCollectionsSchedule = cms.Schedule(process.analysisCollectionsPath)
-process.schedule.extend(process.analysisCollectionsSchedule)
+process.offlineEventSelectionPath = cms.Path(process.analysisCollectionsSequence)
+process.METMinDeltaPtHLTwrtOfflinePFMETRawPath = cms.Path(process.METMinDeltaPtHLTwrtOfflinePFMETRaw)
+process.offlineAnalysisSchedule = cms.Schedule(*(process.offlineEventSelectionPath, process.METMinDeltaPtHLTwrtOfflinePFMETRawPath))
+#process.offlineAnalysisSchedule = cms.Schedule(*(process.offlineEventSelectionPath, process.METMinDeltaPtHLTwrtOfflinePFMETRawPath, process.metFiltersPath))
+process.schedule.extend(process.offlineAnalysisSchedule)
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 process.schedule.extend([process.analysisNTupleEndPath])
