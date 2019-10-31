@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-sample_name = 'Data_Run2018B_SingleMuon'
+sample_name = 'Data_Run2018B_EGamma'
 
 store_dir = 'jme_trigger/jmeTriggerNtuples/pfMET/v01/191101'
 
