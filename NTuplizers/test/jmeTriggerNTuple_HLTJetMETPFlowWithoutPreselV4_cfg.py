@@ -5,7 +5,7 @@ from HLT_JetMETPFlowWithoutPreselV4_cfg import cms, process
 process.schedule.remove(process.RECOSIMoutput_step)
 
 ### add analysis sequence (JMETrigger NTuple)
-process.analysisCollectionsSequence = cms.Sequence()
+process.offlineEventSelectionSeq = cms.Sequence()
 
 ## additional HLT-METs
 from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETsSeq
@@ -13,19 +13,19 @@ hltMETsSeq(process,
   particleFlow = 'hltParticleFlow'+'::'+process.name_(),
   primaryVertices = 'hltPixelVertices'+'::'+process.name_(),
 )
-process.analysisCollectionsSequence *= process.hltMETsSeq
+process.offlineEventSelectionSeq *= process.hltMETsSeq
 
 ## Muons
 process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
-process.analysisCollectionsSequence *= process.userMuonsSequence
+process.offlineEventSelectionSeq *= process.userMuonsSequence
 
 ## Electrons
 #from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 #setupEgammaPostRecoSeq(process, runVID=True, runEnergyCorrections=False, era='2018-Prompt', phoIDModules=[])
-#process.analysisCollectionsSequence *= process.egammaPostRecoSeq
+#process.offlineEventSelectionSeq *= process.egammaPostRecoSeq
 
 process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
-process.analysisCollectionsSequence *= process.userElectronsSequence
+process.offlineEventSelectionSeq *= process.userElectronsSequence
 
 ## Event Selection
 from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
@@ -51,7 +51,7 @@ process.eventSelOneLepton = cms.EDFilter('CandViewCountFilter',
   minNumber = cms.uint32(1),
 )
 
-process.analysisCollectionsSequence *= cms.Sequence(
+process.offlineEventSelectionSeq *= cms.Sequence(
     process.eventSelMuons
   * process.eventSelElectrons
   * process.eventSelLeptons
@@ -190,7 +190,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 )
 
-process.offlineEventSelectionPath = cms.Path(process.analysisCollectionsSequence)
+process.offlineEventSelectionPath = cms.Path(process.offlineEventSelectionSeq)
 process.METMinDeltaPtHLTwrtOfflinePFMETRawPath = cms.Path(process.METMinDeltaPtHLTwrtOfflinePFMETRaw)
 process.offlineAnalysisSchedule = cms.Schedule(*(process.offlineEventSelectionPath, process.METMinDeltaPtHLTwrtOfflinePFMETRawPath))
 #process.offlineAnalysisSchedule = cms.Schedule(*(process.offlineEventSelectionPath, process.METMinDeltaPtHLTwrtOfflinePFMETRawPath, process.metFiltersPath))
