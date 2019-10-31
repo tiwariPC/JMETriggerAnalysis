@@ -38,30 +38,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResults = cms.InputTag('TriggerResults'+'::'+process.name_()),
 
-  TriggerResultsFilterOR = cms.vstring(
+  TriggerResultsFilterOR = cms.vstring(),
 
-#    'HLT_IsoMu24',
-#    'HLT_Ele32_WPTight_Gsf',
-  ),
+  TriggerResultsFilterAND = cms.vstring()
 
-  TriggerResultsFilterAND = cms.vstring(
-
-#    'HLT_IsoMu24',
-#    'HLT_Ele32_WPTight_Gsf',
-  ),
-
-  TriggerResultsCollections = cms.vstring(
-
-#    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
-#    'HLT_Ele32_WPTight_Gsf',
-#    'HLT_IsoMu24',
-#    'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL',
-#    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8',
-#    'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',
-#    'HLT_PFJet80NoCaloJetCut',
-#    'HLT_PFMET200NoCaloMETCut_NotCleaned',
-#    'HLT_PFMETTypeOne200NoCaloMETCut_HBHE_BeamHaloCleaned',
-  ),
+  TriggerResultsCollections = cms.vstring(),
 
   recoVertexCollections = cms.PSet(
 
@@ -114,12 +95,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMETNoPileUpJME = cms.InputTag('hltPFMETNoPileUpJME'+'::'+process.name_()),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
 
-    hltSoftKillerMET = cms.InputTag('hltSoftKillerMET'+'::'+process.name_()),
-
     hltPuppiMET = cms.InputTag('hltPuppiMET'+'::'+process.name_()),
     hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'+'::'+process.name_()),
-
     hltPuppiMETWithPuppiForJets = cms.InputTag('hltPuppiMETWithPuppiForJets'+'::'+process.name_()),
+
+    hltSoftKillerMET = cms.InputTag('hltSoftKillerMET'+'::'+process.name_()),
   ),
 
   patMETCollections = cms.PSet(
