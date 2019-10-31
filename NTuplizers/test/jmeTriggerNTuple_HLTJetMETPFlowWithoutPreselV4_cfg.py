@@ -7,6 +7,14 @@ process.schedule.remove(process.RECOSIMoutput_step)
 ### add analysis sequence (JMETrigger NTuple)
 process.analysisCollectionsSequence = cms.Sequence()
 
+## additional HLT-METs
+from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETsSeq
+hltMETsSeq(process,
+  particleFlow = 'hltParticleFlow'+'::'+process.name_(),
+  primaryVertices = 'hltPixelVertices'+'::'+process.name_(),
+)
+process.analysisCollectionsSequence *= process.hltMETsSeq
+
 ## Muons
 process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
 process.analysisCollectionsSequence *= process.userMuonsSequence
@@ -57,7 +65,7 @@ process.METMinDeltaPtHLTwrtOfflinePFMETRaw = cms.EDFilter('METMinDeltaPt',
   offline = cms.InputTag('slimmedMETs'),
   offlineCorrectionLevel = cms.string('Raw'),
 
-  minRelDiff = cms.double(0.5),
+  minRelDiff = cms.double(4.0),
 )
 
 ## JMETrigger NTuple
@@ -95,6 +103,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     hltParticleFlow = cms.string('METMinDeltaPtHLTwrtOfflinePFMETRawPath'),
     offlinePFCandidates = cms.string('METMinDeltaPtHLTwrtOfflinePFMETRawPath'),
+    hltPuppiForMET = cms.string('METMinDeltaPtHLTwrtOfflinePFMETRawPath'),
   ),
 
   recoVertexCollections = cms.PSet(
@@ -107,6 +116,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFCandidateCollections = cms.PSet(
 
     hltParticleFlow = cms.InputTag('hltParticleFlow'+'::'+process.name_()),
+    hltPuppiForMET = cms.InputTag('hltPuppiForMET'+'::'+process.name_()),
   ),
 
   patPackedCandidateCollections = cms.PSet(
@@ -134,6 +144,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     hltPFMET = cms.InputTag('hltPFMETProducer'+'::'+process.name_()),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'+'::'+process.name_()),
+
+    hltPuppiMET = cms.InputTag('hltPuppiMET'+'::'+process.name_()),
+    hltPuppiMETWithPuppiForJets = cms.InputTag('hltPuppiMETWithPuppiForJets'+'::'+process.name_()),
+
+    hltSoftKillerMET = cms.InputTag('hltSoftKillerMET'+'::'+process.name_()),
   ),
 
   patMETCollections = cms.PSet(
@@ -154,10 +169,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   stringCutObjectSelectors = cms.PSet(
 
-#    hltParticleFlow = cms.string('pt>0.5'),
-#    offlineParticleFlow = cms.string('pt>0.5'),
-    hltAK4PFJetsCorrected = cms.string('pt>3'),
-    offlineAK4PFCHSJetsCorrected = cms.string('pt>10'),
+    hltAK4PFJetsCorrected = cms.string('pt>15'),
+    offlineAK4PFCHSJetsCorrected = cms.string('pt>15'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
