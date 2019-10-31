@@ -35,7 +35,6 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
 
  public:
   explicit JMETriggerNTuple(const edm::ParameterSet&);
-  virtual ~JMETriggerNTuple() {}
 
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
@@ -1227,7 +1226,7 @@ void JMETriggerNTuple::fillDescriptions(edm::ConfigurationDescriptions& descript
 
 //  edm::ParameterSetDescription recoCaloMETCollections;
 //  desc.add<edm::ParameterSetDescription>("recoCaloMETCollections", recoCaloMETCollections);
-  descriptions.add("jmeTriggerNTuple", desc);
+  descriptions.add("JMETriggerNTuple", desc);
 }
 
 DEFINE_FWK_MODULE(JMETriggerNTuple);

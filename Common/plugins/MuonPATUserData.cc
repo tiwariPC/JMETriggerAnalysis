@@ -20,12 +20,13 @@ class MuonPATUserData : public edm::EDProducer {
 
  public:
   explicit MuonPATUserData(const edm::ParameterSet&);
-  virtual ~MuonPATUserData() {}
+
+  static void fillDescriptions(edm::ConfigurationDescriptions&);
 
  private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
-  edm::EDGetTokenT<edm::View<pat::Muon> > src_;
+  edm::EDGetToken src_;
 
   std::vector<std::string>     vmaps_bool_;
   std::vector<edm::EDGetToken> vmaps_bool_token_;
@@ -43,7 +44,6 @@ class MuonPATUserData : public edm::EDProducer {
   // Muon IDs HZZ
   bool IDLooseHZZ(const reco::Muon&, const reco::Vertex&);
   bool IDTightHZZ(const reco::Muon&, const reco::Vertex&);
-  // ------------
 };
 
 MuonPATUserData::MuonPATUserData(const edm::ParameterSet& iConfig)
@@ -337,6 +337,14 @@ bool MuonPATUserData::IDTightHZZ(const reco::Muon& muon, const reco::Vertex& vtx
   if(muon.pt() > 200.){ pass |= muon::isTrackerHighPtMuon(muon, vtx); }
 
   return pass;
+}
+
+void MuonPATUserData::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
+
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+
+  descriptions.add("MuonPATUserData", desc);
 }
 
 DEFINE_FWK_MODULE(MuonPATUserData);
