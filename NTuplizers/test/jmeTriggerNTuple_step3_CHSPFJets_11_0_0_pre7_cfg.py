@@ -44,6 +44,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResultsCollections = cms.vstring(),
 
+  fillCollectionConditions = cms.PSet(),
+
   recoVertexCollections = cms.PSet(
 
     hltGoodPrimaryVertices = cms.InputTag('goodOfflinePrimaryVertices'+'::'+process.name_()),
