@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 
 sample_name = 'Data_Run2018B_SingleMuon'
 
-store_dir = 'jme_trigger/jmeTriggerNtuples/pfMET/v01/191101'
+store_dir = 'jme_trigger/jmeTriggerNtuples/pfMET/v02/191101'
 
 MIN_DSET = '/SingleMuon/Run2018B-17Sep2018-v1/MINIAOD'
 RAW_DSET = '/SingleMuon/Run2018B-v1/RAW'
