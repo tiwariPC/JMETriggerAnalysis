@@ -1,4 +1,4 @@
-#include <JMETriggerAnalysis/NTuplizers/plugins/FwdPtrConverter.h>
+#include <JMETriggerAnalysis/Common/plugins/FwdPtrConverter.h>
 #include <FWCore/Framework/interface/MakerMacros.h>
 
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
