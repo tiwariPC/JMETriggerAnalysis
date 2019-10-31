@@ -20,12 +20,13 @@ class ElectronPATUserData : public edm::EDProducer {
 
  public:
   explicit ElectronPATUserData(const edm::ParameterSet&);
-  virtual ~ElectronPATUserData() {}
+
+  static void fillDescriptions(edm::ConfigurationDescriptions&);
 
  private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
-  edm::EDGetTokenT<edm::View<pat::Electron> > src_;
+  edm::EDGetToken src_;
 
   std::vector<std::string>     vmaps_bool_;
   std::vector<edm::EDGetToken> vmaps_bool_token_;
@@ -278,6 +279,14 @@ void ElectronPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.put(std::move(newElecs));
 
   return;
+}
+
+void ElectronPATUserData::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
+
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+
+  descriptions.add("ElectronPATUserData", desc);
 }
 
 DEFINE_FWK_MODULE(ElectronPATUserData);

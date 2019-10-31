@@ -1,6 +1,3 @@
-#include <memory>
-#include <utility>
-
 #include <FWCore/Framework/interface/Frameworkfwd.h>
 #include <FWCore/Framework/interface/EDProducer.h>
 #include <FWCore/Framework/interface/Event.h>
@@ -10,16 +7,20 @@
 #include <DataFormats/PatCandidates/interface/PackedCandidate.h>
 #include <DataFormats/ParticleFlowCandidate/interface/PFCandidate.h>
 
+#include <memory>
+#include <utility>
+
 class PATPackedCandidatesToRecoPFCandidatesConverter : public edm::EDProducer {
 
  public:
   explicit PATPackedCandidatesToRecoPFCandidatesConverter(const edm::ParameterSet&);
-  virtual ~PATPackedCandidatesToRecoPFCandidatesConverter() {}
+
+  static void fillDescriptions(edm::ConfigurationDescriptions&);
 
  private:
   void produce(edm::Event&, const edm::EventSetup&);
 
-  edm::EDGetTokenT<pat::PackedCandidateCollection> src_;
+  edm::EDGetToken src_;
 };
 
 PATPackedCandidatesToRecoPFCandidatesConverter::PATPackedCandidatesToRecoPFCandidatesConverter(const edm::ParameterSet& iConfig){
@@ -46,6 +47,15 @@ void PATPackedCandidatesToRecoPFCandidatesConverter::produce(edm::Event& iEvent,
   iEvent.put(std::move(recoPFCands));
 
   return;
+}
+
+void PATPackedCandidatesToRecoPFCandidatesConverter::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
+
+  edm::ParameterSetDescription desc;
+
+  desc.add<edm::InputTag>("src")->setComment("edm::InputTag of input pat::PackedCandidateCollection");
+
+  descriptions.add("PATPackedCandidatesToRecoPFCandidatesConverter", desc);
 }
 
 DEFINE_FWK_MODULE(PATPackedCandidatesToRecoPFCandidatesConverter);
