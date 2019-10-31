@@ -7,14 +7,10 @@
   <use name="FWCore/MessageLogger"/>
   <use name="FWCore/Utilities"/>
   <use name="FWCore/ServiceRegistry"/>
+  <use name="FWCore/Common"/>
   <use name="CommonTools/UtilAlgos"/>
   <use name="CommonTools/Utils"/>
-  <use name="FWCore/Common"/>
   <use name="DataFormats/Common"/>
-  <use name="DataFormats/PatCandidates"/>
-  <use name="DataFormats/VertexReco"/>
-  <use name="DataFormats/MuonReco"/>
-  <use name="RecoEgamma/EgammaTools"/>
   <use name="rootmath"/>
   <use name="root"/>
 </library>
