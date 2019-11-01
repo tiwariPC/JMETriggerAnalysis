@@ -40,7 +40,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResultsFilterOR = cms.vstring(),
 
-  TriggerResultsFilterAND = cms.vstring()
+  TriggerResultsFilterAND = cms.vstring(),
 
   TriggerResultsCollections = cms.vstring(),
 
