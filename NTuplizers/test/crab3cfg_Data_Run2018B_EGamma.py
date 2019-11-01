@@ -29,8 +29,8 @@ config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Coll
 config.Data.inputDataset = MIN_DSET
 config.Data.secondaryInputDataset = RAW_DSET
 config.Data.outLFNDirBase = '/store/user/missirol/'+store_dir+'/'+sample_name
-config.Data.unitsPerJob = 10000
-config.Data.totalUnits = -1
+config.Data.unitsPerJob = 100000
+#config.Data.totalUnits = -1
 
 config.section_('Site')
 config.Site.storageSite = 'T2_DE_DESY'
