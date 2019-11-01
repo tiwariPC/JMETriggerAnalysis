@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 
 sample_name = 'Data_Run2018B_SingleMuon'
 
-store_dir = 'jme_trigger/jmeTriggerNtuples/pfMET/v02/191101'
+store_dir = 'jme_trigger/jmeTriggerNtuples/pfMET/v02/191102'
 
 MIN_DSET = '/SingleMuon/Run2018B-17Sep2018-v1/MINIAOD'
 RAW_DSET = '/SingleMuon/Run2018B-v1/RAW'
@@ -30,7 +30,7 @@ config.Data.inputDataset = MIN_DSET
 config.Data.secondaryInputDataset = RAW_DSET
 config.Data.outLFNDirBase = '/store/user/missirol/'+store_dir+'/'+sample_name
 config.Data.unitsPerJob = 10000
-config.Data.totalUnits = 1000000
+config.Data.totalUnits = -1
 
 config.section_('Site')
 config.Site.storageSite = 'T2_DE_DESY'
