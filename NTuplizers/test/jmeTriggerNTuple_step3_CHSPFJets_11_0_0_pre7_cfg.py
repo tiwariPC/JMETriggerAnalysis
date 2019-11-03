@@ -4,9 +4,9 @@ from step3_CHSPFJets_11_0_0_pre7 import cms, process
 ### remove cms.EndPath for EDM output
 del process.HLTOutput
 
-process.DQMStore.enableMultiThread = False
-process.options.numberOfStreams = 1
-process.options.numberOfThreads = 1
+#process.DQMStore.enableMultiThread = False
+#process.options.numberOfStreams = 1
+#process.options.numberOfThreads = 1
 
 ### Sequence for HLT(-like) MET Collections
 from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETsSeq

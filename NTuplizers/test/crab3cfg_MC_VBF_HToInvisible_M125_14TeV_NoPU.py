@@ -11,16 +11,16 @@ config = Configuration()
 config.section_('General')
 config.General.requestName = 'jmeTriggerNTuple_'+sample_name
 config.General.transferOutputs = True
-config.General.transferLogs = True
+config.General.transferLogs = False
 
 config.section_('JobType')
 config.JobType.pluginName  = 'Analysis'
-config.JobType.maxMemoryMB = 5000
 config.JobType.psetName = 'jmeTriggerNTuple_step3_CHSPFJets_11_0_0_pre7_cfg.py'
 config.JobType.inputFiles = ['step3_CHSPFJets_11_0_0_pre7.py']
 config.JobType.pyCfgParams = ['output='+sample_name+'.root']
 config.JobType.maxJobRuntimeMin = 2500
-#config.JobType.numCores = 4
+config.JobType.maxMemoryMB = 10000
+config.JobType.numCores = 4
 
 config.section_('Data')
 config.Data.publication = False
