@@ -1,7 +1,6 @@
 <export>
 </export>
 <library  name="JMETriggerAnalysisCommon_plugins" file="*.cc">
-  <use name="JMETriggerAnalysis/Common"/>
   <use name="FWCore/Framework"/>
   <use name="FWCore/ParameterSet"/>
   <use name="FWCore/MessageLogger"/>
