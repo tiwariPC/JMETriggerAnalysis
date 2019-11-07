@@ -497,6 +497,9 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
     LogDebug("JMETriggerNTuple::analyze") << "output collections will be saved to TTree";
 
+    // fill TriggerResultsContainer
+    triggerResultsContainer_ptr_->fill(*triggerResults_handle, iEvent);
+
     // update fill-collection conditions
     fillCollectionConditionMap_.update(*triggerResults_handle, iEvent);
   }

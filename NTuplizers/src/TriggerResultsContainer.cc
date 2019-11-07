@@ -62,6 +62,9 @@ void TriggerResultsContainer::fill(const edm::TriggerResults& triggerResults, co
       const auto& triggerName = triggerNames.at(idx);
       const auto triggerName_unv = triggerName.substr(0, triggerName.rfind("_v"));
 
+      LogDebug("Value") << "path = " << triggerName << ", path (un-versioned) = " << triggerName_unv
+        << ", accept = " << triggerResults.at(idx).accept();
+
       for(auto& entry_i : entries_){
 
         // require Entry::name to match either full name (e.g. "HLT_IsoMu24_v10")
@@ -69,6 +72,10 @@ void TriggerResultsContainer::fill(const edm::TriggerResults& triggerResults, co
         if((entry_i.name == triggerName_unv) || (entry_i.name == triggerName)){
 
           entry_i.accept = triggerResults.at(idx).accept();
+
+          LogDebug("Value") << "path = " << triggerName << ", path (un-versioned) = " << triggerName_unv
+            << ", accept = " << triggerResults.at(idx).accept()
+            << ", matched to entry with name = " << entry_i.name << " (accept = " << entry_i.accept << ")";
         }
       }
     }

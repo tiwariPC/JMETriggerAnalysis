@@ -287,6 +287,7 @@ if opts.logs:
          reportEvery = cms.untracked.int32(1),
        ),
      ),
+     # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
      logDebug = cms.untracked.PSet(
        threshold = cms.untracked.string('DEBUG'),
        extension = cms.untracked.string('.txt'),
