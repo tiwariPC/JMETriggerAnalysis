@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/v2/191030'
+store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191114'
 sample_name = 'VBF_HToInvisible_M125_14TeV_PU140'
 
 MIN_DSET = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19MiniAOD-PU140_106X_upgrade2023_realistic_v3-v1/MINIAODSIM'
@@ -11,7 +11,7 @@ config = Configuration()
 config.section_('General')
 config.General.requestName = 'jmeTriggerNTuple_'+sample_name
 config.General.transferOutputs = True
-config.General.transferLogs = True
+config.General.transferLogs = False
 
 config.section_('JobType')
 config.JobType.pluginName  = 'Analysis'
