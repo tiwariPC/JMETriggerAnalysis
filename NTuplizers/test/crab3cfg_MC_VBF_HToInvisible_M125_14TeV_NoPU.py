@@ -15,8 +15,8 @@ config.General.transferLogs = False
 
 config.section_('JobType')
 config.JobType.pluginName  = 'Analysis'
-config.JobType.psetName = 'jmeTriggerNTuple_step3_CHSPFJets_11_0_0_pre7_cfg.py'
-config.JobType.inputFiles = ['step3_CHSPFJets_11_0_0_pre7.py']
+config.JobType.psetName = 'jmeTriggerNTuple_cfg.py'
+config.JobType.inputFiles = []
 config.JobType.pyCfgParams = ['output='+sample_name+'.root']
 config.JobType.maxJobRuntimeMin = 2500
 config.JobType.maxMemoryMB = 10000

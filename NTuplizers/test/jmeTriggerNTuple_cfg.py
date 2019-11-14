@@ -1,5 +1,6 @@
 ### configuration file to re-run customized HLT Menu on RAW
-from step3_CHSPFJets_11_0_0_pre7 import cms, process
+#from JMETriggerAnalysis.NTuplizers.step3_CHSPFJets_11_0_0_pre7 import cms, process
+from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_11_0_0_pre7 import cms, process
 
 ### remove cms.EndPath for EDM output
 del process.HLTOutput
