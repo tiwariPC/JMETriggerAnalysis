@@ -4,7 +4,7 @@ from CommonTools.PileupAlgos.Puppi_cff import *
 from CommonTools.PileupAlgos.PhotonPuppi_cff import puppiPhoton
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
 
-def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pfNoPileUpJME=None):
+def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTypeOne, primaryVertices, pfNoPileUpJME=None):
 
     ### PF MET
     proc.hltPFMET = cms.EDProducer( 'PFMETProducer',
@@ -16,19 +16,19 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
     ### PF MET Type-1
     proc.hltAK4PFFastJetCorrector = cms.EDProducer( 'L1FastjetCorrectorProducer',
         srcRho = cms.InputTag( 'fixedGridRhoFastjetAll'+'::'+proc.name_() ),
-        algorithm = cms.string( 'AK4PFHLT' ),
+        algorithm = cms.string( jescLabelForPFMETTypeOne ),
         level = cms.string( 'L1FastJet' )
     )
     proc.hltAK4PFRelativeCorrector = cms.EDProducer( 'LXXXCorrectorProducer',
-        algorithm = cms.string( 'AK4PFHLT' ),
+        algorithm = cms.string( jescLabelForPFMETTypeOne ),
         level = cms.string( 'L2Relative' )
     )
     proc.hltAK4PFAbsoluteCorrector = cms.EDProducer( 'LXXXCorrectorProducer',
-        algorithm = cms.string( 'AK4PFHLT' ),
+        algorithm = cms.string( jescLabelForPFMETTypeOne ),
         level = cms.string( 'L3Absolute' )
     )
     proc.hltAK4PFResidualCorrector = cms.EDProducer( 'LXXXCorrectorProducer',
-        algorithm = cms.string( 'AK4PFHLT' ),
+        algorithm = cms.string( jescLabelForPFMETTypeOne ),
         level = cms.string( 'L2L3Residual' )
     )
     proc.hltAK4PFCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
@@ -36,7 +36,7 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
     )
     proc.hltcorrPFMETTypeOne = cms.EDProducer( 'PFJetMETcorrInputProducer',
         src = cms.InputTag( ak4PFJetsForPFMETTypeOne ),
-        type1JetPtThreshold = cms.double( 35.0 ),
+        type1JetPtThreshold = cms.double( 15.0 ),
         skipEMfractionThreshold = cms.double( 0.9 ),
         skipEM = cms.bool( True ),
         jetCorrLabelRes = cms.InputTag( 'hltAK4PFCorrector' ),
@@ -44,7 +44,7 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, primaryVertices, pf
         skipMuons = cms.bool( True ),
         skipMuonSelection = cms.string( 'isGlobalMuon | isStandAloneMuon' ),
         jetCorrEtaMax = cms.double( 9.9 ),
-        jetCorrLabel = cms.InputTag( 'hltAK4PFCorrector' )
+        jetCorrLabel = cms.InputTag( 'hltAK4PFCorrector' ),
     )
     proc.hltPFMETTypeOne = cms.EDProducer( 'CorrectedPFMETProducer',
         src = cms.InputTag( 'hltPFMET' ),

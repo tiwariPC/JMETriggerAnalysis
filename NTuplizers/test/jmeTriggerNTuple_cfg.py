@@ -13,7 +13,8 @@ del process.HLTOutput
 from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETsSeq
 hltMETsSeq(process,
   particleFlow = 'particleFlowTmp'+'::'+process.name_(),
-  ak4PFJetsForPFMETTypeOne = 'ak4PFJets'+'::'+process.name_(),
+  ak4PFJetsForPFMETTypeOne = 'ak4PFJetsCHS'+'::'+process.name_(),
+  jescLabelForPFMETTypeOne = 'AK4PFchs',
   primaryVertices = 'goodOfflinePrimaryVertices'+'::'+process.name_(),
   pfNoPileUpJME = 'pfNoPileUpJME'+'::'+process.name_(),
 )
