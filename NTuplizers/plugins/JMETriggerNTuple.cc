@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include <Compression.h>
 #include <TTree.h>
 
 class JMETriggerNTuple : public edm::EDAnalyzer {
@@ -984,6 +985,21 @@ void JMETriggerNTuple::beginJob(){
     this->addBranch(patElectronCollectionContainer_i.name()+"_id", &patElectronCollectionContainer_i.vec_id());
     this->addBranch(patElectronCollectionContainer_i.name()+"_pfIso", &patElectronCollectionContainer_i.vec_pfIso());
     this->addBranch(patElectronCollectionContainer_i.name()+"_etaSC", &patElectronCollectionContainer_i.vec_etaSC());
+  }
+
+  // settings for output TFile and TTree
+  fileService->file().SetCompressionAlgorithm(ROOT::ECompressionAlgorithm::kLZ4);
+  fileService->file().SetCompressionLevel(4);
+
+  for(int idx=0; idx<ttree_->GetListOfBranches()->GetEntries(); ++idx){
+
+    TBranch* br = dynamic_cast<TBranch*>(ttree_->GetListOfBranches()->At(idx));
+    if(br){ br->SetBasketSize(1024 * 1024); }
+  }
+
+  if(ttree_->GetListOfBranches()->GetEntries() > 0){
+
+    ttree_->SetAutoFlush(-1024 * 1024 * ttree_->GetListOfBranches()->GetEntries());
   }
 }
 
