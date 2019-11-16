@@ -18,7 +18,7 @@ config.JobType.pluginName  = 'Analysis'
 config.JobType.psetName = 'jmeTriggerNTuple_cfg.py'
 config.JobType.inputFiles = []
 config.JobType.pyCfgParams = ['output='+sample_name+'.root']
-config.JobType.maxJobRuntimeMin = 2500
+config.JobType.maxJobRuntimeMin = 2880
 config.JobType.maxMemoryMB = 10000
 config.JobType.numCores = 4
 
@@ -30,7 +30,7 @@ config.Data.inputDataset = MIN_DSET
 config.Data.secondaryInputDataset = RAW_DSET
 config.Data.outLFNDirBase = '/store/user/missirol/'+store_dir+'/'+sample_name
 config.Data.unitsPerJob = 100
-config.Data.totalUnits = -1
+config.Data.totalUnits = 250000
 
 config.section_('Site')
 config.Site.storageSite = 'T2_DE_DESY'
