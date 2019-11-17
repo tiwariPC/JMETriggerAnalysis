@@ -24,7 +24,7 @@ config.JobType.numCores = 4
 
 config.section_('Data')
 config.Data.publication = False
-config.Data.ignoreLocality = False
+config.Data.ignoreLocality = True
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.inputDataset = MIN_DSET
 config.Data.secondaryInputDataset = RAW_DSET
