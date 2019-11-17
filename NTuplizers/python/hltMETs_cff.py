@@ -90,7 +90,7 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTy
         candName = particleFlow,
         vertexName = primaryVertices,
     )
-    proc.ak4PuppiJetsForPuppiMETTypeOne = ak4PFJetsPuppi.clone(
+    proc.hltAK4PuppiJetsUncorrected = ak4PFJetsPuppi.clone(
         src = 'hltPuppi',
     )
     proc.hltAK4PuppiFastJetCorrector = cms.EDProducer( 'L1FastjetCorrectorProducer',
@@ -113,8 +113,12 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTy
     proc.hltAK4PuppiCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
         correctors = cms.VInputTag( 'hltAK4PuppiFastJetCorrector','hltAK4PuppiRelativeCorrector','hltAK4PuppiAbsoluteCorrector','hltAK4PuppiResidualCorrector' )
     )
+    proc.hltAK4PuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
+      src = cms.InputTag('hltAK4PuppiJetsUncorrected'),
+      correctors = cms.VInputTag('hltAK4PuppiCorrector'),
+    )
     proc.hltcorrPuppiMETTypeOne = cms.EDProducer( 'PFJetMETcorrInputProducer',
-        src = cms.InputTag( 'ak4PuppiJetsForPuppiMETTypeOne' ),
+        src = cms.InputTag( 'hltAK4PuppiJetsUncorrected' ),
         type1JetPtThreshold = cms.double( 35.0 ),
         skipEMfractionThreshold = cms.double( 0.9 ),
         skipEM = cms.bool( True ),
@@ -148,12 +152,13 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTy
     )
     proc.hltPuppiMETsSeq += cms.Sequence(
         proc.hltPuppi
-      *(proc.ak4PuppiJetsForPuppiMETTypeOne
+      *(proc.hltAK4PuppiJetsUncorrected
       * proc.hltAK4PuppiFastJetCorrector
       * proc.hltAK4PuppiRelativeCorrector
       * proc.hltAK4PuppiAbsoluteCorrector
       * proc.hltAK4PuppiResidualCorrector
       * proc.hltAK4PuppiCorrector
+      * proc.hltAK4PuppiJetsCorrected
       * proc.hltcorrPuppiMETTypeOne
       * proc.hltPuppiMETTypeOne
       + proc.hltPuppiMETWithPuppiForJets)

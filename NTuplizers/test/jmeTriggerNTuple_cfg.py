@@ -74,11 +74,13 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFJetCollections = cms.PSet(
 
     hltAK4PFCHSJetsCorrected = cms.InputTag('ak4PFJetsCHSCorrected'+'::'+process.name_()),
+    hltAK4PuppiJetsCorrected = cms.InputTag('hltAK4PuppiJetsCorrected'+'::'+process.name_()),
   ),
 
   patJetCollections = cms.PSet(
 
     offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'+'::'+'PAT'),
+    offlineAK4PuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'+'::'+'PAT'),
   ),
 
   recoGenMETCollections = cms.PSet(
@@ -124,9 +126,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   stringCutObjectSelectors = cms.PSet(
 
-    ak4GenJets = cms.string('pt>7'),
-    hltAK4PFCHSJetsCorrected = cms.string('pt>7'),
-    offlineAK4PFCHSJetsCorrected = cms.string('pt>7'),
+    ak4GenJets = cms.string('pt > 7'),
+    hltAK4PFCHSJetsCorrected = cms.string('pt > 7'),
+    hltAK4PuppiJetsCorrected = cms.string('pt > 7'),
+    offlineAK4PFCHSJetsCorrected = cms.string('pt > 7'),
+    offlineAK4PuppiJetsCorrected = cms.string('pt > 7'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
