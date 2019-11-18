@@ -5,9 +5,9 @@ from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_11_0_0_pre7 import cms, proc
 ### remove cms.EndPath for EDM output
 del process.HLTOutput
 
-#process.DQMStore.enableMultiThread = False
-#process.options.numberOfStreams = 1
-#process.options.numberOfThreads = 1
+process.DQMStore.enableMultiThread = False
+process.options.numberOfStreams = 1
+process.options.numberOfThreads = 1
 
 ### Sequence for HLT(-like) MET Collections
 from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETsSeq
@@ -127,11 +127,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   stringCutObjectSelectors = cms.PSet(
 
-    ak4GenJets = cms.string('pt > 7'),
-    hltAK4PFCHSJetsCorrected = cms.string('pt > 7'),
-    hltAK4PuppiJetsCorrected = cms.string('pt > 7'),
-    offlineAK4PFCHSJetsCorrected = cms.string('pt > 7'),
-    offlineAK4PuppiJetsCorrected = cms.string('pt > 7'),
+    ak4GenJets = cms.string('pt > 12'),
+    ak4GenJetsNoNu = cms.string('pt > 12'),
+    hltAK4PFCHSJetsCorrected = cms.string('pt > 12'),
+    hltAK4PuppiJetsCorrected = cms.string('pt > 12'),
+    offlineAK4PFCHSJetsCorrected = cms.string('pt > 12'),
+    offlineAK4PuppiJetsCorrected = cms.string('pt > 12'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(

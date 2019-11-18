@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191118'
+store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191119'
 sample_name = 'VBF_HToInvisible_M125_14TeV_PU200'
 
 MIN_DSET = '/VBF_HToInvisible_M125_14TeV_powheg_pythia8/PhaseIITDRSpring19MiniAOD-PU200_106X_upgrade2023_realistic_v3-v1/MINIAODSIM'
@@ -19,8 +19,8 @@ config.JobType.psetName = 'jmeTriggerNTuple_cfg.py'
 config.JobType.inputFiles = []
 config.JobType.pyCfgParams = ['output='+sample_name+'.root']
 config.JobType.maxJobRuntimeMin = 2880
-config.JobType.maxMemoryMB = 10000
-config.JobType.numCores = 4
+config.JobType.maxMemoryMB = 4000
+#config.JobType.numCores = 4
 
 config.section_('Data')
 config.Data.publication = False
