@@ -69,6 +69,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoGenJetCollections = cms.PSet(
 
     ak4GenJets = cms.InputTag('ak4GenJets::HLT'),
+    ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
   ),
 
   recoPFJetCollections = cms.PSet(
