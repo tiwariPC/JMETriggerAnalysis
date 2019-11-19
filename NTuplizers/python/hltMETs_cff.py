@@ -119,7 +119,7 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTy
     )
     proc.hltcorrPuppiMETTypeOne = cms.EDProducer( 'PFJetMETcorrInputProducer',
         src = cms.InputTag( 'hltAK4PuppiJetsUncorrected' ),
-        type1JetPtThreshold = cms.double( 35.0 ),
+        type1JetPtThreshold = cms.double( 15.0 ),
         skipEMfractionThreshold = cms.double( 0.9 ),
         skipEM = cms.bool( True ),
         jetCorrLabelRes = cms.InputTag( 'hltAK4PuppiCorrector' ),
