@@ -14,6 +14,7 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoGenJetCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloJetCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoPFJetCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/PATJetCollectionContainer.h>
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoGenMETCollectionContainer.h>
@@ -63,6 +64,7 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
   std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
   std::vector<PATPackedCandidateCollectionContainer> v_patPackedCandidateCollectionContainer_;
   std::vector<RecoGenJetCollectionContainer> v_recoGenJetCollectionContainer_;
+  std::vector<RecoCaloJetCollectionContainer> v_recoCaloJetCollectionContainer_;
   std::vector<RecoPFJetCollectionContainer> v_recoPFJetCollectionContainer_;
   std::vector<PATJetCollectionContainer> v_patJetCollectionContainer_;
   std::vector<RecoGenMETCollectionContainer> v_recoGenMETCollectionContainer_;
@@ -244,6 +246,32 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
         v_recoGenJetCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
+    }
+  }
+
+  // reco::CaloJetCollection
+  v_recoCaloJetCollectionContainer_.clear();
+
+  if(iConfig.exists("recoCaloJetCollections")){
+
+    const edm::ParameterSet& pset_recoCaloJetCollections = iConfig.getParameter<edm::ParameterSet>("recoCaloJetCollections");
+
+    const auto& inputTagLabels_recoCaloJetCollections = pset_recoCaloJetCollections.getParameterNamesForType<edm::InputTag>();
+
+    v_recoCaloJetCollectionContainer_.reserve(inputTagLabels_recoCaloJetCollections.size());
+
+    for(const auto& label : inputTagLabels_recoCaloJetCollections){
+
+      const auto& inputTag = pset_recoCaloJetCollections.getParameter<edm::InputTag>(label);
+
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::CaloJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+
+      v_recoCaloJetCollectionContainer_.emplace_back(RecoCaloJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::CaloJet> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_recoCaloJetCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
       }
     }
   }
@@ -608,6 +636,31 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     }
   }
 
+  // fill recoCaloJetCollectionContainers
+  for(auto& recoCaloJetCollectionContainer_i : v_recoCaloJetCollectionContainer_){
+
+    recoCaloJetCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(recoCaloJetCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoCaloJetCollectionContainer_i.name()))){
+
+      continue;
+    }
+
+    edm::Handle<std::vector<reco::CaloJet> > i_handle;
+    iEvent.getByToken(recoCaloJetCollectionContainer_i.token(), i_handle);
+
+    if(not i_handle.isValid()){
+
+      edm::LogWarning("JMETriggerNTuple::analyze")
+        << "invalid handle for input collection: \"" << recoCaloJetCollectionContainer_i.inputTagLabel()
+        << "\" (NTuple branches: \"" << recoCaloJetCollectionContainer_i.name() << "_*\")";
+    }
+    else {
+
+      recoCaloJetCollectionContainer_i.fill(*i_handle);
+    }
+  }
+
   // fill recoPFJetCollectionContainers
   for(auto& recoPFJetCollectionContainer_i : v_recoPFJetCollectionContainer_){
 
@@ -882,6 +935,14 @@ void JMETriggerNTuple::beginJob(){
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_eta", &recoGenJetCollectionContainer_i.vec_eta());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_phi", &recoGenJetCollectionContainer_i.vec_phi());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_mass", &recoGenJetCollectionContainer_i.vec_mass());
+  }
+
+  for(auto& recoCaloJetCollectionContainer_i : v_recoCaloJetCollectionContainer_){
+
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_pt", &recoCaloJetCollectionContainer_i.vec_pt());
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_eta", &recoCaloJetCollectionContainer_i.vec_eta());
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_phi", &recoCaloJetCollectionContainer_i.vec_phi());
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_mass", &recoCaloJetCollectionContainer_i.vec_mass());
   }
 
   for(auto& recoPFJetCollectionContainer_i : v_recoPFJetCollectionContainer_){

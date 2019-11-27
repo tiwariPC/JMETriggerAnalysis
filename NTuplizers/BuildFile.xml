@@ -7,8 +7,6 @@
 <use name="DataFormats/PatCandidates"/>
 <use name="DataFormats/JetReco"/>
 <use name="DataFormats/METReco"/>
-<use name="rootmath"/>
-<use name="root"/>
 <export>
   <lib name="1"/>
 </export>
