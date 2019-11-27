@@ -132,6 +132,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'+'::'+process.name_()),
   ),
 
+  recoCaloJetCollections = cms.PSet(
+
+    offlineAK4CaloJetsCorrected = cms.InputTag('slimmedCaloJets'),
+  ),
+
   patJetCollections = cms.PSet(
 
     offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
@@ -173,6 +178,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   stringCutObjectSelectors = cms.PSet(
 
     hltAK4PFJetsCorrected = cms.string('pt>15'),
+    offlineAK4CaloJetsCorrected = cms.string('pt>15'),
     offlineAK4PFCHSJetsCorrected = cms.string('pt>15'),
   ),
 
