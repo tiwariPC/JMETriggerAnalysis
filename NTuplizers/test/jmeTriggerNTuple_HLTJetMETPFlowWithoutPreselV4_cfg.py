@@ -127,14 +127,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlinePFCandidates = cms.InputTag('packedPFCandidates'),
   ),
 
-  recoPFJetCollections = cms.PSet(
-
-    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'+'::'+process.name_()),
-  ),
-
   recoCaloJetCollections = cms.PSet(
 
     offlineAK4CaloJetsCorrected = cms.InputTag('slimmedCaloJets'),
+  ),
+
+  recoPFJetCollections = cms.PSet(
+
+    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'+'::'+process.name_()),
   ),
 
   patJetCollections = cms.PSet(
