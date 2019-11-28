@@ -505,6 +505,9 @@ process.globalreco
 +process.ak4PFJets
 +process.fixedGridRhoFastjetAll
 +process.ak4PFL1FastjetCorrector
++process.ak4PFL2RelativeCorrector
++process.ak4PFL3AbsoluteCorrector
++process.ak4PFL1FastL2L3Corrector
 +process.ak4PFJetsCorrected
 +process.particleFlowPtrs
 +process.goodOfflinePrimaryVertices

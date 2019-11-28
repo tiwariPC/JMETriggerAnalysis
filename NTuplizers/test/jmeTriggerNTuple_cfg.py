@@ -20,6 +20,38 @@ hltMETsSeq(process,
 )
 process.reconstruction *= process.hltMETsSeq
 
+### Sequence for HLT(-like) AK4-{PF,Calo} Jets
+process.ak4PFJetsCorrected.correctors = ['ak4PFL1FastL2L3Corrector']
+
+process.ak4CaloL1FastjetCorrector = cms.EDProducer('L1FastjetCorrectorProducer',
+  algorithm = cms.string('AK4Calo'),
+  level = cms.string('L1FastJet'),
+  srcRho = cms.InputTag('fixedGridRhoFastjetAll'),
+)
+process.ak4CaloL2RelativeCorrector = cms.EDProducer('LXXXCorrectorProducer',
+  algorithm = cms.string('AK4Calo'),
+  level = cms.string('L2Relative'),
+)
+process.ak4CaloL3AbsoluteCorrector = cms.EDProducer('LXXXCorrectorProducer',
+  algorithm = cms.string('AK4Calo'),
+  level = cms.string('L3Absolute'),
+)
+process.ak4CaloL1FastL2L3Corrector = cms.EDProducer('ChainedJetCorrectorProducer',
+  correctors = cms.VInputTag('ak4CaloL1FastjetCorrector', 'ak4CaloL2RelativeCorrector', 'ak4CaloL3AbsoluteCorrector'),
+)
+process.ak4CaloJetsCorrected = cms.EDProducer('CorrectedCaloJetProducer',
+  correctors = cms.VInputTag('ak4CaloL1FastL2L3Corrector'),
+  src = cms.InputTag('ak4CaloJets'),
+)
+process.ak4CaloJetsSeq = cms.Sequence(
+    process.ak4CaloL1FastjetCorrector
+  * process.ak4CaloL2RelativeCorrector
+  * process.ak4CaloL3AbsoluteCorrector
+  * process.ak4CaloL1FastL2L3Corrector
+  * process.ak4CaloJetsCorrected
+)
+process.reconstruction *= process.ak4CaloJetsSeq
+
 ### add analysis sequence (JMETrigger NTuple)
 process.analysisCollectionsSequence = cms.Sequence()
 
@@ -72,15 +104,17 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
   ),
 
-  recoPFJetCollections = cms.PSet(
-
-    hltAK4PFCHSJetsCorrected = cms.InputTag('ak4PFJetsCHSCorrected'+'::'+process.name_()),
-    hltAK4PuppiJetsCorrected = cms.InputTag('hltAK4PuppiJetsCorrected'+'::'+process.name_()),
-  ),
-
   recoCaloJetCollections = cms.PSet(
 
+    hltAK4CaloJetsCorrected = cms.InputTag('ak4CaloJetsCorrected'),
     offlineAK4CaloJetsCorrected = cms.InputTag('slimmedCaloJets'),
+  ),
+
+  recoPFJetCollections = cms.PSet(
+
+    hltAK4PFJetsCorrected = cms.InputTag('ak4PFJetsCorrected'+'::'+process.name_()),
+    hltAK4PFCHSJetsCorrected = cms.InputTag('ak4PFJetsCHSCorrected'+'::'+process.name_()),
+    hltAK4PuppiJetsCorrected = cms.InputTag('hltAK4PuppiJetsCorrected'+'::'+process.name_()),
   ),
 
   patJetCollections = cms.PSet(
@@ -134,9 +168,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     ak4GenJets = cms.string('pt > 12'),
     ak4GenJetsNoNu = cms.string('pt > 12'),
+    hltAK4CaloJetsCorrected = cms.string('pt > 12'),
+    hltAK4PFJetsCorrected = cms.string('pt > 12'),
     hltAK4PFCHSJetsCorrected = cms.string('pt > 12'),
     hltAK4PuppiJetsCorrected = cms.string('pt > 12'),
-    offlineAK4CaloJetsCorrected = cms.string('pt>12'),
+    offlineAK4CaloJetsCorrected = cms.string('pt > 12'),
     offlineAK4PFCHSJetsCorrected = cms.string('pt > 12'),
     offlineAK4PuppiJetsCorrected = cms.string('pt > 12'),
   ),
