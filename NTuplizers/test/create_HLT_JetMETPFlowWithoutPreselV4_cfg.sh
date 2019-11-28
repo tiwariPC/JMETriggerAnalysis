@@ -18,7 +18,7 @@ printf "\n%s\n\n" " >>> cfg file to re-run HLT menu on RAW Data"
 cmsDriver.py HLT2 \
  --processName HLT2 \
  -n 100 --no_exec \
- --python_filename HLT_JetMETPFlowWithoutPreselV4_cfg.py \
+ --python_filename ../python/HLT_JetMETPFlowWithoutPreselV4_cfg.py \
  --step HLT:JetMETPFlowWithoutPreselV4 \
  --era Run2_2018 --data \
  --conditions auto:run2_hlt_GRun \

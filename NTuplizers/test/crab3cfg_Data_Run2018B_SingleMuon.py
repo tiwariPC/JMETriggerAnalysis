@@ -16,12 +16,12 @@ config.General.transferLogs = False
 
 config.section_('JobType')
 config.JobType.pluginName  = 'Analysis'
-config.JobType.psetName = 'jmeTriggerNTuple_HLTJetMETPFlowWithoutPreselV4_cfg.py'
-config.JobType.inputFiles = ['HLT_JetMETPFlowWithoutPreselV4_cfg.py']
+config.JobType.psetName = 'jmeTriggerNTuple_cfg.py'
+config.JobType.inputFiles = []
 config.JobType.pyCfgParams = ['output='+sample_name+'.root']
 config.JobType.maxJobRuntimeMin = 2500
-config.JobType.maxMemoryMB = 10000
-config.JobType.numCores = 4
+config.JobType.maxMemoryMB = 3000
+#config.JobType.numCores = 4
 
 config.section_('Data')
 config.Data.publication = False

@@ -1,8 +1,8 @@
 ### configuration file to re-run customized HLT Menu on RAW
-from HLT_JetMETPFlowWithoutPreselV4_cfg import cms, process
+from JMETriggerAnalysis.NTuplizers.HLT_JetMETPFlowWithoutPreselV4_cfg import cms, process
 
-process.options.numberOfStreams = cms.untracked.uint32(4)
-process.options.numberOfThreads = cms.untracked.uint32(4)
+process.options.numberOfStreams = cms.untracked.uint32(1)
+process.options.numberOfThreads = cms.untracked.uint32(1)
 
 ### remove RECO step (EDM output file will not be produced)
 process.schedule.remove(process.RECOSIMoutput_step)
