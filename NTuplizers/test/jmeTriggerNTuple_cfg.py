@@ -67,8 +67,7 @@ process.globalreco_tracking.replace(process.generalTracks, cms.Sequence(
   * process.generalTracks
 ))
 
-process.generalTracksTask.remove(process.generalTracks)
-process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices, process.generalTracks)
+process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
 
 ###
 ### Sequence for HLT(-like) MET Collections

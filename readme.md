@@ -12,7 +12,7 @@ cmsrel CMSSW_11_0_0_pre7
 cd CMSSW_11_0_0_pre7/src
 cmsenv
 git cms-merge-topic missirol:devel_pixvtx_buildfile
-git clone https://missirol@github.com/missirol/JMETriggerAnalysis.git -o missirol
+git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol
 scram b
 ```
 
