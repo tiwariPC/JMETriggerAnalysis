@@ -63,7 +63,7 @@ void TracksClosestToFirstVerticesSelector::produce(edm::Event& iEvent, const edm
     return;
   }
 
-  LogDebug("Input") << "size of input collections: " << tracks->size() << "tracks, " << vertices->size() << " vertices";
+  LogDebug("Input") << "size of input collections: " << tracks->size() << " tracks, " << vertices->size() << " vertices";
 
   if(vertices->size() > 0){
 
@@ -71,6 +71,7 @@ void TracksClosestToFirstVerticesSelector::produce(edm::Event& iEvent, const edm
 
       double trkVtx_minDz(-1.);
       int trkVtx_minDz_vtxIdx(-1);
+
       for(uint vtx_idx=0; vtx_idx<vertices->size(); ++vtx_idx){
 
         const double dz(std::abs(track.vz() - vertices->at(vtx_idx).z()));
