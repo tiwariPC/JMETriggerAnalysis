@@ -46,8 +46,8 @@ class MuonPATUserData : public edm::EDProducer {
   bool IDTightHZZ(const reco::Muon&, const reco::Vertex&);
 };
 
-MuonPATUserData::MuonPATUserData(const edm::ParameterSet& iConfig)
-{
+MuonPATUserData::MuonPATUserData(const edm::ParameterSet& iConfig){
+
   src_ = consumes<edm::View<pat::Muon> >(iConfig.getParameter<edm::InputTag>("src"));
 
   // ValueMaps [bool]
@@ -100,8 +100,8 @@ MuonPATUserData::MuonPATUserData(const edm::ParameterSet& iConfig)
   produces<pat::MuonCollection>();
 }
 
-void MuonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
+void MuonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
+
   edm::Handle<edm::View<pat::Muon> > patMuons;
   iEvent.getByToken(src_, patMuons);
 

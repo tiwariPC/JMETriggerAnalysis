@@ -1,4 +1,6 @@
+###
 ### configuration file to re-run customized HLT Menu on RAW
+###
 #from JMETriggerAnalysis.NTuplizers.step3_CHSPFJets_11_0_0_pre7 import cms, process
 from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_11_0_0_pre7 import cms, process
 
@@ -9,7 +11,68 @@ process.DQMStore.enableMultiThread = False
 process.options.numberOfStreams = 1
 process.options.numberOfThreads = 1
 
+###
+### redefine GeneralTracks, selecting a subset of tracks associated to N pixel vertices
+###  - each track is associated to the pixel vertex which is closest to it in Z
+###  - the track is retained only if the associated pixel vertex is one of the first N of the vertex collection (ranking is based on sum-pT2)
+###
+# clone original collection of generalTracks
+process.generalTracksOriginal = process.generalTracks.clone()
+
+# re-order (see ranker) and restrict the original list of pixel vertices similarly
+# to what was done at HLT in Run-2 (see hltTrimmedPrimaryVertices in 2018 HLT Menu)
+process.hltTrimmedPixelVertices = cms.EDProducer('PixelVerticesSelector',
+
+  src = cms.InputTag('pixelVertices'),
+
+  minSumPt2 = cms.double( 0.0 ),
+  minSumPt2FractionWrtMax = cms.double( 0.3 ),
+
+  # criterion to rank pixel vertices
+  # (utilizes PVClusterComparer to compute
+  # the vertex SumPtSquared f.o.m. using a sub-set of tracks)
+  ranker = cms.PSet(
+    track_chi2_max = cms.double( 20.0 ),
+    track_pt_max = cms.double( 20.0 ),
+    track_prob_min = cms.double( -1.0 ),
+    track_pt_min = cms.double( 1.0 )
+  ),
+
+  # retain only first N vertices
+  maxNVertices = cms.int32( 300 ),
+)
+
+# updated collection of generalTracks
+#  - redefine the module "generalTracks", so that downstream modules
+#    automatically use this updated collection
+#    (instead of the original "generalTracks" collection)
+#  - new set of generalTracks contains only the input tracks
+#    associated to one of the first N pixel vertices
+process.generalTracks = cms.EDProducer('TracksClosestToFirstVerticesSelector',
+
+  tracks = cms.InputTag('generalTracksOriginal'),
+  vertices = cms.InputTag('hltTrimmedPixelVertices'),
+
+  # retain only tracks associated to one of the first N vertices
+  maxNVertices = cms.int32( 10 ),
+
+  # track-vertex association: max delta-Z between track and z-closest vertex
+  maxDeltaZ = cms.double( 1.0 ),
+)
+
+# insert updated generalTracks into tracking sequence and related task
+process.globalreco_tracking.replace(process.generalTracks, cms.Sequence(
+   (process.generalTracksOriginal
+  +(process.reconstruction_pixelTrackingOnly * process.hltTrimmedPixelVertices))
+  * process.generalTracks
+))
+
+process.generalTracksTask.remove(process.generalTracks)
+process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices, process.generalTracks)
+
+###
 ### Sequence for HLT(-like) MET Collections
+###
 from JMETriggerAnalysis.NTuplizers.hltMETs_cff import hltMETsSeq
 hltMETsSeq(process,
   particleFlow = 'particleFlowTmp'+'::'+process.name_(),
@@ -20,7 +83,9 @@ hltMETsSeq(process,
 )
 process.reconstruction *= process.hltMETsSeq
 
+###
 ### Sequence for HLT(-like) AK4-{PF,Calo} Jets
+###
 process.ak4PFJetsCorrected.correctors = ['ak4PFL1FastL2L3Corrector']
 
 process.ak4CaloL1FastjetCorrector = cms.EDProducer('L1FastjetCorrectorProducer',
@@ -52,7 +117,9 @@ process.ak4CaloJetsSeq = cms.Sequence(
 )
 process.reconstruction *= process.ak4CaloJetsSeq
 
+###
 ### add analysis sequence (JMETrigger NTuple)
+###
 process.analysisCollectionsSequence = cms.Sequence()
 
 ## Muons
@@ -83,6 +150,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoVertexCollections = cms.PSet(
 
     hltPixelVertices = cms.InputTag('pixelVertices'+'::'+process.name_()),
+    hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'+'::'+process.name_()),
     hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'+'::'+process.name_()),
     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'+'::'+'PAT'),
   ),
@@ -206,7 +274,9 @@ process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 #process.schedule.extend([process.analysisNTupleEndPath])
 
+###
 ### command-line arguments
+###
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
 
@@ -265,7 +335,10 @@ if opts.logs:
        'logInfo',
        'logDebug',
      ),
+     # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
      debugModules = cms.untracked.vstring(
+       'PixelVerticesSelector',
+       'TracksClosestToFirstVerticesSelector',
        'JMETriggerNTuple',
      ),
      categories = cms.untracked.vstring(

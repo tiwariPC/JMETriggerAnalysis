@@ -411,7 +411,7 @@ process.generalTracks = cms.EDProducer("TrackListMerger",  ### v1
 )
 
 process.globalreco_tracking = cms.Sequence(
-	process.offlineBeamSpot+
+    process.offlineBeamSpot+
     process.itLocalReco +
     process.otLocalReco +
     process.calolocalreco +
