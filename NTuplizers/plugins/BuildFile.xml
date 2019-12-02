@@ -1,6 +1,5 @@
-<export>
-</export>
-<library  name="JMETriggerAnalysisNTuplizers_plugins" file="*.cc">
+<library name="JMETriggerAnalysisNTuplizersPlugins" file="*.cc">
+  <flags EDM_PLUGIN="1"/>
   <use name="JMETriggerAnalysis/NTuplizers"/>
   <use name="FWCore/Framework"/>
   <use name="FWCore/ParameterSet"/>

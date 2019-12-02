@@ -1,10 +1,10 @@
 from WMCore.Configuration import Configuration
 
 store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191119'
-sample_name = 'QCD_Pt_0_1000_14TeV_PU200'
+sample_name = 'QCD_Pt_15to3000_Flat_14TeV_PU200'
 
-MIN_DSET = '/QCD_Pt_0_1000_14TeV_TuneCUETP8M1/PhaseIITDRSpring19MiniAOD-PU200_106X_upgrade2023_realistic_v3-v2/MINIAODSIM'
-RAW_DSET = '/QCD_Pt_0_1000_14TeV_TuneCUETP8M1/PhaseIITDRSpring19DR-PU200_106X_upgrade2023_realistic_v3-v2/GEN-SIM-DIGI-RAW'
+MIN_DSET = '/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/PhaseIITDRSpring19MiniAOD-PU200_castor_106X_upgrade2023_realistic_v3-v2/MINIAODSIM'
+RAW_DSET = '/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/PhaseIITDRSpring19DR-PU200_castor_106X_upgrade2023_realistic_v3-v2/GEN-SIM-DIGI-RAW'
 
 config = Configuration()
 
