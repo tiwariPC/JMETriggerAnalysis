@@ -57,7 +57,7 @@ process.generalTracks = cms.EDProducer('TracksClosestToFirstVerticesSelector',
   maxNVertices = cms.int32( 10 ),
 
   # track-vertex association: max delta-Z between track and z-closest vertex
-  maxDeltaZ = cms.double( 1.0 ),
+  maxDeltaZ = cms.double( 0.2 ),
 )
 
 # insert updated generalTracks into tracking sequence and related task
