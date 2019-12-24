@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --conditions auto:phase2_realistic -n 10 --era Phase2C8_timing_layer_bar --no_output --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM --geometry Extended2023D41 --no_exec
+# with command line options: step3 --conditions auto:phase2_realistic -n 10 --era Phase2C8 --no_output --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM --geometry Extended2023D41 --no_exec
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Phase2C8_timing_layer_bar_cff import Phase2C8_timing_layer_bar
+from Configuration.Eras.Era_Phase2C8_cff import Phase2C8
 
-process = cms.Process('RECO2',Phase2C8_timing_layer_bar)
+process = cms.Process('RECO2',Phase2C8)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -62,14 +62,9 @@ process.calolocalreco = cms.Sequence(process.ecalLocalRecoSequence+process.hcalL
 
 process.particleFlowTmpBarrel.useEGammaFilters = cms.bool(False)
 process.particleFlowTmpBarrel.useEGammaElectrons = cms.bool(False)
-process.particleFlowTmpBarrel.useEGammaSupercluster = cms.bool(False)
 process.particleFlowTmpBarrel.usePFConversions = cms.bool(False)
 process.particleFlowTmpBarrel.usePFDecays = cms.bool(False)
-process.particleFlowTmpBarrel.usePFElectrons = cms.bool(False)
 process.particleFlowTmpBarrel.usePFNuclearInteractions = cms.bool(False)
-process.particleFlowTmpBarrel.usePFPhotons = cms.bool(False)
-process.particleFlowTmpBarrel.usePFSCEleCalib = cms.bool(False)
-process.particleFlowTmpBarrel.usePhotonReg = cms.bool(False)
 process.particleFlowTmpBarrel.useProtectionsForJetMET = cms.bool(False)
 
 process.pfTrack.GsfTracksInEvents = cms.bool(False)
@@ -176,7 +171,9 @@ process.particleFlowBlock = cms.EDProducer("PFBlockProducer",
         cms.PSet(
             linkType = cms.string('TRACK:HCAL'),
             linkerName = cms.string('TrackAndHCALLinker'),
-            useKDTree = cms.bool(True)
+            useKDTree = cms.bool(True),
+            trajectoryLayerEntrance = cms.string('HCALEntrance'),
+            trajectoryLayerExit = cms.string('HCALExit')
         ), 
         cms.PSet(
             linkType = cms.string('TRACK:HO'),
