@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --conditions auto:phase2_realistic -n 10 --era Phase2C8 --no_output --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM --geometry Extended2023D41 --no_exec
+# with command line options: step3 --conditions auto:phase2_realistic_T14 -n 10 --era Phase2C8 --no_output --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM --geometry Extended2026D41 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C8_cff import Phase2C8
@@ -24,25 +24,22 @@ process.load('Configuration.StandardSequences.RecoSim_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(50)
+    input = cms.untracked.int32(20)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(#"root://xrootd-cms.infn.it//store/mc/PhaseIITDRSpring19DR/QCD_Pt-15to3000_EMEnriched_TuneCP5_13TeV_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/50000/BBB89FE4-5C9D-7842-BDE3-C89FF77630B6.root",
-#"file:/eos/cms/store/mc/PhaseIITDRSpring19DR/TTbar_14TeV_TuneCP5_Pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3_ext1-v3/60000/A7DE6079-B3AE-4743-A5F3-2050EDEB8383.root"
-     "file:/eos/cms/store/mc/PhaseIITDRSpring19DR/QCD_Pt_50to80_TuneCP5_14TeV_pythia8/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v2/260000/0053B97F-B96D-0244-9074-4878AA9B8BC0.root"
-
-),
-#    fileNames = cms.untracked.vstring('file:/eos/cms/store/mc/PhaseIITDRSpring19DR/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/NoPU_castor_106X_upgrade2023_realistic_v3-v2/270000/07A5023E-D011-E448-87A6-FD9586277D47.root'),
-    secondaryFileNames = cms.untracked.vstring()
+  fileNames = cms.untracked.vstring(
+#    '/store/mc/PhaseIITDRSpring19DR/QCD_Pt-15to3000_EMEnriched_TuneCP5_13TeV_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/50000/BBB89FE4-5C9D-7842-BDE3-C89FF77630B6.root',
+#    '/store/mc/PhaseIITDRSpring19DR/TTbar_14TeV_TuneCP5_Pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3_ext1-v3/60000/A7DE6079-B3AE-4743-A5F3-2050EDEB8383.root',
+#    '/store/mc/PhaseIITDRSpring19DR/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/NoPU_castor_106X_upgrade2023_realistic_v3-v2/270000/07A5023E-D011-E448-87A6-FD9586277D47.root',
+    '/store/mc/PhaseIITDRSpring19DR/QCD_Pt_50to80_TuneCP5_14TeV_pythia8/GEN-SIM-DIGI-RAW/NoPU_106X_upgrade2023_realistic_v3-v2/260000/0053B97F-B96D-0244-9074-4878AA9B8BC0.root',
+  ),
+  secondaryFileNames = cms.untracked.vstring(),
 )
 
-process.options = cms.untracked.PSet(
-
-)
+process.options = cms.untracked.PSet()
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
@@ -57,7 +54,7 @@ process.configurationMetadata = cms.untracked.PSet(
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T14', '')
 
 #modifications:
 process.calolocalreco = cms.Sequence(process.ecalLocalRecoSequence+process.hcalLocalRecoSequence+process.hbhereco+process.hgcalLocalRecoSequence)
@@ -437,7 +434,6 @@ process.HGCalUncalibRecHit+process.HGCalRecHit
 +process.particleFlowClusterHGCal)
 #+process.particleFlowClusterHGCalFromMultiCl)
 
-
 #redefininf global reco
 process.globalreco = cms.Sequence(process.hbhereco+
 process.globalreco_tracking+
@@ -452,7 +448,6 @@ process.muonGlobalReco+
 process.fastTimingGlobalReco
 )
 
-
 #redefining particleFlowReco sequence
 process.particleFlowReco = cms.Sequence(
 (process.pfTrack+
@@ -464,13 +459,10 @@ process.simPFProducer)
 +process.particleFlowBlock+
 process.particleFlowTmpBarrel+process.particleFlowTmp)
 
-
 #process.particleFlowSuperClusteringSequence = cms.Sequence(
 #process.particleFlowSuperClusterECAL)
 #+process.particleFlowSuperClusterHGCal)
 #+process.particleFlowSuperClusterHGCalFromMultiCl)
-
-
 
 #Using only the central part to measure the rho corrections 
 #process.fixedGridRhoFastjetCentral.pfCandidatesTag = cms.InputTag("particleFlowTmp")
@@ -478,11 +470,11 @@ process.particleFlowTmpBarrel+process.particleFlowTmp)
 process.fixedGridRhoFastjetAll.pfCandidatesTag = cms.InputTag("particleFlowTmp")
 process.ak4PFL1FastjetCorrector.srcRho = cms.InputTag("fixedGridRhoFastjetAll")
 
-
 process.ak4PFJetsCorrected = cms.EDProducer("CorrectedPFJetProducer",                                                                                          
     correctors = cms.VInputTag("ak4PFL1FastjetCorrector"),                                                                                                              
     src = cms.InputTag("ak4PFJets")                                                                                                                            
-)        
+)
+
 process.ak4PFJetsCHSCorrected = cms.EDProducer("CorrectedPFJetProducer",                                                                                          
     correctors = cms.VInputTag("ak4PFCHSL1FastL2L3Corrector"),                                                                                                              
     src = cms.InputTag("ak4PFJetsCHS")                                                                                                                            
@@ -496,7 +488,7 @@ process.particleFlowPtrs.src = cms.InputTag("particleFlowTmp")
 
 #redefining reconstruction_step
 process.reconstruction = cms.Sequence(process.localreco+
-process.globalreco
+ process.globalreco
 +process.particleFlowReco
 +process.ak4PFJets
 +process.fixedGridRhoFastjetAll
@@ -522,7 +514,6 @@ process.raw2digi_step = cms.Path(process.RawToDigi)
 #process.L1Reco_step = cms.Path(process.L1Reco)
 process.reconstruction_step = cms.Path(process.reconstruction)
 
-
 process.hltOutput = cms.OutputModule( "PoolOutputModule",                                                                                                   
      fileName = cms.untracked.string( "hltoutput_hlt.root" ),                                                                                                         
      fastCloning = cms.untracked.bool( False ),                                                                                                             
@@ -534,13 +525,12 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
                                                                                                                          
          )                                                                                                                                                  
      )                                                                                                                                                      
-                                                                                                                                                            
+
 process.HLTOutput = cms.EndPath( process.hltOutput )
 
 # load the DQMStore and DQMRootOutputModule
 process.load( "DQMServices.Core.DQMStore_cfi" )
 process.DQMStore.enableMultiThread = True
-
 
 # configure the FastTimerService
 process.load( "HLTrigger.Timer.FastTimerService_cfi" )
@@ -577,11 +567,9 @@ process.FastTimerService.dqmPathMemoryResolution   =    5000
 process.FastTimerService.dqmModuleMemoryRange      =  100000
 process.FastTimerService.dqmModuleMemoryResolution =     500
 
-
 # set the base DQM folder for the plots
 process.FastTimerService.dqmPath                   = 'HLT/TimerService'
 process.FastTimerService.enableDQMbyProcesses      = False
-
 
 ##################################### for timing                                                                                                                  
 # enable the TrigReport and TimeReport                                                                                                                            
@@ -591,11 +579,9 @@ process.options = cms.untracked.PSet(
 process.options.numberOfStreams = cms.untracked.uint32(4)                                                                                                         
 process.options.numberOfThreads = cms.untracked.uint32(4) 
 
-
 # FastTimerService client
 process.load('HLTrigger.Timer.fastTimerServiceClient_cfi')
 process.fastTimerServiceClient.dqmPath = "HLT/TimerService"
-
 
 # DQM file saver
 process.load('DQMServices.Components.DQMFileSaver_cfi')
@@ -614,7 +600,6 @@ process.DQMFileSaverOutput = cms.EndPath( process.fastTimerServiceClient + proce
 #from FWCore.ParameterSet.Utilities import convertToUnscheduled
 #process=convertToUnscheduled(process)
 
-
 # Customisation from command line
 
 #Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
@@ -627,10 +612,6 @@ process.DQMFileSaverOutput = cms.EndPath( process.fastTimerServiceClient + proce
 # End adding early deletion
 
 # HLT Tracking v2: re-defining generalTracks as earlyGeneralTracks with only 2 iterations
-
-
-
-
 
 from SLHCUpgradeSimulations.Configuration.aging import customise_aging_1000
 process = customise_aging_1000(process)
