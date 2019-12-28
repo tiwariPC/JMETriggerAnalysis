@@ -1,8 +1,8 @@
 ###
 ### configuration file to re-run customized HLT Menu on RAW
 ###
-#from JMETriggerAnalysis.NTuplizers.step3_CHSPFJets_11_0_0_pre7 import cms, process
-from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_11_0_0_pre7 import cms, process
+#from JMETriggerAnalysis.NTuplizers.step3_TrackingV0_11_0_0 import cms, process
+from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_11_0_0 import cms, process
 
 ### remove cms.EndPath for EDM output
 del process.HLTOutput
@@ -11,63 +11,67 @@ process.DQMStore.enableMultiThread = False
 process.options.numberOfStreams = 1
 process.options.numberOfThreads = 1
 
-###
-### redefine GeneralTracks, selecting a subset of tracks associated to N pixel vertices
-###  - each track is associated to the pixel vertex which is closest to it in Z
-###  - the track is retained only if the associated pixel vertex is one of the first N of the vertex collection (ranking is based on sum-pT2)
-###
-# clone original collection of generalTracks
-process.generalTracksOriginal = process.generalTracks.clone()
+useOnlyTracksFromNVertices = False
 
-# re-order (see ranker) and restrict the original list of pixel vertices similarly
-# to what was done at HLT in Run-2 (see hltTrimmedPrimaryVertices in 2018 HLT Menu)
-process.hltTrimmedPixelVertices = cms.EDProducer('PixelVerticesSelector',
+if useOnlyTracksFromNVertices:
 
-  src = cms.InputTag('pixelVertices'),
+   ###
+   ### redefine GeneralTracks, selecting a subset of tracks associated to N pixel vertices
+   ###  - each track is associated to the pixel vertex which is closest to it in Z
+   ###  - the track is retained only if the associated pixel vertex is one of the first N of the vertex collection (ranking is based on sum-pT2)
+   ###
+   # clone original collection of generalTracks
+   process.generalTracksOriginal = process.generalTracks.clone()
 
-  minSumPt2 = cms.double( 0.0 ),
-  minSumPt2FractionWrtMax = cms.double( 0.3 ),
+   # re-order (see ranker) and restrict the original list of pixel vertices similarly
+   # to what was done at HLT in Run-2 (see hltTrimmedPrimaryVertices in 2018 HLT Menu)
+   process.hltTrimmedPixelVertices = cms.EDProducer('PixelVerticesSelector',
 
-  # criterion to rank pixel vertices
-  # (utilizes PVClusterComparer to compute
-  # the vertex SumPtSquared f.o.m. using a sub-set of tracks)
-  ranker = cms.PSet(
-    track_chi2_max = cms.double( 20.0 ),
-    track_pt_max = cms.double( 20.0 ),
-    track_prob_min = cms.double( -1.0 ),
-    track_pt_min = cms.double( 1.0 )
-  ),
+     src = cms.InputTag('pixelVertices'),
 
-  # retain only first N vertices
-  maxNVertices = cms.int32( 300 ),
-)
+     minSumPt2 = cms.double( 0.0 ),
+     minSumPt2FractionWrtMax = cms.double( 0.3 ),
 
-# updated collection of generalTracks
-#  - redefine the module "generalTracks", so that downstream modules
-#    automatically use this updated collection
-#    (instead of the original "generalTracks" collection)
-#  - new set of generalTracks contains only the input tracks
-#    associated to one of the first N pixel vertices
-process.generalTracks = cms.EDProducer('TracksClosestToFirstVerticesSelector',
+     # criterion to rank pixel vertices
+     # (utilizes PVClusterComparer to compute
+     # the vertex SumPtSquared f.o.m. using a sub-set of tracks)
+     ranker = cms.PSet(
+       track_chi2_max = cms.double( 20.0 ),
+       track_pt_max = cms.double( 20.0 ),
+       track_prob_min = cms.double( -1.0 ),
+       track_pt_min = cms.double( 1.0 )
+     ),
 
-  tracks = cms.InputTag('generalTracksOriginal'),
-  vertices = cms.InputTag('hltTrimmedPixelVertices'),
+     # retain only first N vertices
+     maxNVertices = cms.int32( 300 ),
+   )
 
-  # retain only tracks associated to one of the first N vertices
-  maxNVertices = cms.int32( 10 ),
+   # updated collection of generalTracks
+   #  - redefine the module "generalTracks", so that downstream modules
+   #    automatically use this updated collection
+   #    (instead of the original "generalTracks" collection)
+   #  - new set of generalTracks contains only the input tracks
+   #    associated to one of the first N pixel vertices
+   process.generalTracks = cms.EDProducer('TracksClosestToFirstVerticesSelector',
 
-  # track-vertex association: max delta-Z between track and z-closest vertex
-  maxDeltaZ = cms.double( 0.2 ),
-)
+     tracks = cms.InputTag('generalTracksOriginal'),
+     vertices = cms.InputTag('hltTrimmedPixelVertices'),
 
-# insert updated generalTracks into tracking sequence and related task
-process.globalreco_tracking.replace(process.generalTracks, cms.Sequence(
-   (process.generalTracksOriginal
-  +(process.reconstruction_pixelTrackingOnly * process.hltTrimmedPixelVertices))
-  * process.generalTracks
-))
+     # retain only tracks associated to one of the first N vertices
+     maxNVertices = cms.int32( 10 ),
 
-process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
+     # track-vertex association: max delta-Z between track and z-closest vertex
+     maxDeltaZ = cms.double( 0.2 ),
+   )
+
+   # insert updated generalTracks into tracking sequence and related task
+   process.globalreco_tracking.replace(process.generalTracks, cms.Sequence(
+      (process.generalTracksOriginal
+     +(process.reconstruction_pixelTrackingOnly * process.hltTrimmedPixelVertices))
+     * process.generalTracks
+   ))
+
+   process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
 
 ###
 ### Sequence for HLT(-like) MET Collections
@@ -148,8 +152,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoVertexCollections = cms.PSet(
 
-    hltPixelVertices = cms.InputTag('pixelVertices'+'::'+process.name_()),
-    hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'+'::'+process.name_()),
     hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'+'::'+process.name_()),
     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'+'::'+'PAT'),
   ),
@@ -266,6 +268,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 )
 
+if useOnlyTracksFromNVertices:
+   process.JMETriggerNTuple.recoVertexCollections = cms.PSet(
+     hltPixelVertices = cms.InputTag('pixelVertices'+'::'+process.name_()),
+     hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'+'::'+process.name_()),
+     hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'+'::'+process.name_()),
+     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'+'::'+'PAT'),
+   )
+
 process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
 #process.analysisCollectionsSchedule = cms.Schedule(process.analysisCollectionsPath)
 #process.schedule.extend(process.analysisCollectionsSchedule)
@@ -299,6 +309,11 @@ opts.register('logs', False,
               vpo.VarParsing.varType.bool,
               'create log files configured via MessageLogger')
 
+opts.register('htrk', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'added monitoring histograms for selected Tracks and Vertices')
+
 opts.register('wantSummary', False,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.bool,
@@ -324,6 +339,20 @@ process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.ou
 if opts.lumis is not None:
    import FWCore.PythonUtilities.LumiList as LumiList
    process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
+
+# Tracking Monitoring
+if opts.htrk:
+   from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
+   process.TrackHistograms_pixelTracks = TrackHistogrammer.clone(src = cms.InputTag('pixelTracks'))
+   process.TrackHistograms_generalTracks = TrackHistogrammer.clone(src = cms.InputTag('generalTracks'))
+
+   process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
+
+   process.trkMonitoringSeq = cms.Sequence(
+       process.TrackHistograms_pixelTracks
+     + process.TrackHistograms_generalTracks
+   )
+   process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
 
 # MessageLogger
 if opts.logs:
@@ -376,6 +405,7 @@ if opts.logs:
 if opts.dumpPython is not None:
    open(opts.dumpPython, 'w').write(process.dumpPython())
 
+# input EDM files
 process.source.fileNames = [
   '/store/mc/PhaseIITDRSpring19MiniAOD/VBF_HToInvisible_M125_14TeV_powheg_pythia8/MINIAODSIM/PU200_106X_upgrade2023_realistic_v3-v1/270000/44F51AA8-922E-2642-83E4-BC53F2D88EF2.root',
 ]
