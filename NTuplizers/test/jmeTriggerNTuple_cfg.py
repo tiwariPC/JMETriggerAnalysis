@@ -11,7 +11,7 @@ process.DQMStore.enableMultiThread = False
 process.options.numberOfStreams = 1
 process.options.numberOfThreads = 1
 
-useOnlyTracksFromNVertices = True
+useOnlyTracksFromNVertices = False
 
 if useOnlyTracksFromNVertices:
 
