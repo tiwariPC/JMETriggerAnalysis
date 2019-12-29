@@ -342,15 +342,21 @@ if opts.lumis is not None:
 
 # Tracking Monitoring
 if opts.htrk:
+   process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
+
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
    process.TrackHistograms_pixelTracks = TrackHistogrammer.clone(src = cms.InputTag('pixelTracks'))
    process.TrackHistograms_generalTracks = TrackHistogrammer.clone(src = cms.InputTag('generalTracks'))
 
-   process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
+   from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
+   process.VertexHistograms_pixelVertices = VertexHistogrammer.clone(src = cms.InputTag('pixelVertices'))
+   process.VertexHistograms_offlinePrimaryVertices = VertexHistogrammer.clone(src = cms.InputTag('offlinePrimaryVertices'))
 
    process.trkMonitoringSeq = cms.Sequence(
        process.TrackHistograms_pixelTracks
      + process.TrackHistograms_generalTracks
+     + process.VertexHistograms_pixelVertices
+     + process.VertexHistograms_offlinePrimaryVertices
    )
    process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
 
