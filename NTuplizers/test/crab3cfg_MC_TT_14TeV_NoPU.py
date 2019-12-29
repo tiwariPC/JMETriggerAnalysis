@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191119'
+store_dir = 'jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/v04/191229'
 sample_name = 'TT_14TeV_NoPU'
 
 MIN_DSET = '/TT_TuneCP5_14TeV-powheg-pythia8/PhaseIITDRSpring19MiniAOD-NoPU_106X_upgrade2023_realistic_v3-v2/MINIAODSIM'
