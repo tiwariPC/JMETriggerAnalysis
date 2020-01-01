@@ -7,6 +7,9 @@ from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_11_0_0 import cms, process
 # remove cms.EndPath for EDM output
 del process.HLTOutput
 
+# remove cms.EndPath for DQM output
+del process.DQMFileSaverOutput
+
 # reset path to EDM input files
 process.source.fileNames = []
 process.source.secondaryFileNames = []
