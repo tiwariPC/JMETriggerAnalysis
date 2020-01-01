@@ -4,7 +4,7 @@ from CommonTools.PileupAlgos.Puppi_cff import *
 from CommonTools.PileupAlgos.PhotonPuppi_cff import puppiPhoton
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
 
-def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTypeOne, primaryVertices, pfNoPileUpJME=None):
+def hltJMESequence(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTypeOne, primaryVertices, pfNoPileUpJME=None):
 
     ### PF MET
     proc.hltPFMET = cms.EDProducer( 'PFMETProducer',
@@ -165,7 +165,7 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTy
     )
 
     ### METs Sequence
-    proc.hltMETsSeq = cms.Sequence(
+    proc.hltJMESequence = cms.Sequence(
         proc.hltPFMET
       +(proc.hltAK4PFFastJetCorrector
       * proc.hltAK4PFRelativeCorrector
@@ -188,7 +188,7 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTy
            globalThreshold = cms.double( 0.0 ),
            calculateSignificance = cms.bool( False ),
        )
-       proc.hltMETsSeq += cms.Sequence(
+       proc.hltJMESequence += cms.Sequence(
            proc.pfNoPileUpJMECands
          * proc.hltPFMETNoPileUpJME
        )
@@ -204,7 +204,7 @@ def hltMETsSeq(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTy
         globalThreshold = cms.double( 0.0 ),
         calculateSignificance = cms.bool( False ),
     )
-    proc.hltMETsSeq += cms.Sequence(
+    proc.hltJMESequence += cms.Sequence(
         proc.hltSoftKiller
       * proc.hltSoftKillerMET
     )
