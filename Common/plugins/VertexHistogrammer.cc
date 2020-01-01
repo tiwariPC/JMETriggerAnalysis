@@ -45,15 +45,15 @@ class VertexHistogrammer : public edm::EDAnalyzer {
 VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
   : vertices_token_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("src"))){
 
-  h_vertex_x_ = fs_->make<TH1D>("vertex_x", "vertex_x", 500, -1, 1);
-  h_vertex_y_ = fs_->make<TH1D>("vertex_y", "vertex_y", 500, -1, 1);
-  h_vertex_z_ = fs_->make<TH1D>("vertex_z", "vertex_z", 600, -20, 20);
-  h_vertex_normChi2_ = fs_->make<TH1D>("vertex_normChi2", "vertex_normChi2", 600, 0, 20);
-  h_vertex_ndof_ = fs_->make<TH1D>("vertex_ndof", "vertex_ndof", 600, 0, 20);
-  h_vertex_nTracks_ = fs_->make<TH1D>("vertex_nTracks", "vertex_nTracks", 600, 0, 20);
+  h_vertex_x_ = fs_->make<TH1D>("vertex_x", "vertex_x", 600, -0.1, 0.1);
+  h_vertex_y_ = fs_->make<TH1D>("vertex_y", "vertex_y", 600, -0.1, 0.1);
+  h_vertex_z_ = fs_->make<TH1D>("vertex_z", "vertex_z", 600, -30, 30);
+  h_vertex_normChi2_ = fs_->make<TH1D>("vertex_normChi2", "vertex_normChi2", 600, 0, 12);
+  h_vertex_ndof_ = fs_->make<TH1D>("vertex_ndof", "vertex_ndof", 120, 0, 480);
+  h_vertex_nTracks_ = fs_->make<TH1D>("vertex_nTracks", "vertex_nTracks", 120, 0, 480);
 
-  h_track_pt_ = fs_->make<TH1D>("track_pt", "track_pt", 500, 0, 5.);
-  h_track_eta_ = fs_->make<TH1D>("track_eta", "track_eta", 500, -5., 5.);
+  h_track_pt_ = fs_->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
+  h_track_eta_ = fs_->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
   h_track_phi_ = fs_->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
   h_track_dxy_ = fs_->make<TH1D>("track_dxy", "track_dxy", 600, -1., 1.);
   h_track_dz_ = fs_->make<TH1D>("track_dz", "track_dz", 600, -1., 1.);

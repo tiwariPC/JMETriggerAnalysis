@@ -37,12 +37,12 @@ class TrackHistogrammer : public edm::EDAnalyzer {
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
   : tracks_token_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("src"))){
 
-  h_track_pt_ = fs_->make<TH1D>("track_pt", "track_pt", 500, 0, 5.);
-  h_track_eta_ = fs_->make<TH1D>("track_eta", "track_eta", 500, -5., 5.);
+  h_track_pt_ = fs_->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
+  h_track_eta_ = fs_->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
   h_track_phi_ = fs_->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
 
-  h_track_outerPt_ = fs_->make<TH1D>("track_outerPt", "track_outerPt", 500, 0, 5.);
-  h_track_outerEta_ = fs_->make<TH1D>("track_outerEta", "track_outerEta", 500, -5., 5.);
+  h_track_outerPt_ = fs_->make<TH1D>("track_outerPt", "track_outerPt", 600, 0, 5.);
+  h_track_outerEta_ = fs_->make<TH1D>("track_outerEta", "track_outerEta", 600, -5., 5.);
   h_track_outerPhi_ = fs_->make<TH1D>("track_outerPhi", "track_outerPhi", 600, -3., 3.);
 }
 
