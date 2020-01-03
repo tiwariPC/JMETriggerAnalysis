@@ -85,10 +85,10 @@ def batch_job_HTCondor(**kwargs):
     _o_shebang = '#!/bin/bash'
     _o_file.write(_o_shebang+'\n')
 
-#    # HTCondor getenv=True does not export LD_LIBRARY_PATH
-#    # --> added by hand in the script itself
-#    if 'LD_LIBRARY_PATH' in os.environ:
-#       _o_file.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
+    # export explicitly the environment variable LD_LIBRARY_PATH
+    if kwargs.get('export_LD_LIBRARY_PATH', False):
+       if 'LD_LIBRARY_PATH' in os.environ:
+          _o_file.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
 
     _o_file.write('\n'+kwargs['output_string']+'\n')
 
@@ -171,6 +171,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--submit', dest='submit', action='store_true', default=False,
                         help='submit job(s) on the batch system')
+
+    parser.add_argument('--no-export-LD-LIBRARY-PATH', dest='no_export_LD_LIBRARY_PATH', action='store_true', default=False,
+                        help='do not export explicitly the environment variable "LD_LIBRARY_PATH" in the batch-job executable')
 
     parser.add_argument('--dry-run', dest='dry_run', action='store_true', default=False,
                         help='enable dry-run mode')
@@ -451,6 +454,8 @@ if opts.dumpPython is not None:
                  'submit_options': opts.htc_opts,
 
                  'is_slc7_arch': is_slc7_arch,
+
+                 'export_LD_LIBRARY_PATH': (not opts.no_export_LD_LIBRARY_PATH),
 
                  'RequestCpus': opts.cpus,
                  'RequestMemory': opts.memory,
