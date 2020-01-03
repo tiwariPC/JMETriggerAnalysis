@@ -1,28 +1,27 @@
-#include <FWCore/Framework/interface/Frameworkfwd.h>
-#include <FWCore/Framework/interface/EDAnalyzer.h>
-#include <FWCore/Framework/interface/Event.h>
-#include <FWCore/Framework/interface/MakerMacros.h>
-#include <FWCore/ParameterSet/interface/ParameterSet.h>
-#include <FWCore/MessageLogger/interface/MessageLogger.h>
-#include <FWCore/Utilities/interface/Exception.h>
-#include <FWCore/ServiceRegistry/interface/Service.h>
-#include <CommonTools/UtilAlgos/interface/TFileService.h>
-#include <DataFormats/Common/interface/TriggerResults.h>
-#include <FWCore/Common/interface/TriggerNames.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoGenJetCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloJetCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFJetCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/PATJetCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoGenMETCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloMETCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFMETCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/PATMETCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/PATMuonCollectionContainer.h>
-#include <JMETriggerAnalysis/NTuplizers/interface/PATElectronCollectionContainer.h>
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Utilities/interface/Exception.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoGenJetCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoCaloJetCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoPFJetCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/PATJetCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoGenMETCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoCaloMETCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoPFMETCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/PATMETCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/PATMuonCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/PATElectronCollectionContainer.h"
 
 #include <string>
 #include <vector>
@@ -33,16 +32,18 @@
 #include <Compression.h>
 #include <TTree.h>
 
-class JMETriggerNTuple : public edm::EDAnalyzer {
+namespace {
+
+class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
  public:
   explicit JMETriggerNTuple(const edm::ParameterSet&);
-
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
  protected:
-  virtual void beginJob();
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  void beginJob() override;
+  void analyze(const edm::Event&, const edm::EventSetup&) override;
+  void endJob() override {}
 
   template <typename... Args>
   void addBranch(const std::string&, Args...);
@@ -83,8 +84,7 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
   class FillCollectionConditionsMap {
 
    public:
-    FillCollectionConditionsMap();
-    FillCollectionConditionsMap(const edm::ParameterSet&);
+    explicit FillCollectionConditionsMap();
 
     void clear();
     int init(const edm::ParameterSet&);
@@ -110,11 +110,15 @@ class JMETriggerNTuple : public edm::EDAnalyzer {
   FillCollectionConditionsMap fillCollectionConditionMap_;
 };
 
+}
+
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   : TTreeName_(iConfig.getParameter<std::string>("TTreeName"))
   , TriggerResultsFilterOR_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterOR"))
   , TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterAND"))
   , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string> >("outputBranchesToBeDropped")) {
+
+  usesResource("TFileService");
 
   const auto& TriggerResultsInputTag = iConfig.getParameter<edm::InputTag>("TriggerResults");
   const auto& TriggerResultsCollections = iConfig.getParameter<std::vector<std::string> >("TriggerResultsCollections");
@@ -1193,11 +1197,6 @@ bool JMETriggerNTuple::passesTriggerResults_AND(const edm::TriggerResults& trigg
 JMETriggerNTuple::FillCollectionConditionsMap::FillCollectionConditionsMap(){
 
   this->clear();
-}
-
-JMETriggerNTuple::FillCollectionConditionsMap::FillCollectionConditionsMap(const edm::ParameterSet& pset){
-
-  this->init(pset);
 }
 
 int JMETriggerNTuple::FillCollectionConditionsMap::init(const edm::ParameterSet& pset){
