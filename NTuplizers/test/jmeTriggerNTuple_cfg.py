@@ -363,10 +363,6 @@ if opts.logs:
      ),
    )
 
-# dump content of cms.Process to python file
-if opts.dumpPython is not None:
-   open(opts.dumpPython, 'w').write(process.dumpPython())
-
 # input EDM files [primary]
 if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
@@ -481,6 +477,10 @@ if opts.skimTracks:
      hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'+'::'+process.name_()),
      offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'+'::'+'PAT'),
    )
+
+# dump content of cms.Process to python file
+if opts.dumpPython is not None:
+   open(opts.dumpPython, 'w').write(process.dumpPython())
 
 # print-outs
 print '--- jmeTriggerNTuple_cfg.py ---\n'
