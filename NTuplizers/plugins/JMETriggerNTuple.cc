@@ -32,8 +32,6 @@
 #include <Compression.h>
 #include <TTree.h>
 
-namespace {
-
 class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
  public:
@@ -41,7 +39,7 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
  protected:
-  void beginJob() override;
+  void beginJob() override {}
   void analyze(const edm::Event&, const edm::EventSetup&) override;
   void endJob() override {}
 
@@ -110,15 +108,11 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   FillCollectionConditionsMap fillCollectionConditionMap_;
 };
 
-}
-
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   : TTreeName_(iConfig.getParameter<std::string>("TTreeName"))
   , TriggerResultsFilterOR_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterOR"))
   , TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterAND"))
   , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string> >("outputBranchesToBeDropped")) {
-
-  usesResource("TFileService");
 
   const auto& TriggerResultsInputTag = iConfig.getParameter<edm::InputTag>("TriggerResults");
   const auto& TriggerResultsCollections = iConfig.getParameter<std::vector<std::string> >("TriggerResultsCollections");
@@ -488,6 +482,202 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
         v_patElectronCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
       }
     }
+  }
+
+  // setup TTree
+  usesResource(TFileService::kSharedResource);
+
+  edm::Service<TFileService> fs;
+
+  if(not fs){
+
+    throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
+  }
+
+  ttree_ = fs->make<TTree>(TTreeName_.c_str(), TTreeName_.c_str());
+
+  if(not ttree_){
+
+    throw edm::Exception(edm::errors::Configuration, "failed to create TTree via TFileService::make<TTree>");
+  }
+
+  this->addBranch("run", &run_);
+  this->addBranch("luminosityBlock", &luminosityBlock_);
+  this->addBranch("event", &event_);
+
+  for(const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()){
+
+    this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
+  }
+
+  for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
+
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_tracksSize", &recoVertexCollectionContainer_i.vec_tracksSize());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_isFake", &recoVertexCollectionContainer_i.vec_isFake());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_chi2", &recoVertexCollectionContainer_i.vec_chi2());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_ndof", &recoVertexCollectionContainer_i.vec_ndof());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_x", &recoVertexCollectionContainer_i.vec_x());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_y", &recoVertexCollectionContainer_i.vec_y());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_z", &recoVertexCollectionContainer_i.vec_z());
+  }
+
+  for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){
+
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_pdgId", &recoPFCandidateCollectionContainer_i.vec_pdgId());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_pt", &recoPFCandidateCollectionContainer_i.vec_pt());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_eta", &recoPFCandidateCollectionContainer_i.vec_eta());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_phi", &recoPFCandidateCollectionContainer_i.vec_phi());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_mass", &recoPFCandidateCollectionContainer_i.vec_mass());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vx", &recoPFCandidateCollectionContainer_i.vec_vx());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vy", &recoPFCandidateCollectionContainer_i.vec_vy());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vz", &recoPFCandidateCollectionContainer_i.vec_vz());
+  }
+
+  for(auto& patPackedCandidateCollectionContainer_i : v_patPackedCandidateCollectionContainer_){
+
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_pdgId", &patPackedCandidateCollectionContainer_i.vec_pdgId());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_pt", &patPackedCandidateCollectionContainer_i.vec_pt());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_eta", &patPackedCandidateCollectionContainer_i.vec_eta());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_phi", &patPackedCandidateCollectionContainer_i.vec_phi());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_mass", &patPackedCandidateCollectionContainer_i.vec_mass());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vx", &patPackedCandidateCollectionContainer_i.vec_vx());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vy", &patPackedCandidateCollectionContainer_i.vec_vy());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vz", &patPackedCandidateCollectionContainer_i.vec_vz());
+    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_fromPV", &patPackedCandidateCollectionContainer_i.vec_fromPV());
+  }
+
+  for(auto& recoGenJetCollectionContainer_i : v_recoGenJetCollectionContainer_){
+
+    this->addBranch(recoGenJetCollectionContainer_i.name()+"_pt", &recoGenJetCollectionContainer_i.vec_pt());
+    this->addBranch(recoGenJetCollectionContainer_i.name()+"_eta", &recoGenJetCollectionContainer_i.vec_eta());
+    this->addBranch(recoGenJetCollectionContainer_i.name()+"_phi", &recoGenJetCollectionContainer_i.vec_phi());
+    this->addBranch(recoGenJetCollectionContainer_i.name()+"_mass", &recoGenJetCollectionContainer_i.vec_mass());
+  }
+
+  for(auto& recoCaloJetCollectionContainer_i : v_recoCaloJetCollectionContainer_){
+
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_pt", &recoCaloJetCollectionContainer_i.vec_pt());
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_eta", &recoCaloJetCollectionContainer_i.vec_eta());
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_phi", &recoCaloJetCollectionContainer_i.vec_phi());
+    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_mass", &recoCaloJetCollectionContainer_i.vec_mass());
+  }
+
+  for(auto& recoPFJetCollectionContainer_i : v_recoPFJetCollectionContainer_){
+
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_pt", &recoPFJetCollectionContainer_i.vec_pt());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_eta", &recoPFJetCollectionContainer_i.vec_eta());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_phi", &recoPFJetCollectionContainer_i.vec_phi());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_mass", &recoPFJetCollectionContainer_i.vec_mass());
+  }
+
+  for(auto& patJetCollectionContainer_i : v_patJetCollectionContainer_){
+
+    this->addBranch(patJetCollectionContainer_i.name()+"_pt", &patJetCollectionContainer_i.vec_pt());
+    this->addBranch(patJetCollectionContainer_i.name()+"_eta", &patJetCollectionContainer_i.vec_eta());
+    this->addBranch(patJetCollectionContainer_i.name()+"_phi", &patJetCollectionContainer_i.vec_phi());
+    this->addBranch(patJetCollectionContainer_i.name()+"_mass", &patJetCollectionContainer_i.vec_mass());
+  }
+
+  for(auto& recoGenMETCollectionContainer_i : v_recoGenMETCollectionContainer_){
+
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_pt", &recoGenMETCollectionContainer_i.vec_pt());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_phi", &recoGenMETCollectionContainer_i.vec_phi());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_sumEt", &recoGenMETCollectionContainer_i.vec_sumEt());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_NeutralEMEtFraction", &recoGenMETCollectionContainer_i.vec_NeutralEMEtFraction());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &recoGenMETCollectionContainer_i.vec_NeutralHadEtFraction());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &recoGenMETCollectionContainer_i.vec_ChargedEMEtFraction());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &recoGenMETCollectionContainer_i.vec_ChargedHadEtFraction());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_MuonEtFraction", &recoGenMETCollectionContainer_i.vec_MuonEtFraction());
+    this->addBranch(recoGenMETCollectionContainer_i.name()+"_InvisibleEtFraction", &recoGenMETCollectionContainer_i.vec_InvisibleEtFraction());
+  }
+
+  for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
+
+    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_pt", &recoCaloMETCollectionContainer_i.vec_pt());
+    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_phi", &recoCaloMETCollectionContainer_i.vec_phi());
+    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_sumEt", &recoCaloMETCollectionContainer_i.vec_sumEt());
+  }
+
+  for(auto& recoPFMETCollectionContainer_i : v_recoPFMETCollectionContainer_){
+
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_pt", &recoPFMETCollectionContainer_i.vec_pt());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_phi", &recoPFMETCollectionContainer_i.vec_phi());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_sumEt", &recoPFMETCollectionContainer_i.vec_sumEt());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_NeutralEMFraction", &recoPFMETCollectionContainer_i.vec_NeutralEMFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &recoPFMETCollectionContainer_i.vec_NeutralHadEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &recoPFMETCollectionContainer_i.vec_ChargedEMEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &recoPFMETCollectionContainer_i.vec_ChargedHadEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_MuonEtFraction", &recoPFMETCollectionContainer_i.vec_MuonEtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_Type6EtFraction", &recoPFMETCollectionContainer_i.vec_Type6EtFraction());
+    this->addBranch(recoPFMETCollectionContainer_i.name()+"_Type7EtFraction", &recoPFMETCollectionContainer_i.vec_Type7EtFraction());
+  }
+
+  for(auto& patMETCollectionContainer_i : v_patMETCollectionContainer_){
+
+    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_pt", &patMETCollectionContainer_i.vec_Raw_pt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_phi", &patMETCollectionContainer_i.vec_Raw_phi());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_sumEt", &patMETCollectionContainer_i.vec_Raw_sumEt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_pt", &patMETCollectionContainer_i.vec_Type1_pt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_phi", &patMETCollectionContainer_i.vec_Type1_phi());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_sumEt", &patMETCollectionContainer_i.vec_Type1_sumEt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_pt", &patMETCollectionContainer_i.vec_Type1XY_pt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_phi", &patMETCollectionContainer_i.vec_Type1XY_phi());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_sumEt", &patMETCollectionContainer_i.vec_Type1XY_sumEt());
+    this->addBranch(patMETCollectionContainer_i.name()+"_NeutralEMFraction", &patMETCollectionContainer_i.vec_NeutralEMFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &patMETCollectionContainer_i.vec_NeutralHadEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &patMETCollectionContainer_i.vec_ChargedEMEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &patMETCollectionContainer_i.vec_ChargedHadEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_MuonEtFraction", &patMETCollectionContainer_i.vec_MuonEtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type6EtFraction", &patMETCollectionContainer_i.vec_Type6EtFraction());
+    this->addBranch(patMETCollectionContainer_i.name()+"_Type7EtFraction", &patMETCollectionContainer_i.vec_Type7EtFraction());
+  }
+
+  for(auto& patMuonCollectionContainer_i : v_patMuonCollectionContainer_){
+
+    this->addBranch(patMuonCollectionContainer_i.name()+"_pdgId", &patMuonCollectionContainer_i.vec_pdgId());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_pt", &patMuonCollectionContainer_i.vec_pt());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_eta", &patMuonCollectionContainer_i.vec_eta());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_phi", &patMuonCollectionContainer_i.vec_phi());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_mass", &patMuonCollectionContainer_i.vec_mass());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_vx", &patMuonCollectionContainer_i.vec_vx());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_vy", &patMuonCollectionContainer_i.vec_vy());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_vz", &patMuonCollectionContainer_i.vec_vz());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_dxyPV", &patMuonCollectionContainer_i.vec_dxyPV());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_dzPV", &patMuonCollectionContainer_i.vec_dzPV());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_id", &patMuonCollectionContainer_i.vec_id());
+    this->addBranch(patMuonCollectionContainer_i.name()+"_pfIso", &patMuonCollectionContainer_i.vec_pfIso());
+  }
+
+  for(auto& patElectronCollectionContainer_i : v_patElectronCollectionContainer_){
+
+    this->addBranch(patElectronCollectionContainer_i.name()+"_pdgId", &patElectronCollectionContainer_i.vec_pdgId());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_pt", &patElectronCollectionContainer_i.vec_pt());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_eta", &patElectronCollectionContainer_i.vec_eta());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_phi", &patElectronCollectionContainer_i.vec_phi());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_mass", &patElectronCollectionContainer_i.vec_mass());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_vx", &patElectronCollectionContainer_i.vec_vx());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_vy", &patElectronCollectionContainer_i.vec_vy());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_vz", &patElectronCollectionContainer_i.vec_vz());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_dxyPV", &patElectronCollectionContainer_i.vec_dxyPV());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_dzPV", &patElectronCollectionContainer_i.vec_dzPV());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_id", &patElectronCollectionContainer_i.vec_id());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_pfIso", &patElectronCollectionContainer_i.vec_pfIso());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_etaSC", &patElectronCollectionContainer_i.vec_etaSC());
+  }
+
+  // settings for output TFile and TTree
+  fs->file().SetCompressionAlgorithm(ROOT::ECompressionAlgorithm::kLZ4);
+  fs->file().SetCompressionLevel(4);
+
+  for(int idx=0; idx<ttree_->GetListOfBranches()->GetEntries(); ++idx){
+
+    TBranch* br = dynamic_cast<TBranch*>(ttree_->GetListOfBranches()->At(idx));
+    if(br){ br->SetBasketSize(1024 * 1024); }
+  }
+
+  if(ttree_->GetListOfBranches()->GetEntries() > 0){
+
+    ttree_->SetAutoFlush(-1024 * 1024 * ttree_->GetListOfBranches()->GetEntries());
   }
 }
 
@@ -870,202 +1060,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   // fill TTree
   ttree_->Fill();
-}
-
-void JMETriggerNTuple::beginJob(){
-
-  edm::Service<TFileService> fileService;
-
-  if(not fileService){
-
-    throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
-  }
-
-  ttree_ = fileService->make<TTree>(TTreeName_.c_str(), TTreeName_.c_str());
-
-  if(not ttree_){
-
-    throw edm::Exception(edm::errors::Configuration, "failed to create TTree via TFileService::make<TTree>");
-  }
-
-  this->addBranch("run", &run_);
-  this->addBranch("luminosityBlock", &luminosityBlock_);
-  this->addBranch("event", &event_);
-
-  for(const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()){
-
-    this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
-  }
-
-  for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
-
-    this->addBranch(recoVertexCollectionContainer_i.name()+"_tracksSize", &recoVertexCollectionContainer_i.vec_tracksSize());
-    this->addBranch(recoVertexCollectionContainer_i.name()+"_isFake", &recoVertexCollectionContainer_i.vec_isFake());
-    this->addBranch(recoVertexCollectionContainer_i.name()+"_chi2", &recoVertexCollectionContainer_i.vec_chi2());
-    this->addBranch(recoVertexCollectionContainer_i.name()+"_ndof", &recoVertexCollectionContainer_i.vec_ndof());
-    this->addBranch(recoVertexCollectionContainer_i.name()+"_x", &recoVertexCollectionContainer_i.vec_x());
-    this->addBranch(recoVertexCollectionContainer_i.name()+"_y", &recoVertexCollectionContainer_i.vec_y());
-    this->addBranch(recoVertexCollectionContainer_i.name()+"_z", &recoVertexCollectionContainer_i.vec_z());
-  }
-
-  for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){
-
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_pdgId", &recoPFCandidateCollectionContainer_i.vec_pdgId());
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_pt", &recoPFCandidateCollectionContainer_i.vec_pt());
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_eta", &recoPFCandidateCollectionContainer_i.vec_eta());
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_phi", &recoPFCandidateCollectionContainer_i.vec_phi());
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_mass", &recoPFCandidateCollectionContainer_i.vec_mass());
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vx", &recoPFCandidateCollectionContainer_i.vec_vx());
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vy", &recoPFCandidateCollectionContainer_i.vec_vy());
-    this->addBranch(recoPFCandidateCollectionContainer_i.name()+"_vz", &recoPFCandidateCollectionContainer_i.vec_vz());
-  }
-
-  for(auto& patPackedCandidateCollectionContainer_i : v_patPackedCandidateCollectionContainer_){
-
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_pdgId", &patPackedCandidateCollectionContainer_i.vec_pdgId());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_pt", &patPackedCandidateCollectionContainer_i.vec_pt());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_eta", &patPackedCandidateCollectionContainer_i.vec_eta());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_phi", &patPackedCandidateCollectionContainer_i.vec_phi());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_mass", &patPackedCandidateCollectionContainer_i.vec_mass());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vx", &patPackedCandidateCollectionContainer_i.vec_vx());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vy", &patPackedCandidateCollectionContainer_i.vec_vy());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_vz", &patPackedCandidateCollectionContainer_i.vec_vz());
-    this->addBranch(patPackedCandidateCollectionContainer_i.name()+"_fromPV", &patPackedCandidateCollectionContainer_i.vec_fromPV());
-  }
-
-  for(auto& recoGenJetCollectionContainer_i : v_recoGenJetCollectionContainer_){
-
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_pt", &recoGenJetCollectionContainer_i.vec_pt());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_eta", &recoGenJetCollectionContainer_i.vec_eta());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_phi", &recoGenJetCollectionContainer_i.vec_phi());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_mass", &recoGenJetCollectionContainer_i.vec_mass());
-  }
-
-  for(auto& recoCaloJetCollectionContainer_i : v_recoCaloJetCollectionContainer_){
-
-    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_pt", &recoCaloJetCollectionContainer_i.vec_pt());
-    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_eta", &recoCaloJetCollectionContainer_i.vec_eta());
-    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_phi", &recoCaloJetCollectionContainer_i.vec_phi());
-    this->addBranch(recoCaloJetCollectionContainer_i.name()+"_mass", &recoCaloJetCollectionContainer_i.vec_mass());
-  }
-
-  for(auto& recoPFJetCollectionContainer_i : v_recoPFJetCollectionContainer_){
-
-    this->addBranch(recoPFJetCollectionContainer_i.name()+"_pt", &recoPFJetCollectionContainer_i.vec_pt());
-    this->addBranch(recoPFJetCollectionContainer_i.name()+"_eta", &recoPFJetCollectionContainer_i.vec_eta());
-    this->addBranch(recoPFJetCollectionContainer_i.name()+"_phi", &recoPFJetCollectionContainer_i.vec_phi());
-    this->addBranch(recoPFJetCollectionContainer_i.name()+"_mass", &recoPFJetCollectionContainer_i.vec_mass());
-  }
-
-  for(auto& patJetCollectionContainer_i : v_patJetCollectionContainer_){
-
-    this->addBranch(patJetCollectionContainer_i.name()+"_pt", &patJetCollectionContainer_i.vec_pt());
-    this->addBranch(patJetCollectionContainer_i.name()+"_eta", &patJetCollectionContainer_i.vec_eta());
-    this->addBranch(patJetCollectionContainer_i.name()+"_phi", &patJetCollectionContainer_i.vec_phi());
-    this->addBranch(patJetCollectionContainer_i.name()+"_mass", &patJetCollectionContainer_i.vec_mass());
-  }
-
-  for(auto& recoGenMETCollectionContainer_i : v_recoGenMETCollectionContainer_){
-
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_pt", &recoGenMETCollectionContainer_i.vec_pt());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_phi", &recoGenMETCollectionContainer_i.vec_phi());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_sumEt", &recoGenMETCollectionContainer_i.vec_sumEt());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_NeutralEMEtFraction", &recoGenMETCollectionContainer_i.vec_NeutralEMEtFraction());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &recoGenMETCollectionContainer_i.vec_NeutralHadEtFraction());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &recoGenMETCollectionContainer_i.vec_ChargedEMEtFraction());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &recoGenMETCollectionContainer_i.vec_ChargedHadEtFraction());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_MuonEtFraction", &recoGenMETCollectionContainer_i.vec_MuonEtFraction());
-    this->addBranch(recoGenMETCollectionContainer_i.name()+"_InvisibleEtFraction", &recoGenMETCollectionContainer_i.vec_InvisibleEtFraction());
-  }
-
-  for(auto& recoCaloMETCollectionContainer_i : v_recoCaloMETCollectionContainer_){
-
-    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_pt", &recoCaloMETCollectionContainer_i.vec_pt());
-    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_phi", &recoCaloMETCollectionContainer_i.vec_phi());
-    this->addBranch(recoCaloMETCollectionContainer_i.name()+"_sumEt", &recoCaloMETCollectionContainer_i.vec_sumEt());
-  }
-
-  for(auto& recoPFMETCollectionContainer_i : v_recoPFMETCollectionContainer_){
-
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_pt", &recoPFMETCollectionContainer_i.vec_pt());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_phi", &recoPFMETCollectionContainer_i.vec_phi());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_sumEt", &recoPFMETCollectionContainer_i.vec_sumEt());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_NeutralEMFraction", &recoPFMETCollectionContainer_i.vec_NeutralEMFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &recoPFMETCollectionContainer_i.vec_NeutralHadEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &recoPFMETCollectionContainer_i.vec_ChargedEMEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &recoPFMETCollectionContainer_i.vec_ChargedHadEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_MuonEtFraction", &recoPFMETCollectionContainer_i.vec_MuonEtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_Type6EtFraction", &recoPFMETCollectionContainer_i.vec_Type6EtFraction());
-    this->addBranch(recoPFMETCollectionContainer_i.name()+"_Type7EtFraction", &recoPFMETCollectionContainer_i.vec_Type7EtFraction());
-  }
-
-  for(auto& patMETCollectionContainer_i : v_patMETCollectionContainer_){
-
-    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_pt", &patMETCollectionContainer_i.vec_Raw_pt());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_phi", &patMETCollectionContainer_i.vec_Raw_phi());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Raw_sumEt", &patMETCollectionContainer_i.vec_Raw_sumEt());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_pt", &patMETCollectionContainer_i.vec_Type1_pt());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_phi", &patMETCollectionContainer_i.vec_Type1_phi());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type1_sumEt", &patMETCollectionContainer_i.vec_Type1_sumEt());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_pt", &patMETCollectionContainer_i.vec_Type1XY_pt());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_phi", &patMETCollectionContainer_i.vec_Type1XY_phi());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type1XY_sumEt", &patMETCollectionContainer_i.vec_Type1XY_sumEt());
-    this->addBranch(patMETCollectionContainer_i.name()+"_NeutralEMFraction", &patMETCollectionContainer_i.vec_NeutralEMFraction());
-    this->addBranch(patMETCollectionContainer_i.name()+"_NeutralHadEtFraction", &patMETCollectionContainer_i.vec_NeutralHadEtFraction());
-    this->addBranch(patMETCollectionContainer_i.name()+"_ChargedEMEtFraction", &patMETCollectionContainer_i.vec_ChargedEMEtFraction());
-    this->addBranch(patMETCollectionContainer_i.name()+"_ChargedHadEtFraction", &patMETCollectionContainer_i.vec_ChargedHadEtFraction());
-    this->addBranch(patMETCollectionContainer_i.name()+"_MuonEtFraction", &patMETCollectionContainer_i.vec_MuonEtFraction());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type6EtFraction", &patMETCollectionContainer_i.vec_Type6EtFraction());
-    this->addBranch(patMETCollectionContainer_i.name()+"_Type7EtFraction", &patMETCollectionContainer_i.vec_Type7EtFraction());
-  }
-
-  for(auto& patMuonCollectionContainer_i : v_patMuonCollectionContainer_){
-
-    this->addBranch(patMuonCollectionContainer_i.name()+"_pdgId", &patMuonCollectionContainer_i.vec_pdgId());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_pt", &patMuonCollectionContainer_i.vec_pt());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_eta", &patMuonCollectionContainer_i.vec_eta());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_phi", &patMuonCollectionContainer_i.vec_phi());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_mass", &patMuonCollectionContainer_i.vec_mass());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_vx", &patMuonCollectionContainer_i.vec_vx());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_vy", &patMuonCollectionContainer_i.vec_vy());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_vz", &patMuonCollectionContainer_i.vec_vz());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_dxyPV", &patMuonCollectionContainer_i.vec_dxyPV());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_dzPV", &patMuonCollectionContainer_i.vec_dzPV());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_id", &patMuonCollectionContainer_i.vec_id());
-    this->addBranch(patMuonCollectionContainer_i.name()+"_pfIso", &patMuonCollectionContainer_i.vec_pfIso());
-  }
-
-  for(auto& patElectronCollectionContainer_i : v_patElectronCollectionContainer_){
-
-    this->addBranch(patElectronCollectionContainer_i.name()+"_pdgId", &patElectronCollectionContainer_i.vec_pdgId());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_pt", &patElectronCollectionContainer_i.vec_pt());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_eta", &patElectronCollectionContainer_i.vec_eta());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_phi", &patElectronCollectionContainer_i.vec_phi());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_mass", &patElectronCollectionContainer_i.vec_mass());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_vx", &patElectronCollectionContainer_i.vec_vx());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_vy", &patElectronCollectionContainer_i.vec_vy());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_vz", &patElectronCollectionContainer_i.vec_vz());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_dxyPV", &patElectronCollectionContainer_i.vec_dxyPV());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_dzPV", &patElectronCollectionContainer_i.vec_dzPV());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_id", &patElectronCollectionContainer_i.vec_id());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_pfIso", &patElectronCollectionContainer_i.vec_pfIso());
-    this->addBranch(patElectronCollectionContainer_i.name()+"_etaSC", &patElectronCollectionContainer_i.vec_etaSC());
-  }
-
-  // settings for output TFile and TTree
-  fileService->file().SetCompressionAlgorithm(ROOT::ECompressionAlgorithm::kLZ4);
-  fileService->file().SetCompressionLevel(4);
-
-  for(int idx=0; idx<ttree_->GetListOfBranches()->GetEntries(); ++idx){
-
-    TBranch* br = dynamic_cast<TBranch*>(ttree_->GetListOfBranches()->At(idx));
-    if(br){ br->SetBasketSize(1024 * 1024); }
-  }
-
-  if(ttree_->GetListOfBranches()->GetEntries() > 0){
-
-    ttree_->SetAutoFlush(-1024 * 1024 * ttree_->GetListOfBranches()->GetEntries());
-  }
 }
 
 template <typename... Args>
