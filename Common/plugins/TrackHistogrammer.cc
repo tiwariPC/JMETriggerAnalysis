@@ -1,26 +1,29 @@
-#include <memory>
-
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 
-#include "TH1D.h"
+#include <memory>
 
-class TrackHistogrammer : public edm::EDAnalyzer {
+#include <TH1D.h>
+
+namespace {
+
+class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
  public:
   explicit TrackHistogrammer(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
  private:
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  void beginJob() override {}
+  void analyze(const edm::Event&, const edm::EventSetup&) override;
+  void endJob() override {}
 
   edm::EDGetToken tracks_token_;
 
@@ -34,8 +37,12 @@ class TrackHistogrammer : public edm::EDAnalyzer {
   TH1D *h_track_outerPhi_;
 };
 
+}
+
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
   : tracks_token_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("src"))){
+
+  usesResource("TFileService");
 
   h_track_pt_ = fs_->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
   h_track_eta_ = fs_->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);

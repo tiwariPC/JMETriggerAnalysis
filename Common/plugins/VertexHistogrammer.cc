@@ -1,10 +1,7 @@
-#include <memory>
-
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -13,16 +10,22 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 
-#include "TH1D.h"
+#include <memory>
 
-class VertexHistogrammer : public edm::EDAnalyzer {
+#include <TH1D.h>
+
+namespace {
+
+class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
  public:
   explicit VertexHistogrammer(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
  private:
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  void beginJob() override {}
+  void analyze(const edm::Event&, const edm::EventSetup&) override;
+  void endJob() override {}
 
   edm::EDGetToken vertices_token_;
 
@@ -42,8 +45,12 @@ class VertexHistogrammer : public edm::EDAnalyzer {
   TH1D *h_track_dz_;
 };
 
+}
+
 VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
   : vertices_token_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("src"))){
+
+  usesResource("TFileService");
 
   h_vertex_x_ = fs_->make<TH1D>("vertex_x", "vertex_x", 600, -0.1, 0.1);
   h_vertex_y_ = fs_->make<TH1D>("vertex_y", "vertex_y", 600, -0.1, 0.1);
