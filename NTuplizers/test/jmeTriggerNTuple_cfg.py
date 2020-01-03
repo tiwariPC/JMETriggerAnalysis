@@ -227,10 +227,15 @@ opts.register('skipEvents', 0,
               vpo.VarParsing.varType.int,
               'number of events to be skipped')
 
-opts.register('threads', 1,
+opts.register('numThreads', 1,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
-              'number of threads/streams')
+              'number of threads')
+
+opts.register('numStreams', 1,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'number of streams')
 
 opts.register('lumis', None,
               vpo.VarParsing.multiplicity.singleton,
@@ -276,14 +281,10 @@ process.maxEvents.input = opts.maxEvents
 process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
 # multi-threading settings
-if opts.threads > 1:
-   process.DQMStore.enableMultiThread = True
-   process.options.numberOfStreams = opts.threads
-   process.options.numberOfThreads = opts.threads
-else:
-   process.DQMStore.enableMultiThread = False
-   process.options.numberOfStreams = 1
-   process.options.numberOfThreads = 1
+process.options.numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1)
+process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 1)
+if hasattr(process, 'DQMStore'):
+   process.DQMStore.enableMultiThread = True if (process.options.numberOfThreads > 1) else False
 
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
