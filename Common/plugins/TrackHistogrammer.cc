@@ -12,8 +12,6 @@
 
 #include <TH1D.h>
 
-namespace {
-
 class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
  public:
@@ -27,8 +25,6 @@ class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
   edm::EDGetToken tracks_token_;
 
-  edm::Service<TFileService> fs_;
-
   TH1D *h_track_pt_;
   TH1D *h_track_eta_;
   TH1D *h_track_phi_;
@@ -37,20 +33,25 @@ class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   TH1D *h_track_outerPhi_;
 };
 
-}
-
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
   : tracks_token_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("src"))){
 
-  usesResource("TFileService");
+  usesResource(TFileService::kSharedResource);
 
-  h_track_pt_ = fs_->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
-  h_track_eta_ = fs_->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
-  h_track_phi_ = fs_->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
+  edm::Service<TFileService> fs;
 
-  h_track_outerPt_ = fs_->make<TH1D>("track_outerPt", "track_outerPt", 600, 0, 5.);
-  h_track_outerEta_ = fs_->make<TH1D>("track_outerEta", "track_outerEta", 600, -5., 5.);
-  h_track_outerPhi_ = fs_->make<TH1D>("track_outerPhi", "track_outerPhi", 600, -3., 3.);
+  if(not fs){
+
+    throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
+  }
+
+  h_track_pt_ = fs->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
+  h_track_eta_ = fs->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
+  h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
+
+  h_track_outerPt_ = fs->make<TH1D>("track_outerPt", "track_outerPt", 600, 0, 5.);
+  h_track_outerEta_ = fs->make<TH1D>("track_outerEta", "track_outerEta", 600, -5., 5.);
+  h_track_outerPhi_ = fs->make<TH1D>("track_outerPhi", "track_outerPhi", 600, -3., 3.);
 }
 
 void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
