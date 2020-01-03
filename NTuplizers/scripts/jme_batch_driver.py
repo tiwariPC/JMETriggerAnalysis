@@ -35,11 +35,9 @@ def batch_job_HTCondor(**kwargs):
 
       '#arguments = ',
 
-      '#transfer_executable = True',
+      'transfer_executable = True',
 
-      '+JobFlavour = "workday"',
-
-      '#universe = vanilla',
+      'universe = vanilla',
 
       'getenv = True',
 
@@ -48,8 +46,10 @@ def batch_job_HTCondor(**kwargs):
 
       'requirements = (OpSysAndVer == "'+('CentOS7' if kwargs.get('is_slc7_arch', True) else 'SL6')+'")',
 
-      '# RequestMemory  =  2000',
-      '#+RequestRuntime = 10800',
+      'RequestCpus = '+str(kwargs.get('RequestCpus', 1)),
+
+      ' RequestMemory  = '+str(kwargs.get('RequestMemory', 2000)),
+      '+RequestRuntime = '+str(kwargs.get('+RequestRuntime', 10800)),
     ]
 
     if 'transfer_input_files' in kwargs:
@@ -151,6 +151,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
                         help='maximum number of events per job')
+
+#    parser.add_argument('-t', '--threads', dest='threads', action='store', type=int, default=1, required=False,
+#                        help='number of threads')
 
     parser.add_argument('--batch', dest='batch', choices=['htc'], action='store', default='htc',
                         help='type of batch system for job submission')
@@ -400,6 +403,11 @@ if __name__ == '__main__':
                  'submit_options': opts.htc_opts,
 
                  'is_slc7_arch': is_slc7_arch,
+
+                 'RequestCpus': 1, #opts.threads,
+
+                 'RequestMemory': 2000,
+                 '+RequestRuntime': 10800,
 
                  'verbose': VERBOSE,
 
