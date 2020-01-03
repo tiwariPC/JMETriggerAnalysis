@@ -5,9 +5,8 @@ from __future__ import print_function
 import argparse
 import os
 import sys
-import json
-import copy
 import math
+import datetime
 
 from JMETriggerAnalysis.NTuplizers.utils.common import *
 
@@ -134,6 +133,9 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--cfg', dest='cmsRun_cfg', action='store', default=None, required=True,
                         help='path to cmsRun cfg file')
 
+    parser.add_argument('--customize-cfg', dest='customize_cfg', action='store_true', default=False,
+                        help='append minimal customization to cmsRun-cfg required by the driver')
+
     parser.add_argument('-d', '--dataset', dest='dataset', action='store', default=None, required=True,
                         help='name of MINIAOD* input data set in DAS')
 
@@ -152,8 +154,14 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
                         help='maximum number of events per job')
 
-#    parser.add_argument('-t', '--threads', dest='threads', action='store', type=int, default=1, required=False,
-#                        help='number of threads')
+    parser.add_argument('--cpus', dest='cpus', action='store', type=int, default=1, required=False,
+                        help='argument of HTC parameter "RequestCpus"')
+
+    parser.add_argument('--memory', dest='memory', action='store', type=int, default=2000, required=False,
+                        help='argument of HTC parameter "RequestMemory"')
+
+    parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=10800, required=False,
+                        help='argument of HTC parameter "+RequestRuntime"')
 
     parser.add_argument('--batch', dest='batch', choices=['htc'], action='store', default='htc',
                         help='type of batch system for job submission')
@@ -184,6 +192,8 @@ if __name__ == '__main__':
     if os.path.exists(opts.output):
        KILL(log_prx+'target path to output directory already exists [-o]: '+str(opts.output))
 
+    OUTPUT_DIR = os.path.abspath(opts.output)
+
     if opts.n_events == 0:
        KILL(log_prx+'logic error: requesting zero events per job (use non-zero value for argument of option "-n")')
 
@@ -191,19 +201,26 @@ if __name__ == '__main__':
        if opts.submit and (not opts.dry_run):
           if opts.batch == 'htc': which('condor_submit')
 
+    if opts.cpus <= 0:
+       KILL(log_prx+'invalid (non-positive) value for HTC parameter "RequestCpus": '+str(opts.cpus))
+
+    if opts.memory <= 0:
+       KILL(log_prx+'invalid (non-positive) value for HTC parameter "RequestMemory": '+str(opts.memory))
+
+    if opts.runtime <= 0:
+       KILL(log_prx+'invalid (non-positive) value for HTC parameter "+RequestRuntime": '+str(opts.runtime))
+
     is_slc7_arch = False
     if os.environ['SCRAM_ARCH'].startswith('slc7'): is_slc7_arch = True
     elif os.environ['SCRAM_ARCH'].startswith('slc6'): pass
     else:
        KILL(log_prc+'could not infer architecture from environment variable "SCRAM_ARCH": '+str(os.environ['SCRAM_ARCH']))
 
-    OUTPUT_DIR = os.path.abspath(opts.output)
-
     ### unrecognized command-line arguments
     ### -> used as additional command-line arguments to cmsRun
     if len(opts_unknown):
        print('-'*50)
-       print('additional cmsRun command-line arguments:')
+       print(colored_text('additional cmsRun command-line arguments:', ['1']))
        for _tmp in opts_unknown: print(' '+str(_tmp))
        print('-'*50)
 
@@ -320,6 +337,38 @@ if __name__ == '__main__':
     out_cmsRun_cfg = os.path.abspath(OUTPUT_DIR+'/cfg.py')
     EXE('cp '+opts.cmsRun_cfg+' '+out_cmsRun_cfg, verbose=opts.verbose, dry_run=opts.dry_run)
 
+    if opts.customize_cfg:
+       with open(out_cmsRun_cfg, 'a') as cfg_file:
+            custom_str = """
+###
+### customization added by {:} [time-stamp: {:}]
+###
+
+import FWCore.ParameterSet.VarParsing as vpo
+opts = vpo.VarParsing('analysis')
+
+opts.register('skipEvents', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'number of events to be skipped')
+
+opts.register('dumpPython', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'Path to python file with content of cms.Process')
+
+# max number of events to be processed
+process.maxEvents.input = opts.maxEvents
+
+# number of events to be skipped
+process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
+
+# dump content of cms.Process to python file
+if opts.dumpPython is not None:
+   open(opts.dumpPython, 'w').write(process.dumpPython())
+"""
+            cfg_file.write(custom_str.format(os.path.basename(__file__), str(datetime.datetime.now())))
+
     ### copy driver command
     with open(os.path.abspath(OUTPUT_DIR+'/cmdLog'), 'w') as file_cmdLog:
          file_cmdLog.write((' '.join(sys.argv[:]))+'\n')
@@ -352,7 +401,6 @@ if __name__ == '__main__':
 
             # cmsRun arguments (cfg-file + options)
             cmsRun_opts = out_cmsRun_cfg
-            cmsRun_opts += ' \\\n output='+str(i_OUTPUT_BASENAME_woExt)+'.root'
             cmsRun_opts += ' \\\n maxEvents='+str(i_maxEvents)
             cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
             cmsRun_opts += ' \\\n inputFiles='+str(','.join(i_inputFiles))
@@ -404,10 +452,9 @@ if __name__ == '__main__':
 
                  'is_slc7_arch': is_slc7_arch,
 
-                 'RequestCpus': 1, #opts.threads,
-
-                 'RequestMemory': 2000,
-                 '+RequestRuntime': 10800,
+                 'RequestCpus': opts.cpus,
+                 'RequestMemory': opts.memory,
+                 '+RequestRuntime': opts.runtime,
 
                  'verbose': VERBOSE,
 
