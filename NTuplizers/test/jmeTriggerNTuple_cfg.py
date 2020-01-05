@@ -284,7 +284,7 @@ process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 process.options.numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1)
 process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 1)
 if hasattr(process, 'DQMStore'):
-   process.DQMStore.enableMultiThread = True if (process.options.numberOfThreads > 1) else False
+   process.DQMStore.enableMultiThread = (process.options.numberOfThreads > 1)
 
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
