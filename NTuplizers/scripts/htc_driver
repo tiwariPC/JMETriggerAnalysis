@@ -311,6 +311,12 @@ process.maxEvents.input = opts.maxEvents
 # number of events to be skipped
 process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
+# input EDM files [primary]
+process.source.fileNames = opts.inputFiles
+
+# input EDM files [secondary]
+process.source.secondaryFileNames = opts.secondaryInputFiles
+
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
    open(opts.dumpPython, 'w').write(process.dumpPython())
