@@ -179,6 +179,9 @@ if __name__ == '__main__':
     parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=10800, required=False,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
+    parser.add_argument('--batch-name', dest='batch_name', action='store', default=None, required=False,
+                        help='argument of HTCondor parameter "batch_name" (if not specified, basename of argument of "--output" is used)')
+
     parser.add_argument('--submit', dest='submit', action='store_true', default=False,
                         help='submit job(s) on the batch system')
 
@@ -335,7 +338,7 @@ if opts.dumpPython is not None:
 
     SUBFILE_LINES = [
       'BASEDIR = '+OUTPUT_DIR,
-      'batch_name = $Fd(BASEDIR)',
+      'batch_name = '+(opts.batch_name if (opts.batch_name is not None) else '$Fn(BASEDIR)'),
       'initialdir = $DIRNAME(QFILE)',
       'executable = $(initialdir)/exe.sh',
       'output = logs/out.$(Cluster).$(Process)',
@@ -385,7 +388,7 @@ if opts.dumpPython is not None:
             EXE('touch '+str(i_OUTPUT_DIR)+'/flag.queue', verbose=opts.verbose, dry_run=opts.dry_run)
 
             # number of events for this job
-            i_maxEvents = opts.n_events
+            i_maxEvents = min(opts.n_events, i_inputFiles_nevents) if (opts.n_events > 0) else i_inputFiles_nevents
             if (i_job == (i_njobs - 1)) and (i_nevt_remainder != 0):
                i_maxEvents = i_nevt_remainder
 
