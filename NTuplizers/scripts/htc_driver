@@ -258,7 +258,7 @@ if __name__ == '__main__':
     ### -> used to determine format of output-file name
     njobs = 0
     for i_inpfdc in inputfileDicts:
-        njobs += int(math.ceil(float(i_inpfdc['filesMINIAOD.nevents']) / opts.n_events))
+        njobs += int(math.ceil(float(i_inpfdc['filesMINIAOD.nevents']) / opts.n_events)) if (opts.n_events > 0) else 1
     if njobs == 0:
        KILL(log_prx+'input error: expected number of batch jobs is zero (check input data set and number of events): '+opts.dataset)
     outputname_postfix_format = '_{:0'+str(1+int(math.log10(njobs)))+'d}'
@@ -370,8 +370,8 @@ if opts.dumpPython is not None:
         i_secondaryInputFiles = i_inpfdc['filesRAW']
 
         # number of jobs for this set of input files
-        i_njobs = int(math.ceil(float(i_inputFiles_nevents) / opts.n_events))
-        i_nevt_remainder = i_inputFiles_nevents%opts.n_events
+        i_njobs = int(math.ceil(float(i_inputFiles_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
+        i_nevt_remainder = i_inputFiles_nevents%opts.n_events if (opts.n_events > 0) else 0
 
         for i_job in range(i_njobs):
 
@@ -406,6 +406,7 @@ if opts.dumpPython is not None:
             i_SHELL_COMMANDS += [['if [ -f flag.done ]; then exit 0; fi;']]
             i_SHELL_COMMANDS += [['cd '+os.environ['CMSSW_BASE']+'/src']]
             i_SHELL_COMMANDS += [['eval `scram runtime -sh`']]
+            i_SHELL_COMMANDS += [['cd -']]
             i_SHELL_COMMANDS += [['cmsRun '+cmsRun_opts]]
             i_SHELL_COMMANDS += [['touch flag.done']]
 
