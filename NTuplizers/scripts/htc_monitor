@@ -58,7 +58,7 @@ def monitor(options, log=''):
         for path, subdirs, files in os.walk(input_dir):
             for name in files:
                 if os.path.basename(name) == 'condor.sub':
-                   INPUT_DIRS_2 += [os.path.dirname(os.path.abspath(os.path.join(path, name)))]
+                   INPUT_DIRS_2 += [os.path.dirname(os.path.join(path, name))]
 
     if len(INPUT_DIRS_2) == 0:
        return True
@@ -71,28 +71,22 @@ def monitor(options, log=''):
     read_running_exes = True
 
     for inp_dir in INPUT_DIRS_2:
-        files_done = glob.glob(inp_dir+'/'+options.jobdirname+'_*/flag.done')
-        files_exe = glob.glob(inp_dir+'/'+options.jobdirname+'_*/exe.sh')
 
-        counter_completed += len(files_done)
-        counter_input += len(files_exe)
+        job_dirs = glob.glob(inp_dir+'/'+options.jobdirname+'_*/')
+        counter_input += len(job_dirs)
 
-        for _tmp in files_done:
-            _tmp_dirname = os.path.dirname(_tmp)
-            for _tmp2 in [_tmp_dirname+'/flag.queue', _tmp_dirname+'/flag.submitted']:
-                if os.path.isfile(_tmp2):
-                   EXE('rm -f '+_tmp2, verbose=opts.verbose, dry_run=opts.dry_run)
-
-        dirs_undone = [os.path.abspath(_tmp) for _tmp in glob.glob(inp_dir+'/'+options.jobdirname+'_*/') \
-                       if os.path.isfile(_tmp+'/flag.queue') or os.path.isfile(_tmp+'/flag.submitted')]
-
-        for _tmp_dirname in dirs_undone:
-
-            if os.path.isfile(_tmp_dirname+'/flag.done'):
-               for _tmp2 in [_tmp_dirname+'/flag.queue', _tmp_dirname+'/flag.submitted']:
+        dirs_undone = []
+        for _tmp in job_dirs:
+            if os.path.isfile(_tmp+'/flag.done'):
+               counter_completed += 1
+               for _tmp2 in [_tmp+'/flag.queue', _tmp+'/flag.submitted']:
                    if os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=opts.verbose, dry_run=opts.dry_run)
-               continue
+
+            if os.path.isfile(_tmp+'/flag.queue') or os.path.isfile(_tmp+'/flag.submitted'):
+               dirs_undone += [os.path.abspath(_tmp)]
+
+        for _tmp_dirname in dirs_undone:
 
             if read_running_exes:
                running_exes = HTCondor_jobExecutables_2(os.environ['USER'])
@@ -109,7 +103,7 @@ def monitor(options, log=''):
                    if os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=opts.verbose, dry_run=opts.dry_run)
             else:
-               resubmit_job = options.resubmit and (counter_resubmitted < options.jobs_max)
+               resubmit_job = options.resubmit and ((options.jobs_max < 0) or (counter_resubmitted < options.jobs_max))
 
                if os.path.isfile(_tmp_dirname+'/flag.submitted'):
                   EXE('mv '+_tmp_dirname+'/flag.submitted '+_tmp_dirname+'/flag.queue', verbose=opts.verbose, dry_run=opts.dry_run)
@@ -170,7 +164,7 @@ if __name__ == '__main__':
     parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=None, required=False,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
-    parser.add_argument('--jobs-max', dest='jobs_max', action='store', type=int, default=5000,
+    parser.add_argument('--jobs-max', dest='jobs_max', action='store', type=int, default=-1,
                         help='maximum number of jobs that can submitted to the batch system')
 
     parser.add_argument('--repeat', dest='repeat', nargs='?', type=int, const=-1, default=None,
