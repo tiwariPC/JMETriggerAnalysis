@@ -10,6 +10,9 @@ from JMETriggerAnalysis.NTuplizers.utils.common import *
 
 def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
 
+    if verbose:
+       print(das_name)
+
     dataset_split = das_name.split('/')
     if len(dataset_split) != 4:
        KILL('load_dataset_data -- invalid data-set name (format is incorrect, check slashes): '+das_name)
@@ -31,7 +34,11 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
 
     totEvents, breakLoop = 0, False
 
-    for i_file in dataset_files:
+    for i_file_idx, i_file in enumerate(dataset_files):
+
+        if verbose:
+           print('  file', i_file_idx, '/', len(dataset_files))
+
         i_file_nevents = command_output_lines('dasgoclient --query "file='+str(i_file)+' | grep file.nevents"')
         i_file_nevents = [_tmp.replace(' ', '') for _tmp in i_file_nevents]
         i_file_nevents = [_tmp for _tmp in i_file_nevents if _tmp != '']
@@ -97,7 +104,7 @@ def assert_dataset_data(dset_data, verbose=False):
 
     if 'DAS' not in dset_data:
        KILL('assert_dataset_data -- 11')
-    elif not isinstance(dset_data['DAS'], str):
+    elif not isinstance(dset_data['DAS'], basestring):
        KILL('assert_dataset_data -- 12')
 
     if 'files' not in dset_data:
@@ -112,7 +119,7 @@ def assert_dataset_data(dset_data, verbose=False):
 
         if 'file' not in i_ent:
            KILL('assert_dataset_data -- 41 '+str(i_ent))
-        elif not isinstance(i_ent['file'], str):
+        elif not isinstance(i_ent['file'], basestring):
            KILL('assert_dataset_data -- 42 '+str(i_ent))
 
         if 'nevents' not in i_ent:
@@ -129,7 +136,7 @@ def assert_dataset_data(dset_data, verbose=False):
                KILL('assert_dataset_data -- 52 '+str(i_ent))
             else:
                for _tmp2 in i_ent[_tmp]:
-                   if not isinstance(_tmp2, str):
+                   if not isinstance(_tmp2, basestring):
                       KILL('assert_dataset_data -- 53 '+str(i_ent))
 
 def skim_das_jsondump(file_path, max_files=-1, max_events=-1, verbose=False):

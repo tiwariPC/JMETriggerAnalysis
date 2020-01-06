@@ -72,8 +72,6 @@ if __name__ == '__main__':
     log_prx = os.path.basename(__file__)+' -- '
 
     ### opts --------------------
-    VERBOSE = bool(opts.verbose and (not opts.submit))
-
     if 'CMSSW_BASE' not in os.environ:
        KILL(log_prx+'global variable CMSSW_BASE is not defined (set up CMSSW environment with "cmsenv" before submitting jobs)')
 
@@ -114,7 +112,7 @@ if __name__ == '__main__':
 
     ### unrecognized command-line arguments
     ### -> used as additional command-line arguments to cmsRun
-    if len(opts_unknown):
+    if opts.verbose and len(opts_unknown):
        print('-'*50)
        print(colored_text('additional cmsRun command-line arguments:', ['1']))
        for _tmp in opts_unknown: print(' '+str(_tmp))
@@ -144,7 +142,7 @@ if __name__ == '__main__':
            break
     if nJobs == 0:
        KILL(log_prx+'input error: expected number of batch jobs is zero (check input data set and number of events): '+opts.dataset)
-    outputname_postfix_format = '_{:0'+str(1+int(math.log10(nJobs)))+'d}'
+    outputname_postfix_format = '_{:0'+str(max(1, int(math.ceil(math.log10(nJobs)))+'d}'
     del nJobs, totEvents, breakLoop
 
     ### grid certificate

@@ -39,8 +39,6 @@ if __name__ == '__main__':
     log_prx = os.path.basename(__file__)+' -- '
 
     ### opts --------------------
-    VERBOSE = bool(opts.verbose and (not opts.submit))
-
     if os.path.exists(opts.output):
        KILL(log_prx+'target path to output .json file already exists [-o]: '+str(opts.output))
 

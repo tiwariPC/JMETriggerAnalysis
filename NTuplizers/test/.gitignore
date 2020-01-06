@@ -3,3 +3,4 @@ HLT_*_cfg.py
 log*.txt
 crab.log
 crab_*/
+out_*/
