@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""baj_driver.py -- creates scripts for batch-submission of cmsRun jobs
+"""
+script to create area for submission of HTCondor batch jobs
 """
 from __future__ import print_function
 import argparse
@@ -10,136 +11,7 @@ import json
 import datetime
 
 from JMETriggerAnalysis.NTuplizers.utils.common import *
-
-def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
-
-    dset_data = []
-
-    dataset_split = das_name.split('/')
-    if len(dataset_split) != 4:
-       KILL(log_prx+'invalid data-set name (format is incorrect, check slashes): '+das_name)
-
-    if 'MINIAOD' not in dataset_split[3]:
-       KILL(log_prx+'the data set\'s Tier is not MINIAOD*: '+das_name)
-
-    dataset_files = command_output_lines('dasgoclient --query "file dataset='+str(das_name)+'"')
-    dataset_files = [_tmp for _tmp in dataset_files if _tmp != '']
-    dataset_files = sorted(list(set(dataset_files)))
-
-    if len(dataset_files) == 0:
-       KILL(log_prx+'empty list of input files for dataset: '+str(das_name))
-
-    if max_files > 0:
-       dataset_files = dataset_files[:max_files]
-
-    tot_events, break_loop = 0, False
-
-    for i_file in dataset_files:
-        i_file_nevents = command_output_lines('dasgoclient --query "file='+str(i_file)+' | grep file.nevents"')
-        i_file_nevents = [_tmp.replace(' ', '') for _tmp in i_file_nevents]
-        i_file_nevents = [_tmp for _tmp in i_file_nevents if _tmp != '']
-        i_file_nevents = sorted(list(set(i_file_nevents)))
-
-        if len(i_file_nevents) != 1:
-           KILL('AAA')
-
-        i_file_nevents = i_file_nevents[0]
-
-        if not is_int(i_file_nevents):
-           KILL('BBB')
-
-        i_file_nevents = int(i_file_nevents)
-
-        tot_events += i_file_nevents
-        if (max_events > 0) and (tot_events >= max_events):
-           i_file_nevents -= (tot_events - max_events)
-           break_loop = True
-
-        if verbose:
-           print(i_file)
-           print(i_file_nevents)
-
-        i_file_rawparents = []
-
-        i_file_aodfiles = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
-        i_file_aodfiles = [_tmp for _tmp in i_file_aodfiles if _tmp != '']
-        i_file_aodfiles = sorted(list(set(i_file_aodfiles)))
-        for i_file_aodf in i_file_aodfiles:
-            i_file_rawfiles_tmp = command_output_lines('dasgoclient --query "parent file='+str(i_file_aodf)+'"')
-            i_file_rawfiles_tmp = [_tmp.replace(' ', '') for _tmp in i_file_rawfiles_tmp]
-            i_file_rawfiles_tmp = [_tmp for _tmp in i_file_rawfiles_tmp if _tmp != '']
-            i_file_rawfiles_tmp = sorted(list(set(i_file_rawfiles_tmp)))
-            i_file_rawparents += i_file_rawfiles_tmp
-
-        i_file_rawparents = sorted(list(set(i_file_rawparents)))
-
-        if verbose:
-           for _tmp in i_file_rawparents:
-               print(' '*5, _tmp)
-
-        dset_data += [{
-          'filesMINIAOD': [i_file],
-          'filesMINIAOD.nevents': i_file_nevents,
-          'filesRAW': i_file_rawparents,
-        }]
-
-        if break_loop:
-           break
-
-    del tot_events, break_loop
-
-    return dset_data
-
-def skim_dataset_json(file_path, max_files=-1, max_events=-1, verbose=False):
-
-    dset_data = json.load(open(file_path))
-
-    # checks on .json file content
-    if not isinstance(dset_data, list):
-       KILL(log_prx+'invalid content of dataset .json file [-d]: '+str(file_path))
-
-    for i_ent in dset_data:
-
-        if not isinstance(i_ent, dict):
-           KILL(log_prx+'bbb')
-
-        if 'filesMINIAOD.nevents' not in i_ent:
-           KILL(log_prx+'ccc')
-
-        if not isinstance(i_ent['filesMINIAOD.nevents'], int):
-           KILL(log_prx+'ddd')
-
-        for _tmp in ['filesMINIAOD', 'filesRAW']:
-
-            if _tmp not in i_ent:
-               KILL(log_prx+'ccc '+_tmp)
-
-            if not isinstance(i_ent[_tmp], list):
-               KILL(log_prx+'ddd '+_tmp)
-
-            for _tmp2 in i_ent[_tmp]:
-                if not isinstance(_tmp2, str):
-                   KILL(log_prx+'eee '+_tmp)
-
-    # skim input list based on max_files and max_events
-    if max_files > 0:
-       dset_data = dset_data[max_files]
-
-    if max_events > 0:
-       lastIndex, totEvents = 0, 0
-       for _tmp in dset_data:
-           lastIndex += 1
-           i_file_nevents = _tmp['filesMINIAOD.nevents']
-           totEvents += i_file_nevents
-           if totEvents >= max_events:
-              i_file_nevents -= (totEvents - max_events)
-              _tmp['filesMINIAOD.nevents'] = i_file_nevents
-              break
-       if lastIndex != len(dset_data):
-          dset_data = dset_data[:lastIndex]
-       del lastIndex, totEvents
-
-    return dset_data
+from JMETriggerAnalysis.NTuplizers.utils.das import load_dataset_data, skim_das_jsondump
 
 #### main
 if __name__ == '__main__':
@@ -249,23 +121,31 @@ if __name__ == '__main__':
        print('-'*50)
 
     ### extract input-files information from data set name via dasgoclient
-    ### -> list of dictionaries, each containing names of MINIAOD files, RAW parent files, and number of events per file
-    inputfileDicts = []
+    ### -> list of dictionaries, each containing DAS name, files, number of events per file, and parent files
+    input_dset = {}
 
     if os.path.isfile(opts.dataset):
-       inputfileDicts = skim_dataset_json(file_path=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, verbose=opts.verbose)
+       input_dset = skim_das_jsondump(file_path=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, verbose=opts.verbose)
     else:
-       inputfileDicts = load_dataset_data(das_name=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, verbose=opts.verbose)
+       which('dasgoclient')
+       input_dset = load_dataset_data(das_name=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, verbose=opts.verbose)
 
     ### total number of events and jobs
     ### -> used to determine format of output-file name
-    njobs = 0
-    for i_inpfdc in inputfileDicts:
-        njobs += int(math.ceil(float(i_inpfdc['filesMINIAOD.nevents']) / opts.n_events)) if (opts.n_events > 0) else 1
-    if njobs == 0:
+    nJobs, totEvents, breakLoop = 0, 0, False
+    for i_inpfdc in input_dset['files']:
+        i_nevents = i_inpfdc['nevents']
+        totEvents += i_nevents
+        if (opts.max_events > 0) and (totEvents >= opts.max_events):
+           i_nevents -= (totEvents - opts.max_events)
+           breakLoop = True
+        nJobs += int(math.ceil(float(i_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
+        if breakLoop:
+           break
+    if nJobs == 0:
        KILL(log_prx+'input error: expected number of batch jobs is zero (check input data set and number of events): '+opts.dataset)
-    outputname_postfix_format = '_{:0'+str(1+int(math.log10(njobs)))+'d}'
-    del njobs
+    outputname_postfix_format = '_{:0'+str(1+int(math.log10(nJobs)))+'d}'
+    del nJobs, totEvents, breakLoop
 
     ### grid certificate
     voms_cert_path = None
@@ -327,8 +207,13 @@ if opts.dumpPython is not None:
             cfg_file.write(custom_str.format(os.path.basename(__file__), str(datetime.datetime.now())))
 
     ### copy driver command
-    with open(os.path.abspath(OUTPUT_DIR+'/cmdLog'), 'w') as file_cmdLog:
-         file_cmdLog.write((' '.join(sys.argv[:]))+'\n')
+    if not opts.dry_run:
+       with open(os.path.abspath(OUTPUT_DIR+'/cmdLog'), 'w') as file_cmdLog:
+            file_cmdLog.write((' '.join(sys.argv[:]))+'\n')
+
+    ### copy dataset information in .json format
+    if not opts.dry_run:
+       json.dump(input_dset, open(OUTPUT_DIR+'/dataset.json', 'w'), sort_keys=True, indent=2)
 
     ### condor submission file
     SUBFILE_ABSPATH = OUTPUT_DIR+'/condor.sub'
@@ -359,27 +244,30 @@ if opts.dumpPython is not None:
       'queue QFILE matching files $(BASEDIR)/*/flag.queue',
     ]
 
-    with open(SUBFILE_ABSPATH, 'w') as f_subfile:
-       for _tmp in SUBFILE_LINES:
-           f_subfile.write(_tmp+'\n')
+    if not opts.dry_run:
+       with open(SUBFILE_ABSPATH, 'w') as f_subfile:
+          for _tmp in SUBFILE_LINES:
+              f_subfile.write(_tmp+'\n')
 
     ### create output batch scripts
-    job_counter = 0
+    jobCounter = 0
+    totEvents = 0
+    breakLoop = False
 
-    for i_inpfdc in inputfileDicts:
+    for i_inpfdc in input_dset['files']:
 
-        i_inputFiles = i_inpfdc['filesMINIAOD']
-        i_inputFiles_nevents = i_inpfdc['filesMINIAOD.nevents']
-        i_secondaryInputFiles = i_inpfdc['filesRAW']
+        i_inputFile = i_inpfdc['file']
+        i_inputFile_nevents = i_inpfdc['nevents']
+        i_secondaryInputFiles = i_inpfdc['parentFiles_2']
 
         # number of jobs for this set of input files
-        i_njobs = int(math.ceil(float(i_inputFiles_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
-        i_nevt_remainder = i_inputFiles_nevents%opts.n_events if (opts.n_events > 0) else 0
+        i_njobs = int(math.ceil(float(i_inputFile_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
+        i_nevt_remainder = i_inputFile_nevents%opts.n_events if (opts.n_events > 0) else 0
 
         for i_job in range(i_njobs):
 
             # name of output sub-directory
-            i_OUTPUT_DIR = OUTPUT_DIR+'/'+opts.jobdirname+outputname_postfix_format.format(job_counter)
+            i_OUTPUT_DIR = OUTPUT_DIR+'/'+opts.jobdirname+outputname_postfix_format.format(jobCounter)
 
             # create logs/ directory for HTCondor log-files
             EXE('mkdir -p '+str(i_OUTPUT_DIR)+'/logs', verbose=opts.verbose, dry_run=opts.dry_run)
@@ -388,21 +276,26 @@ if opts.dumpPython is not None:
             EXE('touch '+str(i_OUTPUT_DIR)+'/flag.queue', verbose=opts.verbose, dry_run=opts.dry_run)
 
             # number of events for this job
-            i_maxEvents = min(opts.n_events, i_inputFiles_nevents) if (opts.n_events > 0) else i_inputFiles_nevents
+            i_maxEvents = opts.n_events if (opts.n_events > 0) else i_inputFile_nevents
             if (i_job == (i_njobs - 1)) and (i_nevt_remainder != 0):
                i_maxEvents = i_nevt_remainder
+
+            totEvents += i_maxEvents
+            if (opts.max_events > 0) and (totEvents >= opts.max_events):
+               i_maxEvents -= (totEvents - opts.max_events)
+               breakLoop = True
 
             # cmsRun arguments (cfg-file + options)
             cmsRun_opts = out_cmsRun_cfg
             cmsRun_opts += ' \\\n maxEvents='+str(i_maxEvents)
             cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
-            cmsRun_opts += ' \\\n inputFiles='+str(','.join(i_inputFiles))
+            cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
             cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
             for _tmp in opts_unknown:
                 cmsRun_opts += ' \\\n '+str(_tmp)
 
             ## dump of full python config
-            if job_counter == 0:
+            if jobCounter == 0:
                EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> /dev/null', suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
 
             i_SHELL_COMMANDS  = [['set -e']]
@@ -418,22 +311,28 @@ if opts.dumpPython is not None:
             if os.path.exists(EXEFILE_ABSPATH):
                KILL(log_prx+'target output file already exists (executable of batch job): '+EXEFILE_ABSPATH)
 
-            with open(EXEFILE_ABSPATH, 'w') as f_exefile:
+            if not opts.dry_run:
+               with open(EXEFILE_ABSPATH, 'w') as f_exefile:
 
-               f_exefile.write('#!/bin/bash\n')
+                  f_exefile.write('#!/bin/bash\n')
 
-               # export explicitly the environment variable LD_LIBRARY_PATH
-               if not opts.no_export_LD_LIBRARY_PATH:
-                  if 'LD_LIBRARY_PATH' in os.environ:
-                     f_exefile.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
+                  # export explicitly the environment variable LD_LIBRARY_PATH
+                  if not opts.no_export_LD_LIBRARY_PATH:
+                     if 'LD_LIBRARY_PATH' in os.environ:
+                        f_exefile.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
 
-               f_exefile.write('\n'+('\n\n'.join([' \\\n '.join(_tmp) for _tmp in i_SHELL_COMMANDS]))+'\n')
+                  f_exefile.write('\n'+('\n\n'.join([' \\\n '.join(_tmp) for _tmp in i_SHELL_COMMANDS]))+'\n')
 
             print(colored_text('output:', ['1', '94']), os.path.relpath(EXEFILE_ABSPATH, os.environ['PWD']))
 
             EXE('chmod u+x '+EXEFILE_ABSPATH, verbose=opts.verbose, dry_run=opts.dry_run)
 
-            job_counter += 1
+            jobCounter += 1
+
+            if breakLoop:
+               break
+
+    del jobCounter, totEvents, breakLoop
 
     if opts.submit:
        EXE('condor_submit '+SUBFILE_ABSPATH, suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
