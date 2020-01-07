@@ -155,7 +155,7 @@ def skim_das_jsondump(file_path, max_files=-1, max_events=-1, verbose=False):
            if totEvents >= max_events:
               break
        if lastIndex != len(dset_data['files']):
-          dset_data['files'] = dset_data[:lastIndex]
+          dset_data['files'] = dset_data['files'][:lastIndex]
        del lastIndex, totEvents
 
     return dset_data
