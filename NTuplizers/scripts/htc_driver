@@ -145,22 +145,22 @@ if __name__ == '__main__':
     outputname_postfix_format = '_{:0'+str(max(1, int(math.ceil(math.log10(nJobs)))))+'d}'
     del nJobs, totEvents, breakLoop
 
-    ### grid certificate
-    voms_cert_path = None
+    ### voms proxy
+    voms_proxy_path = None
 
     if ('X509_USER_PROXY' in os.environ):
-       voms_cert_path = os.environ['X509_USER_PROXY']
+       voms_proxy_path = os.environ['X509_USER_PROXY']
     else:
-       voms_cert_path = '/tmp/x509up_u'+str(os.getuid())
+       voms_proxy_path = '/tmp/x509up_u'+str(os.getuid())
 
-    if not os.path.isfile(voms_cert_path):
+    if not os.path.isfile(voms_proxy_path):
        EXE('voms-proxy-init --voms cms', verbose=opts.verbose, dry_run=opts.dry_run)
 
-    if not os.path.isfile(voms_cert_path):
-       KILL(log_prx+'invalid path to voms certificate: '+voms_cert_path)
+    if not os.path.isfile(voms_proxy_path):
+       KILL(log_prx+'invalid path to voms proxy: '+voms_proxy_path)
 
     EXE('mkdir -p '+OUTPUT_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
-    EXE('cp '+voms_cert_path+' '+OUTPUT_DIR+'/X509_USER_PROXY', verbose=opts.verbose, dry_run=opts.dry_run)
+    EXE('cp '+voms_proxy_path+' '+OUTPUT_DIR+'/X509_USER_PROXY', verbose=opts.verbose, dry_run=opts.dry_run)
 
     ### copy cmsRun-cfg into output directory
     out_cmsRun_cfg = os.path.abspath(OUTPUT_DIR+'/cfg.py')

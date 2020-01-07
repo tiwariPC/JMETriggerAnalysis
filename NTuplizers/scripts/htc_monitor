@@ -18,7 +18,7 @@ def monitor(options, log=''):
     for i_opt in options.inputs:
 
         if not os.path.isdir(i_opt):
-           if opts.verbose: WARNING(log+'input argument is not a valid directory: '+i_opt)
+           if options.verbose: WARNING(log+'input argument is not a valid directory: '+i_opt)
            continue
 
         INPUT_DIRS += [i_opt]
@@ -75,6 +75,9 @@ def monitor(options, log=''):
         job_dirs = glob.glob(inp_dir+'/'+options.jobdirname+'_*/')
         counter_input += len(job_dirs)
 
+        if (options.proxy is not None) and (len(job_dirs) > 0):
+           EXE('cp '+str(options.proxy)+' '+inp_dir+'/X509_USER_PROXY', verbose=options.verbose, dry_run=options.dry_run)
+
         dirs_undone = []
         for _tmp in job_dirs:
 
@@ -82,7 +85,7 @@ def monitor(options, log=''):
                counter_completed += 1
                for _tmp2 in [_tmp+'/flag.queue', _tmp+'/flag.submitted']:
                    if os.path.isfile(_tmp2):
-                      EXE('rm -f '+_tmp2, verbose=opts.verbose, dry_run=opts.dry_run)
+                      EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
 
             elif os.path.isfile(_tmp+'/flag.queue') or os.path.isfile(_tmp+'/flag.submitted'):
                dirs_undone += [os.path.abspath(_tmp)]
@@ -96,18 +99,18 @@ def monitor(options, log=''):
             if _tmp_dirname+'/exe.sh' in running_exes:
                counter_running += 1
                if os.path.isfile(_tmp_dirname+'/flag.queue'):
-                  EXE('mv '+_tmp_dirname+'/flag.queue '+_tmp_dirname+'/flag.submitted', verbose=opts.verbose, dry_run=opts.dry_run)
+                  EXE('mv '+_tmp_dirname+'/flag.queue '+_tmp_dirname+'/flag.submitted', verbose=options.verbose, dry_run=options.dry_run)
             elif options.local:
                counter_completed += 1
                local_exefiles = [_tmp_dirname+'/exe.sh']
                for _tmp2 in [_tmp_dirname+'/flag.queue', _tmp_dirname+'/flag.submitted']:
                    if os.path.isfile(_tmp2):
-                      EXE('rm -f '+_tmp2, verbose=opts.verbose, dry_run=opts.dry_run)
+                      EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
             else:
                resubmit_job = options.resubmit and ((options.jobs_max < 0) or (counter_resubmitted < options.jobs_max))
 
                if os.path.isfile(_tmp_dirname+'/flag.submitted'):
-                  EXE('mv '+_tmp_dirname+'/flag.submitted '+_tmp_dirname+'/flag.queue', verbose=opts.verbose, dry_run=opts.dry_run)
+                  EXE('mv '+_tmp_dirname+'/flag.submitted '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
 
                if resubmit_job:
                   counter_resubmitted += 1
@@ -159,6 +162,9 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--jobdirname', dest='jobdirname', action='store', default='job', required=False,
                         help='prefix of batch-job sub-directories (example: [JOBDIRNAME]_[counter]/)')
 
+    parser.add_argument('-p', '--proxy', dest='proxy', action='store', default=None, required=False,
+                        help='path to voms proxy (if specified, will overwrite the file X509_USER_PROXY in every valid submission directory)')
+
     parser.add_argument('--memory', dest='memory', action='store', type=int, default=None, required=False,
                         help='argument of HTCondor parameter "RequestMemory"')
 
@@ -193,6 +199,9 @@ if __name__ == '__main__':
 
     if (opts.runtime is not None) and (opts.runtime <= 0):
        KILL(log_prx+'invalid (non-positive) value for HTCondor parameter "+RequestRuntime": '+str(opts.runtime))
+
+    if (opts.proxy is not None) and (not os.path.isfile(opts.proxy)):
+       KILL(log_prx+'invalid path to voms proxy: '+str(opts.proxy))
 
     if len(opts_unknown) > 0:
        KILL(log_prx+'unsupported command-line arguments: '+str(opts_unknown))
