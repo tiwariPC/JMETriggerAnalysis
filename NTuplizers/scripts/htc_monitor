@@ -107,7 +107,7 @@ def monitor(options, log=''):
                    if os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
             else:
-               resubmit_job = options.resubmit and ((options.jobs_max < 0) or (counter_resubmitted < options.jobs_max))
+               resubmit_job = options.resubmit and ((options.max_jobs < 0) or (counter_resubmitted < options.max_jobs))
 
                if os.path.isfile(_tmp_dirname+'/flag.submitted'):
                   EXE('mv '+_tmp_dirname+'/flag.submitted '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=None, required=False,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
-    parser.add_argument('--jobs-max', dest='jobs_max', action='store', type=int, default=-1,
+    parser.add_argument('-m', '--max-jobs', dest='max_jobs', action='store', type=int, default=-1,
                         help='maximum number of jobs that can submitted to the batch system')
 
     parser.add_argument('--repeat', dest='repeat', nargs='?', type=int, const=-1, default=None,
