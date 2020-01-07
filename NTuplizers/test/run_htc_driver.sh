@@ -2,8 +2,8 @@
 
 set -e
 
-if [ $# -ne 1 ]; then
-  echo "specify path to output directory"
+if [ $# -lt 1 ]; then
+  echo ">> argument missing - specify path to output directory"
   exit 1
 fi
 
@@ -24,7 +24,7 @@ DATASETS=(
  VBF_HToInvisible_M125_14TeV_PU200
 )
 
-EXE="htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 2000 --runtime 1800"
+EXE="htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 3000 --runtime 10800"
 
 for dset in "${DATASETS[@]}"; do
 
@@ -41,7 +41,7 @@ for dset in "${DATASETS[@]}"; do
     mkdir -p ${ODIR}
   fi
 
-  ${EXE} -d ${IDIR}/${dset}.json -o ${ODIR}/${dset}
+  ${EXE} -d ${IDIR}/${dset}.json -o ${ODIR}/${dset} "${@:2}"
 
 done
 unset -v dset
