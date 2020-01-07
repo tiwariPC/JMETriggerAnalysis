@@ -17,9 +17,6 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
     if len(dataset_split) != 4:
        KILL('load_dataset_data -- invalid data-set name (format is incorrect, check slashes): '+das_name)
 
-    if 'MINIAOD' not in dataset_split[3]:
-       KILL('load_dataset_data -- the data set\'s Tier is not MINIAOD*: '+das_name)
-
     dset_data = {'DAS': str(das_name), 'files': []}
 
     dataset_files = command_output_lines('dasgoclient --query "file dataset='+str(das_name)+'"')
@@ -62,29 +59,29 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
            print(i_file)
            print(i_file_nevents)
 
-        i_file_rawparents = []
+        i_file_parents2 = []
 
-        i_file_aodfiles = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
-        i_file_aodfiles = [_tmp for _tmp in i_file_aodfiles if _tmp != '']
-        i_file_aodfiles = sorted(list(set(i_file_aodfiles)))
-        for i_file_aodf in i_file_aodfiles:
+        i_file_parents1 = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
+        i_file_parents1 = [_tmp for _tmp in i_file_parents1 if _tmp != '']
+        i_file_parents1 = sorted(list(set(i_file_parents1)))
+        for i_file_aodf in i_file_parents1:
             i_file_rawfiles_tmp = command_output_lines('dasgoclient --query "parent file='+str(i_file_aodf)+'"')
             i_file_rawfiles_tmp = [_tmp.replace(' ', '') for _tmp in i_file_rawfiles_tmp]
             i_file_rawfiles_tmp = [_tmp for _tmp in i_file_rawfiles_tmp if _tmp != '']
             i_file_rawfiles_tmp = sorted(list(set(i_file_rawfiles_tmp)))
-            i_file_rawparents += i_file_rawfiles_tmp
+            i_file_parents2 += i_file_rawfiles_tmp
 
-        i_file_rawparents = sorted(list(set(i_file_rawparents)))
+        i_file_parents2 = sorted(list(set(i_file_parents2)))
 
         if verbose:
-           for _tmp in i_file_rawparents:
+           for _tmp in i_file_parents2:
                print(' '*5, _tmp)
 
         dset_data['files'] += [{
           'file': i_file,
           'nevents': i_file_nevents,
-          'parentFiles_1': i_file_aodfiles,
-          'parentFiles_2': i_file_rawparents,
+          'parentFiles_1': i_file_parents1,
+          'parentFiles_2': i_file_parents2,
         }]
 
         if breakLoop:

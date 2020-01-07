@@ -25,7 +25,7 @@ if __name__ == '__main__':
                         help='append minimal customization to cmsRun-cfg required by the driver')
 
     parser.add_argument('-d', '--dataset', dest='dataset', action='store', default=None, required=True,
-                        help='name of MINIAOD* input data set in DAS')
+                        help='name of input data set in DAS')
 
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
@@ -41,6 +41,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
                         help='maximum number of events per job')
+
+    parser.add_argument('-p', '--parentFiles-level', dest='parentFiles_level', action='store', type=int, default=2, required=False,
+                        help='level of parentFiles to be used as secondary input files (currently, anything other than 1 and 2 disables the usage of secondary input files)')
 
     parser.add_argument('--cpus', dest='cpus', action='store', type=int, default=1, required=False,
                         help='argument of HTCondor parameter "RequestCpus"')
@@ -256,7 +259,12 @@ if opts.dumpPython is not None:
 
         i_inputFile = i_inpfdc['file']
         i_inputFile_nevents = i_inpfdc['nevents']
-        i_secondaryInputFiles = i_inpfdc['parentFiles_2']
+
+        i_secondaryInputFiles = None
+        if opts.parentFiles_level == 2:
+           i_secondaryInputFiles = i_inpfdc['parentFiles_2']
+        elif opts.parentFiles_level == 1:
+           i_secondaryInputFiles = i_inpfdc['parentFiles_1']
 
         # number of jobs for this set of input files
         i_njobs = int(math.ceil(float(i_inputFile_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
@@ -288,7 +296,8 @@ if opts.dumpPython is not None:
             cmsRun_opts += ' \\\n maxEvents='+str(i_maxEvents)
             cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
             cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
-            cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
+            if i_secondaryInputFiles is not None:
+               cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
             for _tmp in opts_unknown:
                 cmsRun_opts += ' \\\n '+str(_tmp)
 
