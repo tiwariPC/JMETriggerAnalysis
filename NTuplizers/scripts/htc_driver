@@ -54,6 +54,9 @@ if __name__ == '__main__':
     parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=10800, required=False,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
+    parser.add_argument('--jobflavour', dest='jobflavour', action='store', default=None, required=False,
+                        help='argument of HTCondor parameter "+JobFlavour"')
+
     parser.add_argument('--batch-name', dest='batch_name', action='store', default=None, required=False,
                         help='argument of HTCondor parameter "batch_name" (if not specified, basename of argument of "--output" is used)')
 
@@ -241,6 +244,7 @@ if opts.dumpPython is not None:
       'RequestCpus = '+str(opts.cpus),
       'RequestMemory = '+str(opts.memory),
       '+RequestRuntime = '+str(opts.runtime),
+    ] + (['+JobFlavour = '+str(opts.jobflavour)] if (opts.jobflavour is not None) else []) + [
       'x509userproxy = $(BASEDIR)/X509_USER_PROXY',
       'queue QFILE matching files $(BASEDIR)/*/flag.queue',
     ]

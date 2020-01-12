@@ -81,9 +81,9 @@ def monitor(options, log=''):
         dirs_undone = []
         for _tmp in job_dirs:
 
-            if os.path.isfile(_tmp+'/flag.done'):
+            if os.path.isfile(_tmp+'flag.done'):
                counter_completed += 1
-               for _tmp2 in [_tmp+'/flag.queue', _tmp+'/flag.submitted']:
+               for _tmp2 in [_tmp+'flag.queue', _tmp+'flag.submitted']:
                    if os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
 
@@ -111,6 +111,9 @@ def monitor(options, log=''):
 
                if os.path.isfile(_tmp_dirname+'/flag.submitted'):
                   EXE('mv '+_tmp_dirname+'/flag.submitted '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
+
+               if options.show_resubmitted:
+                  print(colored_text('>> job '+('resubmitted' if resubmit_job else 'to be resubmitted')+' :', ['94']), colored_text(os.path.relpath(_tmp_dirname), ['1', '94']))
 
                if resubmit_job:
                   counter_resubmitted += 1
@@ -179,6 +182,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-f', '--frequency', dest='frequency', action='store', type=int, default=3600,
                         help='interval of time in seconds between executions of the monitor (has no effect if --repeat is not specified)')
+
+    parser.add_argument('--show-resubmitted', dest='show_resubmitted', action='store_true', default=False,
+                        help='show batch jobs flagged for resubmission')
 
     parser.add_argument('-l', '--local', dest='local', action='store_true', default=False,
                         help='execute jobs locally')
