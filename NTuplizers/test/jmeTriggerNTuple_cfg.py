@@ -312,9 +312,17 @@ if opts.htrk:
    process.trkMonitoringSeq = cms.Sequence(
        process.TrackHistograms_pixelTracks
      + process.TrackHistograms_generalTracks
-     + process.VertexHistograms_pixelVertices
+   )
+
+   if opts.skimTracks:
+      process.TrackHistograms_generalTracksOriginal = TrackHistogrammer.clone(src = cms.InputTag('generalTracksOriginal'))
+      process.trkMonitoringSeq += process.TrackHistograms_generalTracksOriginal
+
+   process.trkMonitoringSeq += cms.Sequence(
+       process.VertexHistograms_pixelVertices
      + process.VertexHistograms_offlinePrimaryVertices
    )
+
    process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
 
 # MessageLogger
