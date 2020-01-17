@@ -25,6 +25,7 @@ class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
   edm::EDGetToken tracks_token_;
 
+  TH1D *h_track_mult_;
   TH1D *h_track_pt_;
   TH1D *h_track_eta_;
   TH1D *h_track_phi_;
@@ -45,6 +46,7 @@ TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
+  h_track_mult_ = fs->make<TH1D>("track_mult", "track_mult", 240, 0, 12000);
   h_track_pt_ = fs->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
   h_track_eta_ = fs->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
   h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
@@ -60,6 +62,8 @@ void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   iEvent.getByToken(tracks_token_, tracks);
 
   if(tracks.isValid()){
+
+    h_track_mult_->Fill(tracks->size());
 
     for(const auto& trk : *tracks){
 
