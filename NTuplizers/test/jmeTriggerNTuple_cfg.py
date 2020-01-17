@@ -475,9 +475,9 @@ if opts.skimTracks:
 
    process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
 
-   # modify PV inputs of Puppi collections
-   process.puppiNoLep.vertexName = process.generalTracks.vertices
-   process.hltPuppi.vertexName = process.generalTracks.vertices
+#   # modify PV inputs of Puppi collections
+#   process.puppiNoLep.vertexName = process.generalTracks.vertices
+#   process.hltPuppi.vertexName = process.generalTracks.vertices
 
    # add PV collections to JMETriggerNTuple
    process.JMETriggerNTuple.recoVertexCollections = cms.PSet(
