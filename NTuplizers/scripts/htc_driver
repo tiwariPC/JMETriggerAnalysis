@@ -55,7 +55,7 @@ if __name__ == '__main__':
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
     parser.add_argument('--jobflavour', dest='jobflavour', action='store', default=None, required=False,
-                        help='argument of HTCondor parameter "+JobFlavour"')
+                        help='argument of HTCondor parameter "+JobFlavour" (by default, the parameter is not specified)')
 
     parser.add_argument('--batch-name', dest='batch_name', action='store', default=None, required=False,
                         help='argument of HTCondor parameter "batch_name" (if not specified, basename of argument of "--output" is used)')
@@ -118,10 +118,12 @@ if __name__ == '__main__':
 
     ### unrecognized command-line arguments
     ### -> used as additional command-line arguments to cmsRun
-    if opts.verbose and len(opts_unknown):
+    cmsRun_addopts = opts_unknown[:]
+
+    if opts.verbose and len(cmsRun_addopts):
        print('-'*50)
        print(colored_text('additional cmsRun command-line arguments:', ['1']))
-       for _tmp in opts_unknown: print(' '+str(_tmp))
+       for _tmp in cmsRun_addopts: print(' '+str(_tmp))
        print('-'*50)
 
     ### extract input-files information from data set name via dasgoclient
@@ -302,8 +304,8 @@ if opts.dumpPython is not None:
             cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
             if i_secondaryInputFiles is not None:
                cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
-            for _tmp in opts_unknown:
-                cmsRun_opts += ' \\\n '+str(_tmp)
+            for _tmp in cmsRun_addopts:
+               cmsRun_opts += ' \\\n '+str(_tmp)
 
             ## dump of full python config
             if jobCounter == 0:
