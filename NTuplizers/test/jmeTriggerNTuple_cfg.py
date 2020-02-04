@@ -1,8 +1,83 @@
 ###
+### command-line arguments
+###
+import FWCore.ParameterSet.VarParsing as vpo
+opts = vpo.VarParsing('analysis')
+
+opts.register('skipEvents', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'number of events to be skipped')
+
+opts.register('numThreads', 1,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'number of threads')
+
+opts.register('numStreams', 1,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'number of streams')
+
+opts.register('lumis', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'path to .json with list of luminosity sections')
+
+opts.register('logs', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'create log files configured via MessageLogger')
+
+opts.register('wantSummary', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'show cmsRun summary at job completion')
+
+opts.register('dumpPython', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'path to python file with content of cms.Process')
+
+opts.register('reco', 'trkV2_110X_D49',
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'keyword defining reconstruction methods for JME inputs')
+
+opts.register('trkdqm', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'added monitoring histograms for selected Tracks and Vertices')
+
+opts.register('skimTracks', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'skim original collection of generalTracks (only tracks associated to first N pixel vertices)')
+
+opts.register('output', 'out.root',
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'path to output ROOT file')
+
+opts.parseArguments()
+
+###
 ### configuration file to re-run customized HLT Menu on RAW
 ###
-#from JMETriggerAnalysis.NTuplizers.step3_TrackingV0_11_0_0 import cms, process
-from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_11_0_0 import cms, process
+if opts.reco == 'trkV0_110X_D41':
+   from JMETriggerAnalysis.NTuplizers.step3_TrackingV0_110X_GeometryD41 import cms, process
+
+elif opts.reco == 'trkV0_110X_D49':
+   from JMETriggerAnalysis.NTuplizers.step3_TrackingV0_110X_GeometryD49 import cms, process
+
+elif opts.reco == 'trkV2_110X_D41':
+   from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_110X_GeometryD41 import cms, process
+
+elif opts.reco == 'trkV2_110X_D49':
+   from JMETriggerAnalysis.NTuplizers.step3_TrackingV2_110X_GeometryD49 import cms, process
+
+else:
+   raise RuntimeError('invalid argument for option "reco": '+opts.reco)
 
 # remove cms.EndPath for EDM output
 del process.HLTOutput
@@ -94,7 +169,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoVertexCollections = cms.PSet(
 
     hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'+'::'+process.name_()),
-    offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'+'::'+'PAT'),
+    offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
   ),
 
   recoPFCandidateCollections = cms.PSet(
@@ -130,8 +205,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patJetCollections = cms.PSet(
 
-    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'+'::'+'PAT'),
-    offlineAK4PuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'+'::'+'PAT'),
+    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
+    offlineAK4PuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
   ),
 
   recoGenMETCollections = cms.PSet(
@@ -161,8 +236,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patMETCollections = cms.PSet(
 
-    offlineMETs = cms.InputTag('slimmedMETs::PAT'),
-    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi::PAT'),
+    offlineMETs = cms.InputTag('slimmedMETs'),
+    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
   ),
 
   patMuonCollections = cms.PSet(
@@ -216,64 +291,6 @@ process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 #process.schedule.extend([process.analysisNTupleEndPath])
 
-###
-### command-line arguments
-###
-import FWCore.ParameterSet.VarParsing as vpo
-opts = vpo.VarParsing('analysis')
-
-opts.register('skipEvents', 0,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.int,
-              'number of events to be skipped')
-
-opts.register('numThreads', 1,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.int,
-              'number of threads')
-
-opts.register('numStreams', 1,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.int,
-              'number of streams')
-
-opts.register('lumis', None,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.string,
-              'Path to .json with list of luminosity sections')
-
-opts.register('logs', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'create log files configured via MessageLogger')
-
-opts.register('wantSummary', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'show cmsRun summary at job completion')
-
-opts.register('dumpPython', None,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.string,
-              'Path to python file with content of cms.Process')
-
-opts.register('htrk', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'added monitoring histograms for selected Tracks and Vertices')
-
-opts.register('skimTracks', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'skim original collection of generalTracks (only tracks associated to first N pixel vertices)')
-
-opts.register('output', 'out.root',
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.string,
-              'Path to output ROOT file')
-
-opts.parseArguments()
-
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
 
@@ -298,7 +315,7 @@ if opts.lumis is not None:
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
 # Tracking Monitoring
-if opts.htrk:
+if opts.trkdqm:
    process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
 
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
@@ -377,7 +394,7 @@ if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
    process.source.fileNames = [
-     '/store/mc/PhaseIITDRSpring19MiniAOD/VBF_HToInvisible_M125_14TeV_powheg_pythia8/MINIAODSIM/PU200_106X_upgrade2023_realistic_v3-v1/270000/44F51AA8-922E-2642-83E4-BC53F2D88EF2.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/MINIAODSIM/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/7589BB2C-3179-6345-86A5-D7F65C4F1D1D.root',
    ]
 
 # input EDM files [secondary]
@@ -385,33 +402,33 @@ if opts.secondaryInputFiles:
    process.source.secondaryFileNames = opts.secondaryInputFiles
 else:
    process.source.secondaryFileNames = [
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/1E1B806D-79E0-E64D-BF05-C3A27770E806.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/89AC30B0-09CC-0546-85F1-5A44E9862E23.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/49E12F95-9253-2648-8367-D4A365874C3A.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/B2FF45B9-F262-5B4F-B6C7-DFDD7F32548A.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/C121E739-5001-1740-BAE3-BED6B2B884C0.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/FA8E3C34-2C63-984E-A29C-006612623D1A.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/3A196B8F-0379-7D4C-B708-610966D0EF53.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/81749946-45BB-DF42-94A7-9ECBEE99BF63.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/287B3859-98B3-9B48-ADC0-A977EB28356C.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/91F4C91D-0074-3947-B8C7-599010B26910.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/7C5FCF1B-03E3-074A-AB4B-B3E1AC4E6A10.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/138081EF-72D4-3B4B-995B-E7B8B068BA00.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/C4737E02-79A8-EA48-904B-F4EFFA28475A.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/205038D2-3BE9-6646-A976-8887B2B5B1FE.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/A2301ED8-ADCF-D543-9A80-E29D700AA1B7.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/108EB88F-7978-7443-B62A-26A020677697.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/5CFC5A38-A05D-1048-A5F3-008D7996A9A5.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/8F717475-6ECC-2243-AEFF-3DEF0A278480.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/1C102355-F05E-2E42-9D00-512F27ACC410.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/B5E23869-1DA0-944B-8D85-BC1BCAD564E3.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/81A97D18-471D-C44F-8E43-EC750D709318.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/281740D4-55CE-BF4D-A973-8B4D6C94D668.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/EDA86465-936B-C44A-A927-4E474237807F.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/7F6A6846-BE2A-D74C-A267-26DB9F099F92.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/D78E16FA-9B5F-F84C-9528-2604FC455F89.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/D8A2DF13-8892-9D48-9276-DC058B48573E.root',
-     '/store/mc/PhaseIITDRSpring19DR/VBF_HToInvisible_M125_14TeV_powheg_pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3-v1/270000/1935F21C-E1E1-1345-A8A1-1A44315C1180.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/020785D6-2611-D64A-A1D8-6ADDEF8D5B15.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/137AD489-9669-7148-93B8-EB743460A028.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/1599C1F0-BC15-7F4F-A9D5-E3438A46C8CC.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/25D09A8F-8755-2D4B-882D-8082C9473523.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/27C7CA8C-A923-4A4D-ABAB-345E74B3F6DC.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/37623260-89AF-2346-8D02-9382F14EC018.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/3F0BF703-1344-C546-AFB1-78824B21A022.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/6EBEF926-DD6D-9449-9D42-F8BAA3AAF462.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/70869742-728C-2946-B84D-76446E63715F.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/76022194-556D-6F4C-934C-EEA17BF845A5.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/7A9A5194-B02F-9B45-A39F-138FFCB2B4B4.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/91710CF1-D996-A049-82AB-587BF73D66BC.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/9FD78B49-8535-4B44-AAD1-CB067B0F1D06.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/A33FBE94-FE94-8B4C-AD1F-B6667277BF48.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/A63C0692-51BC-7C4B-8616-4B1662974193.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/ACB652A4-27AA-2544-BC62-28CC1C306D0C.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/BBBF1CD9-BCA8-8E42-AEFF-4F31CBBA5FE2.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/C3733900-B5E4-CB40-88BB-9D5DE956BBEF.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/C6A51DBE-8A25-E449-8B31-827C3B13EAFE.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/C6D607BE-7C36-7040-AC34-95DDA535C401.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/DF714427-4FDF-A543-9B60-2900AFD09503.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/E45E11CE-168D-9747-A0B7-33BD0AA8ECC8.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/EAB22C54-165E-5847-8431-DFBAC441B238.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/EC195DA2-5129-3549-BEC4-03F5ADB857C1.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/EE316A70-3F31-7448-95DB-8C5468A46E2B.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/F7124A73-16AA-4847-BE9E-C649BFCC7ECB.root',
+     '/store/relval/CMSSW_11_0_0/RelValQCD_Pt15To7000_Flat_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v3_2026D49PU200-v1/20000/FC222052-E9BD-E94E-BC38-867DA59C3326.root',
    ]
 
 # skimming of tracks
@@ -484,7 +501,7 @@ if opts.skimTracks:
      hltPixelVertices = cms.InputTag('pixelVertices'+'::'+process.name_()),
      hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'+'::'+process.name_()),
      hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'+'::'+process.name_()),
-     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'+'::'+'PAT'),
+     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
    )
 
 # dump content of cms.Process to python file
@@ -492,9 +509,16 @@ if opts.dumpPython is not None:
    open(opts.dumpPython, 'w').write(process.dumpPython())
 
 # print-outs
-print '--- jmeTriggerNTuple_cfg.py ---\n'
+print '--- jmeTriggerNTuple_cfg.py ---'
+print ''
+print 'option: output = ', opts.output
+print 'option: reco = ', opts.reco
+print 'option: skimTracks = ', opts.skimTracks
+print 'option: trkdqm = ', opts.trkdqm
+print ''
 print 'process.maxEvents.input =', process.maxEvents.input
 print 'process.source.skipEvents =', process.source.skipEvents
 print 'process.source.fileNames =', process.source.fileNames
 print 'process.source.secondaryFileNames =', process.source.secondaryFileNames
-print '\n-------------------------------'
+print ''
+print '-------------------------------'
