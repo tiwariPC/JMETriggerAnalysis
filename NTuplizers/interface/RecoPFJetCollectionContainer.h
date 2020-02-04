@@ -19,11 +19,37 @@ class RecoPFJetCollectionContainer : public VRecoCandidateCollectionContainer<re
   std::vector<float>& vec_phi(){ return phi_; }
   std::vector<float>& vec_mass(){ return mass_; }
 
+  std::vector<float>& vec_chargedHadronEnergyFraction(){ return chargedHadronEnergyFraction_; }
+  std::vector<float>& vec_chargedEmEnergyFraction(){ return chargedEmEnergyFraction_; }
+  std::vector<float>& vec_neutralHadronEnergyFraction(){ return neutralHadronEnergyFraction_; }
+  std::vector<float>& vec_neutralEmEnergyFraction(){ return neutralEmEnergyFraction_; }
+  std::vector<float>& vec_muonEnergyFraction(){ return muonEnergyFraction_; }
+
+  std::vector<int>& vec_chargedMultiplicity(){ return chargedMultiplicity_; }
+  std::vector<int>& vec_neutralMultiplicity(){ return neutralMultiplicity_; }
+  std::vector<int>& vec_muonMultiplicity(){ return muonMultiplicity_; }
+  std::vector<int>& vec_electronMultiplicity(){ return electronMultiplicity_; }
+  std::vector<int>& vec_photonMultiplicity(){ return photonMultiplicity_; }
+  std::vector<int>& vec_nConstituents(){ return nConstituents_; }
+
  protected:
   std::vector<float> pt_;
   std::vector<float> eta_;
   std::vector<float> phi_;
   std::vector<float> mass_;
+
+  std::vector<float> chargedHadronEnergyFraction_;
+  std::vector<float> chargedEmEnergyFraction_;
+  std::vector<float> neutralHadronEnergyFraction_;
+  std::vector<float> neutralEmEnergyFraction_;
+  std::vector<float> muonEnergyFraction_;
+
+  std::vector<int> chargedMultiplicity_;
+  std::vector<int> neutralMultiplicity_;
+  std::vector<int> muonMultiplicity_;
+  std::vector<int> electronMultiplicity_;
+  std::vector<int> photonMultiplicity_;
+  std::vector<int> nConstituents_;
 };
 
 #endif

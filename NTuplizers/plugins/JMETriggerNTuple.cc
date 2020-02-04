@@ -568,6 +568,17 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_eta", &recoPFJetCollectionContainer_i.vec_eta());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_phi", &recoPFJetCollectionContainer_i.vec_phi());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_mass", &recoPFJetCollectionContainer_i.vec_mass());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &recoPFJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_chargedEmEnergyFraction", &recoPFJetCollectionContainer_i.vec_chargedEmEnergyFraction());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &recoPFJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_neutralEmEnergyFraction", &recoPFJetCollectionContainer_i.vec_neutralEmEnergyFraction());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_muonEnergyFraction", &recoPFJetCollectionContainer_i.vec_muonEnergyFraction());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_chargedMultiplicity", &recoPFJetCollectionContainer_i.vec_chargedMultiplicity());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_neutralMultiplicity", &recoPFJetCollectionContainer_i.vec_neutralMultiplicity());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_muonMultiplicity", &recoPFJetCollectionContainer_i.vec_muonMultiplicity());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_electronMultiplicity", &recoPFJetCollectionContainer_i.vec_electronMultiplicity());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_photonMultiplicity", &recoPFJetCollectionContainer_i.vec_photonMultiplicity());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_nConstituents", &recoPFJetCollectionContainer_i.vec_nConstituents());
   }
 
   for(auto& patJetCollectionContainer_i : v_patJetCollectionContainer_){
@@ -576,6 +587,17 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patJetCollectionContainer_i.name()+"_eta", &patJetCollectionContainer_i.vec_eta());
     this->addBranch(patJetCollectionContainer_i.name()+"_phi", &patJetCollectionContainer_i.vec_phi());
     this->addBranch(patJetCollectionContainer_i.name()+"_mass", &patJetCollectionContainer_i.vec_mass());
+    this->addBranch(patJetCollectionContainer_i.name()+"_jesc", &patJetCollectionContainer_i.vec_jesc());
+    this->addBranch(patJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &patJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
+    this->addBranch(patJetCollectionContainer_i.name()+"_chargedEmEnergyFraction", &patJetCollectionContainer_i.vec_chargedEmEnergyFraction());
+    this->addBranch(patJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &patJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
+    this->addBranch(patJetCollectionContainer_i.name()+"_neutralEmEnergyFraction", &patJetCollectionContainer_i.vec_neutralEmEnergyFraction());
+    this->addBranch(patJetCollectionContainer_i.name()+"_muonEnergyFraction", &patJetCollectionContainer_i.vec_muonEnergyFraction());
+    this->addBranch(patJetCollectionContainer_i.name()+"_chargedMultiplicity", &patJetCollectionContainer_i.vec_chargedMultiplicity());
+    this->addBranch(patJetCollectionContainer_i.name()+"_neutralMultiplicity", &patJetCollectionContainer_i.vec_neutralMultiplicity());
+    this->addBranch(patJetCollectionContainer_i.name()+"_muonMultiplicity", &patJetCollectionContainer_i.vec_muonMultiplicity());
+    this->addBranch(patJetCollectionContainer_i.name()+"_electronMultiplicity", &patJetCollectionContainer_i.vec_electronMultiplicity());
+    this->addBranch(patJetCollectionContainer_i.name()+"_photonMultiplicity", &patJetCollectionContainer_i.vec_photonMultiplicity());
   }
 
   for(auto& recoGenMETCollectionContainer_i : v_recoGenMETCollectionContainer_){

@@ -11,6 +11,19 @@ void RecoPFJetCollectionContainer::clear(){
   eta_.clear();
   phi_.clear();
   mass_.clear();
+
+  chargedHadronEnergyFraction_.clear();
+  chargedEmEnergyFraction_.clear();
+  neutralHadronEnergyFraction_.clear();
+  neutralEmEnergyFraction_.clear();
+  muonEnergyFraction_.clear();
+
+  chargedMultiplicity_.clear();
+  neutralMultiplicity_.clear();
+  muonMultiplicity_.clear();
+  electronMultiplicity_.clear();
+  photonMultiplicity_.clear();
+  nConstituents_.clear();
 }
 
 void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
@@ -19,6 +32,19 @@ void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
   eta_.reserve(vec_size);
   phi_.reserve(vec_size);
   mass_.reserve(vec_size);
+
+  chargedHadronEnergyFraction_.reserve(vec_size);
+  chargedEmEnergyFraction_.reserve(vec_size);
+  neutralHadronEnergyFraction_.reserve(vec_size);
+  neutralEmEnergyFraction_.reserve(vec_size);
+  muonEnergyFraction_.reserve(vec_size);
+
+  chargedMultiplicity_.reserve(vec_size);
+  neutralMultiplicity_.reserve(vec_size);
+  muonMultiplicity_.reserve(vec_size);
+  electronMultiplicity_.reserve(vec_size);
+  photonMultiplicity_.reserve(vec_size);
+  nConstituents_.reserve(vec_size);
 }
 
 void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
@@ -27,4 +53,17 @@ void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
   eta_.emplace_back(obj.eta());
   phi_.emplace_back(obj.phi());
   mass_.emplace_back(obj.mass());
+
+  chargedHadronEnergyFraction_.emplace_back(obj.chargedHadronEnergyFraction());
+  chargedEmEnergyFraction_.emplace_back(obj.chargedEmEnergyFraction());
+  neutralHadronEnergyFraction_.emplace_back(obj.neutralHadronEnergyFraction());
+  neutralEmEnergyFraction_.emplace_back(obj.neutralEmEnergyFraction());
+  muonEnergyFraction_.emplace_back(obj.muonEnergyFraction());
+
+  chargedMultiplicity_.emplace_back(obj.chargedMultiplicity());
+  neutralMultiplicity_.emplace_back(obj.neutralMultiplicity());
+  muonMultiplicity_.emplace_back(obj.muonMultiplicity());
+  electronMultiplicity_.emplace_back(obj.electronMultiplicity());
+  photonMultiplicity_.emplace_back(obj.photonMultiplicity());
+  nConstituents_.emplace_back(obj.nConstituents());
 }
