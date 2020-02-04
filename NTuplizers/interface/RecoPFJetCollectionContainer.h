@@ -30,7 +30,6 @@ class RecoPFJetCollectionContainer : public VRecoCandidateCollectionContainer<re
   std::vector<int>& vec_muonMultiplicity(){ return muonMultiplicity_; }
   std::vector<int>& vec_electronMultiplicity(){ return electronMultiplicity_; }
   std::vector<int>& vec_photonMultiplicity(){ return photonMultiplicity_; }
-  std::vector<int>& vec_nConstituents(){ return nConstituents_; }
 
  protected:
   std::vector<float> pt_;
@@ -49,7 +48,6 @@ class RecoPFJetCollectionContainer : public VRecoCandidateCollectionContainer<re
   std::vector<int> muonMultiplicity_;
   std::vector<int> electronMultiplicity_;
   std::vector<int> photonMultiplicity_;
-  std::vector<int> nConstituents_;
 };
 
 #endif

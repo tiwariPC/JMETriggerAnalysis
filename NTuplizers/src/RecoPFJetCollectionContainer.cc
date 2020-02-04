@@ -23,7 +23,6 @@ void RecoPFJetCollectionContainer::clear(){
   muonMultiplicity_.clear();
   electronMultiplicity_.clear();
   photonMultiplicity_.clear();
-  nConstituents_.clear();
 }
 
 void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
@@ -44,7 +43,6 @@ void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
   muonMultiplicity_.reserve(vec_size);
   electronMultiplicity_.reserve(vec_size);
   photonMultiplicity_.reserve(vec_size);
-  nConstituents_.reserve(vec_size);
 }
 
 void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
@@ -65,5 +63,4 @@ void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
   muonMultiplicity_.emplace_back(obj.muonMultiplicity());
   electronMultiplicity_.emplace_back(obj.electronMultiplicity());
   photonMultiplicity_.emplace_back(obj.photonMultiplicity());
-  nConstituents_.emplace_back(obj.nConstituents());
 }
