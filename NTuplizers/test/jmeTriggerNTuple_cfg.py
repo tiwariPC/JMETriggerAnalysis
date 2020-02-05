@@ -39,6 +39,11 @@ opts.register('dumpPython', None,
               vpo.VarParsing.varType.string,
               'path to python file with content of cms.Process')
 
+opts.register('gt', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'argument of process.GlobalTag.globaltag')
+
 opts.register('reco', 'trkV2_110X_D49',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
@@ -48,6 +53,11 @@ opts.register('trkdqm', False,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.bool,
               'added monitoring histograms for selected Tracks and Vertices')
+
+opts.register('pfdqm', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'added monitoring histograms for selected PF-Candidates')
 
 opts.register('skimTracks', False,
               vpo.VarParsing.multiplicity.singleton,
@@ -291,6 +301,10 @@ process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 #process.schedule.extend([process.analysisNTupleEndPath])
 
+# update process.GlobalTag.globaltag
+if opts.gt is not None:
+   process.GlobalTag.globaltag = opts.gt
+
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
 
@@ -341,6 +355,24 @@ if opts.trkdqm:
    )
 
    process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
+
+# ParticleFlow Monitoring
+if opts.pfdqm:
+
+   from JMETriggerAnalysis.Common.pfCandidateHistogrammerRecoPFCandidate_cfi import pfCandidateHistogrammerRecoPFCandidate
+   process.PFCandidateHistograms_hltPFCands = pfCandidateHistogrammerRecoPFCandidate.clone(src='particleFlowTmp')
+   process.PFCandidateHistograms_hltPuppiCands = pfCandidateHistogrammerRecoPFCandidate.clone(src='hltPuppi', cut='pt > 0.0001')
+
+   from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
+   process.PFCandidateHistograms_offlinePFCands = pfCandidateHistogrammerPatPackedCandidate.clone(src='packedPFCandidates')
+
+   process.pfMonitoringSeq = cms.Sequence(
+       process.PFCandidateHistograms_hltPFCands
+     + process.PFCandidateHistograms_hltPuppiCands
+     + process.PFCandidateHistograms_offlinePFCands
+   )
+
+   process.pfMonitoringEndPath = cms.EndPath(process.pfMonitoringSeq)
 
 # MessageLogger
 if opts.logs:
@@ -511,14 +543,14 @@ if opts.dumpPython is not None:
 # print-outs
 print '--- jmeTriggerNTuple_cfg.py ---'
 print ''
-print 'option: output = ', opts.output
-print 'option: reco = ', opts.reco
-print 'option: skimTracks = ', opts.skimTracks
-print 'option: trkdqm = ', opts.trkdqm
+print 'option: output =', opts.output
+print 'option: reco =', opts.reco
+print 'option: skimTracks =', opts.skimTracks
+print 'option: trkdqm =', opts.trkdqm
+print 'option: pfdqm =', opts.pfdqm
+print 'option: dumpPython =', opts.dumpPython
 print ''
-print 'process.maxEvents.input =', process.maxEvents.input
-print 'process.source.skipEvents =', process.source.skipEvents
-print 'process.source.fileNames =', process.source.fileNames
-print 'process.source.secondaryFileNames =', process.source.secondaryFileNames
-print ''
+print 'process.GlobalTag.globaltag =', process.GlobalTag.globaltag
+print 'process.maxEvents =', process.maxEvents
+print 'process.source =', process.source
 print '-------------------------------'
