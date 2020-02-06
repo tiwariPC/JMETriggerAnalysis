@@ -26,8 +26,8 @@ class PATJetCollectionContainer : public VRecoCandidateCollectionContainer<pat::
   std::vector<float>& vec_neutralEmEnergyFraction(){ return neutralEmEnergyFraction_; }
   std::vector<float>& vec_muonEnergyFraction(){ return muonEnergyFraction_; }
 
-  std::vector<int>& vec_chargedMultiplicity(){ return chargedMultiplicity_; }
-  std::vector<int>& vec_neutralMultiplicity(){ return neutralMultiplicity_; }
+  std::vector<int>& vec_chargedHadronMultiplicity(){ return chargedHadronMultiplicity_; }
+  std::vector<int>& vec_neutralHadronMultiplicity(){ return neutralHadronMultiplicity_; }
   std::vector<int>& vec_muonMultiplicity(){ return muonMultiplicity_; }
   std::vector<int>& vec_electronMultiplicity(){ return electronMultiplicity_; }
   std::vector<int>& vec_photonMultiplicity(){ return photonMultiplicity_; }
@@ -45,8 +45,8 @@ class PATJetCollectionContainer : public VRecoCandidateCollectionContainer<pat::
   std::vector<float> neutralEmEnergyFraction_;
   std::vector<float> muonEnergyFraction_;
 
-  std::vector<int> chargedMultiplicity_;
-  std::vector<int> neutralMultiplicity_;
+  std::vector<int> chargedHadronMultiplicity_;
+  std::vector<int> neutralHadronMultiplicity_;
   std::vector<int> muonMultiplicity_;
   std::vector<int> electronMultiplicity_;
   std::vector<int> photonMultiplicity_;

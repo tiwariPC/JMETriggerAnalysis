@@ -18,8 +18,8 @@ void RecoPFJetCollectionContainer::clear(){
   neutralEmEnergyFraction_.clear();
   muonEnergyFraction_.clear();
 
-  chargedMultiplicity_.clear();
-  neutralMultiplicity_.clear();
+  chargedHadronMultiplicity_.clear();
+  neutralHadronMultiplicity_.clear();
   muonMultiplicity_.clear();
   electronMultiplicity_.clear();
   photonMultiplicity_.clear();
@@ -38,8 +38,8 @@ void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
   neutralEmEnergyFraction_.reserve(vec_size);
   muonEnergyFraction_.reserve(vec_size);
 
-  chargedMultiplicity_.reserve(vec_size);
-  neutralMultiplicity_.reserve(vec_size);
+  chargedHadronMultiplicity_.reserve(vec_size);
+  neutralHadronMultiplicity_.reserve(vec_size);
   muonMultiplicity_.reserve(vec_size);
   electronMultiplicity_.reserve(vec_size);
   photonMultiplicity_.reserve(vec_size);
@@ -58,8 +58,8 @@ void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
   neutralEmEnergyFraction_.emplace_back(obj.neutralEmEnergyFraction());
   muonEnergyFraction_.emplace_back(obj.muonEnergyFraction());
 
-  chargedMultiplicity_.emplace_back(obj.chargedMultiplicity());
-  neutralMultiplicity_.emplace_back(obj.neutralMultiplicity());
+  chargedHadronMultiplicity_.emplace_back(obj.chargedHadronMultiplicity());
+  neutralHadronMultiplicity_.emplace_back(obj.neutralHadronMultiplicity());
   muonMultiplicity_.emplace_back(obj.muonMultiplicity());
   electronMultiplicity_.emplace_back(obj.electronMultiplicity());
   photonMultiplicity_.emplace_back(obj.photonMultiplicity());

@@ -19,8 +19,8 @@ void PATJetCollectionContainer::clear(){
   neutralEmEnergyFraction_.clear();
   muonEnergyFraction_.clear();
 
-  chargedMultiplicity_.clear();
-  neutralMultiplicity_.clear();
+  chargedHadronMultiplicity_.clear();
+  neutralHadronMultiplicity_.clear();
   muonMultiplicity_.clear();
   electronMultiplicity_.clear();
   photonMultiplicity_.clear();
@@ -40,8 +40,8 @@ void PATJetCollectionContainer::reserve(const size_t vec_size){
   neutralEmEnergyFraction_.reserve(vec_size);
   muonEnergyFraction_.reserve(vec_size);
 
-  chargedMultiplicity_.reserve(vec_size);
-  neutralMultiplicity_.reserve(vec_size);
+  chargedHadronMultiplicity_.reserve(vec_size);
+  neutralHadronMultiplicity_.reserve(vec_size);
   muonMultiplicity_.reserve(vec_size);
   electronMultiplicity_.reserve(vec_size);
   photonMultiplicity_.reserve(vec_size);
@@ -61,8 +61,8 @@ void PATJetCollectionContainer::emplace_back(const pat::Jet& obj){
   neutralEmEnergyFraction_.emplace_back(obj.isPFJet() ? obj.neutralEmEnergyFraction() : -99.);
   muonEnergyFraction_.emplace_back(obj.isPFJet() ? obj.muonEnergyFraction() : -99.);
 
-  chargedMultiplicity_.emplace_back(obj.isPFJet() ? obj.chargedMultiplicity() : -1);
-  neutralMultiplicity_.emplace_back(obj.isPFJet() ? obj.neutralMultiplicity() : -1);
+  chargedHadronMultiplicity_.emplace_back(obj.isPFJet() ? obj.chargedHadronMultiplicity() : -1);
+  neutralHadronMultiplicity_.emplace_back(obj.isPFJet() ? obj.neutralHadronMultiplicity() : -1);
   muonMultiplicity_.emplace_back(obj.isPFJet() ? obj.muonMultiplicity() : -1);
   electronMultiplicity_.emplace_back(obj.isPFJet() ? obj.electronMultiplicity() : -1);
   photonMultiplicity_.emplace_back(obj.isPFJet() ? obj.photonMultiplicity() : -1);
