@@ -553,15 +553,15 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_phi", &recoGenJetCollectionContainer_i.vec_phi());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_mass", &recoGenJetCollectionContainer_i.vec_mass());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &recoGenJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_chargedEmEnergyFraction", &recoGenJetCollectionContainer_i.vec_chargedEmEnergyFraction());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &recoGenJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_neutralEmEnergyFraction", &recoGenJetCollectionContainer_i.vec_neutralEmEnergyFraction());
+    this->addBranch(recoGenJetCollectionContainer_i.name()+"_electronEnergyFraction", &recoGenJetCollectionContainer_i.vec_electronEnergyFraction());
+    this->addBranch(recoGenJetCollectionContainer_i.name()+"_photonEnergyFraction", &recoGenJetCollectionContainer_i.vec_photonEnergyFraction());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_muonEnergyFraction", &recoGenJetCollectionContainer_i.vec_muonEnergyFraction());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_chargedHadronMultiplicity", &recoGenJetCollectionContainer_i.vec_chargedHadronMultiplicity());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_neutralHadronMultiplicity", &recoGenJetCollectionContainer_i.vec_neutralHadronMultiplicity());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_muonMultiplicity", &recoGenJetCollectionContainer_i.vec_muonMultiplicity());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_electronMultiplicity", &recoGenJetCollectionContainer_i.vec_electronMultiplicity());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_photonMultiplicity", &recoGenJetCollectionContainer_i.vec_photonMultiplicity());
+    this->addBranch(recoGenJetCollectionContainer_i.name()+"_muonMultiplicity", &recoGenJetCollectionContainer_i.vec_muonMultiplicity());
   }
 
   for(auto& recoCaloJetCollectionContainer_i : v_recoCaloJetCollectionContainer_){
@@ -579,15 +579,15 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_phi", &recoPFJetCollectionContainer_i.vec_phi());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_mass", &recoPFJetCollectionContainer_i.vec_mass());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &recoPFJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
-    this->addBranch(recoPFJetCollectionContainer_i.name()+"_chargedEmEnergyFraction", &recoPFJetCollectionContainer_i.vec_chargedEmEnergyFraction());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &recoPFJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
-    this->addBranch(recoPFJetCollectionContainer_i.name()+"_neutralEmEnergyFraction", &recoPFJetCollectionContainer_i.vec_neutralEmEnergyFraction());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_electronEnergyFraction", &recoPFJetCollectionContainer_i.vec_electronEnergyFraction());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_photonEnergyFraction", &recoPFJetCollectionContainer_i.vec_photonEnergyFraction());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_muonEnergyFraction", &recoPFJetCollectionContainer_i.vec_muonEnergyFraction());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_chargedHadronMultiplicity", &recoPFJetCollectionContainer_i.vec_chargedHadronMultiplicity());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_neutralHadronMultiplicity", &recoPFJetCollectionContainer_i.vec_neutralHadronMultiplicity());
-    this->addBranch(recoPFJetCollectionContainer_i.name()+"_muonMultiplicity", &recoPFJetCollectionContainer_i.vec_muonMultiplicity());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_electronMultiplicity", &recoPFJetCollectionContainer_i.vec_electronMultiplicity());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_photonMultiplicity", &recoPFJetCollectionContainer_i.vec_photonMultiplicity());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_muonMultiplicity", &recoPFJetCollectionContainer_i.vec_muonMultiplicity());
   }
 
   for(auto& patJetCollectionContainer_i : v_patJetCollectionContainer_){
@@ -598,15 +598,15 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patJetCollectionContainer_i.name()+"_mass", &patJetCollectionContainer_i.vec_mass());
     this->addBranch(patJetCollectionContainer_i.name()+"_jesc", &patJetCollectionContainer_i.vec_jesc());
     this->addBranch(patJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &patJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
-    this->addBranch(patJetCollectionContainer_i.name()+"_chargedEmEnergyFraction", &patJetCollectionContainer_i.vec_chargedEmEnergyFraction());
     this->addBranch(patJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &patJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
-    this->addBranch(patJetCollectionContainer_i.name()+"_neutralEmEnergyFraction", &patJetCollectionContainer_i.vec_neutralEmEnergyFraction());
+    this->addBranch(patJetCollectionContainer_i.name()+"_electronEnergyFraction", &patJetCollectionContainer_i.vec_electronEnergyFraction());
+    this->addBranch(patJetCollectionContainer_i.name()+"_photonEnergyFraction", &patJetCollectionContainer_i.vec_photonEnergyFraction());
     this->addBranch(patJetCollectionContainer_i.name()+"_muonEnergyFraction", &patJetCollectionContainer_i.vec_muonEnergyFraction());
     this->addBranch(patJetCollectionContainer_i.name()+"_chargedHadronMultiplicity", &patJetCollectionContainer_i.vec_chargedHadronMultiplicity());
     this->addBranch(patJetCollectionContainer_i.name()+"_neutralHadronMultiplicity", &patJetCollectionContainer_i.vec_neutralHadronMultiplicity());
-    this->addBranch(patJetCollectionContainer_i.name()+"_muonMultiplicity", &patJetCollectionContainer_i.vec_muonMultiplicity());
     this->addBranch(patJetCollectionContainer_i.name()+"_electronMultiplicity", &patJetCollectionContainer_i.vec_electronMultiplicity());
     this->addBranch(patJetCollectionContainer_i.name()+"_photonMultiplicity", &patJetCollectionContainer_i.vec_photonMultiplicity());
+    this->addBranch(patJetCollectionContainer_i.name()+"_muonMultiplicity", &patJetCollectionContainer_i.vec_muonMultiplicity());
   }
 
   for(auto& recoGenMETCollectionContainer_i : v_recoGenMETCollectionContainer_){

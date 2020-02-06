@@ -11,18 +11,19 @@ void RecoPFJetCollectionContainer::clear(){
   eta_.clear();
   phi_.clear();
   mass_.clear();
+  jesc_.clear();
 
   chargedHadronEnergyFraction_.clear();
-  chargedEmEnergyFraction_.clear();
   neutralHadronEnergyFraction_.clear();
-  neutralEmEnergyFraction_.clear();
+  electronEnergyFraction_.clear();
+  photonEnergyFraction_.clear();
   muonEnergyFraction_.clear();
 
   chargedHadronMultiplicity_.clear();
   neutralHadronMultiplicity_.clear();
-  muonMultiplicity_.clear();
   electronMultiplicity_.clear();
   photonMultiplicity_.clear();
+  muonMultiplicity_.clear();
 }
 
 void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
@@ -31,18 +32,19 @@ void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
   eta_.reserve(vec_size);
   phi_.reserve(vec_size);
   mass_.reserve(vec_size);
+  jesc_.reserve(vec_size);
 
   chargedHadronEnergyFraction_.reserve(vec_size);
-  chargedEmEnergyFraction_.reserve(vec_size);
   neutralHadronEnergyFraction_.reserve(vec_size);
-  neutralEmEnergyFraction_.reserve(vec_size);
+  electronEnergyFraction_.reserve(vec_size);
+  photonEnergyFraction_.reserve(vec_size);
   muonEnergyFraction_.reserve(vec_size);
 
   chargedHadronMultiplicity_.reserve(vec_size);
   neutralHadronMultiplicity_.reserve(vec_size);
-  muonMultiplicity_.reserve(vec_size);
   electronMultiplicity_.reserve(vec_size);
   photonMultiplicity_.reserve(vec_size);
+  muonMultiplicity_.reserve(vec_size);
 }
 
 void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
@@ -52,15 +54,21 @@ void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
   phi_.emplace_back(obj.phi());
   mass_.emplace_back(obj.mass());
 
+  const auto totFrac = obj.chargedHadronEnergyFraction() + obj.neutralHadronEnergyFraction()
+   + obj.photonEnergyFraction() + obj.electronEnergyFraction() + obj.muonEnergyFraction() +
+   + obj.HFEMEnergyFraction();
+
+  jesc_.emplace_back(totFrac ? (1./totFrac) : -1.);
+
   chargedHadronEnergyFraction_.emplace_back(obj.chargedHadronEnergyFraction());
-  chargedEmEnergyFraction_.emplace_back(obj.chargedEmEnergyFraction());
   neutralHadronEnergyFraction_.emplace_back(obj.neutralHadronEnergyFraction());
-  neutralEmEnergyFraction_.emplace_back(obj.neutralEmEnergyFraction());
+  electronEnergyFraction_.emplace_back(obj.electronEnergyFraction());
+  photonEnergyFraction_.emplace_back(obj.photonEnergyFraction());
   muonEnergyFraction_.emplace_back(obj.muonEnergyFraction());
 
   chargedHadronMultiplicity_.emplace_back(obj.chargedHadronMultiplicity());
   neutralHadronMultiplicity_.emplace_back(obj.neutralHadronMultiplicity());
-  muonMultiplicity_.emplace_back(obj.muonMultiplicity());
   electronMultiplicity_.emplace_back(obj.electronMultiplicity());
   photonMultiplicity_.emplace_back(obj.photonMultiplicity());
+  muonMultiplicity_.emplace_back(obj.muonMultiplicity());
 }
