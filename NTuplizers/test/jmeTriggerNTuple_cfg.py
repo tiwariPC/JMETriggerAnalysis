@@ -363,11 +363,25 @@ if opts.pfdqm:
    process.PFCandidateHistograms_hltPFCands = pfCandidateHistogrammerRecoPFCandidate.clone(src='particleFlowTmp')
    process.PFCandidateHistograms_hltPuppiCands = pfCandidateHistogrammerRecoPFCandidate.clone(src='hltPuppi', cut='pt > 0.0001')
 
+   process.PFCandidateHistograms_hltPFCands_HB_chargedHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut='abs(pdgId)==211 && (0.0<=abs(eta) && abs(eta)<1.5)')
+   process.PFCandidateHistograms_hltPFCands_HB_neutralHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut='abs(pdgId)==130 && (0.0<=abs(eta) && abs(eta)<1.5)')
+   process.PFCandidateHistograms_hltPFCands_HB_photons        = process.PFCandidateHistograms_hltPFCands.clone(cut='abs(pdgId)==22  && (0.0<=abs(eta) && abs(eta)<1.5)')
+
+   process.PFCandidateHistograms_hltPFCands_HGCal_chargedHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut='abs(pdgId)==211 && (1.5<=abs(eta) && abs(eta)<3.0)')
+   process.PFCandidateHistograms_hltPFCands_HGCal_neutralHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut='abs(pdgId)==130 && (1.5<=abs(eta) && abs(eta)<3.0)')
+   process.PFCandidateHistograms_hltPFCands_HGCal_photons        = process.PFCandidateHistograms_hltPFCands.clone(cut='abs(pdgId)==22  && (1.5<=abs(eta) && abs(eta)<3.0)')
+
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
    process.PFCandidateHistograms_offlinePFCands = pfCandidateHistogrammerPatPackedCandidate.clone(src='packedPFCandidates')
 
    process.pfMonitoringSeq = cms.Sequence(
        process.PFCandidateHistograms_hltPFCands
+     + process.PFCandidateHistograms_hltPFCands_HB_chargedHadrons
+     + process.PFCandidateHistograms_hltPFCands_HB_neutralHadrons
+     + process.PFCandidateHistograms_hltPFCands_HB_photons
+     + process.PFCandidateHistograms_hltPFCands_HGCal_chargedHadrons
+     + process.PFCandidateHistograms_hltPFCands_HGCal_neutralHadrons
+     + process.PFCandidateHistograms_hltPFCands_HGCal_photons
      + process.PFCandidateHistograms_hltPuppiCands
      + process.PFCandidateHistograms_offlinePFCands
    )
