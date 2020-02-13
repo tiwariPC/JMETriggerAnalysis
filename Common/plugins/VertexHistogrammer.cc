@@ -27,6 +27,7 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
 
   edm::EDGetToken vertices_token_;
 
+  TH1D *h_vertex_mult_;
   TH1D *h_vertex_x_;
   TH1D *h_vertex_y_;
   TH1D *h_vertex_z_;
@@ -53,6 +54,7 @@ VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
+  h_vertex_mult_ = fs->make<TH1D>("vertex_mult", "vertex_mult", 120, 0, 600);
   h_vertex_x_ = fs->make<TH1D>("vertex_x", "vertex_x", 600, -0.1, 0.1);
   h_vertex_y_ = fs->make<TH1D>("vertex_y", "vertex_y", 600, -0.1, 0.1);
   h_vertex_z_ = fs->make<TH1D>("vertex_z", "vertex_z", 600, -30, 30);
@@ -73,6 +75,8 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
   iEvent.getByToken(vertices_token_, vertices);
 
   if(vertices.isValid()){
+
+    h_vertex_mult_->Fill(vertices->size());
 
     for(const auto& vtx : *vertices){
 
