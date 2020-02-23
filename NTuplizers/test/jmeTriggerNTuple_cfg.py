@@ -141,6 +141,30 @@ process.ak4CaloJetsCorrected = cms.EDProducer('CorrectedCaloJetProducer',
   src = cms.InputTag('ak4CaloJets'),
 )
 
+# Calo AK8
+process.ak8CaloJets = process.ak4CaloJets.clone(rParam = 0.8)
+
+#process.ak8CaloL1FastjetCorrector = cms.EDProducer('L1FastjetCorrectorProducer',
+#  algorithm = cms.string('AK8Calo'),
+#  level = cms.string('L1FastJet'),
+#  srcRho = cms.InputTag('fixedGridRhoFastjetAll'),
+#)
+#process.ak8CaloL2RelativeCorrector = cms.EDProducer('LXXXCorrectorProducer',
+#  algorithm = cms.string('AK8Calo'),
+#  level = cms.string('L2Relative'),
+#)
+#process.ak8CaloL3AbsoluteCorrector = cms.EDProducer('LXXXCorrectorProducer',
+#  algorithm = cms.string('AK8Calo'),
+#  level = cms.string('L3Absolute'),
+#)
+#process.ak8CaloL1FastL2L3Corrector = cms.EDProducer('ChainedJetCorrectorProducer',
+#  correctors = cms.VInputTag('ak8CaloL1FastjetCorrector', 'ak8CaloL2RelativeCorrector', 'ak8CaloL3AbsoluteCorrector'),
+#)
+#process.ak8CaloJetsCorrected = cms.EDProducer('CorrectedCaloJetProducer',
+#  correctors = cms.VInputTag('ak8CaloL1FastL2L3Corrector'),
+#  src = cms.InputTag('ak8CaloJets'),
+#)
+
 # CaloJets Sequence
 process.caloJetsSeq = cms.Sequence(
    (process.ak4CaloL1FastjetCorrector
@@ -148,6 +172,12 @@ process.caloJetsSeq = cms.Sequence(
   * process.ak4CaloL3AbsoluteCorrector
   * process.ak4CaloL1FastL2L3Corrector
   * process.ak4CaloJetsCorrected)
+  +(process.ak8CaloJets)
+#  * process.ak8CaloL1FastjetCorrector
+#  * process.ak8CaloL2RelativeCorrector
+#  * process.ak8CaloL3AbsoluteCorrector
+#  * process.ak8CaloL1FastL2L3Corrector
+#  * process.ak8CaloJetsCorrected)
 )
 process.reconstruction *= process.caloJetsSeq
 
@@ -158,10 +188,14 @@ process.load('RecoJets.JetProducers.PFClustersForJets_cff')
 process.load('RecoJets.JetProducers.ak4PFClusterJets_cfi')
 process.ak4PFClusterJets.doPVCorrection = False
 
+# PFClusterJets AK8
+process.ak8PFClusterJets = process.ak4PFClusterJets.clone(rParam = 0.8)
+
 # PFClusterJets Sequence
 process.pfClusterJetsSeq = cms.Sequence(
     process.pfClusterRefsForJets_step
-  * process.ak4PFClusterJets
+  *(process.ak4PFClusterJets
+  + process.ak8PFClusterJets)
 )
 process.reconstruction *= process.pfClusterJetsSeq
 
@@ -215,18 +249,20 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoGenJetCollections = cms.PSet(
 
-    ak4GenJets = cms.InputTag('ak4GenJets::HLT'),
     ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
+    ak8GenJetsNoNu = cms.InputTag('ak8GenJetsNoNu::HLT'),
   ),
 
   recoCaloJetCollections = cms.PSet(
 
     hltAK4CaloJetsUncorrected = cms.InputTag('ak4CaloJets'),
+    hltAK8CaloJetsUncorrected = cms.InputTag('ak8CaloJets'),
   ),
 
   recoPFClusterJetCollections = cms.PSet(
 
     hltAK4PFClusterJetsUncorrected = cms.InputTag('ak4PFClusterJets'),
+    hltAK8PFClusterJetsUncorrected = cms.InputTag('ak8PFClusterJets'),
   ),
 
   recoPFJetCollections = cms.PSet(
@@ -286,10 +322,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   stringCutObjectSelectors = cms.PSet(
 
-    ak4GenJets = cms.string('pt > 12'),
     ak4GenJetsNoNu = cms.string('pt > 12'),
+    ak8GenJetsNoNu = cms.string('pt > 50'),
     hltAK4CaloJetsUncorrected = cms.string('pt > 12'),
+    hltAK8CaloJetsUncorrected = cms.string('pt > 100'),
     hltAK4PFClusterJetsUncorrected = cms.string('pt > 12'),
+    hltAK8PFClusterJetsUncorrected = cms.string('pt > 100'),
     hltAK4PFJetsUncorrected = cms.string('pt > 12'),
     hltAK4PFJetsCorrected = cms.string('pt > 12'),
     hltAK4PFCHSJetsCorrected = cms.string('pt > 12'),
