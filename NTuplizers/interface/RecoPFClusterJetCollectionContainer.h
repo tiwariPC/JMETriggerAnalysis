@@ -1,18 +1,18 @@
-#ifndef JMETriggerAnalysis_RecoCaloJetCollectionContainer_h
-#define JMETriggerAnalysis_RecoCaloJetCollectionContainer_h
+#ifndef JMETriggerAnalysis_RecoPFClusterJetCollectionContainer_h
+#define JMETriggerAnalysis_RecoPFClusterJetCollectionContainer_h
 
 #include <JMETriggerAnalysis/NTuplizers/interface/VRecoCandidateCollectionContainer.h>
-#include <DataFormats/JetReco/interface/CaloJet.h>
+#include <DataFormats/JetReco/interface/PFClusterJet.h>
 
-class RecoCaloJetCollectionContainer : public VRecoCandidateCollectionContainer<reco::CaloJet> {
+class RecoPFClusterJetCollectionContainer : public VRecoCandidateCollectionContainer<reco::PFClusterJet> {
 
  public:
-  explicit RecoCaloJetCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
-  virtual ~RecoCaloJetCollectionContainer() {}
+  explicit RecoPFClusterJetCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
+  virtual ~RecoPFClusterJetCollectionContainer() {}
 
   void clear();
   void reserve(const size_t);
-  void emplace_back(const reco::CaloJet&);
+  void emplace_back(const reco::PFClusterJet&);
 
   std::vector<float>& vec_pt(){ return pt_; }
   std::vector<float>& vec_eta(){ return eta_; }

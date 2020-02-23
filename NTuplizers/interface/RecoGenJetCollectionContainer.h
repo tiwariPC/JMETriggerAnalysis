@@ -19,6 +19,8 @@ class RecoGenJetCollectionContainer : public VRecoCandidateCollectionContainer<r
   std::vector<float>& vec_phi(){ return phi_; }
   std::vector<float>& vec_mass(){ return mass_; }
 
+  std::vector<uint>& vec_numberOfDaughters(){ return numberOfDaughters_; }
+
   std::vector<float>& vec_chargedHadronEnergyFraction(){ return chargedHadronEnergyFraction_; }
   std::vector<float>& vec_neutralHadronEnergyFraction(){ return neutralHadronEnergyFraction_; }
   std::vector<float>& vec_electronEnergyFraction(){ return electronEnergyFraction_; }
@@ -36,6 +38,8 @@ class RecoGenJetCollectionContainer : public VRecoCandidateCollectionContainer<r
   std::vector<float> eta_;
   std::vector<float> phi_;
   std::vector<float> mass_;
+
+  std::vector<uint> numberOfDaughters_;
 
   std::vector<float> chargedHadronEnergyFraction_;
   std::vector<float> neutralHadronEnergyFraction_;

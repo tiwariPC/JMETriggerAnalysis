@@ -18,7 +18,9 @@ class PATJetCollectionContainer : public VRecoCandidateCollectionContainer<pat::
   std::vector<float>& vec_eta(){ return eta_; }
   std::vector<float>& vec_phi(){ return phi_; }
   std::vector<float>& vec_mass(){ return mass_; }
+
   std::vector<float>& vec_jesc(){ return jesc_; }
+  std::vector<uint>& vec_numberOfDaughters(){ return numberOfDaughters_; }
 
   std::vector<float>& vec_chargedHadronEnergyFraction(){ return chargedHadronEnergyFraction_; }
   std::vector<float>& vec_neutralHadronEnergyFraction(){ return neutralHadronEnergyFraction_; }
@@ -37,7 +39,9 @@ class PATJetCollectionContainer : public VRecoCandidateCollectionContainer<pat::
   std::vector<float> eta_;
   std::vector<float> phi_;
   std::vector<float> mass_;
+
   std::vector<float> jesc_;
+  std::vector<uint> numberOfDaughters_;
 
   std::vector<float> chargedHadronEnergyFraction_;
   std::vector<float> neutralHadronEnergyFraction_;

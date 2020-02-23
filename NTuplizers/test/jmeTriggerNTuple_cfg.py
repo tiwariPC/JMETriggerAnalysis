@@ -117,6 +117,9 @@ process.reconstruction *= process.hltJMESequence
 ###
 process.ak4PFJetsCorrected.correctors = ['ak4PFL1FastL2L3Corrector']
 
+process.ak4CaloJets.doPVCorrection = False
+
+# Calo AK4
 process.ak4CaloL1FastjetCorrector = cms.EDProducer('L1FastjetCorrectorProducer',
   algorithm = cms.string('AK4Calo'),
   level = cms.string('L1FastJet'),
@@ -137,14 +140,30 @@ process.ak4CaloJetsCorrected = cms.EDProducer('CorrectedCaloJetProducer',
   correctors = cms.VInputTag('ak4CaloL1FastL2L3Corrector'),
   src = cms.InputTag('ak4CaloJets'),
 )
-process.ak4CaloJetsSeq = cms.Sequence(
-    process.ak4CaloL1FastjetCorrector
+
+# CaloJets Sequence
+process.caloJetsSeq = cms.Sequence(
+   (process.ak4CaloL1FastjetCorrector
   * process.ak4CaloL2RelativeCorrector
   * process.ak4CaloL3AbsoluteCorrector
   * process.ak4CaloL1FastL2L3Corrector
-  * process.ak4CaloJetsCorrected
+  * process.ak4CaloJetsCorrected)
 )
-process.reconstruction *= process.ak4CaloJetsSeq
+process.reconstruction *= process.caloJetsSeq
+
+# PFClusterJets
+process.load('RecoJets.JetProducers.PFClustersForJets_cff')
+
+# PFClusterJets AK4
+process.load('RecoJets.JetProducers.ak4PFClusterJets_cfi')
+process.ak4PFClusterJets.doPVCorrection = False
+
+# PFClusterJets Sequence
+process.pfClusterJetsSeq = cms.Sequence(
+    process.pfClusterRefsForJets_step
+  * process.ak4PFClusterJets
+)
+process.reconstruction *= process.pfClusterJetsSeq
 
 ###
 ### add analysis sequence (JMETrigger NTuple)
@@ -203,6 +222,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoCaloJetCollections = cms.PSet(
 
     hltAK4CaloJetsUncorrected = cms.InputTag('ak4CaloJets'),
+  ),
+
+  recoPFClusterJetCollections = cms.PSet(
+
+    hltAK4PFClusterJetsUncorrected = cms.InputTag('ak4PFClusterJets'),
   ),
 
   recoPFJetCollections = cms.PSet(
@@ -265,6 +289,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     ak4GenJets = cms.string('pt > 12'),
     ak4GenJetsNoNu = cms.string('pt > 12'),
     hltAK4CaloJetsUncorrected = cms.string('pt > 12'),
+    hltAK4PFClusterJetsUncorrected = cms.string('pt > 12'),
     hltAK4PFJetsUncorrected = cms.string('pt > 12'),
     hltAK4PFJetsCorrected = cms.string('pt > 12'),
     hltAK4PFCHSJetsCorrected = cms.string('pt > 12'),

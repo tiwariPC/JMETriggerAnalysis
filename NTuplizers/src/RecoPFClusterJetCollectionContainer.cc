@@ -1,11 +1,11 @@
-#include <JMETriggerAnalysis/NTuplizers/interface/RecoCaloJetCollectionContainer.h>
+#include <JMETriggerAnalysis/NTuplizers/interface/RecoPFClusterJetCollectionContainer.h>
 
-RecoCaloJetCollectionContainer::RecoCaloJetCollectionContainer(
+RecoPFClusterJetCollectionContainer::RecoPFClusterJetCollectionContainer(
   const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token, const std::string& strCut, const bool orderByHighestPt
 ) : VRecoCandidateCollectionContainer(name, inputTagLabel, token, strCut, orderByHighestPt) {
 }
 
-void RecoCaloJetCollectionContainer::clear(){
+void RecoPFClusterJetCollectionContainer::clear(){
 
   pt_.clear();
   eta_.clear();
@@ -15,7 +15,7 @@ void RecoCaloJetCollectionContainer::clear(){
   numberOfDaughters_.clear();
 }
 
-void RecoCaloJetCollectionContainer::reserve(const size_t vec_size){
+void RecoPFClusterJetCollectionContainer::reserve(const size_t vec_size){
 
   pt_.reserve(vec_size);
   eta_.reserve(vec_size);
@@ -25,7 +25,7 @@ void RecoCaloJetCollectionContainer::reserve(const size_t vec_size){
   numberOfDaughters_.reserve(vec_size);
 }
 
-void RecoCaloJetCollectionContainer::emplace_back(const reco::CaloJet& obj){
+void RecoPFClusterJetCollectionContainer::emplace_back(const reco::PFClusterJet& obj){
 
   pt_.emplace_back(obj.pt());
   eta_.emplace_back(obj.eta());

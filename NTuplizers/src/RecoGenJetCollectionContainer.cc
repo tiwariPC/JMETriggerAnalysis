@@ -12,6 +12,8 @@ void RecoGenJetCollectionContainer::clear(){
   phi_.clear();
   mass_.clear();
 
+  numberOfDaughters_.clear();
+
   chargedHadronEnergyFraction_.clear();
   neutralHadronEnergyFraction_.clear();
   electronEnergyFraction_.clear();
@@ -32,6 +34,8 @@ void RecoGenJetCollectionContainer::reserve(const size_t vec_size){
   phi_.reserve(vec_size);
   mass_.reserve(vec_size);
 
+  numberOfDaughters_.reserve(vec_size);;
+
   chargedHadronEnergyFraction_.reserve(vec_size);
   neutralHadronEnergyFraction_.reserve(vec_size);
   electronEnergyFraction_.reserve(vec_size);
@@ -51,6 +55,8 @@ void RecoGenJetCollectionContainer::emplace_back(const reco::GenJet& obj){
   eta_.emplace_back(obj.eta());
   phi_.emplace_back(obj.phi());
   mass_.emplace_back(obj.mass());
+
+  numberOfDaughters_.emplace_back(obj.numberOfDaughters());
 
   chargedHadronEnergyFraction_.emplace_back(obj.energy() ? (obj.chargedHadronEnergy()/obj.energy()) : -99.);
   neutralHadronEnergyFraction_.emplace_back(obj.energy() ? (obj.neutralHadronEnergy()/obj.energy()) : -99.);

@@ -11,7 +11,9 @@ void RecoPFJetCollectionContainer::clear(){
   eta_.clear();
   phi_.clear();
   mass_.clear();
+
   jesc_.clear();
+  numberOfDaughters_.clear();
 
   chargedHadronEnergyFraction_.clear();
   neutralHadronEnergyFraction_.clear();
@@ -32,7 +34,9 @@ void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
   eta_.reserve(vec_size);
   phi_.reserve(vec_size);
   mass_.reserve(vec_size);
+
   jesc_.reserve(vec_size);
+  numberOfDaughters_.reserve(vec_size);;
 
   chargedHadronEnergyFraction_.reserve(vec_size);
   neutralHadronEnergyFraction_.reserve(vec_size);
@@ -59,6 +63,7 @@ void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
    + obj.HFEMEnergyFraction();
 
   jesc_.emplace_back(totFrac ? (1./totFrac) : -1.);
+  numberOfDaughters_.emplace_back(obj.numberOfDaughters());
 
   chargedHadronEnergyFraction_.emplace_back(obj.chargedHadronEnergyFraction());
   neutralHadronEnergyFraction_.emplace_back(obj.neutralHadronEnergyFraction());
