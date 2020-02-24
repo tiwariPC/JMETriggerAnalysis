@@ -181,8 +181,16 @@ process.caloJetsSeq = cms.Sequence(
 )
 process.reconstruction *= process.caloJetsSeq
 
-# PFClusterJets
+### PFClusterJets
 process.load('RecoJets.JetProducers.PFClustersForJets_cff')
+
+# add PFClusters from HGCal
+process.pfClusterRefsForJetsHGCAL = cms.EDProducer('PFClusterRefCandidateProducer',
+  src = cms.InputTag('particleFlowClusterHGCal'),
+  particleType = cms.string('pi+'),
+)
+process.pfClusterRefsForJets_stepTask.add(process.pfClusterRefsForJetsHGCAL)
+process.pfClusterRefsForJets.src += ['pfClusterRefsForJetsHGCAL']
 
 # PFClusterJets AK4
 process.load('RecoJets.JetProducers.ak4PFClusterJets_cfi')
