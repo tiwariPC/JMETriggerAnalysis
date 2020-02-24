@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from CommonTools.PileupAlgos.Puppi_cff import *
 from CommonTools.PileupAlgos.PhotonPuppi_cff import puppiPhoton
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
+from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsPuppi
 
 def hltJMESequence(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFMETTypeOne, primaryVertices, pfNoPileUpJME=None):
 
@@ -32,7 +33,7 @@ def hltJMESequence(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFM
       level = cms.string( 'L2L3Residual' )
     )
     proc.hltAK4PFCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-        correctors = cms.VInputTag( 'hltAK4PFFastJetCorrector','hltAK4PFRelativeCorrector','hltAK4PFAbsoluteCorrector','hltAK4PFResidualCorrector' )
+        correctors = cms.VInputTag( 'hltAK4PFFastJetCorrector', 'hltAK4PFRelativeCorrector', 'hltAK4PFAbsoluteCorrector', 'hltAK4PFResidualCorrector' )
     )
     proc.hltcorrPFMETTypeOne = cms.EDProducer( 'PFJetMETcorrInputProducer',
       src = cms.InputTag( ak4PFJetsForPFMETTypeOne ),
@@ -111,7 +112,7 @@ def hltJMESequence(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFM
       level = cms.string( 'L2L3Residual' )
     )
     proc.hltAK4PuppiCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK4PuppiFastJetCorrector','hltAK4PuppiRelativeCorrector','hltAK4PuppiAbsoluteCorrector','hltAK4PuppiResidualCorrector' )
+      correctors = cms.VInputTag( 'hltAK4PuppiFastJetCorrector', 'hltAK4PuppiRelativeCorrector', 'hltAK4PuppiAbsoluteCorrector', 'hltAK4PuppiResidualCorrector' )
     )
     proc.hltAK4PuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
       src = cms.InputTag('hltAK4PuppiJetsUncorrected'),
@@ -141,6 +142,34 @@ def hltJMESequence(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFM
       calculateSignificance = cms.bool( False ),
     )
 
+    proc.hltAK8PuppiJetsUncorrected = ak8PFJetsPuppi.clone(
+      src = 'hltPuppi',
+    )
+    proc.hltAK8PuppiFastJetCorrector = cms.EDProducer( 'L1FastjetCorrectorProducer',
+      srcRho = cms.InputTag( 'fixedGridRhoFastjetAll' ),
+      algorithm = cms.string( 'AK8PFPuppi' ),
+      level = cms.string( 'L1FastJet' )
+    )
+    proc.hltAK8PuppiRelativeCorrector = cms.EDProducer( 'LXXXCorrectorProducer',
+      algorithm = cms.string( 'AK8PFPuppi' ),
+      level = cms.string( 'L2Relative' )
+    )
+    proc.hltAK8PuppiAbsoluteCorrector = cms.EDProducer( 'LXXXCorrectorProducer',
+      algorithm = cms.string( 'AK8PFPuppi' ),
+      level = cms.string( 'L3Absolute' )
+    )
+    proc.hltAK8PuppiResidualCorrector = cms.EDProducer( 'LXXXCorrectorProducer',
+      algorithm = cms.string( 'AK8PFPuppi' ),
+      level = cms.string( 'L2L3Residual' )
+    )
+    proc.hltAK8PuppiCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
+      correctors = cms.VInputTag( 'hltAK8PuppiFastJetCorrector', 'hltAK8PuppiRelativeCorrector', 'hltAK8PuppiAbsoluteCorrector', 'hltAK8PuppiResidualCorrector' )
+    )
+    proc.hltAK8PuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
+      src = cms.InputTag('hltAK8PuppiJetsUncorrected'),
+      correctors = cms.VInputTag('hltAK8PuppiCorrector'),
+    )
+
     # Puppi METs Sequence
     proc.hltPuppiMETsSeq = cms.Sequence(
        (proc.pfNoLepPUPPI
@@ -149,9 +178,7 @@ def hltJMESequence(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFM
       * proc.puppiMerged
       * proc.hltPuppiForMET
       * proc.hltPuppiMET
-    )
-    proc.hltPuppiMETsSeq += cms.Sequence(
-        proc.hltPuppi
+      + proc.hltPuppi
       *(proc.hltAK4PuppiJetsUncorrected
       * proc.hltAK4PuppiFastJetCorrector
       * proc.hltAK4PuppiRelativeCorrector
@@ -161,7 +188,14 @@ def hltJMESequence(proc, particleFlow, ak4PFJetsForPFMETTypeOne, jescLabelForPFM
       * proc.hltAK4PuppiJetsCorrected
       * proc.hltcorrPuppiMETTypeOne
       * proc.hltPuppiMETTypeOne
-      + proc.hltPuppiMETWithPuppiForJets)
+      + proc.hltPuppiMETWithPuppiForJets
+      + proc.hltAK8PuppiJetsUncorrected
+      * proc.hltAK8PuppiFastJetCorrector
+      * proc.hltAK8PuppiRelativeCorrector
+      * proc.hltAK8PuppiAbsoluteCorrector
+      * proc.hltAK8PuppiResidualCorrector
+      * proc.hltAK8PuppiCorrector
+      * proc.hltAK8PuppiJetsCorrected)
     )
 
     ### METs Sequence

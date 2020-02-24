@@ -271,12 +271,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4PFJetsCorrected = cms.InputTag('ak4PFJetsCorrected'+'::'+process.name_()),
     hltAK4PFCHSJetsCorrected = cms.InputTag('ak4PFJetsCHSCorrected'+'::'+process.name_()),
     hltAK4PuppiJetsCorrected = cms.InputTag('hltAK4PuppiJetsCorrected'+'::'+process.name_()),
+    hltAK8PuppiJetsCorrected = cms.InputTag('hltAK8PuppiJetsCorrected'+'::'+process.name_()),
   ),
 
   patJetCollections = cms.PSet(
 
     offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
     offlineAK4PuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
+    offlineAK8PuppiJetsCorrected = cms.InputTag('slimmedJetsAK8'),
   ),
 
   recoGenMETCollections = cms.PSet(
@@ -332,9 +334,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4PFJetsCorrected = cms.string('pt > 12'),
     hltAK4PFCHSJetsCorrected = cms.string('pt > 12'),
     hltAK4PuppiJetsCorrected = cms.string('pt > 12'),
+    hltAK8PuppiJetsCorrected = cms.string('pt > 100'),
     offlineAK4CaloJetsCorrected = cms.string('pt > 12'),
     offlineAK4PFCHSJetsCorrected = cms.string('pt > 12'),
     offlineAK4PuppiJetsCorrected = cms.string('pt > 12'),
+    offlineAK8PuppiJetsCorrected = cms.string('pt > 100'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
