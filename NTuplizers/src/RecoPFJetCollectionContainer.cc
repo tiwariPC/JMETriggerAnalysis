@@ -62,14 +62,16 @@ void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
    + obj.photonEnergyFraction() + obj.electronEnergyFraction() + obj.muonEnergyFraction() +
    + obj.HFEMEnergyFraction();
 
-  jesc_.emplace_back(totFrac ? (1./totFrac) : -1.);
+  const auto jesc = totFrac ? (1./totFrac) : 1.;
+
+  jesc_.emplace_back(jesc);
   numberOfDaughters_.emplace_back(obj.numberOfDaughters());
 
-  chargedHadronEnergyFraction_.emplace_back(obj.chargedHadronEnergyFraction());
-  neutralHadronEnergyFraction_.emplace_back(obj.neutralHadronEnergyFraction());
-  electronEnergyFraction_.emplace_back(obj.electronEnergyFraction());
-  photonEnergyFraction_.emplace_back(obj.photonEnergyFraction());
-  muonEnergyFraction_.emplace_back(obj.muonEnergyFraction());
+  chargedHadronEnergyFraction_.emplace_back(obj.chargedHadronEnergyFraction() * jesc);
+  neutralHadronEnergyFraction_.emplace_back(obj.neutralHadronEnergyFraction() * jesc);
+  electronEnergyFraction_.emplace_back(obj.electronEnergyFraction() * jesc);
+  photonEnergyFraction_.emplace_back(obj.photonEnergyFraction() * jesc);
+  muonEnergyFraction_.emplace_back(obj.muonEnergyFraction() * jesc);
 
   chargedHadronMultiplicity_.emplace_back(obj.chargedHadronMultiplicity());
   neutralHadronMultiplicity_.emplace_back(obj.neutralHadronMultiplicity());
