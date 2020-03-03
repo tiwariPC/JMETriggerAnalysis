@@ -528,8 +528,6 @@ if opts.logs:
      ),
      # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
      debugModules = cms.untracked.vstring(
-       'PixelVerticesSelector',
-       'TracksClosestToFirstVerticesSelector',
        'JMETriggerNTuple',
      ),
      categories = cms.untracked.vstring(
@@ -563,6 +561,12 @@ if opts.logs:
        ),
      ),
    )
+
+   if opts.skimTracks:
+      process.MessageLogger.debugModules += [
+        'hltTrimmedPixelVertices',
+        'generalTracks',
+      ]
 
 # input EDM files [primary]
 if opts.inputFiles:
