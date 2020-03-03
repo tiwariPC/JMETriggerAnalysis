@@ -181,7 +181,7 @@ process.caloJetsSeq = cms.Sequence(
 )
 process.reconstruction *= process.caloJetsSeq
 
-### PFClusterJets
+### PFCluster Jets/MET
 process.load('RecoJets.JetProducers.PFClustersForJets_cff')
 
 # add PFClusters from HGCal
@@ -199,13 +199,18 @@ process.ak4PFClusterJets.doPVCorrection = False
 # PFClusterJets AK8
 process.ak8PFClusterJets = process.ak4PFClusterJets.clone(rParam = 0.8)
 
-# PFClusterJets Sequence
-process.pfClusterJetsSeq = cms.Sequence(
+# PFClusterMET
+from RecoMET.METProducers.PFClusterMET_cfi import pfClusterMet
+process.pfClusterMET = pfClusterMet.clone()
+
+# PFCluster Jets/MET Sequence
+process.pfClusterJMESeq = cms.Sequence(
     process.pfClusterRefsForJets_step
   *(process.ak4PFClusterJets
-  + process.ak8PFClusterJets)
+  + process.ak8PFClusterJets
+  + process.pfClusterMET)
 )
-process.reconstruction *= process.pfClusterJetsSeq
+process.reconstruction *= process.pfClusterJMESeq
 
 ###
 ### add analysis sequence (JMETrigger NTuple)
@@ -299,6 +304,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
 #    hltMet = cms.InputTag('hltMet'+'::'+process.name_()),
 #    hltMetClean = cms.InputTag('hltMetClean'+'::'+process.name_()),
+  ),
+
+  recoPFClusterMETCollections = cms.PSet(
+
+    hltPFClusterMET = cms.InputTag('pfClusterMET'+'::'+process.name_()),
   ),
 
   recoPFMETCollections = cms.PSet(
