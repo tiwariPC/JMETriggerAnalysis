@@ -33,7 +33,7 @@ cmsDriver.py step3 \
   -n 10 \
   --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
   --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_JME \
-  --customise_commands 'process.schedule = cms.Schedule(process.raw2digi_step,process.reconstruction_step,process.endjob_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n'
+  --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n'
 ```
 
 ### Useful Links
