@@ -30,9 +30,7 @@ cd CMSSW_11_1_0_pre3/src
 cmsenv
 
 # [optional] PR#28976
-git cms-addpkg RecoParticleFlow/PFClusterProducer
-git cherry-pick 445d74b1df707d06a208d5f1a95b8492fc187239
-git cherry-pick e68e48a95b4d20a9904d35b94dc4772b4298b135
+git cms-merge-topic felicepantaleo:fix_realistic_sim_clusters_11_1_0_pre3
 
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
 scram b
