@@ -25,21 +25,37 @@ def getParameterDependencies(parameter):
                ret += getParameterDependencies(_parPSet.getParameter(_psetParName))
     return ret
 
+def getModuleDependencies(module):
+    ret = []
+    for _ikey in module.parameters_():
+        if not hasattr(module, _ikey):
+           raise RuntimeError('key "'+_ikey+'" not found in module: '+module.dumpPython())
+        ret += getParameterDependencies(getattr(module, _ikey))
+    return ret
+
+def processHasModule(process, module):
+    if hasattr(process, module):
+       return True
+
+#    for _tmp in process.es_sources_():
+#        print(_tmp, '=', getattr(process, _tmp).dumpPython())
+#    for _tmp in process.es_prefers_():
+#        print(_tmp, '=', getattr(process, _tmp).dumpPython())
+#    for _tmp in process.es_producers_():
+#        print(_tmp, '=', getattr(process, _tmp).dumpPython())
+
+    return False
+
 def moduleDependencyDictFromSequence(process, sequence):
     ret = {}
     for _modname in getattr(process, sequence).moduleNames():
-        ret[_modname] = []
         if not hasattr(process, _modname):
            raise RuntimeError(_modname)
-        _mod = getattr(process, _modname)
-        for _ikey in _mod.parameters_():
-            if not hasattr(_mod, _ikey):
-               raise RuntimeError(_modname+'.'+_ikey)
-            ret[_modname] += getParameterDependencies(getattr(_mod, _ikey))
+        ret[_modname] = getModuleDependencies(getattr(process, _modname))
         # remove duplicates
         ret[_modname] = sorted(list(set(ret[_modname])))
         # retain only labels corresponding to a member of process (ignore dependencies from collections in input EDM file)
-        ret[_modname] = [_tmp for _tmp in ret[_modname] if (_tmp and hasattr(process, _tmp))]
+        ret[_modname] = [_tmp for _tmp in ret[_modname] if (_tmp and processHasModule(process, _tmp))]
     # verify absence of self-dependencies and circular-dependencies
     for _modname in ret:
         for _dep in ret[_modname]:

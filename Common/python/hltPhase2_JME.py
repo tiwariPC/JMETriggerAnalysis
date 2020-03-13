@@ -821,7 +821,8 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     )
 
     # process.globalreco: reconstruction up to PFClusters
-    process.globalreco_tracking = cms.Sequence(process.globalreco_trackingTask)
+    if (not hasattr(process, 'globalreco_tracking')) and hasattr(process, 'globalreco_trackingTask'):
+       process.globalreco_tracking = cms.Sequence(process.globalreco_trackingTask)
 
     process.globalreco = cms.Sequence(
         process.caloTowersRec

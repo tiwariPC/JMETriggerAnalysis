@@ -5,7 +5,7 @@ from JMETriggerAnalysis.Common.utils import *
 #from offline_cfg_dump import *
 #sequence = 'particleFlowReco'
 
-from JMETriggerAnalysis.Common.hltPhase2_TRK_dump import *
+from trkPOG_dump import *
 
 process.otLocalReco = cms.Sequence(
    process.MeasurementTrackerEvent
@@ -114,13 +114,42 @@ process.MC_Tracking_v2_seq = cms.Sequence(
 
 sequence = 'MC_Tracking_v2_seq'
 
+#for _modname in process.switchProducerNames():
+#    print(_modname)
+#processHasModule(process, 'a')
+#for _tmp in []:
+#    print(_tmp, processHasModule(process, _tmp))
+
 orderedListOfModuleNames = orderedListOfModuleNamesFromSequence(process, sequence)
+
+newList = orderedListOfModuleNames[:]
+for _tmp in orderedListOfModuleNames:
+    newList += getModuleDependencies(getattr(process, _tmp))
+newList = sorted(list(set(newList)))
 
 #print('process.'+sequence+' = cms.Sequence(')
 #for _idx in range(len(orderedListOfModuleNames)):
 #    print('  '+(' ' if (_idx == 0) else '+')+' '+orderedListOfModuleNames[_idx])
 #print(')')
 
+
+
+#for _tmp in newList:
+#    if hasattr(process, _tmp): print(_tmp)
+
 print('import FWCore.ParameterSet.Config as cms\n')
+#for _idx in range(len(newList)):
+#    if newList[_idx] in orderedListOfModuleNames: continue
+#    if not hasattr(process, newList[_idx]): continue
+#    print(newList[_idx], '=', getattr(process, newList[_idx]).dumpPython())
+for _tmp in process.es_prefers_():
+    if _tmp in orderedListOfModuleNames: continue
+    print(_tmp, '=', getattr(process, _tmp).dumpPython())
+for _tmp in process.es_sources_():
+    if _tmp in orderedListOfModuleNames: continue
+    print(_tmp, '=', getattr(process, _tmp).dumpPython())
+for _tmp in process.es_producers_():
+    if _tmp in orderedListOfModuleNames: continue
+    print(_tmp, '=', getattr(process, _tmp).dumpPython())
 for _idx in range(len(orderedListOfModuleNames)):
     print(orderedListOfModuleNames[_idx], '=', getattr(process, orderedListOfModuleNames[_idx]).dumpPython())
