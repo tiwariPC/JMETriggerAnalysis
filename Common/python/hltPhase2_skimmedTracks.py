@@ -16,10 +16,6 @@ def customize_hltPhase2_skimmedTracks(process):
     if not hasattr(process, 'globalreco_tracking'):
        raise RuntimeError('process has no member named "globalreco_tracking"')
 
-    # check if generalTracksTask task exists
-    if not hasattr(process, 'generalTracksTask'):
-       raise RuntimeError('process has no member named "generalTracksTask"')
-
     # check if generalTracks module exists
     if not hasattr(process, 'generalTracks'):
        raise RuntimeError('process has no member named "generalTracks"')
@@ -79,14 +75,23 @@ def customize_hltPhase2_skimmedTracks(process):
       maxDeltaZ = cms.double( 0.2 ),
     )
 
-    # insert updated generalTracks into tracking sequence and related task
-    process.globalreco_trackingTask.replace(process.generalTracks, cms.Task(
-       process.generalTracksOriginal,
-       process.reconstruction_pixelTrackingOnlyTask,
-       process.hltTrimmedPixelVertices,
-       process.generalTracks,
-    ))
-
-    process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
+    # check if generalTracksTask task exists
+    if hasattr(process, 'generalTracksTask'):
+       # [customization without TRK-v02 applied] insert updated generalTracks into tracking task
+       process.globalreco_trackingTask.replace(process.generalTracks, cms.Task(
+          process.generalTracksOriginal,
+          process.reconstruction_pixelTrackingOnlyTask,
+          process.hltTrimmedPixelVertices,
+          process.generalTracks,
+       ))
+       process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
+    else:
+       # [customization on top of TRK-v02] insert updated generalTracks into tracking sequence
+       process.globalreco_tracking.replace(process.generalTracks, cms.Sequence(
+            process.generalTracksOriginal
+          + process.reconstruction_pixelTrackingOnly
+          + process.hltTrimmedPixelVertices
+          + process.generalTracks
+       ))
 
     return process
