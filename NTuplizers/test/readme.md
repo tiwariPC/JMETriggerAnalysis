@@ -1,19 +1,19 @@
 ### Instructions to generate configuration file(s) for HLT Phase-2 reconstruction:
 
-* [Step #1] create local CMSSW area and add relevant packages:
+* *Step #1* create local CMSSW area and add the relevant packages:
 ```
 cmsrel CMSSW_11_1_0_pre3
 cd CMSSW_11_1_0_pre3/src
 cmsenv
 
-# [optional] PR#28976
+# [optional] PR#28976 (fix to realistic SIM-Clusters)
 git cms-merge-topic felicepantaleo:fix_realistic_sim_clusters_11_1_0_pre3
 
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2_devel
 scram b
 ```
 
-* [Step #2] generate configuration file to run on RAW files:
+* *Step #2* generate customized configuration file to run TRK(v02)+PF+JME HLT-like reconstruction on RAW:
 ```
 cmsDriver.py step3 \
   --geometry Extended2026D49 --era Phase2C9 \
@@ -35,6 +35,6 @@ cmsDriver.py step3 \
   --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n'
 ```
 
-### Useful Links
+### Links
 
-TWiki: `https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2#MC_samples`
+ * Phase-2 MC samples: `https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2#MC_samples`
