@@ -30,7 +30,7 @@ cmsDriver.py step3 \
   --mc \
   --nThreads 4 \
   --nStreams 4 \
-  --python_filename hltPhase2_cfg.py \
+  --python_filename hltPhase2_TRKv02_cfg.py \
   --no_exec \
   -n 10 \
   --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \

@@ -75,7 +75,7 @@ opts.parseArguments()
 ### base configuration file
 ###
 if opts.reco == 'hltPhase2':
-   from hltPhase2_cfg import cms, process
+   from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv02_cfg import cms, process
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
 
