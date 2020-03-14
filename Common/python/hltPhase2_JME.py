@@ -7,6 +7,8 @@ from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets, ak4PFJetsCHS, ak4PFJe
 from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets, ak8PFJetsCHS, ak8PFJetsPuppi
 from RecoMET.METProducers.PFClusterMET_cfi import pfClusterMet
 
+from CondCore.CondDB.CondDB_cfi import CondDB
+
 def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ### Guidelines to browse the code below:
@@ -853,5 +855,20 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     del process.simPFProducer.trackTimeValueMap
 
     #### ------------------------------------------------------------
+
+    # update JESC via local SQLite file
+    CondDBJECFile = CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/PhaseIIFall17_V5b_MC.db' )
+    process.jec = cms.ESSource('PoolDBESSource', CondDBJECFile, toGet = cms.VPSet())
+    for _tmp in ['AK4PF', 'AK4PFchs', 'AK4PFPuppi', 'AK8PF', 'AK8PFchs', 'AK8PFPuppi']:
+        process.jec.toGet.append(
+          cms.PSet(
+            record = cms.string('JetCorrectionsRecord'),
+            tag    = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_'+_tmp),
+            label  = cms.untracked.string(_tmp),
+          )
+        )
+
+    # Add an ESPrefer to override JEC that might be available from the global tag
+    process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
 
     return process
