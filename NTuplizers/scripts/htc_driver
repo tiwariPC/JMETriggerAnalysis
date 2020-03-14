@@ -309,7 +309,7 @@ if opts.dumpPython is not None:
 
             ## dump of full python config
             if jobCounter == 0:
-               EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> /dev/null', suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
+               EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> '+OUTPUT_DIR+'/dumpPython.log', verbose=opts.verbose, dry_run=opts.dry_run)
 
             i_SHELL_COMMANDS  = [['set -e']]
             i_SHELL_COMMANDS += [['if [ -f flag.done ]; then exit 0; fi;']]
