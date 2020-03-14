@@ -9,6 +9,11 @@ opts.register('skipEvents', 0,
               vpo.VarParsing.varType.int,
               'number of events to be skipped')
 
+opts.register('dumpPython', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'path to python file with content of cms.Process')
+
 opts.register('numThreads', 1,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
@@ -500,6 +505,10 @@ if opts.skimTracks:
      'hltTrimmedPixelVertices_ndof',
    ]
 
+# dump content of cms.Process to python file
+if opts.dumpPython is not None:
+   open(opts.dumpPython, 'w').write(process.dumpPython())
+
 # print-outs
 print '--- jmeTriggerNTuple_cfg.py ---'
 print ''
@@ -508,6 +517,7 @@ print 'option: reco =', opts.reco
 print 'option: skimTracks =', opts.skimTracks
 print 'option: trkdqm =', opts.trkdqm
 print 'option: pfdqm =', opts.pfdqm
+print 'option: dumpPython =', opts.dumpPython
 print ''
 print 'process.GlobalTag.globaltag =', process.GlobalTag.globaltag
 print 'process.maxEvents =', process.maxEvents
