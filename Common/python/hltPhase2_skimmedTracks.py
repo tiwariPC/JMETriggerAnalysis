@@ -76,7 +76,7 @@ def customize_hltPhase2_skimmedTracks(process):
     )
 
     # check if generalTracksTask task exists
-    if hasattr(process, 'generalTracksTask'):
+    if hasattr(process, 'globalreco_trackingTask'):
        # [customization without TRK-v02 applied] insert updated generalTracks into tracking task
        process.globalreco_trackingTask.replace(process.generalTracks, cms.Task(
           process.generalTracksOriginal,
@@ -84,7 +84,8 @@ def customize_hltPhase2_skimmedTracks(process):
           process.hltTrimmedPixelVertices,
           process.generalTracks,
        ))
-       process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
+       if hasattr(process, 'generalTracksTask'):
+          process.generalTracksTask.add(process.generalTracksOriginal, process.hltTrimmedPixelVertices)
     else:
        # [customization on top of TRK-v02] insert updated generalTracks into tracking sequence
        process.globalreco_tracking.replace(process.generalTracks, cms.Sequence(
