@@ -1,6 +1,8 @@
 ### Instructions to generate configuration file(s) for HLT Phase-2 reconstruction:
 
-* *Step #1* create local CMSSW area and add the relevant packages:
+----
+
+* **Step #1** create local CMSSW area and add the relevant packages.
 ```
 cmsrel CMSSW_11_1_0_pre3
 cd CMSSW_11_1_0_pre3/src
@@ -13,7 +15,9 @@ git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phas
 scram b
 ```
 
-* *Step #2* generate customized configuration file to run TRK(v02)+PF+JME HLT-like reconstruction on RAW:
+----
+
+* **Step #2** generate customized configuration file to run TRK(v02)+PF+JME HLT-like reconstruction on RAW.
 ```
 cmsDriver.py step3 \
   --geometry Extended2026D49 --era Phase2C9 \
@@ -34,6 +38,8 @@ cmsDriver.py step3 \
   --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_JME \
   --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n'
 ```
+
+----
 
 ### Links
 
