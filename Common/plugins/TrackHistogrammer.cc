@@ -23,7 +23,8 @@ class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   void analyze(const edm::Event&, const edm::EventSetup&) override;
   void endJob() override {}
 
-  edm::EDGetToken tracks_token_;
+  const edm::InputTag tracks_tag_;
+  edm::EDGetTokenT<reco::TrackCollection> tracks_token_;
 
   TH1D *h_track_mult_;
   TH1D *h_track_pt_;
@@ -35,14 +36,15 @@ class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 };
 
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
-  : tracks_token_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("src"))){
+  : tracks_tag_(iConfig.getParameter<edm::InputTag>("src")){
+
+  tracks_token_ = consumes<reco::TrackCollection>(tracks_tag_);
 
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
   if(not fs){
-
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -57,36 +59,27 @@ TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
 }
 
 void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  edm::Handle<reco::TrackCollection> tracks;
-  iEvent.getByToken(tracks_token_, tracks);
+  auto const& tracks(iEvent.getHandle(tracks_token_));
 
   if(tracks.isValid()){
-
     h_track_mult_->Fill(tracks->size());
-
-    for(const auto& trk : *tracks){
-
+    for(auto const& trk : *tracks){
       h_track_pt_->Fill(trk.pt());
       h_track_eta_->Fill(trk.eta());
       h_track_phi_->Fill(trk.phi());
-
       h_track_outerPt_->Fill(trk.outerPt());
       h_track_outerEta_->Fill(trk.outerEta());
       h_track_outerPhi_->Fill(trk.outerPhi());
     }
   }
   else {
-
-    edm::LogWarning("Input") << "invalid TrackCollection";
+    edm::LogWarning("Input") << "invalid handle to reco::TrackCollection : " << tracks_tag_.encode();
   }
 }
 
 void TrackHistogrammer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-
   edm::ParameterSetDescription desc;
-//  desc.setUnknown();
-  desc.add<edm::InputTag>("src")->setComment("edm::InputTag of input reco::TrackCollection");
+  desc.add<edm::InputTag>("src")->setComment("edm::InputTag of reco::TrackCollection");
   descriptions.add("TrackHistogrammer", desc);
 }
 

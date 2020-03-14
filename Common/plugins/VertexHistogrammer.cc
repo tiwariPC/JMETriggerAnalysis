@@ -25,7 +25,8 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
   void analyze(const edm::Event&, const edm::EventSetup&) override;
   void endJob() override {}
 
-  edm::EDGetToken vertices_token_;
+  const edm::InputTag vertices_tag_;
+  edm::EDGetTokenT<reco::VertexCollection> vertices_token_;
 
   TH1D *h_vertex_mult_;
   TH1D *h_vertex_x_;
@@ -43,14 +44,15 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
 };
 
 VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
-  : vertices_token_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("src"))){
+  : vertices_tag_(iConfig.getParameter<edm::InputTag>("src")){
+
+  vertices_token_ = consumes<reco::VertexCollection>(vertices_tag_);
 
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
   if(not fs){
-
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -70,16 +72,12 @@ VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
 }
 
 void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  edm::Handle<reco::VertexCollection> vertices;
-  iEvent.getByToken(vertices_token_, vertices);
+  auto const& vertices(iEvent.getHandle(vertices_token_));
 
   if(vertices.isValid()){
-
     h_vertex_mult_->Fill(vertices->size());
 
-    for(const auto& vtx : *vertices){
-
+    for(auto const& vtx : *vertices){
       h_vertex_x_->Fill(vtx.x());
       h_vertex_y_->Fill(vtx.y());
       h_vertex_z_->Fill(vtx.z());
@@ -88,9 +86,7 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
       h_vertex_nTracks_->Fill(vtx.nTracks());
 
       if(vtx.hasRefittedTracks()){
-
-        for(const auto& trk : vtx.refittedTracks()){
-
+        for(auto const& trk : vtx.refittedTracks()){
           h_track_pt_->Fill(trk.pt());
           h_track_eta_->Fill(trk.eta());
           h_track_phi_->Fill(trk.phi());
@@ -99,9 +95,7 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
         }
       }
       else {
-
         for(std::vector<reco::TrackBaseRef>::const_iterator trk_it = vtx.tracks_begin(); trk_it != vtx.tracks_end(); ++trk_it){
-
           h_track_pt_->Fill((*trk_it)->pt());
           h_track_eta_->Fill((*trk_it)->eta());
           h_track_phi_->Fill((*trk_it)->phi());
@@ -112,16 +106,13 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
     }
   }
   else {
-
-    edm::LogWarning("Input") << "invalid VertexCollection";
+    edm::LogWarning("Input") << "invalid handle to reco::VertexCollection : " << vertices_tag_.encode();
   }
 }
 
 void VertexHistogrammer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-
   edm::ParameterSetDescription desc;
-//  desc.setUnknown();
-  desc.add<edm::InputTag>("src")->setComment("edm::InputTag of input reco::VertexCollection");
+  desc.add<edm::InputTag>("src")->setComment("edm::InputTag of reco::VertexCollection");
   descriptions.add("VertexHistogrammer", desc);
 }
 
