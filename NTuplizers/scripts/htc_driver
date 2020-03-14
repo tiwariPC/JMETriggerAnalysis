@@ -315,7 +315,7 @@ if opts.dumpPython is not None:
             i_SHELL_COMMANDS += [['if [ -f flag.done ]; then exit 0; fi;']]
             i_SHELL_COMMANDS += [['cd '+os.environ['CMSSW_BASE']+'/src']]
             i_SHELL_COMMANDS += [['eval `scram runtime -sh`']]
-            i_SHELL_COMMANDS += [['cd -']]
+            i_SHELL_COMMANDS += [['cd - &> /dev/null']]
             i_SHELL_COMMANDS += [['cmsRun '+cmsRun_opts]]
             i_SHELL_COMMANDS += [['touch flag.done']]
 
