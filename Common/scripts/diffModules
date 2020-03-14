@@ -5,12 +5,12 @@ A script to output modules differing across two cmsRun configuration files
 from __future__ import print_function
 import argparse
 import os
-import importlib
+import imp
 
 from JMETriggerAnalysis.Common.utils import *
 
 def getProcess(filepath):
-    _procTmp = importlib.import_module(filepath)
+    _procTmp = imp.load_source('name', os.path.abspath(filepath))
     if not hasattr(_procTmp, 'process'):
        raise RuntimeError('getProcess("'+filepath+'")')
     return getattr(_procTmp, 'process')
@@ -20,11 +20,11 @@ if __name__ == '__main__':
    ### args
    parser = argparse.ArgumentParser(description=__doc__)
 
-   parser.add_argument('-r', '--reference', dest='reference', action='store', default=None, required=True,
-                       help='name of the reference configuration file (format: importlib)')
+   parser.add_argument('-r', '--reference', dest='reference', action='store', default=None,
+                       help='path to the reference configuration file [optional]')
 
    parser.add_argument('-t', '--target', dest='target', action='store', default=None, required=True,
-                       help='name of the target configuration file (format: importlib)')
+                       help='path to the target configuration file')
 
    parser.add_argument('-s', '--sequence', dest='sequence', action='store', default=None, required=True,
                        help='name of the sequence in the target file')
@@ -47,13 +47,30 @@ if __name__ == '__main__':
    parser.add_argument('-p', '--prefix-output', dest='prefix_output', action='store', default='',
                        help='string used as prefix to the names of output modules (example: prefix="process.")')
 
+   parser.add_argument('-v', '--verbosity', dest='verbosity', action='store', type=int, default=0,
+                       help='verbosity of log messages')
+
    opts, opts_unknown = parser.parse_known_args()
    ###
 
    log_prx = os.path.basename(__file__)+' -- '
 
-   process1 = getProcess(opts.reference)
-   process2 = getProcess(opts.target)
+   process1 = None
+   if (opts.reference is None):
+      if opts.verbosity > 0:
+         print('-'*75)
+         print(log_prx+'path to reference configuration file not specified [-r]')
+         print('-'*75)
+   elif not os.path.isfile(opts.reference):
+      raise RuntimeError(log_prx+'invalid path to reference configuration file [-r]: '+opts.reference)
+   else:
+      process1 = getProcess(opts.reference)
+
+   process2 = None
+   if not os.path.isfile(opts.target):
+      raise RuntimeError(log_prx+'invalid path to target configuration file [-t]: '+opts.target)
+   else:
+      process2 = getProcess(opts.target)
 
    modulesToBeIgnored = sorted(list(set(opts.ignore)))
    onlyModulesToBeConsidered = sorted(list(set(opts.consider_only)))
