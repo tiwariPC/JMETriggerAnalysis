@@ -216,11 +216,25 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
                 useKDTree = cms.bool(False)
             ), 
             cms.PSet(
-                SuperClusterMatchByRef = cms.bool(True),
                 linkType = cms.string('SC:ECAL'),
                 linkerName = cms.string('SCAndECALLinker'),
-                useKDTree = cms.bool(False)
-            )
+                useKDTree = cms.bool(False),
+                SuperClusterMatchByRef = cms.bool(True)
+            ),
+            cms.PSet(
+              linkType   = cms.string("TRACK:HFEM"),
+              linkerName = cms.string("TrackAndHCALLinker"),
+              useKDTree  = cms.bool(True),
+              trajectoryLayerEntrance = cms.string("VFcalEntrance"),
+              trajectoryLayerExit = cms.string("")
+            ),
+            cms.PSet(
+              linkType   = cms.string("TRACK:HFHAD"),
+              linkerName = cms.string("TrackAndHCALLinker"),
+              useKDTree  = cms.bool(True),
+              trajectoryLayerEntrance = cms.string("VFcalEntrance"),
+              trajectoryLayerExit = cms.string("")
+            ),
         ),
         verbose = cms.untracked.bool(False)
     )
