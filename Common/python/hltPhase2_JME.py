@@ -873,14 +873,21 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     # update JESC via local SQLite file
     CondDBJECFile = CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/PhaseIIFall17_V5b_MC.db' )
     process.jec = cms.ESSource('PoolDBESSource', CondDBJECFile, toGet = cms.VPSet())
-    for _tmp in ['AK4PF', 'AK4PFchs', 'AK4PFPuppi', 'AK8PF', 'AK8PFchs', 'AK8PFPuppi']:
-        process.jec.toGet.append(
-          cms.PSet(
-            record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_'+_tmp),
-            label  = cms.untracked.string(_tmp),
-          )
+    for _tmp in [
+      'AK4PF',
+#      'AK4PFchs',
+#      'AK4PFPuppi',
+#      'AK8PF',
+#      'AK8PFchs',
+#      'AK8PFPuppi',
+    ]:
+      process.jec.toGet.append(
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_'+_tmp),
+          label = cms.untracked.string(_tmp),
         )
+      )
 
     # Add an ESPrefer to override JEC that might be available from the global tag
     process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
