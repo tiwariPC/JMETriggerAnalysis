@@ -1,6 +1,7 @@
 from __future__ import print_function
-import FWCore.ParameterSet.Config as cms
 from collections import defaultdict
+
+import FWCore.ParameterSet.Config as cms
 
 def getParameterDependencies(parameter):
     ret = []

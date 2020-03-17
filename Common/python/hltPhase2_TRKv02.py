@@ -1,5 +1,4 @@
 import FWCore.ParameterSet.Config as cms
-import importlib
 
 def customize_hltPhase2_TRKv02(process):
 
