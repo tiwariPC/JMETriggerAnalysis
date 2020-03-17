@@ -11,7 +11,7 @@ cmsenv
 # [optional] PR#28976 (fix to realistic SIM-Clusters)
 git cms-merge-topic felicepantaleo:fix_realistic_sim_clusters_11_1_0_pre3
 
-git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2_devel
+git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
 scram b
 ```
 
