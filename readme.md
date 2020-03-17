@@ -7,7 +7,7 @@ CMSSW Packages for JetMET Trigger Studies
 
 Set up CMSSW area:
 
- * `11_0_X`:
+ * `11_0_X` (currently, unmaintained):
 ```shell
 cmsrel CMSSW_11_0_1
 cd CMSSW_11_0_1/src
