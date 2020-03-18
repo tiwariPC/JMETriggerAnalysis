@@ -118,13 +118,13 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
                 importerName = cms.string('GenericClusterImporter'),
                 source = cms.InputTag("particleFlowClusterPS")
             ), 
-#            cms.PSet(
-#                importerName = cms.string('TrackTimingImporter'),
-#                timeErrorMap = cms.InputTag("tofPID","sigmat0"),
-#                timeErrorMapGsf = cms.InputTag("tofPID","sigmat0"),
-#                timeValueMap = cms.InputTag("tofPID","t0"),
-#                timeValueMapGsf = cms.InputTag("tofPID","t0")
-#            )
+            cms.PSet(
+                importerName = cms.string('TrackTimingImporter'),
+                timeErrorMap = cms.InputTag("tofPID","sigmat0"),
+                timeErrorMapGsf = cms.InputTag("tofPID","sigmat0"),
+                timeValueMap = cms.InputTag("tofPID","t0"),
+                timeValueMapGsf = cms.InputTag("tofPID","t0")
+            )
         ),
         linkDefinitions = cms.VPSet(
             cms.PSet(
@@ -823,10 +823,9 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     process.localreco = cms.Sequence(
         process.bunchSpacingProducer
       + process.calolocalreco
-      + process.fastTimingLocalReco # comment?
       + process.muonlocalreco
-      + process.recoCTPPS # comment?
       + process.trackerlocalreco
+      + process.fastTimingLocalReco
     )
 
     process.reconstruction = cms.Sequence(
@@ -845,6 +844,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       + process.ecalClusters
 #      + process.egammaGlobalReco
       + process.globalreco_tracking
+      + process.fastTimingGlobalReco # necessary for MTD inputs to PF
 
         # insert CaloJets sequence in process.globalreco
         # (module muons1stStep from muonGlobalReco requires AK4CaloJets [*])
@@ -865,8 +865,8 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       * getattr(process, name)
     )
 
-    # disable use of timing information in simPFProducer
-    del process.simPFProducer.trackTimeValueMap
+#    # disable use of timing information in simPFProducer
+#    del process.simPFProducer.trackTimeValueMap
 
     #### ------------------------------------------------------------
 

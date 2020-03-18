@@ -920,6 +920,15 @@ def customize_hltPhase2_TRKv02(process):
     ### Sequences
     ###
 
+    process.itLocalReco = cms.Sequence(
+        process.siPhase2Clusters
+      + process.siPixelClusters
+      + process.siPixelClusterShapeCache
+      + process.siPixelClustersPreSplitting
+      + process.siPixelRecHits
+      + process.siPixelRecHitsPreSplitting
+    )
+
     process.otLocalReco = cms.Sequence(
         process.MeasurementTrackerEvent
     )
@@ -941,7 +950,7 @@ def customize_hltPhase2_TRKv02(process):
       + process.initialStepSeeds
       + process.initialStepTrackCandidates
       + process.initialStepTracks
-      + process.initialStepPVSequence #uses beamspot
+      + process.initialStepPVSequence
       + process.initialStepSelector
     )
 
@@ -960,86 +969,40 @@ def customize_hltPhase2_TRKv02(process):
       + process.highPtTripletStepSeedClusterMask
     )
 
-    process.itLocalReco = cms.Sequence(
-        process.siPhase2Clusters
-      + process.siPixelClusters
-      + process.siPixelClusterShapeCache
-      + process.siPixelClustersPreSplitting
-      + process.siPixelRecHits
-      + process.siPixelRecHitsPreSplitting
-    )
-
-    process.initialStepSequence = cms.Sequence(
-        process.initialStepSeedLayers
-      + process.initialStepTrackingRegions
-      + process.initialStepHitDoublets
-      + process.initialStepHitQuadruplets
-      + process.initialStepSeeds
-      + process.initialStepTrackCandidates
-      + process.initialStepTracks
-      + process.initialStepPVSequence #uses beamspot
-      + process.initialStepSelector
-    )
-
-    process.highPtTripletStepSequence = cms.Sequence(
-        process.highPtTripletStepClusters
-      + process.highPtTripletStepSeedLayers
-      + process.highPtTripletStepTrackingRegions
-      + process.highPtTripletStepHitDoublets
-      + process.highPtTripletStepHitTriplets
-      + process.highPtTripletStepSeedLayers
-      + process.highPtTripletStepSeeds
-      + process.highPtTripletStepTrackCandidates
-      + process.highPtTripletStepTracks
-      + process.highPtTripletStepSelector
-      + process.initialStepSeedClusterMask 
-      + process.highPtTripletStepSeedClusterMask
-    )
-
     process.vertexReco = cms.Sequence(
-        process.ak4CaloJetsForTrk
+        process.unsortedOfflinePrimaryVertices4DnoPID
       + process.unsortedOfflinePrimaryVertices
+      + process.trackWithVertexRefSelectorBeforeSorting4DnoPID
       + process.trackWithVertexRefSelectorBeforeSorting
+      + process.trackRefsForJetsBeforeSorting4DnoPID
       + process.trackRefsForJetsBeforeSorting
-      + process.offlinePrimaryVertices
+      + process.tpClusterProducer
+      + process.tofPID4DnoPID
+      + process.unsortedOfflinePrimaryVertices4D
+      + process.trackWithVertexRefSelectorBeforeSorting4D
+      + process.trackRefsForJetsBeforeSorting4D
+      + process.tofPID
+      + process.quickTrackAssociatorByHits
+      + process.trackTimeValueMapProducer
+      + process.caloTowerForTrk
+      + process.ak4CaloJetsForTrk
+#      + process.offlinePrimaryVertices4DnoPIDWithBS
+#      + process.offlinePrimaryVertices4DWithBS
+#      + process.offlinePrimaryVertices4D
       + process.offlinePrimaryVerticesWithBS
+      + process.offlinePrimaryVertices
+#      + process.generalV0Candidates
       + process.inclusiveVertexFinder
       + process.vertexMerger
       + process.trackVertexArbitrator
       + process.inclusiveSecondaryVertices
-#        process.unsortedOfflinePrimaryVertices4DnoPID
-#      + process.unsortedOfflinePrimaryVertices
-#      + process.trackWithVertexRefSelectorBeforeSorting4DnoPID
-#      + process.trackWithVertexRefSelectorBeforeSorting
-#      + process.trackRefsForJetsBeforeSorting4DnoPID
-#      + process.trackRefsForJetsBeforeSorting
-#      + process.tpClusterProducer
-#      + process.tofPID4DnoPID
-#      + process.unsortedOfflinePrimaryVertices4D
-#      + process.trackWithVertexRefSelectorBeforeSorting4D
-#      + process.trackRefsForJetsBeforeSorting4D
-#      + process.tofPID
-#      + process.quickTrackAssociatorByHits
-#      + process.trackTimeValueMapProducer
-#      + process.caloTowerForTrk
-#      + process.ak4CaloJetsForTrk
-#      + process.offlinePrimaryVertices4DnoPIDWithBS
-#      + process.offlinePrimaryVertices4DWithBS
-#      + process.offlinePrimaryVertices4D
-#      + process.offlinePrimaryVerticesWithBS
-#      + process.offlinePrimaryVertices
-#      + process.generalV0Candidates
-#      + process.inclusiveVertexFinder
-#      + process.vertexMerger
-#      + process.trackVertexArbitrator
-#      + process.inclusiveSecondaryVertices
 #      + process.offlinePrimaryVertices4DnoPID
     )
 
     process.globalreco_tracking = cms.Sequence(
         process.itLocalReco
-      + process.offlineBeamSpot #cmssw_10_6
       + process.otLocalReco
+      + process.offlineBeamSpot #cmssw_10_6
       + process.trackerClusterCheck
       + process.initialStepSequence
       + process.highPtTripletStepSequence
@@ -1050,6 +1013,7 @@ def customize_hltPhase2_TRKv02(process):
 
     # remove globalreco_trackingTask to avoid any ambiguities
     # with the updated sequence process.globalreco_tracking
-    del process.globalreco_trackingTask
+    if hasattr(process, 'globalreco_trackingTask'):
+       del process.globalreco_trackingTask
 
     return process
