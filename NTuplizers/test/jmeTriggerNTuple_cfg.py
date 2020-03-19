@@ -44,7 +44,7 @@ opts.register('gt', None,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
 
-opts.register('reco', 'HLT_dev_CMSSW_11_1_0_GRun',
+opts.register('reco', 'HLT',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
@@ -74,10 +74,34 @@ opts.parseArguments()
 ###
 ### base configuration file
 ###
-if opts.reco == 'HLT_dev_CMSSW_11_1_0_GRun':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun import cms, process
+if opts.reco == 'HLT':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+
+elif opts.reco == 'HLT_iter2GlobalPtSeed0p9':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   from JMETriggerAnalysis.NTuplizers.customize_HLT_iter2GlobalPtSeed0p9 import *
+   process = customize_HLT_iter2GlobalPtSeed0p9(process)
+
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
+
+# remove cms.OutputModule objects from HLT config-dump
+for _tmp in process.outputModules_():
+    _tmp_mod = getattr(process, _tmp)
+    if type(_tmp_mod) == cms.OutputModule:
+       process.__delattr__(_tmp)
+       print '> removed cms.OutputModule:', _tmp
+
+# remove cms.EndPath objects from HLT config-dump
+for _tmp in process.endpaths_():
+    _tmp_mod = getattr(process, _tmp)
+    if type(_tmp_mod) == cms.EndPath:
+       process.__delattr__(_tmp)
+       print '> removed cms.EndPath:', _tmp
+
+# delete process.MessaggeLogger from HLT config
+if hasattr(process, 'MessageLogger'):
+   del process.MessageLogger
 
 ###
 ### add analysis sequence (JMETrigger NTuple)
@@ -105,7 +129,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResultsFilterAND = cms.vstring(),
 
-  TriggerResultsCollections = cms.vstring(),
+  TriggerResultsCollections = cms.vstring(
+    'HLT_Ele32_WPTight_Gsf',
+    'HLT_IsoMu24',
+  ),
 
   fillCollectionConditions = cms.PSet(),
 
@@ -212,10 +239,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 )
 
 process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
-process.schedule.extend([process.analysisCollectionsPath])
+#process.HLTSchedule.extend([process.analysisCollectionsPath])
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
-process.schedule.extend([process.analysisNTupleEndPath])
+#process.HLTSchedule.extend([process.analysisNTupleEndPath])
 
 # update process.GlobalTag.globaltag
 if opts.gt is not None:
@@ -247,7 +274,7 @@ process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.ou
 # Tracking Monitoring
 if opts.trkdqm:
    process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
-   process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
+#   process.HLTSchedule.extend([process.reconstruction_pixelTrackingOnly_step])
 
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
    process.TrackHistograms_pixelTracks = TrackHistogrammer.clone(src = 'pixelTracks')
@@ -281,7 +308,7 @@ if opts.trkdqm:
 #   )
 
    process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
-   process.schedule.extend([process.trkMonitoringEndPath])
+#   process.HLTSchedule.extend([process.trkMonitoringEndPath])
 
 # ParticleFlow Monitoring
 if opts.pfdqm:
@@ -349,7 +376,7 @@ if opts.pfdqm:
    )
 
    process.pfMonitoringEndPath = cms.EndPath(process.pfMonitoringSeq)
-   process.schedule.extend([process.pfMonitoringEndPath])
+#   process.HLTSchedule.extend([process.pfMonitoringEndPath])
 
 # MessageLogger
 if opts.logs:
@@ -411,6 +438,9 @@ else:
    ]
 
 # input EDM files [secondary]
+if not hasattr(process.source, 'secondaryFileNames'):
+   process.source.secondaryFileNames = cms.untracked.vstring()
+
 if opts.secondaryInputFiles == ['None']:
    process.source.secondaryFileNames = []
 elif opts.secondaryInputFiles != []:
