@@ -17,8 +17,9 @@ scram b
 
 * **Step #2** : 
 ```
-hltGetConfiguration /dev/CMSSW_11_1_0/GRun --full --offline --mc --unprescale --process HLT2 --globaltag auto:run3_mc_GRun > \
-  ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/python/HLT_dev_CMSSW_11_1_0_GRun.py
+hltGetConfiguration /dev/CMSSW_11_1_0/GRun --full --offline --mc --unprescale --process HLT2 --globaltag auto:phase1_2021_realistic \
+ --input /store/mc/Run3Winter20DRPremixMiniAOD/QCD_Pt_170to300_TuneCP5_14TeV_pythia8/GEN-SIM-RAW/110X_mcRun3_2021_realistic_v6-v2/40000/A623EE66-618D-FC43-B4FC-6C4029CD68FB.root \
+ > ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/python/HLT_dev_CMSSW_11_1_0_GRun.py
 ```
 
 ----
