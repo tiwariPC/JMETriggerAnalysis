@@ -44,7 +44,7 @@ opts.register('gt', None,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
 
-opts.register('reco', 'hltPhase2',
+opts.register('reco', 'HLT_dev_CMSSW_11_1_0_GRun',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
@@ -74,8 +74,8 @@ opts.parseArguments()
 ###
 ### base configuration file
 ###
-if opts.reco == 'hltPhase2':
-   from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv02_cfg import cms, process
+if opts.reco == 'HLT_dev_CMSSW_11_1_0_GRun':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun import cms, process
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
 
@@ -133,22 +133,22 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoCaloJetCollections = cms.PSet(
 
-    hltAK4CaloJetsUncorrected = cms.InputTag(''),
-    hltAK4CaloJetsCorrected = cms.InputTag(''),
+    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
+    hltAK4CaloJetsCorrected = cms.InputTag('hltAK4CaloJetsCorrected'),
 
-    hltAK8CaloJetsUncorrected = cms.InputTag(''),
-    hltAK8CaloJetsCorrected = cms.InputTag(''),
+    hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
+    hltAK8CaloJetsCorrected = cms.InputTag('hltAK8CaloJetsCorrected'),
   ),
 
   recoPFClusterJetCollections = cms.PSet(
   ),
 
   recoPFJetCollections = cms.PSet(
-    hltAK4PFJetsUncorrected = cms.InputTag(''),
-    hltAK4PFJetsCorrected = cms.InputTag(''),
+    hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
+    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
 
-    hltAK4PFJetsUncorrected = cms.InputTag(''),
-    hltAK4PFJetsCorrected = cms.InputTag(''),
+    hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
+    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
   ),
 
   patJetCollections = cms.PSet(
@@ -160,7 +160,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   recoCaloMETCollections = cms.PSet(
-    hltCaloMET = cms.InputTag('hltMET'),
+    hltCaloMET = cms.InputTag('hltMet'),
   ),
 
   recoPFClusterMETCollections = cms.PSet(
@@ -168,7 +168,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFMETCollections = cms.PSet(
 
-    hltPFMET = cms.InputTag('hltPFMET'),
+    hltPFMET = cms.InputTag('hltPFMETProducer'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
   ),
 
@@ -186,16 +186,16 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     ak4GenJetsNoNu = cms.string('pt > 12'),
     ak8GenJetsNoNu = cms.string('pt > 50'),
 
-    hltAK4CaloJetsUncorrected = cms.string('pt > 12'),
+    hltAK4CaloJets = cms.string('pt > 12'),
     hltAK4CaloJetsCorrected = cms.string('pt > 12'),
 
-    hltAK8CaloJetsUncorrected = cms.string('pt > 80'),
+    hltAK8CaloJets = cms.string('pt > 80'),
     hltAK8CaloJetsCorrected = cms.string('pt > 80'),
 
-    hltAK4PFJetsUncorrected = cms.string('pt > 12'),
+    hltAK4PFJets = cms.string('pt > 12'),
     hltAK4PFJetsCorrected = cms.string('pt > 12'),
 
-    hltAK8PFJetsUncorrected = cms.string('pt > 80'),
+    hltAK8PFJets = cms.string('pt > 80'),
     hltAK8PFJetsCorrected = cms.string('pt > 80'),
   ),
 

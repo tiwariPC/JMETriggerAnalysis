@@ -17,8 +17,8 @@ scram b
 
 * **Step #2** : 
 ```
-cd ${CMSSW_BASE}/src/HLTrigger/Configuration/test
-./cmsDriver.sh
+hltGetConfiguration /dev/CMSSW_11_1_0/GRun --full --offline --mc --unprescale --process HLT2 --globaltag auto:run3_mc_GRun > \
+  ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/python/HLT_dev_CMSSW_11_1_0_GRun.py
 ```
 
 ----
