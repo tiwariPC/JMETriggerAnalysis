@@ -77,6 +77,18 @@ opts.parseArguments()
 if opts.reco == 'HLT':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
 
+elif opts.reco == 'HLT_iter2RegionalPtSeed0p9':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 0.9
+
+elif opts.reco == 'HLT_iter2RegionalPtSeed2p0':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 2.0
+
+elif opts.reco == 'HLT_iter2RegionalPtSeed5p0':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 5.0
+
 elif opts.reco == 'HLT_iter2GlobalPtSeed0p9':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
    from JMETriggerAnalysis.NTuplizers.customize_HLT_iter2GlobalPtSeed0p9 import *
@@ -98,6 +110,14 @@ for _tmp in process.endpaths_():
     if type(_tmp_mod) == cms.EndPath:
        process.__delattr__(_tmp)
        print '> removed cms.EndPath:', _tmp
+
+## remove selected cms.Path objects from HLT config-dump
+#for _tmp in process.paths_():
+#    if _tmp.startswith('HLT_') or _tmp.startswith('MC_'):
+#       _tmp_mod = getattr(process, _tmp)
+#       if type(_tmp_mod) == cms.Path:
+#          process.__delattr__(_tmp)
+#          print '> removed cms.Path:', _tmp
 
 # delete process.MessaggeLogger from HLT config
 if hasattr(process, 'MessageLogger'):
