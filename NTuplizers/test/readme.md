@@ -35,4 +35,6 @@ edmConfigDump \
  * [SWGuideGlobalHLT Twiki / Instructions for `CMSSW_11_1_X`](https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGlobalHLT#Using_CMSSW_10_6_or_CMSSW_11_0_o)
 
  * DAS query for Run-3 MC samples (RAW):
-   ```dasgoclient --query="dataset dataset=/*/Run3Winter20*/*RAW* status=VALID"```
+   ```
+dasgoclient --query="dataset dataset=/*/Run3Winter20*/*RAW* status=VALID"
+   ```
