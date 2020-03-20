@@ -272,6 +272,9 @@ if opts.dumpPython is not None:
         elif opts.parentFiles_level == 1:
            i_secondaryInputFiles = i_inpfdc['parentFiles_1']
 
+        if isinstance(i_secondaryInputFiles, list) and len(i_secondaryInputFiles) == 0:
+           KILL(log_prx+'list of secondary input files is empty (parentFiles_level = '+str(opts.parentFiles_level)+')')
+
         # number of jobs for this set of input files
         i_njobs = int(math.ceil(float(i_inputFile_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
         i_nevt_remainder = i_inputFile_nevents%opts.n_events if (opts.n_events > 0) else 0

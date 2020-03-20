@@ -8,7 +8,7 @@ import json
 
 from JMETriggerAnalysis.NTuplizers.utils.common import *
 
-def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
+def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=2, verbose=False):
 
     if verbose:
        print(das_name)
@@ -59,19 +59,21 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, verbose=False):
            print(i_file)
            print(i_file_nevents)
 
+        i_file_parents1 = []
         i_file_parents2 = []
-
-        i_file_parents1 = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
-        i_file_parents1 = [_tmp for _tmp in i_file_parents1 if _tmp != '']
-        i_file_parents1 = sorted(list(set(i_file_parents1)))
-        for i_file_aodf in i_file_parents1:
-            i_file_parents2_tmp = command_output_lines('dasgoclient --query "parent file='+str(i_file_aodf)+'"')
-            i_file_parents2_tmp = [_tmp.replace(' ', '') for _tmp in i_file_parents2_tmp]
-            i_file_parents2_tmp = [_tmp for _tmp in i_file_parents2_tmp if _tmp != '']
-            i_file_parents2_tmp = sorted(list(set(i_file_parents2_tmp)))
-            i_file_parents2 += i_file_parents2_tmp
-
-        i_file_parents2 = sorted(list(set(i_file_parents2)))
+        if parentFiles_levels > 0:
+           i_file_parents1 = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
+           i_file_parents1 = [_tmp for _tmp in i_file_parents1 if _tmp != '']
+           i_file_parents1 = sorted(list(set(i_file_parents1)))
+           if parentFiles_levels > 1:
+              i_file_parents2 = []
+              for i_file_aodf in i_file_parents1:
+                  i_file_parents2_tmp = command_output_lines('dasgoclient --query "parent file='+str(i_file_aodf)+'"')
+                  i_file_parents2_tmp = [_tmp.replace(' ', '') for _tmp in i_file_parents2_tmp]
+                  i_file_parents2_tmp = [_tmp for _tmp in i_file_parents2_tmp if _tmp != '']
+                  i_file_parents2_tmp = sorted(list(set(i_file_parents2_tmp)))
+                  i_file_parents2 += i_file_parents2_tmp
+              i_file_parents2 = sorted(list(set(i_file_parents2)))
 
         if verbose:
            for _tmp in i_file_parents2:
