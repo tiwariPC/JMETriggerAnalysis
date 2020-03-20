@@ -37,4 +37,4 @@ edmConfigDump \
  * DAS query for Run-3 MC samples (RAW):
    ```
 dasgoclient --query="dataset dataset=/*/Run3Winter20*/*RAW* status=VALID"
-   ```
+```
