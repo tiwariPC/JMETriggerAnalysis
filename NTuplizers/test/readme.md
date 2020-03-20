@@ -14,7 +14,7 @@ scram b
 
 ----
 
-* **Step #2** : download the HLT Menu for `CMSSW_11_1_0`, and create the corresponding python configuration dump.
+* **Step #2** : download the HLT Menu for `CMSSW_11_1_0`, and create the corresponding configuration dump.
 ```
 hltGetConfiguration /dev/CMSSW_11_1_0/GRun --full --offline --mc --unprescale --process HLT2 \
  --globaltag auto:phase1_2021_realistic \
