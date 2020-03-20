@@ -59,10 +59,10 @@ opts.register('pfdqm', False,
               vpo.VarParsing.varType.bool,
               'added monitoring histograms for selected PF-Candidates')
 
-opts.register('skimTracks', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'skim original collection of generalTracks (only tracks associated to first N pixel vertices)')
+#opts.register('skimTracks', False,
+#              vpo.VarParsing.multiplicity.singleton,
+#              vpo.VarParsing.varType.bool,
+#              'skim original collection of generalTracks (only tracks associated to first N pixel vertices)')
 
 opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
@@ -98,26 +98,26 @@ else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
 
 # remove cms.OutputModule objects from HLT config-dump
-for _tmp in process.outputModules_():
-    _tmp_mod = getattr(process, _tmp)
-    if type(_tmp_mod) == cms.OutputModule:
-       process.__delattr__(_tmp)
-       print '> removed cms.OutputModule:', _tmp
+for _modname in process.outputModules_():
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.OutputModule:
+       process.__delattr__(_modname)
+       print '> removed cms.OutputModule:', _modname
 
 # remove cms.EndPath objects from HLT config-dump
-for _tmp in process.endpaths_():
-    _tmp_mod = getattr(process, _tmp)
-    if type(_tmp_mod) == cms.EndPath:
-       process.__delattr__(_tmp)
-       print '> removed cms.EndPath:', _tmp
+for _modname in process.endpaths_():
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.EndPath:
+       process.__delattr__(_modname)
+       print '> removed cms.EndPath:', _modname
 
 ## remove selected cms.Path objects from HLT config-dump
-#for _tmp in process.paths_():
-#    if _tmp.startswith('HLT_') or _tmp.startswith('MC_'):
-#       _tmp_mod = getattr(process, _tmp)
-#       if type(_tmp_mod) == cms.Path:
-#          process.__delattr__(_tmp)
-#          print '> removed cms.Path:', _tmp
+#for _modname in process.paths_():
+#    if _modname.startswith('HLT_') or _modname.startswith('MC_'):
+#       _mod = getattr(process, _modname)
+#       if type(_mod) == cms.Path:
+#          process.__delattr__(_modname)
+#          print '> removed cms.Path:', _modname
 
 # delete process.MessaggeLogger from HLT config
 if hasattr(process, 'MessageLogger'):
@@ -346,7 +346,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFCandidateCollections = cms.PSet(
 
-#    particleFlowTmp = cms.InputTag('particleFlowTmp'),
+#    hltParticleFlow = cms.InputTag('hltParticleFlow'),
   ),
 
   patPackedCandidateCollections = cms.PSet(
@@ -475,29 +475,26 @@ process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.ou
 
 # Tracking Monitoring
 if opts.trkdqm:
-   process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
-#   process.HLTSchedule.extend([process.reconstruction_pixelTrackingOnly_step])
-
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-   process.TrackHistograms_pixelTracks = TrackHistogrammer.clone(src = 'pixelTracks')
-   process.TrackHistograms_generalTracks = TrackHistogrammer.clone(src = 'generalTracks')
-
-   from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
-   process.VertexHistograms_pixelVertices = VertexHistogrammer.clone(src = 'pixelVertices')
-   process.VertexHistograms_offlinePrimaryVertices = VertexHistogrammer.clone(src = 'offlinePrimaryVertices')
+   process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
+   process.TrackHistograms_hltPFMuonMerging = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
 
    process.trkMonitoringSeq = cms.Sequence(
-       process.TrackHistograms_pixelTracks
-     + process.TrackHistograms_generalTracks
+       process.TrackHistograms_hltPixelTracks
+     + process.TrackHistograms_hltPFMuonMerging
    )
 
-   if opts.skimTracks:
-      process.TrackHistograms_generalTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
-      process.trkMonitoringSeq += process.TrackHistograms_generalTracksOriginal
+#   if opts.skimTracks:
+#      process.TrackHistograms_generalTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
+#      process.trkMonitoringSeq += process.TrackHistograms_generalTracksOriginal
+
+   from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
+   process.VertexHistograms_hltTrimmedPixelVertices = VertexHistogrammer.clone(src = 'hltTrimmedPixelVertices')
+   process.VertexHistograms_hltVerticesPF = VertexHistogrammer.clone(src = 'hltVerticesPF')
 
    process.trkMonitoringSeq += cms.Sequence(
-       process.VertexHistograms_pixelVertices
-     + process.VertexHistograms_offlinePrimaryVertices
+       process.VertexHistograms_hltTrimmedPixelVertices
+     + process.VertexHistograms_hltVerticesPF
    )
 
 #   from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
@@ -516,36 +513,36 @@ if opts.trkdqm:
 if opts.pfdqm:
 
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerRecoPFCandidate_cfi import pfCandidateHistogrammerRecoPFCandidate
-   process.PFCandidateHistograms_hltPFCands = pfCandidateHistogrammerRecoPFCandidate.clone(src = 'particleFlowTmp')
+   process.PFCandidateHistograms_hltPFCands = pfCandidateHistogrammerRecoPFCandidate.clone(src = 'hltParticleFlow')
    process.PFCandidateHistograms_hltPFCands_HB = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
    process.PFCandidateHistograms_hltPFCands_HB_chargedHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
    process.PFCandidateHistograms_hltPFCands_HB_neutralHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
    process.PFCandidateHistograms_hltPFCands_HB_photons = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
-   process.PFCandidateHistograms_hltPFCands_HGCal = process.PFCandidateHistograms_hltPFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_hltPFCands_HGCal_chargedHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==211 && (1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_hltPFCands_HGCal_neutralHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==130 && (1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_hltPFCands_HGCal_photons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==22  && (1.5<=abs(eta) && abs(eta)<3.0)')
+   process.PFCandidateHistograms_hltPFCands_HE = process.PFCandidateHistograms_hltPFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
+   process.PFCandidateHistograms_hltPFCands_HE_chargedHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==211 && (1.5<=abs(eta) && abs(eta)<3.0)')
+   process.PFCandidateHistograms_hltPFCands_HE_neutralHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==130 && (1.5<=abs(eta) && abs(eta)<3.0)')
+   process.PFCandidateHistograms_hltPFCands_HE_photons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==22  && (1.5<=abs(eta) && abs(eta)<3.0)')
 
-   process.PFCandidateHistograms_hltPuppiCands = pfCandidateHistogrammerRecoPFCandidate.clone(src = 'hltPuppi')
-   process.PFCandidateHistograms_hltPuppiCands_HB = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
-   process.PFCandidateHistograms_hltPuppiCands_HB_chargedHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
-   process.PFCandidateHistograms_hltPuppiCands_HB_neutralHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
-   process.PFCandidateHistograms_hltPuppiCands_HB_photons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
-   process.PFCandidateHistograms_hltPuppiCands_HGCal = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_hltPuppiCands_HGCal_chargedHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==211')
-   process.PFCandidateHistograms_hltPuppiCands_HGCal_neutralHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==130')
-   process.PFCandidateHistograms_hltPuppiCands_HGCal_photons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==22')
-
-   from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
-   process.PFCandidateHistograms_offlinePFCands = pfCandidateHistogrammerPatPackedCandidate.clone(src = 'packedPFCandidates')
-   process.PFCandidateHistograms_offlinePFCands_HB = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
-   process.PFCandidateHistograms_offlinePFCands_HB_chargedHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
-   process.PFCandidateHistograms_offlinePFCands_HB_neutralHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
-   process.PFCandidateHistograms_offlinePFCands_HB_photons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
-   process.PFCandidateHistograms_offlinePFCands_HGCal = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_offlinePFCands_HGCal_chargedHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==211')
-   process.PFCandidateHistograms_offlinePFCands_HGCal_neutralHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==130')
-   process.PFCandidateHistograms_offlinePFCands_HGCal_photons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==22')
+#   process.PFCandidateHistograms_hltPuppiCands = pfCandidateHistogrammerRecoPFCandidate.clone(src = 'hltPuppi')
+#   process.PFCandidateHistograms_hltPuppiCands_HB = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
+#   process.PFCandidateHistograms_hltPuppiCands_HB_chargedHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
+#   process.PFCandidateHistograms_hltPuppiCands_HB_neutralHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
+#   process.PFCandidateHistograms_hltPuppiCands_HB_photons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
+#   process.PFCandidateHistograms_hltPuppiCands_HE = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
+#   process.PFCandidateHistograms_hltPuppiCands_HE_chargedHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==211')
+#   process.PFCandidateHistograms_hltPuppiCands_HE_neutralHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==130')
+#   process.PFCandidateHistograms_hltPuppiCands_HE_photons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==22')
+#
+#   from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
+#   process.PFCandidateHistograms_offlinePFCands = pfCandidateHistogrammerPatPackedCandidate.clone(src = 'packedPFCandidates')
+#   process.PFCandidateHistograms_offlinePFCands_HB = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
+#   process.PFCandidateHistograms_offlinePFCands_HB_chargedHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
+#   process.PFCandidateHistograms_offlinePFCands_HB_neutralHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
+#   process.PFCandidateHistograms_offlinePFCands_HB_photons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
+#   process.PFCandidateHistograms_offlinePFCands_HE = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
+#   process.PFCandidateHistograms_offlinePFCands_HE_chargedHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==211')
+#   process.PFCandidateHistograms_offlinePFCands_HE_neutralHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==130')
+#   process.PFCandidateHistograms_offlinePFCands_HE_photons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==22')
 
    process.pfMonitoringSeq = cms.Sequence(
        process.PFCandidateHistograms_hltPFCands
@@ -553,28 +550,28 @@ if opts.pfdqm:
      + process.PFCandidateHistograms_hltPFCands_HB_chargedHadrons
      + process.PFCandidateHistograms_hltPFCands_HB_neutralHadrons
      + process.PFCandidateHistograms_hltPFCands_HB_photons
-     + process.PFCandidateHistograms_hltPFCands_HGCal
-     + process.PFCandidateHistograms_hltPFCands_HGCal_chargedHadrons
-     + process.PFCandidateHistograms_hltPFCands_HGCal_neutralHadrons
-     + process.PFCandidateHistograms_hltPFCands_HGCal_photons
-     + process.PFCandidateHistograms_hltPuppiCands
-     + process.PFCandidateHistograms_hltPuppiCands_HB
-     + process.PFCandidateHistograms_hltPuppiCands_HB_chargedHadrons
-     + process.PFCandidateHistograms_hltPuppiCands_HB_neutralHadrons
-     + process.PFCandidateHistograms_hltPuppiCands_HB_photons
-     + process.PFCandidateHistograms_hltPuppiCands_HGCal
-     + process.PFCandidateHistograms_hltPuppiCands_HGCal_chargedHadrons
-     + process.PFCandidateHistograms_hltPuppiCands_HGCal_neutralHadrons
-     + process.PFCandidateHistograms_hltPuppiCands_HGCal_photons
-     + process.PFCandidateHistograms_offlinePFCands
-     + process.PFCandidateHistograms_offlinePFCands_HB
-     + process.PFCandidateHistograms_offlinePFCands_HB_chargedHadrons
-     + process.PFCandidateHistograms_offlinePFCands_HB_neutralHadrons
-     + process.PFCandidateHistograms_offlinePFCands_HB_photons
-     + process.PFCandidateHistograms_offlinePFCands_HGCal
-     + process.PFCandidateHistograms_offlinePFCands_HGCal_chargedHadrons
-     + process.PFCandidateHistograms_offlinePFCands_HGCal_neutralHadrons
-     + process.PFCandidateHistograms_offlinePFCands_HGCal_photons
+     + process.PFCandidateHistograms_hltPFCands_HE
+     + process.PFCandidateHistograms_hltPFCands_HE_chargedHadrons
+     + process.PFCandidateHistograms_hltPFCands_HE_neutralHadrons
+     + process.PFCandidateHistograms_hltPFCands_HE_photons
+#     + process.PFCandidateHistograms_hltPuppiCands
+#     + process.PFCandidateHistograms_hltPuppiCands_HB
+#     + process.PFCandidateHistograms_hltPuppiCands_HB_chargedHadrons
+#     + process.PFCandidateHistograms_hltPuppiCands_HB_neutralHadrons
+#     + process.PFCandidateHistograms_hltPuppiCands_HB_photons
+#     + process.PFCandidateHistograms_hltPuppiCands_HE
+#     + process.PFCandidateHistograms_hltPuppiCands_HE_chargedHadrons
+#     + process.PFCandidateHistograms_hltPuppiCands_HE_neutralHadrons
+#     + process.PFCandidateHistograms_hltPuppiCands_HE_photons
+#     + process.PFCandidateHistograms_offlinePFCands
+#     + process.PFCandidateHistograms_offlinePFCands_HB
+#     + process.PFCandidateHistograms_offlinePFCands_HB_chargedHadrons
+#     + process.PFCandidateHistograms_offlinePFCands_HB_neutralHadrons
+#     + process.PFCandidateHistograms_offlinePFCands_HB_photons
+#     + process.PFCandidateHistograms_offlinePFCands_HE
+#     + process.PFCandidateHistograms_offlinePFCands_HE_chargedHadrons
+#     + process.PFCandidateHistograms_offlinePFCands_HE_neutralHadrons
+#     + process.PFCandidateHistograms_offlinePFCands_HE_photons
    )
 
    process.pfMonitoringEndPath = cms.EndPath(process.pfMonitoringSeq)
@@ -625,11 +622,11 @@ if opts.logs:
      ),
    )
 
-   if opts.skimTracks:
-      process.MessageLogger.debugModules += [
-        'hltTrimmedPixelVertices',
-        'generalTracks',
-      ]
+#   if opts.skimTracks:
+#      process.MessageLogger.debugModules += [
+#        'hltTrimmedPixelVertices',
+#        'hltVerticesPF',
+#      ]
 
 # input EDM files [primary]
 if opts.inputFiles:
@@ -659,7 +656,7 @@ print '--- jmeTriggerNTuple_cfg.py ---'
 print ''
 print 'option: output =', opts.output
 print 'option: reco =', opts.reco
-print 'option: skimTracks =', opts.skimTracks
+#print 'option: skimTracks =', opts.skimTracks
 print 'option: trkdqm =', opts.trkdqm
 print 'option: pfdqm =', opts.pfdqm
 print 'option: dumpPython =', opts.dumpPython
