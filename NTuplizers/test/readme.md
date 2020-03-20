@@ -8,7 +8,6 @@ cmsrel CMSSW_11_1_0_pre4
 cd CMSSW_11_1_0_pre4/src
 cmsenv
 
-git cms-addpkg HLTrigger/Configuration
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 scram b
 ```
