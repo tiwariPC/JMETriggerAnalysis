@@ -41,6 +41,10 @@ cmsDriver.py step3 \
 
 ----
 
-### Links
+### Notes
 
- * Phase-2 MC samples: `https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2#MC_samples`
+ * [HLT Phase-2 Twiki / MC samples](https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2#MC_samples)
+ * DAS query for Phase-2 MC samples (RAW):
+```
+dasgoclient --query="dataset dataset=/*/Phase2HLTTDRWinter20*/*RAW* status=VALID"
+```
