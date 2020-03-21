@@ -3,18 +3,13 @@
 set -e
 
 if [ $# -lt 1 ]; then
-  echo ">> argument missing - specify path to output directory"
+  printf "%s\n" ">>> argument missing - specify path to output directory"
   exit 1
 fi
 
 NEVT=50000
 
 ODIR=$1
-
-if [ -d ${ODIR} ]; then
-  echo "output directory already exists: ${ODIR}"
-  return
-fi
 
 JDIR=${1}_json
 
@@ -32,17 +27,27 @@ recos=(
  HLT_iter2RegionalPtSeed0p9
  HLT_iter2RegionalPtSeed2p0
  HLT_iter2RegionalPtSeed5p0
+ HLT_iter2RegionalPtSeed10p0
  HLT_iter2GlobalPtSeed0p9
 )
 
 for reco in "${recos[@]}"; do
 
+  ODIR=$1/${reco}
+
+  if [ -d ${ODIR} ]; then
+    printf "%s\n" ">>> output directory already exists: ${ODIR}"
+    continue
+  fi
+
   htc_driver -c jmeTriggerNTuple_cfg.py -n 200 numThreads=1 --cpus 1 --memory 3000 --runtime 10800 \
    -d ${JDIR}/Run3Winter20_QCD_Pt_170to300_14TeV.json -p 0 \
-   -o ${ODIR}/${reco}/Run3Winter20_QCD_Pt_170to300_14TeV \
+   -o ${ODIR}/Run3Winter20_QCD_Pt_170to300_14TeV \
    -m ${NEVT} reco=${reco}
+
+  unset -v ODIR
 
 done
 unset -v reco
 
-unset -v NEVT ODIR JDIR
+unset -v NEVT JDIR

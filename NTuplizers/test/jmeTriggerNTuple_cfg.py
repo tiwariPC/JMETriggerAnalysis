@@ -89,6 +89,10 @@ elif opts.reco == 'HLT_iter2RegionalPtSeed5p0':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
    process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 5.0
 
+elif opts.reco == 'HLT_iter2RegionalPtSeed10p0':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
+
 elif opts.reco == 'HLT_iter2GlobalPtSeed0p9':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
    from JMETriggerAnalysis.NTuplizers.customize_HLT_iter2GlobalPtSeed0p9 import *
