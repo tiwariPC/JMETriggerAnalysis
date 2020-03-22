@@ -81,14 +81,14 @@ PFCandidateHistogrammer<PFCandType>::PFCandidateHistogrammer(const edm::Paramete
 
 template <typename PFCandType>
 void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  auto const& pfCands = iEvent.get(pfCands_token_);
+  edm::Handle<std::vector<PFCandType>> pfCands;
+  iEvent.getByToken(pfCands_token_, pfCands);
 
   uint pfcand_mult(0), pfcand_mult_X(0), pfcand_mult_h(0), pfcand_mult_e(0), \
        pfcand_mult_mu(0), pfcand_mult_gamma(0), pfcand_mult_h0(0),\
        pfcand_mult_hHF(0), pfcand_mult_egammaHF(0);
 
-  for(auto const& pfc : pfCands){
+  for(auto const& pfc : *pfCands){
 
     if(not stringCutSelector_(pfc)){ continue; }
 

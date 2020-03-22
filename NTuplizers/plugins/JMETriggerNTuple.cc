@@ -609,16 +609,6 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_phi", &recoGenJetCollectionContainer_i.vec_phi());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_mass", &recoGenJetCollectionContainer_i.vec_mass());
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_numberOfDaughters", &recoGenJetCollectionContainer_i.vec_numberOfDaughters());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &recoGenJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &recoGenJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_electronEnergyFraction", &recoGenJetCollectionContainer_i.vec_electronEnergyFraction());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_photonEnergyFraction", &recoGenJetCollectionContainer_i.vec_photonEnergyFraction());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_muonEnergyFraction", &recoGenJetCollectionContainer_i.vec_muonEnergyFraction());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_chargedHadronMultiplicity", &recoGenJetCollectionContainer_i.vec_chargedHadronMultiplicity());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_neutralHadronMultiplicity", &recoGenJetCollectionContainer_i.vec_neutralHadronMultiplicity());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_electronMultiplicity", &recoGenJetCollectionContainer_i.vec_electronMultiplicity());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_photonMultiplicity", &recoGenJetCollectionContainer_i.vec_photonMultiplicity());
-    this->addBranch(recoGenJetCollectionContainer_i.name()+"_muonMultiplicity", &recoGenJetCollectionContainer_i.vec_muonMultiplicity());
   }
 
   for(auto& recoCaloJetCollectionContainer_i : v_recoCaloJetCollectionContainer_){

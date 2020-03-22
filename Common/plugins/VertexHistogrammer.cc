@@ -72,7 +72,8 @@ VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
 }
 
 void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  auto const& vertices(iEvent.getHandle(vertices_token_));
+  edm::Handle<reco::VertexCollection> vertices;
+  iEvent.getByToken(vertices_token_, vertices);
 
   if(vertices.isValid()){
     h_vertex_mult_->Fill(vertices->size());

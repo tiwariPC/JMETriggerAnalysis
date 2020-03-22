@@ -6,7 +6,6 @@
   <use name="FWCore/ServiceRegistry"/>
   <use name="CommonTools/UtilAlgos"/>
   <use name="CommonTools/Utils"/>
-  <use name="RecoPixelVertexing/PixelVertexFinding"/>
   <use name="DataFormats/Common"/>
   <use name="DataFormats/TrackReco"/>
   <use name="DataFormats/VertexReco"/>
