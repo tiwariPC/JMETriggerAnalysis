@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-def customize_HLT_iter2GlobalPtSeed0p9(process):
+def customize_HLT_trkIter2GlobalPtSeed0p9(process):
 
     process.hltIter2PFlowPixelTrackingRegionsGlobalPtSeed0p9 = cms.EDProducer( 'GlobalTrackingRegionWithVerticesEDProducer',
       RegionPSet = cms.PSet( 

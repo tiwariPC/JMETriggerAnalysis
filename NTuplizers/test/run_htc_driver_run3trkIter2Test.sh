@@ -24,11 +24,11 @@ fi
 
 recos=(
  HLT
- HLT_iter2RegionalPtSeed0p9
- HLT_iter2RegionalPtSeed2p0
- HLT_iter2RegionalPtSeed5p0
- HLT_iter2RegionalPtSeed10p0
- HLT_iter2GlobalPtSeed0p9
+ HLT_trkIter2RegionalPtSeed0p9
+ HLT_trkIter2RegionalPtSeed2p0
+ HLT_trkIter2RegionalPtSeed5p0
+ HLT_trkIter2RegionalPtSeed10p0
+ HLT_trkIter2GlobalPtSeed0p9
 )
 
 for reco in "${recos[@]}"; do
