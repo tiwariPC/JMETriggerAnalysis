@@ -646,6 +646,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_phi", &recoPFJetCollectionContainer_i.vec_phi());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_mass", &recoPFJetCollectionContainer_i.vec_mass());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_jesc", &recoPFJetCollectionContainer_i.vec_jesc());
+    this->addBranch(recoPFJetCollectionContainer_i.name()+"_jetArea", &recoPFJetCollectionContainer_i.vec_jetArea());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_numberOfDaughters", &recoPFJetCollectionContainer_i.vec_numberOfDaughters());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &recoPFJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
     this->addBranch(recoPFJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &recoPFJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
@@ -666,6 +667,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patJetCollectionContainer_i.name()+"_phi", &patJetCollectionContainer_i.vec_phi());
     this->addBranch(patJetCollectionContainer_i.name()+"_mass", &patJetCollectionContainer_i.vec_mass());
     this->addBranch(patJetCollectionContainer_i.name()+"_jesc", &patJetCollectionContainer_i.vec_jesc());
+    this->addBranch(patJetCollectionContainer_i.name()+"_jetArea", &patJetCollectionContainer_i.vec_jetArea());
     this->addBranch(patJetCollectionContainer_i.name()+"_numberOfDaughters", &patJetCollectionContainer_i.vec_numberOfDaughters());
     this->addBranch(patJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &patJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
     this->addBranch(patJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &patJetCollectionContainer_i.vec_neutralHadronEnergyFraction());

@@ -13,6 +13,7 @@ void PATJetCollectionContainer::clear(){
   mass_.clear();
 
   jesc_.clear();
+  jetArea_.clear();
   numberOfDaughters_.clear();
 
   chargedHadronEnergyFraction_.clear();
@@ -36,6 +37,7 @@ void PATJetCollectionContainer::reserve(const size_t vec_size){
   mass_.reserve(vec_size);
 
   jesc_.reserve(vec_size);
+  jetArea_.reserve(vec_size);
   numberOfDaughters_.reserve(vec_size);;
 
   chargedHadronEnergyFraction_.reserve(vec_size);
@@ -59,6 +61,7 @@ void PATJetCollectionContainer::emplace_back(const pat::Jet& obj){
   mass_.emplace_back(obj.mass());
 
   jesc_.emplace_back(obj.jecFactor(0) ? (1./obj.jecFactor(0)) : 1.);
+  jetArea_.emplace_back(obj.jetArea());
   numberOfDaughters_.emplace_back(obj.numberOfDaughters());
 
   chargedHadronEnergyFraction_.emplace_back(obj.isPFJet() ? obj.chargedHadronEnergyFraction() : -99.);
