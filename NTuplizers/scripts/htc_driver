@@ -315,6 +315,7 @@ if opts.dumpPython is not None:
                EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> '+OUTPUT_DIR+'/dumpPython.log', verbose=opts.verbose, dry_run=opts.dry_run)
 
             i_SHELL_COMMANDS  = [['set -e']]
+            i_SHELL_COMMANDS += [['cd '+i_OUTPUT_DIR]]
             i_SHELL_COMMANDS += [['if [ -f flag.done ]; then exit 0; fi;']]
             i_SHELL_COMMANDS += [['cd '+os.environ['CMSSW_BASE']+'/src']]
             i_SHELL_COMMANDS += [['eval `scram runtime -sh`']]
