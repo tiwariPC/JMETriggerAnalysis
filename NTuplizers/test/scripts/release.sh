@@ -1,7 +1,19 @@
 #!/bin/bash
 
-for ddd in {0..100}; do
-  sleep 1200
+NREPS=100
+INTSEC=1200
+
+if [ $# -ge 2 ]; then
+  NREPS=$1
+  INTSEC=$2
+elif [ $# -eq 1 ]; then
+  NREPS=$1
+fi
+
+for tmp in {0..${NREPS}}; do
+  sleep ${INTSEC}
   condor_release ${USER}
 done
-unset -v ddd
+unset -v tmp
+
+unset -v NREPS INTSEC
