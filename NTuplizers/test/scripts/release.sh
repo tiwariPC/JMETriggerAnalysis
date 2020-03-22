@@ -10,6 +10,8 @@ elif [ $# -eq 1 ]; then
   NREPS=$1
 fi
 
+condor_release ${USER}
+
 for tmp in {0..${NREPS}}; do
   sleep ${INTSEC}
   condor_release ${USER}
