@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process('JESCTXT')
 
 process.load('Configuration.StandardSequences.Services_cff')
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
@@ -22,8 +22,6 @@ process.GlobalTag.globaltag = opts.gt
 
 if not opts.tag:
    opts.tag = opts.gt
-
-process.GlobalTag.globaltag = opts.gt
 
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 process.source = cms.Source('EmptySource')
