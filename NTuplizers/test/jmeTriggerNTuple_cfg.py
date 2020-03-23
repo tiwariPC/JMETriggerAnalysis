@@ -39,6 +39,11 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
+opts.register('era', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'keyword for data-taking period')
+
 opts.register('gt', None,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
