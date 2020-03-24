@@ -17,7 +17,7 @@ def userMETs(process, isMC):
          fixEE2017 = False,
        )
 
-       collection = 'slimmedMETs'+updatedMET_tag+'::topDileptonNtuple'
+       collection = 'slimmedMETs'+updatedMET_tag
 
        runMetCorAndUncFromMiniAOD(process,
          isData=bool(not isMC),
@@ -30,7 +30,7 @@ def userMETs(process, isMC):
        process.puppi.useExistingWeights = False
 
        process.METSequence *= getattr(process, 'puppiMETSequence')
-       process.METSequence *= getattr(process, 'fullPatMetSequence'+'Puppi')
+       process.METSequence *= getattr(process, 'fullPatMetSequencePuppi')
        process.METSequence *= getattr(process, 'fullPatMetSequence'+updatedMET_tag)
 
     elif era == '2017':
@@ -40,7 +40,7 @@ def userMETs(process, isMC):
          fixEE2017Params = {'userawPt': True, 'ptThreshold': 50.0, 'minEtaThreshold': 2.65, 'maxEtaThreshold': 3.139},
        )
 
-       collection = 'slimmedMETs'+updatedMET_tag+'::topDileptonNtuple'
+       collection = 'slimmedMETs'+updatedMET_tag
 
        runMetCorAndUncFromMiniAOD(process,
          isData=bool(not isMC),
@@ -62,7 +62,7 @@ def userMETs(process, isMC):
          fixEE2017 = False,
        )
 
-       collection = 'slimmedMETs'+updatedMET_tag+'::topDileptonNtuple'
+       collection = 'slimmedMETs'+updatedMET_tag
 
        runMetCorAndUncFromMiniAOD(process,
          isData=bool(not isMC),
@@ -74,12 +74,14 @@ def userMETs(process, isMC):
        process.puppiNoLep.useExistingWeights = False
        process.puppi.useExistingWeights = False
 
-       process.METSequence *= getattr(process, 'puppiMETSequence')
-       process.METSequence *= getattr(process, 'fullPatMetSequence'+'Puppi')
-       process.METSequence *= getattr(process, 'fullPatMetSequence'+updatedMET_tag)
-
     else:
        raise RuntimeError('userMETs_cff.py -- invalid value for "era": '+str(era))
     ### ---
+
+    process.userMETsTask = cms.Task(
+      process.puppiMETSequence,
+      process.fullPatMetSequencePuppi,
+      getattr(process, 'fullPatMetSequence'+updatedMET_tag),
+    )
 
     return process

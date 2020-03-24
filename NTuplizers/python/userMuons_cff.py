@@ -28,4 +28,6 @@ def userMuons(process):
       process.userIsolatedMuons,
     )
 
+    process.userMuonsSeq = cms.Sequence(process.userMuonsTask)
+
     return process

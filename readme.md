@@ -13,6 +13,8 @@ cmsrel CMSSW_10_2_21
 cd CMSSW_10_2_21/src
 cmsenv
 
+git clone https://github.com/cms-egamma/EgammaPostRecoTools.git EgammaUser/EgammaPostRecoTools -b master -o cms-egamma
+
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run2
 scram b
 ```

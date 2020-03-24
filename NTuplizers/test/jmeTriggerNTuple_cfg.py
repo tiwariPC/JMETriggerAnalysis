@@ -1,5 +1,5 @@
 ###
-### command-line arguments
+### VarParsing (command-line arguments)
 ###
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
@@ -34,10 +34,20 @@ opts.register('logs', False,
               vpo.VarParsing.varType.bool,
               'create log files configured via MessageLogger')
 
+opts.register('reportEvery', 100,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'report Run/Lumi/Event information every N events')
+
 opts.register('wantSummary', False,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
+
+opts.register('isData', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'apply customizations for real collisions Data')
 
 opts.register('era', None,
               vpo.VarParsing.multiplicity.singleton,
@@ -54,21 +64,6 @@ opts.register('reco', 'HLT',
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
 
-opts.register('trkdqm', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'added monitoring histograms for selected Tracks and Vertices')
-
-opts.register('pfdqm', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'added monitoring histograms for selected PF-Candidates')
-
-#opts.register('skimTracks', False,
-#              vpo.VarParsing.multiplicity.singleton,
-#              vpo.VarParsing.varType.bool,
-#              'skim original collection of generalTracks (only tracks associated to first N pixel vertices)')
-
 opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
@@ -77,73 +72,121 @@ opts.register('output', 'out.root',
 opts.parseArguments()
 
 ###
-### base configuration file
+### Process
 ###
-if opts.reco == 'HLT':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+import FWCore.ParameterSet.Config as cms
 
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed0p9':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 0.9
+process = cms.Process("ANALYSIS")
 
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed2p0':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 2.0
+process.load('Configuration.StandardSequences.Services_cff')
+process.load("Configuration.Geometry.GeometryDB_cff")
+process.load("Configuration.StandardSequences.MagneticField_cff")
 
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed5p0':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 5.0
+###
+### PoolSource (EDM input)
+###
+process.source = cms.Source('PoolSource',
+  fileNames = cms.untracked.vstring(opts.inputFiles),
+  secondaryFileNames = cms.untracked.vstring(opts.secondaryInputFiles),
+  # number of events to be skipped
+  skipEvents = cms.untracked.uint32(opts.skipEvents)
+)
 
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
+# select luminosity sections from .json file
+if opts.lumis is not None:
+   import FWCore.PythonUtilities.LumiList as LumiList
+   process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
 
-elif opts.reco == 'HLT_trkIter2GlobalPtSeed0p9':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   from JMETriggerAnalysis.NTuplizers.customize_HLT_trkIter2GlobalPtSeed0p9 import *
-   process = customize_HLT_trkIter2GlobalPtSeed0p9(process)
+###
+### EDM Options
+###
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(opts.maxEvents))
 
+process.options = cms.untracked.PSet(
+  # show cmsRun summary at job completion
+  wantSummary = cms.untracked.bool(opts.wantSummary),
+  # multi-threading settings
+  numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1),
+  numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 1),
+)
+
+###
+### Global Tag
+###
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+if opts.gt is not None:
+   from Configuration.AlCa.GlobalTag import GlobalTag
+   process.GlobalTag = GlobalTag(process.GlobalTag, opts.gt, '')
 else:
-   raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
-
-# remove cms.OutputModule objects from HLT config-dump
-for _modname in process.outputModules_():
-    _mod = getattr(process, _modname)
-    if type(_mod) == cms.OutputModule:
-       process.__delattr__(_modname)
-       print '> removed cms.OutputModule:', _modname
-
-# remove cms.EndPath objects from HLT config-dump
-for _modname in process.endpaths_():
-    _mod = getattr(process, _modname)
-    if type(_mod) == cms.EndPath:
-       process.__delattr__(_modname)
-       print '> removed cms.EndPath:', _modname
-
-## remove selected cms.Path objects from HLT config-dump
-#for _modname in process.paths_():
-#    if _modname.startswith('HLT_') or _modname.startswith('MC_'):
-#       _mod = getattr(process, _modname)
-#       if type(_mod) == cms.Path:
-#          process.__delattr__(_modname)
-#          print '> removed cms.Path:', _modname
-
-# delete process.MessaggeLogger from HLT config
-if hasattr(process, 'MessageLogger'):
-   del process.MessageLogger
+   raise RuntimeError('failed to specify name of the GlobalTag (use "gt=XYZ")"')
 
 ###
-### add analysis sequence (JMETrigger NTuple)
+### TFileService
 ###
-process.analysisCollectionsSequence = cms.Sequence()
+process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
-### Muons
-#process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
-#process.analysisCollectionsSequence *= process.userMuonsSequence
-#
-### Electrons
-#process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
-#process.analysisCollectionsSequence *= process.userElectronsSequence
+###
+### MessageLogger
+###
+if opts.logs:
+   process.MessageLogger = cms.Service('MessageLogger',
+     destinations = cms.untracked.vstring(
+       'cerr',
+       'logError',
+       'logInfo',
+       'logDebug',
+     ),
+     # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
+     debugModules = cms.untracked.vstring(
+       'JMETriggerNTuple',
+     ),
+     categories = cms.untracked.vstring(
+       'FwkReport',
+     ),
+     cerr = cms.untracked.PSet(
+       threshold = cms.untracked.string('WARNING'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(opts.reportEvery),
+       ),
+     ),
+     logError = cms.untracked.PSet(
+       threshold = cms.untracked.string('ERROR'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(opts.reportEvery),
+       ),
+     ),
+     logInfo = cms.untracked.PSet(
+       threshold = cms.untracked.string('INFO'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(opts.reportEvery),
+       ),
+     ),
+     logDebug = cms.untracked.PSet(
+       threshold = cms.untracked.string('DEBUG'),
+       extension = cms.untracked.string('.txt'),
+       FwkReport = cms.untracked.PSet(
+         reportEvery = cms.untracked.int32(opts.reportEvery),
+       ),
+     ),
+   )
+else:
+   process.load("FWCore.MessageLogger.MessageLogger_cfi")
+   process.MessageLogger.cerr.threshold = 'INFO'
+   process.MessageLogger.cerr.FwkReport.reportEvery = opts.reportEvery
+
+###
+### Analysis Modules
+###
+
+## Muons
+from JMETriggerAnalysis.NTuplizers.userMuons_cff import userMuons
+process = userMuons(process)
+
+## Electrons
+from JMETriggerAnalysis.NTuplizers.userElectrons_cff import userElectrons
+process = userElectrons(process, era=opts.era)
 
 ## Event Selection (none yet)
 
@@ -349,8 +392,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoVertexCollections = cms.PSet(
 
-    hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
-    hltVerticesPF = cms.InputTag('hltVerticesPF'),
+#    hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
+#    hltVerticesPF = cms.InputTag('hltVerticesPF'),
   ),
 
   recoPFCandidateCollections = cms.PSet(
@@ -365,49 +408,48 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoGenJetCollections = cms.PSet(
 
-    ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
-    ak8GenJetsNoNu = cms.InputTag('ak8GenJetsNoNu::HLT'),
+#    ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
+#    ak8GenJetsNoNu = cms.InputTag('ak8GenJetsNoNu::HLT'),
   ),
 
   recoCaloJetCollections = cms.PSet(
 
-    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
-    hltAK4CaloJetsCorrected = cms.InputTag('hltAK4CaloJetsCorrected'),
+#    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
+#    hltAK4CaloJetsCorrected = cms.InputTag('hltAK4CaloJetsCorrected'),
 
-    hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
-    hltAK8CaloJetsCorrected = cms.InputTag('hltAK8CaloJetsCorrected'),
+#    hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
+#    hltAK8CaloJetsCorrected = cms.InputTag('hltAK8CaloJetsCorrected'),
   ),
 
   recoPFClusterJetCollections = cms.PSet(
   ),
 
   recoPFJetCollections = cms.PSet(
-    hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
-    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
+#    hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
+#    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
 
-    hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
-    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
+#    hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
+#    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
   ),
 
   patJetCollections = cms.PSet(
   ),
 
   recoGenMETCollections = cms.PSet(
-    genMETCalo = cms.InputTag('genMetCalo::HLT'),
-    genMETTrue = cms.InputTag('genMetTrue::HLT'),
+#    genMETCalo = cms.InputTag('genMetCalo::HLT'),
+#    genMETTrue = cms.InputTag('genMetTrue::HLT'),
   ),
 
   recoCaloMETCollections = cms.PSet(
-    hltCaloMET = cms.InputTag('hltMet'),
+#    hltCaloMET = cms.InputTag('hltMet'),
   ),
 
   recoPFClusterMETCollections = cms.PSet(
   ),
 
   recoPFMETCollections = cms.PSet(
-
-    hltPFMET = cms.InputTag('hltPFMETProducer'),
-    hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
+#    hltPFMET = cms.InputTag('hltPFMETProducer'),
+#    hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
   ),
 
   patMETCollections = cms.PSet(
@@ -420,21 +462,20 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   stringCutObjectSelectors = cms.PSet(
+#    ak4GenJetsNoNu = cms.string('pt > 12'),
+#    ak8GenJetsNoNu = cms.string('pt > 50'),
 
-    ak4GenJetsNoNu = cms.string('pt > 12'),
-    ak8GenJetsNoNu = cms.string('pt > 50'),
+#    hltAK4CaloJets = cms.string('pt > 12'),
+#    hltAK4CaloJetsCorrected = cms.string('pt > 12'),
 
-    hltAK4CaloJets = cms.string('pt > 12'),
-    hltAK4CaloJetsCorrected = cms.string('pt > 12'),
+#    hltAK8CaloJets = cms.string('pt > 80'),
+#    hltAK8CaloJetsCorrected = cms.string('pt > 80'),
 
-    hltAK8CaloJets = cms.string('pt > 80'),
-    hltAK8CaloJetsCorrected = cms.string('pt > 80'),
+#    hltAK4PFJets = cms.string('pt > 12'),
+#    hltAK4PFJetsCorrected = cms.string('pt > 12'),
 
-    hltAK4PFJets = cms.string('pt > 12'),
-    hltAK4PFJetsCorrected = cms.string('pt > 12'),
-
-    hltAK8PFJets = cms.string('pt > 80'),
-    hltAK8PFJetsCorrected = cms.string('pt > 80'),
+#    hltAK8PFJets = cms.string('pt > 80'),
+#    hltAK8PFJetsCorrected = cms.string('pt > 80'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
@@ -449,228 +490,25 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 )
 
-process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
-#process.HLTSchedule.extend([process.analysisCollectionsPath])
+process.analysisCollectionsPath = cms.Path(
+    process.userMuonsSeq
+  + process.userElectronsSeq
+)
 
-process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
-#process.HLTSchedule.extend([process.analysisNTupleEndPath])
+process.JMETriggerNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 
-# update process.GlobalTag.globaltag
-if opts.gt is not None:
-   process.GlobalTag.globaltag = opts.gt
-
-# max number of events to be processed
-process.maxEvents.input = opts.maxEvents
-
-# number of events to be skipped
-process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
-
-# multi-threading settings
-process.options.numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1)
-process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 1)
-#if hasattr(process, 'DQMStore'):
-#   process.DQMStore.enableMultiThread = (process.options.numberOfThreads > 1)
-
-# show cmsRun summary at job completion
-process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
-
-# select luminosity sections from .json file
-if opts.lumis is not None:
-   import FWCore.PythonUtilities.LumiList as LumiList
-   process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
-
-# create TFileService to be accessed by JMETriggerNTuple plugin
-process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
-
-# Tracking Monitoring
-if opts.trkdqm:
-   from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-   process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
-   process.TrackHistograms_hltPFMuonMerging = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
-
-   process.trkMonitoringSeq = cms.Sequence(
-       process.TrackHistograms_hltPixelTracks
-     + process.TrackHistograms_hltPFMuonMerging
-   )
-
-#   if opts.skimTracks:
-#      process.TrackHistograms_generalTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
-#      process.trkMonitoringSeq += process.TrackHistograms_generalTracksOriginal
-
-   from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
-   process.VertexHistograms_hltTrimmedPixelVertices = VertexHistogrammer.clone(src = 'hltTrimmedPixelVertices')
-   process.VertexHistograms_hltVerticesPF = VertexHistogrammer.clone(src = 'hltVerticesPF')
-
-   process.trkMonitoringSeq += cms.Sequence(
-       process.VertexHistograms_hltTrimmedPixelVertices
-     + process.VertexHistograms_hltVerticesPF
-   )
-
-#   from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
-#   process.vertexAnalysis = vertexAnalysis.clone(vertexRecoCollections = ['offlinePrimaryVertices'])
-#   process.pixelVertexAnalysis = pixelVertexAnalysisPixelTrackingOnly.clone(vertexRecoCollections = ['pixelVertices'])
-#
-#   process.trkMonitoringSeq += cms.Sequence(
-#       process.vertexAnalysis
-#     + process.pixelVertexAnalysis
-#   )
-
-   process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
-#   process.HLTSchedule.extend([process.trkMonitoringEndPath])
-
-# ParticleFlow Monitoring
-if opts.pfdqm:
-
-   from JMETriggerAnalysis.Common.pfCandidateHistogrammerRecoPFCandidate_cfi import pfCandidateHistogrammerRecoPFCandidate
-   process.PFCandidateHistograms_hltPFCands = pfCandidateHistogrammerRecoPFCandidate.clone(src = 'hltParticleFlow')
-   process.PFCandidateHistograms_hltPFCands_HB = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
-   process.PFCandidateHistograms_hltPFCands_HB_chargedHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
-   process.PFCandidateHistograms_hltPFCands_HB_neutralHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
-   process.PFCandidateHistograms_hltPFCands_HB_photons = process.PFCandidateHistograms_hltPFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
-   process.PFCandidateHistograms_hltPFCands_HE = process.PFCandidateHistograms_hltPFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_hltPFCands_HE_chargedHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==211 && (1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_hltPFCands_HE_neutralHadrons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==130 && (1.5<=abs(eta) && abs(eta)<3.0)')
-   process.PFCandidateHistograms_hltPFCands_HE_photons = process.PFCandidateHistograms_hltPFCands.clone(cut = 'abs(pdgId)==22  && (1.5<=abs(eta) && abs(eta)<3.0)')
-
-#   process.PFCandidateHistograms_hltPuppiCands = pfCandidateHistogrammerRecoPFCandidate.clone(src = 'hltPuppi')
-#   process.PFCandidateHistograms_hltPuppiCands_HB = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
-#   process.PFCandidateHistograms_hltPuppiCands_HB_chargedHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
-#   process.PFCandidateHistograms_hltPuppiCands_HB_neutralHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
-#   process.PFCandidateHistograms_hltPuppiCands_HB_photons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
-#   process.PFCandidateHistograms_hltPuppiCands_HE = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
-#   process.PFCandidateHistograms_hltPuppiCands_HE_chargedHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==211')
-#   process.PFCandidateHistograms_hltPuppiCands_HE_neutralHadrons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==130')
-#   process.PFCandidateHistograms_hltPuppiCands_HE_photons = process.PFCandidateHistograms_hltPuppiCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==22')
-#
-#   from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
-#   process.PFCandidateHistograms_offlinePFCands = pfCandidateHistogrammerPatPackedCandidate.clone(src = 'packedPFCandidates')
-#   process.PFCandidateHistograms_offlinePFCands_HB = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5)')
-#   process.PFCandidateHistograms_offlinePFCands_HB_chargedHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==211')
-#   process.PFCandidateHistograms_offlinePFCands_HB_neutralHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==130')
-#   process.PFCandidateHistograms_offlinePFCands_HB_photons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(0.0<=abs(eta) && abs(eta)<1.5) && abs(pdgId)==22')
-#   process.PFCandidateHistograms_offlinePFCands_HE = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0)')
-#   process.PFCandidateHistograms_offlinePFCands_HE_chargedHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==211')
-#   process.PFCandidateHistograms_offlinePFCands_HE_neutralHadrons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==130')
-#   process.PFCandidateHistograms_offlinePFCands_HE_photons = process.PFCandidateHistograms_offlinePFCands.clone(cut = '(1.5<=abs(eta) && abs(eta)<3.0) && abs(pdgId)==22')
-
-   process.pfMonitoringSeq = cms.Sequence(
-       process.PFCandidateHistograms_hltPFCands
-     + process.PFCandidateHistograms_hltPFCands_HB
-     + process.PFCandidateHistograms_hltPFCands_HB_chargedHadrons
-     + process.PFCandidateHistograms_hltPFCands_HB_neutralHadrons
-     + process.PFCandidateHistograms_hltPFCands_HB_photons
-     + process.PFCandidateHistograms_hltPFCands_HE
-     + process.PFCandidateHistograms_hltPFCands_HE_chargedHadrons
-     + process.PFCandidateHistograms_hltPFCands_HE_neutralHadrons
-     + process.PFCandidateHistograms_hltPFCands_HE_photons
-#     + process.PFCandidateHistograms_hltPuppiCands
-#     + process.PFCandidateHistograms_hltPuppiCands_HB
-#     + process.PFCandidateHistograms_hltPuppiCands_HB_chargedHadrons
-#     + process.PFCandidateHistograms_hltPuppiCands_HB_neutralHadrons
-#     + process.PFCandidateHistograms_hltPuppiCands_HB_photons
-#     + process.PFCandidateHistograms_hltPuppiCands_HE
-#     + process.PFCandidateHistograms_hltPuppiCands_HE_chargedHadrons
-#     + process.PFCandidateHistograms_hltPuppiCands_HE_neutralHadrons
-#     + process.PFCandidateHistograms_hltPuppiCands_HE_photons
-#     + process.PFCandidateHistograms_offlinePFCands
-#     + process.PFCandidateHistograms_offlinePFCands_HB
-#     + process.PFCandidateHistograms_offlinePFCands_HB_chargedHadrons
-#     + process.PFCandidateHistograms_offlinePFCands_HB_neutralHadrons
-#     + process.PFCandidateHistograms_offlinePFCands_HB_photons
-#     + process.PFCandidateHistograms_offlinePFCands_HE
-#     + process.PFCandidateHistograms_offlinePFCands_HE_chargedHadrons
-#     + process.PFCandidateHistograms_offlinePFCands_HE_neutralHadrons
-#     + process.PFCandidateHistograms_offlinePFCands_HE_photons
-   )
-
-   process.pfMonitoringEndPath = cms.EndPath(process.pfMonitoringSeq)
-#   process.HLTSchedule.extend([process.pfMonitoringEndPath])
-
-# MessageLogger
-if opts.logs:
-   process.MessageLogger = cms.Service('MessageLogger',
-     destinations = cms.untracked.vstring(
-       'cerr',
-       'logError',
-       'logInfo',
-       'logDebug',
-     ),
-     # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
-     debugModules = cms.untracked.vstring(
-       'JMETriggerNTuple',
-     ),
-     categories = cms.untracked.vstring(
-       'FwkReport',
-     ),
-     cerr = cms.untracked.PSet(
-       threshold = cms.untracked.string('WARNING'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logError = cms.untracked.PSet(
-       threshold = cms.untracked.string('ERROR'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logInfo = cms.untracked.PSet(
-       threshold = cms.untracked.string('INFO'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logDebug = cms.untracked.PSet(
-       threshold = cms.untracked.string('DEBUG'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-   )
-
-#   if opts.skimTracks:
-#      process.MessageLogger.debugModules += [
-#        'hltTrimmedPixelVertices',
-#        'hltVerticesPF',
-#      ]
-
-# input EDM files [primary]
-if opts.inputFiles:
-   process.source.fileNames = opts.inputFiles
-else:
-   process.source.fileNames = [
-     '/store/mc/Run3Winter20DRPremixMiniAOD/QCD_Pt_170to300_TuneCP5_14TeV_pythia8/GEN-SIM-RAW/110X_mcRun3_2021_realistic_v6-v2/40000/A623EE66-618D-FC43-B4FC-6C4029CD68FB.root',
-   ]
-
-# input EDM files [secondary]
-if not hasattr(process.source, 'secondaryFileNames'):
-   process.source.secondaryFileNames = cms.untracked.vstring()
-
-if opts.secondaryInputFiles == ['None']:
-   process.source.secondaryFileNames = []
-elif opts.secondaryInputFiles != []:
-   process.source.secondaryFileNames = opts.secondaryInputFiles
-else:
-   process.source.secondaryFileNames = []
-
-# dump content of cms.Process to python file
+### dump content of cms.Process to python file
 if opts.dumpPython is not None:
    open(opts.dumpPython, 'w').write(process.dumpPython())
 
-# print-outs
+### print-outs
 print '--- jmeTriggerNTuple_cfg.py ---'
 print ''
 print 'option: output =', opts.output
-print 'option: reco =', opts.reco
-#print 'option: skimTracks =', opts.skimTracks
-print 'option: trkdqm =', opts.trkdqm
-print 'option: pfdqm =', opts.pfdqm
 print 'option: dumpPython =', opts.dumpPython
 print ''
 print 'process.GlobalTag.globaltag =', process.GlobalTag.globaltag
 print 'process.maxEvents =', process.maxEvents
 print 'process.source =', process.source
+print 'process.MessageLogger.cerr.FwkReport.reportEvery =', process.MessageLogger.cerr.FwkReport.reportEvery
 print '-------------------------------'

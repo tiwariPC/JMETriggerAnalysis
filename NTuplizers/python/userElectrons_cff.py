@@ -2,23 +2,21 @@ import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
 
+from EgammaUser.EgammaPostRecoTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+
 def userElectrons(process, era):
-    ### EGamma routine to apply IDs + Scale & Smearing Corrections
+    ###
+    ### setupEgammaPostRecoSeq: EGamma-POG routine to apply IDs + Energy-Scale/Smearing Corrections
     ###
     ###  - https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2
     ###  - https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes
     ###  - https://hypernews.cern.ch/HyperNews/CMS/get/egamma/2204/1/1.html because of PUPPI MET: added phoIDModules=[]
     ###
-    from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
-
-    if era == '2016':
-       setupEgammaPostRecoSeq(process, runVID = True, runEnergyCorrections = False, era = '2016-Legacy', phoIDModules=[])
-    elif era == '2017':
-       setupEgammaPostRecoSeq(process, runVID = True, runEnergyCorrections = True , era = '2017-Nov17ReReco', phoIDModules=[])
-    elif era == '2018':
-       setupEgammaPostRecoSeq(process, runVID = True, runEnergyCorrections = False, era = '2018-Prompt', phoIDModules=[])
+    if   era == '2016': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=True, applyVIDOnCorrectedEgamma=True, era='2016-Legacy')
+    elif era == '2017': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=True, applyVIDOnCorrectedEgamma=True, era='2017-Nov17ReReco')
+    elif era == '2018': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=True, applyVIDOnCorrectedEgamma=True, era='2018-Prompt')
     else:
-       raise RuntimeError('offlineElectrons(process, era="'+era+'") -- invalid value for argument "era"')
+       raise RuntimeError('userElectrons(process, era="'+str(era)+'") -- invalid value for argument "era"')
 
     process.userPreselectedElectrons = selectedPatElectrons.clone(
       src = 'slimmedElectrons',
@@ -58,9 +56,11 @@ def userElectrons(process, era):
     )
 
     process.userElectronsTask = cms.Task(
-      userPreselectedElectrons,
-      userElectronsWithUserData,
-      userIsolatedElectrons,
+      process.userPreselectedElectrons,
+      process.userElectronsWithUserData,
+      process.userIsolatedElectrons,
     )
+
+    process.userElectronsSeq = cms.Sequence(process.userElectronsTask)
 
     return process
