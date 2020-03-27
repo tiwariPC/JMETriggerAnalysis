@@ -312,7 +312,11 @@ if opts.dumpPython is not None:
 
             ## dump of full python config
             if jobCounter == 0:
-               EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> '+OUTPUT_DIR+'/dumpPython.log', verbose=opts.verbose, dry_run=opts.dry_run)
+               retcode = EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> '+OUTPUT_DIR+'/dumpPython.log', suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
+               if retcode:
+                  EXE('cat '+OUTPUT_DIR+'/dumpPython.log', verbose=opts.verbose, dry_run=opts.dry_run)
+                  raise SystemExit(retcode)
+               del retcode
 
             i_SHELL_COMMANDS  = [['set -e']]
             i_SHELL_COMMANDS += [['cd '+i_OUTPUT_DIR]]

@@ -11,7 +11,7 @@ from JMETriggerAnalysis.NTuplizers.utils.common import *
 def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=2, verbose=False):
 
     if verbose:
-       print(das_name)
+       print(colored_text(das_name, ['1']))
 
     dataset_split = das_name.split('/')
     if len(dataset_split) != 4:
@@ -33,21 +33,18 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
 
     for i_file_idx, i_file in enumerate(dataset_files):
 
-        if verbose:
-           print('  file', i_file_idx, '/', len(dataset_files))
-
         i_file_nevents = command_output_lines('dasgoclient --query "file='+str(i_file)+' | grep file.nevents"')
         i_file_nevents = [_tmp.replace(' ', '') for _tmp in i_file_nevents]
         i_file_nevents = [_tmp for _tmp in i_file_nevents if _tmp != '']
         i_file_nevents = sorted(list(set(i_file_nevents)))
 
         if len(i_file_nevents) != 1:
-           KILL('AAA')
+           KILL(das_name+' '+i_file+' '+str(i_file_nevents))
 
         i_file_nevents = i_file_nevents[0]
 
         if not is_int(i_file_nevents):
-           KILL('BBB')
+           KILL(das_name+' '+i_file+' '+str(i_file_nevents))
 
         i_file_nevents = int(i_file_nevents)
 
@@ -56,8 +53,7 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
            breakLoop = True
 
         if verbose:
-           print(i_file)
-           print(i_file_nevents)
+           print('  [ file', i_file_idx+1, '/', len(dataset_files), '] [ # events =', i_file_nevents, ']', i_file)
 
         i_file_parents1 = []
         i_file_parents2 = []

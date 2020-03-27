@@ -16,8 +16,10 @@ def EXE(cmd, suspend=True, verbose=False, dry_run=False):
     if dry_run: return
 
     _exitcode = os.system(cmd)
+    _exitcode = min(255, _exitcode)
 
-    if _exitcode and suspend: raise SystemExit(_exitcode)
+    if _exitcode and suspend:
+       raise SystemExit(_exitcode)
 
     return _exitcode
 # --
