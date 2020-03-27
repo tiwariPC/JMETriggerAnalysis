@@ -59,11 +59,6 @@ opts.register('pfdqm', False,
               vpo.VarParsing.varType.bool,
               'added monitoring histograms for selected PF-Candidates')
 
-#opts.register('skimTracks', False,
-#              vpo.VarParsing.multiplicity.singleton,
-#              vpo.VarParsing.varType.bool,
-#              'skim original collection of generalTracks (only tracks associated to first N pixel vertices)')
-
 opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
@@ -129,7 +124,9 @@ if hasattr(process, 'MessageLogger'):
 
 # add path: MC_PFMETNoMu_v1
 process.hltPreMCPFMETNoMu = process.hltPreMCPFMET.clone()
+
 process.hltPFMETNoMuOpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPFMETNoMuProducer')
+
 process.MC_PFMETNoMu_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCPFMETNoMu
@@ -137,6 +134,57 @@ process.MC_PFMETNoMu_v1 = cms.Path(
   + process.hltParticleFlowNoMu
   + process.hltPFMETNoMuProducer
   + process.hltPFMETNoMuOpenFilter
+  + process.HLTEndSequence
+)
+
+# add path: MC_PuppiMET_v1
+process.hltPreMCPuppiMET = process.hltPreMCPFMET.clone()
+
+from CommonTools.PileupAlgos.Puppi_cff import *
+process.hltPuppi = puppi.clone(
+  candName = 'hltParticleFlow',
+  vertexName = 'hltPixelVertices',
+  vtxNdofCut = 0,
+)
+process.hltPuppiMET = process.hltPFMETProducer.clone(src = 'hltPuppi', alias = '')
+
+process.hltPuppiMETSequence = cms.Sequence(
+    process.hltPuppi
+  + process.hltPuppiMET
+)
+
+process.hltPuppiMETOpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPuppiMET')
+
+process.MC_PuppiMET_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCPuppiMET
+  + process.HLTAK4PFJetsSequence
+  + process.hltPuppiMETSequence
+  + process.hltPuppiMETOpenFilter
+  + process.HLTEndSequence
+)
+
+# add path: MC_PuppiMETNoMu_v1
+process.hltPreMCPuppiMETNoMu = process.hltPreMCPFMET.clone()
+
+process.hltPuppiNoMu = process.hltParticleFlowNoMu.clone(src = 'hltPuppi')
+
+process.hltPuppiMETNoMu = process.hltPFMETProducer.clone(src = 'hltPuppiNoMu', alias = '')
+
+process.hltPuppiMETNoMuSequence = cms.Sequence(
+    process.hltPuppi
+  + process.hltPuppiNoMu
+  + process.hltPuppiMETNoMu
+)
+
+process.hltPuppiMETNoMuOpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPuppiMETNoMu')
+
+process.MC_PuppiMETNoMu_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCPuppiMETNoMu
+  + process.HLTAK4PFJetsSequence
+  + process.hltPuppiMETNoMuSequence
+  + process.hltPuppiMETNoMuOpenFilter
   + process.HLTEndSequence
 )
 
@@ -352,12 +400,15 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'MC_PFHT',
     'MC_PFMET',
     'MC_PFMETNoMu',
+    'MC_PuppiMET',
+    'MC_PuppiMETNoMu',
   ),
 
   fillCollectionConditions = cms.PSet(),
 
   recoVertexCollections = cms.PSet(
 
+    hltPixelVertices = cms.InputTag('hltPixelVertices'),
     hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
     hltVerticesPF = cms.InputTag('hltVerticesPF'),
   ),
@@ -417,6 +468,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     hltPFMET = cms.InputTag('hltPFMETProducer'),
     hltPFMETNoMu = cms.InputTag('hltPFMETNoMuProducer'),
+    hltPuppiMET = cms.InputTag('hltPuppiMET'),
+    hltPuppiMETNoMu = cms.InputTag('hltPuppiMETNoMu'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
   ),
 
@@ -502,10 +555,6 @@ if opts.trkdqm:
        process.TrackHistograms_hltPixelTracks
      + process.TrackHistograms_hltPFMuonMerging
    )
-
-#   if opts.skimTracks:
-#      process.TrackHistograms_generalTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
-#      process.trkMonitoringSeq += process.TrackHistograms_generalTracksOriginal
 
    from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
    process.VertexHistograms_hltTrimmedPixelVertices = VertexHistogrammer.clone(src = 'hltTrimmedPixelVertices')
@@ -641,12 +690,6 @@ if opts.logs:
      ),
    )
 
-#   if opts.skimTracks:
-#      process.MessageLogger.debugModules += [
-#        'hltTrimmedPixelVertices',
-#        'hltVerticesPF',
-#      ]
-
 # input EDM files [primary]
 if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
@@ -675,12 +718,12 @@ print '--- jmeTriggerNTuple_cfg.py ---'
 print ''
 print 'option: output =', opts.output
 print 'option: reco =', opts.reco
-#print 'option: skimTracks =', opts.skimTracks
 print 'option: trkdqm =', opts.trkdqm
 print 'option: pfdqm =', opts.pfdqm
 print 'option: dumpPython =', opts.dumpPython
 print ''
-print 'process.GlobalTag.globaltag =', process.GlobalTag.globaltag
-print 'process.maxEvents =', process.maxEvents
-print 'process.source =', process.source
+print 'process.GlobalTag =', process.GlobalTag.dumpPython()
+print 'process.source =', process.source.dumpPython()
+print 'process.maxEvents =', process.maxEvents.dumpPython()
+print 'process.options =', process.options.dumpPython()
 print '-------------------------------'
