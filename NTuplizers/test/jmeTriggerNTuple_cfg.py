@@ -127,6 +127,19 @@ for _modname in process.endpaths_():
 if hasattr(process, 'MessageLogger'):
    del process.MessageLogger
 
+# add path: MC_PFMETNoMu_v1
+process.hltPreMCPFMETNoMu = process.hltPreMCPFMET.clone()
+process.hltPFMETNoMuOpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPFMETNoMuProducer')
+process.MC_PFMETNoMu_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCPFMETNoMu
+  + process.HLTAK4PFJetsSequence
+  + process.hltParticleFlowNoMu
+  + process.hltPFMETNoMuProducer
+  + process.hltPFMETNoMuOpenFilter
+  + process.HLTEndSequence
+)
+
 ###
 ### add analysis sequence (JMETrigger NTuple)
 ###
@@ -338,6 +351,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'MC_AK8TrimPFJets',
     'MC_PFHT',
     'MC_PFMET',
+    'MC_PFMETNoMu',
   ),
 
   fillCollectionConditions = cms.PSet(),
@@ -402,6 +416,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFMETCollections = cms.PSet(
 
     hltPFMET = cms.InputTag('hltPFMETProducer'),
+    hltPFMETNoMu = cms.InputTag('hltPFMETNoMuProducer'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
   ),
 
