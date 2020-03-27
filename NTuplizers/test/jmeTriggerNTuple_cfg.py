@@ -72,6 +72,11 @@ opts.parseArguments()
 if opts.reco == 'HLT':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
 
+elif opts.reco == 'HLT_pfBlockAlgoRemovePS':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   from JMETriggerAnalysis.NTuplizers.customize_HLT_pfBlockAlgoRemovePS import *
+   process = customize_HLT_pfBlockAlgoRemovePS(process)
+
 elif opts.reco == 'HLT_trkIter2RegionalPtSeed0p9':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
    process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 0.9
