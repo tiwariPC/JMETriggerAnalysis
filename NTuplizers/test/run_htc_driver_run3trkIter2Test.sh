@@ -39,6 +39,7 @@ fi
 
 recos=(
  HLT
+ HLT_pfBlockAlgoRemovePS
  HLT_trkIter2RegionalPtSeed0p9
  HLT_trkIter2RegionalPtSeed2p0
  HLT_trkIter2RegionalPtSeed5p0
@@ -68,6 +69,16 @@ for reco in "${recos[@]}"; do
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 3000 --runtime 10800 \
    -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_170to300_14TeV.json -p 0 \
    -o ${OUTDIR_ROOT}/Run3Winter20_QCD_Pt_170to300_14TeV \
+   -m ${NEVT} reco=${reco}
+
+  htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 3000 --runtime 10800 \
+   -d ${OUTDIR_JSON}/Run3Winter20_DYToLL_M50_14TeV.json -p 0 \
+   -o ${OUTDIR_ROOT}/Run3Winter20_DYToLL_M50_14TeV \
+   -m ${NEVT} reco=${reco}
+
+  htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 3000 --runtime 10800 \
+   -d ${OUTDIR_JSON}/Run3Winter20_ZprimeToMuMu_M6000_14TeV.json -p 0 \
+   -o ${OUTDIR_ROOT}/Run3Winter20_ZprimeToMuMu_M6000_14TeV \
    -m ${NEVT} reco=${reco}
 
   unset -v OUTDIR_ROOT

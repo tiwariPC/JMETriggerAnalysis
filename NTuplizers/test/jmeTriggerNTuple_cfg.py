@@ -74,8 +74,8 @@ if opts.reco == 'HLT':
 
 elif opts.reco == 'HLT_pfBlockAlgoRemovePS':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   from JMETriggerAnalysis.NTuplizers.customize_HLT_pfBlockAlgoRemovePS import *
-   process = customize_HLT_pfBlockAlgoRemovePS(process)
+   from JMETriggerAnalysis.NTuplizers.customise_HLT_pfBlockAlgoRemovePS import *
+   process = customise_HLT_pfBlockAlgoRemovePS(process)
 
 elif opts.reco == 'HLT_trkIter2RegionalPtSeed0p9':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
@@ -95,8 +95,8 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
 
 elif opts.reco == 'HLT_trkIter2GlobalPtSeed0p9':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   from JMETriggerAnalysis.NTuplizers.customize_HLT_trkIter2GlobalPtSeed0p9 import *
-   process = customize_HLT_trkIter2GlobalPtSeed0p9(process)
+   from JMETriggerAnalysis.NTuplizers.customise_HLT_trkIter2Global import *
+   process = customise_HLT_trkIter2GlobalPtSeed0p9(process, ptMin = 0.9)
 
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
