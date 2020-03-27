@@ -96,7 +96,7 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
 elif opts.reco == 'HLT_trkIter2GlobalPtSeed0p9':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
    from JMETriggerAnalysis.NTuplizers.customise_HLT_trkIter2Global import *
-   process = customise_HLT_trkIter2GlobalPtSeed0p9(process, ptMin = 0.9)
+   process = customise_HLT_trkIter2Global(process, ptMin = 0.9)
 
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
