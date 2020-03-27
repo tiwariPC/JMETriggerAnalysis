@@ -2,7 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 def customize_hltPhase2_TRKv00(process):
 
-
     process.PixelCPEGenericESProducer = cms.ESProducer("PixelCPEGenericESProducer",
         Alpha2Order = cms.bool(True),
         ClusterProbComputationFlag = cms.int32(0),
@@ -1840,7 +1839,6 @@ def customize_hltPhase2_TRKv00(process):
         trajectories = cms.InputTag("initialStepTracks")
     )
 
-
     process.caloTowerForTrk = cms.EDProducer("CaloTowersCreator",
         AllowMissingInputs = cms.bool(False),
         EBGrid = cms.vdouble(-1.0, 1.0, 10.0, 100.0, 1000.0),
@@ -1918,6 +1916,7 @@ def customize_hltPhase2_TRKv00(process):
         missingHcalRescaleFactorForEcal = cms.double(0)
     )
 
+    process.offlineBeamSpot = cms.EDProducer("BeamSpotProducer")
 
     ############# ordered setup
 
@@ -1988,6 +1987,7 @@ def customize_hltPhase2_TRKv00(process):
         process.siPixelRecHits +
         process.siPixelRecHitsPreSplitting
     )
+
     process.otLocalReco = cms.Sequence(
         process.MeasurementTrackerEvent #+
         #clusterSummaryProducer     # not sure what it is :(
@@ -2136,9 +2136,6 @@ def customize_hltPhase2_TRKv00(process):
 #      + process.offlinePrimaryVertices4DnoPID
     )
 
-    process.offlineBeamSpot = cms.EDProducer("BeamSpotProducer")
-
-    #reconstruction_step = cms.Path(
     process.globalreco_tracking = cms.Sequence(
         process.itLocalReco +
         process.offlineBeamSpot + #cmssw_10_6
@@ -2192,8 +2189,6 @@ def customize_hltPhase2_TRKv00(process):
     #    tripletElectronSeeds +
     #    tripletElectronTrackingRegions +
     )
-
-
 
     # remove globalreco_trackingTask to avoid any ambiguities
     # with the updated sequence process.globalreco_tracking
