@@ -519,7 +519,8 @@ print 'option: trkdqm =', opts.trkdqm
 print 'option: pfdqm =', opts.pfdqm
 print 'option: dumpPython =', opts.dumpPython
 print ''
-print 'process.GlobalTag.globaltag =', process.GlobalTag.globaltag
-print 'process.maxEvents =', process.maxEvents
-print 'process.source =', process.source
+print 'process.GlobalTag =', process.GlobalTag.dumpPython()
+print 'process.source =', process.source.dumpPython()
+print 'process.maxEvents =', process.maxEvents.dumpPython()
+print 'process.options =', process.options.dumpPython()
 print '-------------------------------'
