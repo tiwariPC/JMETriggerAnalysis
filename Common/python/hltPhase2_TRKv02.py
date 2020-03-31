@@ -12,10 +12,11 @@ from RecoTracker.TrackProducer.TrackProducer_cfi import TrackProducer as _TrackP
 ### Needed for initialStepSeeds
 from RecoTracker.TkSeedGenerator.seedCreatorFromRegionConsecutiveHitsTripletOnlyEDProducer_cfi import seedCreatorFromRegionConsecutiveHitsTripletOnlyEDProducer as _seedCreatorFromRegionConsecutiveHitsTripletOnlyEDProducer
 
-### Needed for ...?
+### Needed for sorting of primary vertices
 from RecoJets.JetProducers.caloJetsForTrk_cff import caloTowerForTrk as _caloTowerForTrk
 
 ### Rationale: define HLT tracking as "offline tracking" + modifications. The modifications are those in this file.
+
 # Initial step
 from RecoTracker.IterativeTracking.InitialStep_cff import initialStepSeedLayers as _initialStepSeedLayers
 from RecoTracker.IterativeTracking.InitialStep_cff import initialStepTrackingRegions as _initialStepTrackingRegions
@@ -42,7 +43,9 @@ def customize_hltPhase2_TRKv02(process):
     ### The rationale is to take from the release as much as possible, 
     ### and use clone() calls with changes to the parameters if needed
 
-    process.TrackProducer = _TrackProducer.clone()
+    process.TrackProducer = _TrackProducer.clone(
+      TTRHBuilder = 'WithTrackAngle',
+    )
 
     process.trackAlgoPriorityOrder = _trackAlgoPriorityOrderDefault.clone(
         algoOrder = cms.vstring(
@@ -61,6 +64,7 @@ def customize_hltPhase2_TRKv02(process):
     process.MeasurementTracker = _MeasurementTrackerESProducer_default.clone(
         Phase2StripCPE = cms.string('Phase2StripCPE')
     )
+    del process.MeasurementTracker.appendToDataLabel
 
     process.siPixelClustersPreSplitting = _SiPixelClusterizerDefault.clone(
         ElectronPerADCGain = cms.double(600.0),
@@ -68,19 +72,20 @@ def customize_hltPhase2_TRKv02(process):
         Phase2Calibration = cms.bool(True),
         src = cms.InputTag("simSiPixelDigis","Pixel")
     )
-    
+    del process.siPixelClustersPreSplitting.ClusterMode
+
     process.siPixelClusters = _SiPixelClusterizerDefault.clone(
         ElectronPerADCGain = cms.double(600.0),
         MissCalibrate = cms.bool(False),
         Phase2Calibration = cms.bool(True),
         src = cms.InputTag("simSiPixelDigis","Pixel")
     )
+    del process.siPixelClusters.ClusterMode
 
     process.trackerClusterCheck = _trackerClusterCheckDefault.clone(
         doClusterCheck = cms.bool(False),
     )
-    
-    ### Why do we need this?
+
     process.caloTowerForTrk = _caloTowerForTrk.clone(
         HBThreshold = cms.double(0.3),
         HBThreshold1 = cms.double(0.1),
@@ -163,6 +168,7 @@ def customize_hltPhase2_TRKv02(process):
         AlgorithmName = cms.string('initialStep'),
         Fitter = cms.string('FlexibleKFFittingSmoother'),
         src = cms.InputTag("initialStepTrackCandidates"),
+        TTRHBuilder = cms.string('WithTrackAngle'),
     )
 
     # Some PSets for TrackSelector
@@ -199,13 +205,14 @@ def customize_hltPhase2_TRKv02(process):
         d0_par2 = cms.vdouble(0.45, 4.0),
         dz_par1 = cms.vdouble(0.7, 4.0),
         dz_par2 = cms.vdouble(0.55, 4.0),
-        maxNumberLostLayers = cms.uint32(3),
+        maxNumberLostLayers = cms.uint32(2),
         minNumber3DLayers = cms.uint32(3),
         minNumberLayers = cms.uint32(3),
         name = cms.string('initialStep'),
         preFilterName = cms.string('initialStepTight'),
         qualityBit = cms.string('highPurity'),
         res_par = cms.vdouble(0.003, 0.001),
+        keepAllTracks = cms.bool(True),
     )
 
     process.initialStepSelector = _initialStepSelector.clone(
