@@ -21,6 +21,9 @@ class RecoVertexCollectionContainer : public VCollectionContainer<reco::Vertex> 
   std::vector<float>& vec_x(){ return x_; }
   std::vector<float>& vec_y(){ return y_; }
   std::vector<float>& vec_z(){ return z_; }
+  std::vector<float>& vec_xError(){ return xError_; }
+  std::vector<float>& vec_yError(){ return yError_; }
+  std::vector<float>& vec_zError(){ return zError_; }
 
  protected:
   std::vector<uint> tracksSize_;
@@ -30,6 +33,9 @@ class RecoVertexCollectionContainer : public VCollectionContainer<reco::Vertex> 
   std::vector<float> x_;
   std::vector<float> y_;
   std::vector<float> z_;
+  std::vector<float> xError_;
+  std::vector<float> yError_;
+  std::vector<float> zError_;
 };
 
 #endif

@@ -575,6 +575,9 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoVertexCollectionContainer_i.name()+"_x", &recoVertexCollectionContainer_i.vec_x());
     this->addBranch(recoVertexCollectionContainer_i.name()+"_y", &recoVertexCollectionContainer_i.vec_y());
     this->addBranch(recoVertexCollectionContainer_i.name()+"_z", &recoVertexCollectionContainer_i.vec_z());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_xError", &recoVertexCollectionContainer_i.vec_xError());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_yError", &recoVertexCollectionContainer_i.vec_yError());
+    this->addBranch(recoVertexCollectionContainer_i.name()+"_zError", &recoVertexCollectionContainer_i.vec_zError());
   }
 
   for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){

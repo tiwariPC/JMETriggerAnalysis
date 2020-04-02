@@ -14,6 +14,9 @@ void RecoVertexCollectionContainer::clear(){
   x_.clear();
   y_.clear();
   z_.clear();
+  xError_.clear();
+  yError_.clear();
+  zError_.clear();
 }
 
 void RecoVertexCollectionContainer::reserve(const size_t vec_size){
@@ -25,6 +28,9 @@ void RecoVertexCollectionContainer::reserve(const size_t vec_size){
   x_.reserve(vec_size);
   y_.reserve(vec_size);
   z_.reserve(vec_size);
+  xError_.reserve(vec_size);
+  yError_.reserve(vec_size);
+  zError_.reserve(vec_size);
 }
 
 void RecoVertexCollectionContainer::emplace_back(const reco::Vertex& obj){
@@ -36,4 +42,7 @@ void RecoVertexCollectionContainer::emplace_back(const reco::Vertex& obj){
   x_.emplace_back(obj.x());
   y_.emplace_back(obj.y());
   z_.emplace_back(obj.z());
+  xError_.emplace_back(obj.xError());
+  yError_.emplace_back(obj.yError());
+  zError_.emplace_back(obj.zError());
 }
