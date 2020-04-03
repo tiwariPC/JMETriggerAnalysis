@@ -20,6 +20,7 @@ void PATElectronCollectionContainer::clear(){
   id_.clear();
   pfIso_.clear();
   etaSC_.clear();
+  eCorr_.clear();
 }
 
 void PATElectronCollectionContainer::reserve(const size_t vec_size){
@@ -37,6 +38,7 @@ void PATElectronCollectionContainer::reserve(const size_t vec_size){
   id_.reserve(vec_size);
   pfIso_.reserve(vec_size);
   etaSC_.reserve(vec_size);
+  eCorr_.reserve(vec_size);
 }
 
 void PATElectronCollectionContainer::emplace_back(const pat::Electron& obj){
@@ -65,4 +67,8 @@ void PATElectronCollectionContainer::emplace_back(const pat::Electron& obj){
   pfIso_.emplace_back(obj.hasUserFloat("pfIso") ? obj.userFloat("pfIso") : -9999.);
 
   etaSC_.emplace_back(obj.superCluster()->eta());
+
+  const float eCorr((obj.hasUserFloat("ecalTrkEnergyPostCorr") and (obj.energy() != 0.)) ?
+    (obj.userFloat("ecalTrkEnergyPostCorr") / obj.energy()) : 1.0);
+  eCorr_.emplace_back(eCorr);
 }

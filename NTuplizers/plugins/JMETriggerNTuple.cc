@@ -662,6 +662,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patJetCollectionContainer_i.name()+"_jesc", &patJetCollectionContainer_i.vec_jesc());
     this->addBranch(patJetCollectionContainer_i.name()+"_jetArea", &patJetCollectionContainer_i.vec_jetArea());
     this->addBranch(patJetCollectionContainer_i.name()+"_numberOfDaughters", &patJetCollectionContainer_i.vec_numberOfDaughters());
+    this->addBranch(patJetCollectionContainer_i.name()+"_pfid", &patJetCollectionContainer_i.vec_pfid());
     this->addBranch(patJetCollectionContainer_i.name()+"_chargedHadronEnergyFraction", &patJetCollectionContainer_i.vec_chargedHadronEnergyFraction());
     this->addBranch(patJetCollectionContainer_i.name()+"_neutralHadronEnergyFraction", &patJetCollectionContainer_i.vec_neutralHadronEnergyFraction());
     this->addBranch(patJetCollectionContainer_i.name()+"_electronEnergyFraction", &patJetCollectionContainer_i.vec_electronEnergyFraction());
@@ -766,6 +767,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patElectronCollectionContainer_i.name()+"_id", &patElectronCollectionContainer_i.vec_id());
     this->addBranch(patElectronCollectionContainer_i.name()+"_pfIso", &patElectronCollectionContainer_i.vec_pfIso());
     this->addBranch(patElectronCollectionContainer_i.name()+"_etaSC", &patElectronCollectionContainer_i.vec_etaSC());
+    this->addBranch(patElectronCollectionContainer_i.name()+"_eCorr", &patElectronCollectionContainer_i.vec_eCorr());
   }
 
   // settings for output TFile and TTree

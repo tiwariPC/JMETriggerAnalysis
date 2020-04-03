@@ -27,6 +27,7 @@ class PATElectronCollectionContainer : public VRecoCandidateCollectionContainer<
   std::vector<uint>& vec_id(){ return id_; }
   std::vector<float>& vec_pfIso(){ return pfIso_; }
   std::vector<float>& vec_etaSC(){ return etaSC_; }
+  std::vector<float>& vec_eCorr(){ return eCorr_; }
 
  protected:
   std::vector<int> pdgId_;
@@ -42,6 +43,7 @@ class PATElectronCollectionContainer : public VRecoCandidateCollectionContainer<
   std::vector<uint> id_;
   std::vector<float> pfIso_;
   std::vector<float> etaSC_;
+  std::vector<float> eCorr_;
 };
 
 #endif

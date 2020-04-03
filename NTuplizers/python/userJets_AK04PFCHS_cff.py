@@ -1,14 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 
-def userJets_AK04PFCHS(process, isMC, era):
+def userJets_AK04PFCHS(process, era, isData):
+    # task
+    process.userJetsAK04PFCHSTask = cms.Task()
 
     # list of b-tag discriminators to be re-calculated
-    updated_btaggers = None
+    _updated_btaggers = None
 
     # 2016, 2017: re-calculate DeepJet b-taggers (to use latest training)
     if era in ['2016', '2017']:
 
-       updated_btaggers = [
+       _updated_btaggers = [
          'pfDeepFlavourJetTags:probb',
          'pfDeepFlavourJetTags:probbb',
          'pfDeepFlavourJetTags:problepb',
@@ -34,40 +36,41 @@ def userJets_AK04PFCHS(process, isMC, era):
       pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
       svSource = cms.InputTag('slimmedSecondaryVertices'),
 
-      jetCorrections = jetEnergyCorr,
+      jetCorrections = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'], 'None'),
 
-      btagDiscriminators = updated_btaggers,
+      btagDiscriminators = _updated_btaggers,
     )
-    task.add(process.selectedUpdatedPatJetsAK04CHS)
+    process.userJetsAK04PFCHSTask.add(process.patAlgosToolsTask)
+    process.userJetsAK04PFCHSTask.add(process.selectedUpdatedPatJetsAK04CHS)
     _lastJetCollection = 'selectedUpdatedPatJetsAK04CHS'
 
     ### ---
 
-    ##
-    ## SmearedPATJetProducer: standard JetMET tool to apply JERC to pat:Jets
-    ##
-    if isMC:
-       process.patJetsSmeared = cms.EDProducer('SmearedPATJetProducer',
-         src = cms.InputTag('selectedUpdatedPatJetsAK04CHS'),
-         algo   = cms.string('AK4PFchs'),
-         algopt = cms.string('AK4PFchs_pt'),
-         dPtMaxFactor = cms.double(3),
-         dRMax = cms.double(0.2),
-         debug = cms.untracked.bool(False),
-         enabled = cms.bool(True),
-
-         genJets = cms.InputTag("ak4GenJetsNoNu"),
-
-         rho = cms.InputTag("fixedGridRhoFastjetAll"),
-         seed = cms.uint32(37428479),
-
-         skipGenMatching = cms.bool(False),
-         useDeterministicSeed = cms.bool(True),
-         variation = cms.int32(0),
-       )
-       task.add(process.patJetsSmeared)
-       _lastJetCollection = 'patJetsSmeared'
-    ### ---
+#    ##
+#    ## SmearedPATJetProducer: standard JetMET tool to apply JERC to pat:Jets
+#    ##
+#    if not isData:
+#       process.patJetsSmeared = cms.EDProducer('SmearedPATJetProducer',
+#         src = cms.InputTag(_lastJetCollection),
+#         algo   = cms.string('AK4PFchs'),
+#         algopt = cms.string('AK4PFchs_pt'),
+#         dPtMaxFactor = cms.double(3),
+#         dRMax = cms.double(0.2),
+#         debug = cms.untracked.bool(False),
+#         enabled = cms.bool(True),
+#
+#         genJets = cms.InputTag('ak4GenJetsNoNu'),
+#
+#         rho = cms.InputTag('fixedGridRhoFastjetAll'),
+#         seed = cms.uint32(37428479),
+#
+#         skipGenMatching = cms.bool(False),
+#         useDeterministicSeed = cms.bool(True),
+#         variation = cms.int32(0),
+#       )
+#       process.userJetsAK04PFCHSTask.add(process.patJetsSmeared)
+#       _lastJetCollection = 'patJetsSmeared'
+#    ### ---
 
     ### jet selection: PF-Jet ID
     from PhysicsTools.SelectorUtils.pfJetIDSelector_cfi import pfJetIDSelector
@@ -75,70 +78,61 @@ def userJets_AK04PFCHS(process, isMC, era):
     if era == '2016':
 
        process.selectedJetsValueMapPFJetIDTightLepVeto = cms.EDProducer('PatJetIDValueMapProducer',
-
          src = cms.InputTag(_lastJetCollection),
-
          filterParams = cms.PSet(
-
            version = cms.string('WINTER16'),
            quality = cms.string('TIGHTLEPVETO')
          )
        )
 
-       process.selectedJetsValueMapPFJetIDTight = process.selectedJetsValueMapPFJetIDTightLepVeto.clone()
-       process.selectedJetsValueMapPFJetIDTight.filterParams.quality = 'TIGHT'
-
        process.selectedJetsValueMapPFJetIDLoose = process.selectedJetsValueMapPFJetIDTightLepVeto.clone()
        process.selectedJetsValueMapPFJetIDLoose.filterParams.quality = 'LOOSE'
 
-       task.add(process.selectedJetsValueMapPFJetIDTightLepVeto)
-       task.add(process.selectedJetsValueMapPFJetIDTight)
-       task.add(process.selectedJetsValueMapPFJetIDLoose)
+       process.selectedJetsValueMapPFJetIDTight = process.selectedJetsValueMapPFJetIDTightLepVeto.clone()
+       process.selectedJetsValueMapPFJetIDTight.filterParams.quality = 'TIGHT'
+
+       process.userJetsAK04PFCHSTask.add(process.selectedJetsValueMapPFJetIDLoose)
+       process.userJetsAK04PFCHSTask.add(process.selectedJetsValueMapPFJetIDTight)
+       process.userJetsAK04PFCHSTask.add(process.selectedJetsValueMapPFJetIDTightLepVeto)
 
        process.selectedUpdatedPatJetsAK04CHSUserData = cms.EDProducer('PATJetUserDataEmbedder',
-
          src = cms.InputTag(_lastJetCollection),
-
          userInts = cms.PSet(
-
-           PFJetIDLoose        = cms.InputTag('selectedJetsValueMapPFJetIDLoose'),
-           PFJetIDTight        = cms.InputTag('selectedJetsValueMapPFJetIDTight'),
+           PFJetIDLoose = cms.InputTag('selectedJetsValueMapPFJetIDLoose'),
+           PFJetIDTight = cms.InputTag('selectedJetsValueMapPFJetIDTight'),
            PFJetIDTightLepVeto = cms.InputTag('selectedJetsValueMapPFJetIDTightLepVeto'),
          ),
        )
-       task.add(process.selectedUpdatedPatJetsAK04CHSUserData)
+       process.userJetsAK04PFCHSTask.add(process.selectedUpdatedPatJetsAK04CHSUserData)
        _lastJetCollection = 'selectedUpdatedPatJetsAK04CHSUserData'
 
     elif era in ['2017', '2018']:
 
        process.selectedJetsValueMapPFJetIDTightLepVeto = cms.EDProducer('PatJetIDValueMapProducer',
-
          src = cms.InputTag(_lastJetCollection),
-
          filterParams = cms.PSet(
-
            version = cms.string('SUMMER18'),
            quality = cms.string('TIGHTLEPVETO')
          )
        )
 
+       if era == '2017':
+          process.selectedJetsValueMapPFJetIDTightLepVeto.filterParams.version = 'WINTER17'
+
        process.selectedJetsValueMapPFJetIDTight = process.selectedJetsValueMapPFJetIDTightLepVeto.clone()
        process.selectedJetsValueMapPFJetIDTight.filterParams.quality = 'TIGHT'
 
-       task.add(process.selectedJetsValueMapPFJetIDTightLepVeto)
-       task.add(process.selectedJetsValueMapPFJetIDTight)
+       process.userJetsAK04PFCHSTask.add(process.selectedJetsValueMapPFJetIDTight)
+       process.userJetsAK04PFCHSTask.add(process.selectedJetsValueMapPFJetIDTightLepVeto)
 
        process.selectedUpdatedPatJetsAK04CHSUserData = cms.EDProducer('PATJetUserDataEmbedder',
-
          src = cms.InputTag(_lastJetCollection),
-
          userInts = cms.PSet(
-
-           PFJetIDTight        = cms.InputTag('selectedJetsValueMapPFJetIDTight'),
+           PFJetIDTight = cms.InputTag('selectedJetsValueMapPFJetIDTight'),
            PFJetIDTightLepVeto = cms.InputTag('selectedJetsValueMapPFJetIDTightLepVeto'),
          ),
        )
-       task.add(process.selectedUpdatedPatJetsAK04CHSUserData)
+       process.userJetsAK04PFCHSTask.add(process.selectedUpdatedPatJetsAK04CHSUserData)
        _lastJetCollection = 'selectedUpdatedPatJetsAK04CHSUserData'
 
     else:
@@ -149,34 +143,34 @@ def userJets_AK04PFCHS(process, isMC, era):
     from PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi import selectedPatJets
     process.selectedJets = selectedPatJets.clone(
       src = _lastJetCollection,
-      cut = '(pt > 14.) && (abs(eta) < 2.4)',
+      cut = '(pt > 14.) && (abs(eta) < 5.0)',
     )
-    task.add(process.selectedJets)
+    process.userJetsAK04PFCHSTask.add(process.selectedJets)
     _lastJetCollection = 'selectedJets'
     ### ---
 
-    ### update pileup jet ID
-    if updatePUJetId:
+#    ### update pileup jet ID
+#    from RecoJets.JetProducers.PileupJetID_cfi import pileupJetId
+#    process.pileupJetIdUpdated = pileupJetId.clone(
+#      jets = _lastJetCollection,
+#      vertexes = 'offlineSlimmedPrimaryVertices',
+#      inputIsCorrected = True,
+#      applyJec = True,
+#    )
+#    process.userJetsAK04PFCHSTask.add(process.pileupJetIdUpdated)
+#    pileupJetId = 'pileupJetIdUpdated'
+#
+#    from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets
+#    process.updatedPatJets = updatedPatJets.clone(
+#      jetSource = _lastJetCollection,
+#      addJetCorrFactors = False,
+#    )
+#    process.updatedPatJets.userData.userFloats.src.append(pileupJetId+':fullDiscriminant')
+#    process.updatedPatJets.userData.userInts.src.append(pileupJetId+':fullId')
+#    process.userJetsAK04PFCHSTask.add(process.updatedPatJets)
+#    _lastJetCollection = 'updatedPatJets'
+#    ### ---
 
-       from RecoJets.JetProducers.PileupJetID_cfi import pileupJetId
-       process.pileupJetIdUpdated = pileupJetId.clone(
-         jets = _lastJetCollection,
-         vertexes = 'offlineSlimmedPrimaryVertices',
-         inputIsCorrected = True,
-         applyJec = True,
-       )
-       task.add(process .pileupJetIdUpdated)
-       pileupJetId = 'pileupJetIdUpdated'
+    process.userJetsAK04PFCHSSeq = cms.Sequence(process.userJetsAK04PFCHSTask)
 
-       from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff  import updatedPatJets
-       process.updatedPatJets = updatedPatJets.clone(
-         jetSource = _lastJetCollection,
-         addJetCorrFactors = False,
-       )
-       process.updatedPatJets.userData.userFloats.src.append(pileupJetId+':fullDiscriminant')
-       process.updatedPatJets.userData.userInts  .src.append(pileupJetId+':fullId')
-       task.add(process.updatedPatJets)
-       _lastJetCollection = 'updatedPatJets'
-    ### ---
-
-    return process
+    return process, _lastJetCollection

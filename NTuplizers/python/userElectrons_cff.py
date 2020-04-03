@@ -10,11 +10,11 @@ def userElectrons(process, era):
     ###
     ###  - https://twiki.cern.ch/twiki/bin/view/CMS/EgammaMiniAODV2
     ###  - https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes
-    ###  - https://hypernews.cern.ch/HyperNews/CMS/get/egamma/2204/1/1.html because of PUPPI MET: added phoIDModules=[]
+    ###  - https://hypernews.cern.ch/HyperNews/CMS/get/egamma/2204/1/1.html (because of PUPPI MET, added 'phoIDModules=[]')
     ###
-    if   era == '2016': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=True, applyVIDOnCorrectedEgamma=True, era='2016-Legacy')
-    elif era == '2017': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=True, applyVIDOnCorrectedEgamma=True, era='2017-Nov17ReReco')
-    elif era == '2018': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=True, applyVIDOnCorrectedEgamma=True, era='2018-Prompt')
+    if   era == '2016': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=False, era='2016-Legacy')
+    elif era == '2017': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=False, era='2017-Nov17ReReco')
+    elif era == '2018': setupEgammaPostRecoSeq(process, runVID=True, phoIDModules=[], runEnergyCorrections=True, applyEnergyCorrections=False, era='2018-Prompt')
     else:
        raise RuntimeError('userElectrons(process, era="'+str(era)+'") -- invalid value for argument "era"')
 
@@ -33,7 +33,6 @@ def userElectrons(process, era):
       rho = cms.InputTag('fixedGridRhoFastjetAll'),
 
       userFloat_copycat = cms.PSet(
-
         mva_Iso   = cms.string('ElectronMVAEstimatorRun2Fall17'+  'IsoV2Values'),
         mva_NoIso = cms.string('ElectronMVAEstimatorRun2Fall17'+'NoIsoV2Values'),
       ),
@@ -50,6 +49,9 @@ def userElectrons(process, era):
       ),
     )
 
+    if era == '2016':
+       process.userElectronsWithUserData.effAreas_file = 'RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt'
+
     process.userIsolatedElectrons = selectedPatElectrons.clone(
       src = 'userElectronsWithUserData',
       cut = 'userInt("IDCutBasedLoose") > 0',
@@ -61,6 +63,6 @@ def userElectrons(process, era):
       process.userIsolatedElectrons,
     )
 
-    process.userElectronsSeq = cms.Sequence(process.userElectronsTask)
+    process.userElectronsSeq = cms.Sequence(process.egammaPostRecoSeq, process.userElectronsTask)
 
-    return process
+    return process, 'userIsolatedElectrons'

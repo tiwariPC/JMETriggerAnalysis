@@ -30,4 +30,4 @@ def userMuons(process):
 
     process.userMuonsSeq = cms.Sequence(process.userMuonsTask)
 
-    return process
+    return process, 'userIsolatedMuons'

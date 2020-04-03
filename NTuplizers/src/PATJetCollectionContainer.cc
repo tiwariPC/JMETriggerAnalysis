@@ -15,6 +15,7 @@ void PATJetCollectionContainer::clear(){
   jesc_.clear();
   jetArea_.clear();
   numberOfDaughters_.clear();
+  pfid_.clear();
 
   chargedHadronEnergyFraction_.clear();
   neutralHadronEnergyFraction_.clear();
@@ -38,7 +39,8 @@ void PATJetCollectionContainer::reserve(const size_t vec_size){
 
   jesc_.reserve(vec_size);
   jetArea_.reserve(vec_size);
-  numberOfDaughters_.reserve(vec_size);;
+  numberOfDaughters_.reserve(vec_size);
+  pfid_.reserve(vec_size);
 
   chargedHadronEnergyFraction_.reserve(vec_size);
   neutralHadronEnergyFraction_.reserve(vec_size);
@@ -63,6 +65,12 @@ void PATJetCollectionContainer::emplace_back(const pat::Jet& obj){
   jesc_.emplace_back(obj.jecFactor(0) ? (1./obj.jecFactor(0)) : 1.);
   jetArea_.emplace_back(obj.jetArea());
   numberOfDaughters_.emplace_back(obj.numberOfDaughters());
+
+  uint pfid(0);
+  if(obj.hasUserInt("PFJetIDTightLepVeto") && (obj.userInt("PFJetIDTightLepVeto") > 0)){ pfid = 3; }
+  else if(obj.hasUserInt("PFJetIDTight") && (obj.userInt("PFJetIDTight") > 0)){ pfid = 2; }
+  else if(obj.hasUserInt("PFJetIDLoose") && (obj.userInt("PFJetIDLoose") > 0)){ pfid = 1; }
+  pfid_.emplace_back(pfid);
 
   chargedHadronEnergyFraction_.emplace_back(obj.isPFJet() ? obj.chargedHadronEnergyFraction() : -99.);
   neutralHadronEnergyFraction_.emplace_back(obj.isPFJet() ? obj.neutralHadronEnergyFraction() : -99.);
