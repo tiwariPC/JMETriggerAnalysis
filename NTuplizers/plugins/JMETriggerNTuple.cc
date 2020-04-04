@@ -9,6 +9,7 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/ValueContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h"
@@ -61,6 +62,7 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   std::unordered_map<std::string, std::string>  stringCutObjectSelectors_map_;
 
   std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
+  std::vector<ValueContainer<bool>> v_boolContainer_;
   std::vector<RecoVertexCollectionContainer> v_recoVertexCollectionContainer_;
   std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
   std::vector<PATPackedCandidateCollectionContainer> v_patPackedCandidateCollectionContainer_;
@@ -114,12 +116,12 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   : TTreeName_(iConfig.getParameter<std::string>("TTreeName"))
-  , TriggerResultsFilterOR_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterOR"))
-  , TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string> >("TriggerResultsFilterAND"))
-  , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string> >("outputBranchesToBeDropped")) {
+  , TriggerResultsFilterOR_(iConfig.getParameter<std::vector<std::string>>("TriggerResultsFilterOR"))
+  , TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string>>("TriggerResultsFilterAND"))
+  , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string>>("outputBranchesToBeDropped")) {
 
   const auto& TriggerResultsInputTag = iConfig.getParameter<edm::InputTag>("TriggerResults");
-  const auto& TriggerResultsCollections = iConfig.getParameter<std::vector<std::string> >("TriggerResultsCollections");
+  const auto& TriggerResultsCollections = iConfig.getParameter<std::vector<std::string>>("TriggerResultsCollections");
 
   triggerResultsContainer_ptr_.reset(new TriggerResultsContainer(TriggerResultsCollections, TriggerResultsInputTag.label(), this->consumes<edm::TriggerResults>(TriggerResultsInputTag)));
 
@@ -143,6 +145,22 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     for(const auto& label : stringCutObjectSelectors_labels){
 
       stringCutObjectSelectors_map_[label] = pset_stringCutObjectSelectors.getParameter<std::string>(label);
+    }
+  }
+
+  // bool
+  v_boolContainer_.clear();
+
+  if(iConfig.exists("bools")){
+
+    const edm::ParameterSet& pset_bool(iConfig.getParameter<edm::ParameterSet>("bools"));
+    const auto& inputTagLabels_bools(pset_bool.getParameterNamesForType<edm::InputTag>());
+
+    v_boolContainer_.reserve(inputTagLabels_bools.size());
+
+    for(const auto& label : inputTagLabels_bools){
+      auto const& inputTag(pset_bool.getParameter<edm::InputTag>(label));
+      v_boolContainer_.emplace_back(ValueContainer<bool>(label, inputTag.label(), this->consumes<bool>(inputTag)));
     }
   }
 
@@ -566,6 +584,11 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
   }
 
+  for(auto& boolContainer_i : v_boolContainer_){
+
+    this->addBranch(boolContainer_i.name(), &boolContainer_i.value());
+  }
+
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
 
     this->addBranch(recoVertexCollectionContainer_i.name()+"_tracksSize", &recoVertexCollectionContainer_i.vec_tracksSize());
@@ -830,6 +853,28 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
     // update fill-collection conditions
     fillCollectionConditionMap_.update(*triggerResults_handle, iEvent);
+  }
+
+  // fill boolContainers
+  for(auto& boolContainer_i : v_boolContainer_){
+
+    boolContainer_i.setValue(false);
+
+    if(fillCollectionConditionMap_.has(boolContainer_i.name()) and (not fillCollectionConditionMap_.accept(boolContainer_i.name()))){
+      continue;
+    }
+
+    edm::Handle<bool> i_handle;
+    iEvent.getByToken(boolContainer_i.token(), i_handle);
+
+    if(not i_handle.isValid()){
+      edm::LogWarning("JMETriggerNTuple::analyze")
+        << "invalid handle for input collection: \"" << boolContainer_i.inputTagLabel()
+        << "\" (NTuple branch: \"" << boolContainer_i.name() << "\")";
+    }
+    else {
+      boolContainer_i.setValue(*i_handle);
+    }
   }
 
   // fill recoVertexCollectionContainers

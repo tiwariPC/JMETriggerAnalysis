@@ -197,7 +197,7 @@ from JMETriggerAnalysis.NTuplizers.userJets_AK04PFCHS_cff import userJets_AK04PF
 process, userJetsAK04PFCHSCollection = userJets_AK04PFCHS(process, era=opts.era, isData=opts.isData)
 
 from JMETriggerAnalysis.NTuplizers.ele32DoubleL1ToSingleL1FlagProducer_cfi import ele32DoubleL1ToSingleL1FlagProducer
-process.ele32DoubleL1ToSingleL1FlagProducer = ele32DoubleL1ToSingleL1FlagProducer.clone(
+process.ele32DoubleL1ToSingleL1Flag = ele32DoubleL1ToSingleL1FlagProducer.clone(
   electrons = cms.InputTag('slimmedElectrons'),
   triggerResults = cms.InputTag('TriggerResults::HLT'),
   triggerObjects = cms.InputTag('slimmedPatTrigger'),
@@ -403,30 +403,29 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   fillCollectionConditions = cms.PSet(),
 
-  recoVertexCollections = cms.PSet(
+  bools = cms.PSet(
+    ele32DoubleL1ToSingleL1Flag = cms.InputTag('ele32DoubleL1ToSingleL1Flag'),
+  ),
 
+  recoVertexCollections = cms.PSet(
 #    hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
 #    hltVerticesPF = cms.InputTag('hltVerticesPF'),
   ),
 
   recoPFCandidateCollections = cms.PSet(
-
 #    hltParticleFlow = cms.InputTag('hltParticleFlow'),
   ),
 
   patPackedCandidateCollections = cms.PSet(
-
 #    offlinePFCandidates = cms.InputTag('packedPFCandidates'),
   ),
 
   recoGenJetCollections = cms.PSet(
-
 #    ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
 #    ak8GenJetsNoNu = cms.InputTag('ak8GenJetsNoNu::HLT'),
   ),
 
   recoCaloJetCollections = cms.PSet(
-
 #    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
 #    hltAK4CaloJetsCorrected = cms.InputTag('hltAK4CaloJetsCorrected'),
 
@@ -497,7 +496,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   outputBranchesToBeDropped = cms.vstring(
-
 #    'offlinePrimaryVertices_tracksSize',
 #
 ##    'hltPFMet_ChargedEMEtFraction',
@@ -515,7 +513,7 @@ process.analysisCollectionsPath = cms.Path(
   + process.userLeptons
   + process.userLeptonsMultiplicityFilter
   + process.userJetsAK04PFCHSSeq
-  + process.ele32DoubleL1ToSingleL1FlagProducer
+  + process.ele32DoubleL1ToSingleL1Flag
   + process.JMETriggerNTuple
 )
 

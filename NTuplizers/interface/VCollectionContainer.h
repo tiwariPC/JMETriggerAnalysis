@@ -22,14 +22,14 @@ class VCollectionContainer {
 
   void setStringCutObjectSelector(const std::string&);
 
-  void setName(const std::string& str) { name_ = str; }
+//  void setName(const std::string& str) { name_ = str; }
 
   const std::string& name() const { return name_; }
   const std::string& inputTagLabel() const { return inputTagLabel_; }
   const edm::EDGetToken& token() const { return token_; }
 
  protected:
-  std::string name_;
+  const std::string name_;
   const std::string inputTagLabel_;
   const edm::EDGetToken token_;
 
