@@ -506,8 +506,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 )
 
+from JMETriggerAnalysis.NTuplizers.hltPrinter_cfi import hltPrinter
+process.hltPrinter = hltPrinter.clone()
+
 process.analysisCollectionsPath = cms.Path(
-    process.METFiltersSeq
+    process.hltPrinter
+  + process.METFiltersSeq
   + process.userMuonsSeq
   + process.userElectronsSeq
   + process.userLeptons
