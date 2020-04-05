@@ -276,7 +276,7 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
           LogTrace("") << "[TriggerFlagsProducer::produce]           " << l1tSeedName
             << " getInitialDecisionByName = " << decInitial << " (valid = " << decInitialIsValid << ")";
-	}
+        }
         l1tSeedAcceptFromL1GlobalUtilInitial = l1AlgoLogicParserInitial.expressionResult();
 
         // GlobalLogicParser - Interm
@@ -299,7 +299,7 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
           LogTrace("") << "[TriggerFlagsProducer::produce]           " << l1tSeedName
             << " getIntermDecisionByName = " << decInterm << " (valid = " << decIntermIsValid << ")";
-	}
+        }
         l1tSeedAcceptFromL1GlobalUtilInterm = l1AlgoLogicParserInterm.expressionResult();
 
         // GlobalLogicParser - Final
@@ -322,7 +322,7 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
           LogTrace("") << "[TriggerFlagsProducer::produce]           " << l1tSeedName
             << " getFinalDecisionByName = " << decFinal << " (valid = " << decFinalIsValid << ")";
-	}
+        }
         l1tSeedAcceptFromL1GlobalUtilFinal = l1AlgoLogicParserFinal.expressionResult();
 
         // consistency check between HLT-Path and L1GlobalUtil
