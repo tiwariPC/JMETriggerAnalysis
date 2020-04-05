@@ -49,8 +49,8 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   template <typename... Args>
   void addBranch(const std::string&, Args...);
 
-  bool passesTriggerResults_OR(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&);
-  bool passesTriggerResults_AND(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&);
+  bool passesTriggerResults_logicalOR(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&) const;
+  bool passesTriggerResults_logicalAND(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&) const;
 
   const std::string TTreeName_;
 
@@ -59,7 +59,7 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
 
   const std::vector<std::string> outputBranchesToBeDropped_;
 
-  std::unordered_map<std::string, std::string>  stringCutObjectSelectors_map_;
+  std::unordered_map<std::string, std::string> stringCutObjectSelectors_map_;
 
   std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
   std::vector<ValueContainer<bool>> v_boolContainer_;
@@ -831,7 +831,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     // exit method for events that do not pass the logical OR of the specified HLT paths (if any)
     if(TriggerResultsFilterOR_.size() > 0){
 
-      if(not this->passesTriggerResults_OR(*triggerResults_handle, iEvent, TriggerResultsFilterOR_)){
+      if(not this->passesTriggerResults_logicalOR(*triggerResults_handle, iEvent, TriggerResultsFilterOR_)){
 
         return;
       }
@@ -840,7 +840,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     // exit method for events that do not pass the logical AND of the specified HLT paths (if any)
     if(TriggerResultsFilterAND_.size() > 0){
 
-      if(not this->passesTriggerResults_AND(*triggerResults_handle, iEvent, TriggerResultsFilterAND_)){
+      if(not this->passesTriggerResults_logicalAND(*triggerResults_handle, iEvent, TriggerResultsFilterAND_)){
 
         return;
       }
@@ -1291,12 +1291,11 @@ void JMETriggerNTuple::addBranch(const std::string& branch_name, Args... args){
   }
 }
 
-
-bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& triggerResults, const edm::Event& iEvent, const std::vector<std::string>& paths){
+bool JMETriggerNTuple::passesTriggerResults_logicalOR(const edm::TriggerResults& triggerResults, const edm::Event& iEvent, const std::vector<std::string>& paths) const {
 
   if(paths.size() == 0){
 
-    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_OR") << "input error: empty list of paths for event selection, will return True";
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_logicalOR") << "input error: empty list of paths for event selection, will return True";
 
     return true;
   }
@@ -1305,7 +1304,7 @@ bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& trigge
 
   if(triggerResults.size() != triggerNames.size()){
 
-    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_OR") << "input error: size of TriggerResults ("
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_logicalOR") << "input error: size of TriggerResults ("
       << triggerResults.size() << ") and TriggerNames (" << triggerNames.size() << ") differ, exiting function";
 
     return false;
@@ -1319,17 +1318,17 @@ bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& trigge
 
       if(std::find(paths.begin(), paths.end(), triggerName) != paths.end()){
 
-        LogDebug("JMETriggerNTuple::passesTriggerResults_OR") << "event accepted by path \"" << triggerName << "\"";
+        LogDebug("JMETriggerNTuple::passesTriggerResults_logicalOR") << "event accepted by path \"" << triggerName << "\"";
 
         return true;
       }
       else {
 
-        const auto triggerName_unv = triggerName.substr(0, triggerName.rfind("_v"));
+        const auto triggerNameUnv = triggerName.substr(0, triggerName.rfind("_v"));
 
-        if(std::find(paths.begin(), paths.end(), triggerName_unv) != paths.end()){
+        if(std::find(paths.begin(), paths.end(), triggerNameUnv) != paths.end()){
 
-          LogDebug("JMETriggerNTuple::passesTriggerResults_OR") << "event accepted by path \"" << triggerName_unv << "\"";
+          LogDebug("JMETriggerNTuple::passesTriggerResults_logicalOR") << "event accepted by path \"" << triggerNameUnv << "\"";
 
           return true;
         }
@@ -1340,11 +1339,11 @@ bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& trigge
   return false;
 }
 
-bool JMETriggerNTuple::passesTriggerResults_AND(const edm::TriggerResults& triggerResults, const edm::Event& iEvent, const std::vector<std::string>& paths){
+bool JMETriggerNTuple::passesTriggerResults_logicalAND(const edm::TriggerResults& triggerResults, const edm::Event& iEvent, const std::vector<std::string>& paths) const {
 
   if(paths.size() == 0){
 
-    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_AND") << "input error: empty list of paths for event selection, will return True";
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_logicalAND") << "input error: empty list of paths for event selection, will return True";
 
     return true;
   }
@@ -1353,7 +1352,7 @@ bool JMETriggerNTuple::passesTriggerResults_AND(const edm::TriggerResults& trigg
 
   if(triggerResults.size() != triggerNames.size()){
 
-    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_AND") << "input error: size of TriggerResults ("
+    edm::LogWarning("JMETriggerNTuple::passesTriggerResults_logicalAND") << "input error: size of TriggerResults ("
       << triggerResults.size() << ") and TriggerNames (" << triggerNames.size() << ") differ, exiting function";
 
     return false;
@@ -1367,17 +1366,17 @@ bool JMETriggerNTuple::passesTriggerResults_AND(const edm::TriggerResults& trigg
 
       if(std::find(paths.begin(), paths.end(), triggerName) != paths.end()){
 
-        LogDebug("JMETriggerNTuple::passesTriggerResults_AND") << "event not accepted by path \"" << triggerName << "\"";
+        LogDebug("JMETriggerNTuple::passesTriggerResults_logicalAND") << "event not accepted by path \"" << triggerName << "\"";
 
         return false;
       }
       else {
 
-        const auto triggerName_unv = triggerName.substr(0, triggerName.rfind("_v"));
+        const auto triggerNameUnv = triggerName.substr(0, triggerName.rfind("_v"));
 
-        if(std::find(paths.begin(), paths.end(), triggerName_unv) != paths.end()){
+        if(std::find(paths.begin(), paths.end(), triggerNameUnv) != paths.end()){
 
-          LogDebug("JMETriggerNTuple::passesTriggerResults_AND") << "event not accepted by path \"" << triggerName_unv << "\"";
+          LogDebug("JMETriggerNTuple::passesTriggerResults_logicalAND") << "event not accepted by path \"" << triggerNameUnv << "\"";
 
           return false;
         }
@@ -1466,12 +1465,12 @@ int JMETriggerNTuple::FillCollectionConditionsMap::update(const edm::TriggerResu
     if(triggerResults.at(idx).accept()){
 
       const auto& triggerName = triggerNames.at(idx);
-      const auto triggerName_unv = triggerName.substr(0, triggerName.rfind("_v"));
+      const auto triggerNameUnv = triggerName.substr(0, triggerName.rfind("_v"));
 
       for(auto& map_entry : condMap_){
 
         // require match either full name or name without version
-        if((map_entry.second.path == triggerName_unv) || (map_entry.second.path == triggerName)){
+        if((map_entry.second.path == triggerNameUnv) || (map_entry.second.path == triggerName)){
 
           map_entry.second.accept = triggerResults.at(idx).accept();
 
