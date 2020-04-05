@@ -226,15 +226,18 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResultsFilterAND = cms.vstring(),
 
   TriggerResultsCollections = cms.vstring(
+    # IsoMu
     'HLT_IsoMu24',
     'HLT_IsoMu24_eta2p1',
     'HLT_IsoMu27',
 
+    # Ele
     'HLT_Ele27_WPTight_Gsf',
     'HLT_Ele32_WPTight_Gsf',
     'HLT_Ele32_WPTight_Gsf_L1DoubleEG',
     'HLT_Ele35_WPTight_Gsf',
 
+    # PFJet, PFHT, Others
     'HLT_AK4PFJet100',
     'HLT_AK4PFJet120',
     'HLT_AK4PFJet30',
@@ -320,9 +323,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'HLT_PFHT700_PFMET85_PFMHT85_IDTight',
     'HLT_PFHT700_PFMET95_PFMHT95_IDTight',
     'HLT_PFHT780',
+    'HLT_PFHT800',
     'HLT_PFHT800_PFMET75_PFMHT75_IDTight',
     'HLT_PFHT800_PFMET85_PFMHT85_IDTight',
     'HLT_PFHT890',
+    'HLT_PFHT900',
     'HLT_PFJet140',
     'HLT_PFJet15',
     'HLT_PFJet200',
@@ -348,34 +353,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'HLT_PFJetFwd500',
     'HLT_PFJetFwd60',
     'HLT_PFJetFwd80',
-    'HLT_PFMET100_PFMHT100_IDTight_CaloBTagDeepCSV_3p1',
-    'HLT_PFMET100_PFMHT100_IDTight_PFHT60',
-    'HLT_PFMET110_PFMHT110_IDTight',
-    'HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1',
-    'HLT_PFMET120_PFMHT120_IDTight',
-    'HLT_PFMET120_PFMHT120_IDTight_CaloBTagDeepCSV_3p1',
-    'HLT_PFMET120_PFMHT120_IDTight_PFHT60',
-    'HLT_PFMET130_PFMHT130_IDTight',
-    'HLT_PFMET130_PFMHT130_IDTight_CaloBTagDeepCSV_3p1',
-    'HLT_PFMET140_PFMHT140_IDTight',
-    'HLT_PFMET140_PFMHT140_IDTight_CaloBTagDeepCSV_3p1',
-    'HLT_PFMET200_BeamHaloCleaned',
-    'HLT_PFMET200_NotCleaned',
-    'HLT_PFMET250_NotCleaned',
-    'HLT_PFMET300_NotCleaned',
-    'HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60',
-    'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight',
-    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight',
-    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60',
-    'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight',
-    'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight',
-    'HLT_PFMETTypeOne100_PFMHT100_IDTight_PFHT60',
-    'HLT_PFMETTypeOne110_PFMHT110_IDTight',
-    'HLT_PFMETTypeOne120_PFMHT120_IDTight',
-    'HLT_PFMETTypeOne120_PFMHT120_IDTight_PFHT60',
-    'HLT_PFMETTypeOne130_PFMHT130_IDTight',
-    'HLT_PFMETTypeOne140_PFMHT140_IDTight',
-    'HLT_PFMETTypeOne200_BeamHaloCleaned',
     'HLT_QuadPFJet103_88_75_15',
     'HLT_QuadPFJet103_88_75_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1',
     'HLT_QuadPFJet103_88_75_15_PFBTagDeepCSV_1p3_VBF2',
@@ -391,57 +368,60 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'HLT_TripleJet110_35_35_Mjj650_PFMET110',
     'HLT_TripleJet110_35_35_Mjj650_PFMET120',
     'HLT_TripleJet110_35_35_Mjj650_PFMET130',
+
+    # PFMET
+    'HLT_PFHT300_PFMET100',
+    'HLT_PFHT300_PFMET110',
+    'HLT_PFMET100_PFMHT100_IDTight',
+    'HLT_PFMET100_PFMHT100_IDTight_BeamHaloCleaned',
+    'HLT_PFMET100_PFMHT100_IDTight_PFHT60',
+    'HLT_PFMET110_PFMHT110_IDTight',
+    'HLT_PFMET120_PFMHT120_IDTight',
+    'HLT_PFMET120_PFMHT120_IDTight_HFCleaned',
+    'HLT_PFMET120_PFMHT120_IDTight_PFHT60',
+    'HLT_PFMET120_PFMHT120_IDTight_PFHT60_HFCleaned',
+    'HLT_PFMET130_PFMHT130_IDTight',
+    'HLT_PFMET140_PFMHT140_IDTight',
+    'HLT_PFMET170_BeamHaloCleaned',
+    'HLT_PFMET170_HBHECleaned',
+    'HLT_PFMET170_HBHE_BeamHaloCleaned',
+    'HLT_PFMET170_JetIdCleaned',
+    'HLT_PFMET170_NoiseCleaned',
+    'HLT_PFMET170_NotCleaned',
+    'HLT_PFMET200_HBHECleaned',
+    'HLT_PFMET200_HBHE_BeamHaloCleaned',
+    'HLT_PFMET200_NotCleaned',
+    'HLT_PFMET250_HBHECleaned',
+    'HLT_PFMET300',
+    'HLT_PFMET300_HBHECleaned',
+    'HLT_PFMET400',
+    'HLT_PFMET500',
+    'HLT_PFMET600',
+    'HLT_PFMET90_PFMHT90_IDTight',
+    'HLT_PFMETNoMu100_PFMHTNoMu100_IDTight',
+    'HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60',
+    'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight',
+    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight',
+    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_HFCleaned',
+    'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60',
+    'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight',
+    'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight',
+    'HLT_PFMETNoMu90_PFMHTNoMu90_IDTight',
+    'HLT_PFMETTypeOne100_PFMHT100_IDTight_PFHT60',
+    'HLT_PFMETTypeOne110_PFMHT110_IDTight',
+    'HLT_PFMETTypeOne120_PFMHT120_IDTight',
+    'HLT_PFMETTypeOne120_PFMHT120_IDTight_HFCleaned',
+    'HLT_PFMETTypeOne120_PFMHT120_IDTight_PFHT60',
+    'HLT_PFMETTypeOne130_PFMHT130_IDTight',
+    'HLT_PFMETTypeOne140_PFMHT140_IDTight',
+    'HLT_PFMETTypeOne190_HBHE_BeamHaloCleaned',
+    'HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned',
   ),
 
   fillCollectionConditions = cms.PSet(),
 
   bools = cms.PSet(
     Flag_ele32DoubleL1ToSingleL1 = cms.InputTag('ele32DoubleL1ToSingleL1Flag'),
-
-    Flag_HLT_PFJet40_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet40:L1TSeedAccept'),
-    Flag_HLT_PFJet40_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet40:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet40_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet40:HLTPathPrescaled'),
-    Flag_HLT_PFJet40_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet40:HLTPathAccept'),
-
-    Flag_HLT_PFJet60_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet60:L1TSeedAccept'),
-    Flag_HLT_PFJet60_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet60:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet60_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet60:HLTPathPrescaled'),
-    Flag_HLT_PFJet60_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet60:HLTPathAccept'),
-
-    Flag_HLT_PFJet80_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet80:L1TSeedAccept'),
-    Flag_HLT_PFJet80_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet80:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet80_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet80:HLTPathPrescaled'),
-    Flag_HLT_PFJet80_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet80:HLTPathAccept'),
-
-    Flag_HLT_PFJet140_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet140:L1TSeedAccept'),
-    Flag_HLT_PFJet140_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet140:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet140_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet140:HLTPathPrescaled'),
-    Flag_HLT_PFJet140_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet140:HLTPathAccept'),
-
-    Flag_HLT_PFJet200_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet200:L1TSeedAccept'),
-    Flag_HLT_PFJet200_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet200:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet200_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet200:HLTPathPrescaled'),
-    Flag_HLT_PFJet200_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet200:HLTPathAccept'),
-
-    Flag_HLT_PFJet260_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet260:L1TSeedAccept'),
-    Flag_HLT_PFJet260_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet260:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet260_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet260:HLTPathPrescaled'),
-    Flag_HLT_PFJet260_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet260:HLTPathAccept'),
-
-    Flag_HLT_PFJet320_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet320:L1TSeedAccept'),
-    Flag_HLT_PFJet320_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet320:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet320_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet320:HLTPathPrescaled'),
-    Flag_HLT_PFJet320_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet320:HLTPathAccept'),
-
-    Flag_HLT_PFJet400_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet400:L1TSeedAccept'),
-    Flag_HLT_PFJet400_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet400:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet400_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet400:HLTPathPrescaled'),
-    Flag_HLT_PFJet400_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet400:HLTPathAccept'),
-
-    Flag_HLT_PFJet500_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet500:L1TSeedAccept'),
-    Flag_HLT_PFJet500_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet500:L1TSeedPrescaledOrMasked'),
-    Flag_HLT_PFJet500_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet500:HLTPathPrescaled'),
-    Flag_HLT_PFJet500_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet500:HLTPathAccept'),
   ),
 
   recoVertexCollections = cms.PSet(
@@ -543,36 +523,57 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 )
 
-#from JMETriggerAnalysis.NTuplizers.hltPrinter_cfi import hltPrinter
-#process.hltPrinter = hltPrinter.clone()
+## Trigger Flags
+process.triggerFlagsTask = cms.Task()
+
+hltPathsWithTriggerFlags = [
+  'HLT_PFJet40',
+  'HLT_PFJet60',
+  'HLT_PFJet80',
+  'HLT_PFJet140',
+  'HLT_PFJet200',
+  'HLT_PFJet260',
+  'HLT_PFJet320',
+  'HLT_PFJet400',
+  'HLT_PFJet500',
+
+  'HLT_PFHT250',
+  'HLT_PFHT350',
+  'HLT_PFHT510',
+  'HLT_PFHT780',
+  'HLT_PFHT800',
+  'HLT_PFHT890',
+  'HLT_PFHT900',
+  'HLT_PFHT1050',
+
+  'HLT_PFMET170_NotCleaned',
+  'HLT_PFMET170_HBHECleaned',
+  'HLT_PFMET170_HBHE_BeamHaloCleaned',
+  'HLT_PFMET200_NotCleaned',
+  'HLT_PFMET200_HBHECleaned',
+  'HLT_PFMET200_HBHE_BeamHaloCleaned',
+  'HLT_PFMET250_HBHECleaned',
+  'HLT_PFMETTypeOne190_HBHE_BeamHaloCleaned',
+  'HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned',
+]
 
 from JMETriggerAnalysis.NTuplizers.triggerFlagsProducer_cfi import triggerFlagsProducer
-process.triggerFlagsHLTPFJet40 = triggerFlagsProducer.clone(
-  triggerResults = 'TriggerResults::HLT',
-  pathName = 'HLT_PFJet40',
-  ignorePathVersion = True,
-)
 
-process.triggerFlagsHLTPFJet60 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet60')
-process.triggerFlagsHLTPFJet80 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet80')
-process.triggerFlagsHLTPFJet140 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet140')
-process.triggerFlagsHLTPFJet200 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet200')
-process.triggerFlagsHLTPFJet260 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet260')
-process.triggerFlagsHLTPFJet320 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet320')
-process.triggerFlagsHLTPFJet400 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet400')
-process.triggerFlagsHLTPFJet500 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet500')
+for _hltPathUnv in hltPathsWithTriggerFlags:
+    _triggerFlagsModName = 'triggerFlags'+_hltPathUnv.replace('_','')
+    setattr(process, _triggerFlagsModName, triggerFlagsProducer.clone(
+      triggerResults = 'TriggerResults::HLT',
+      ignorePathVersion = True,
+      pathName = _hltPathUnv,
+    ))
+    process.triggerFlagsTask.add(getattr(process, _triggerFlagsModName))
 
-process.triggerFlagsSeq = cms.Sequence(
-    process.triggerFlagsHLTPFJet40
-  + process.triggerFlagsHLTPFJet60
-  + process.triggerFlagsHLTPFJet80
-  + process.triggerFlagsHLTPFJet140
-  + process.triggerFlagsHLTPFJet200
-  + process.triggerFlagsHLTPFJet260
-  + process.triggerFlagsHLTPFJet320
-  + process.triggerFlagsHLTPFJet400
-  + process.triggerFlagsHLTPFJet500
-)
+    setattr(process.JMETriggerNTuple.bools, 'Flag_'+_hltPathUnv+'_L1TSeedAccept', cms.InputTag(_triggerFlagsModName+':L1TSeedAccept'))
+    setattr(process.JMETriggerNTuple.bools, 'Flag_'+_hltPathUnv+'_L1TSeedPrescaledOrMasked', cms.InputTag(_triggerFlagsModName+':L1TSeedPrescaledOrMasked'))
+    setattr(process.JMETriggerNTuple.bools, 'Flag_'+_hltPathUnv+'_HLTPathPrescaled', cms.InputTag(_triggerFlagsModName+':HLTPathPrescaled'))
+    setattr(process.JMETriggerNTuple.bools, 'Flag_'+_hltPathUnv+'_HLTPathAccept', cms.InputTag(_triggerFlagsModName+':HLTPathAccept'))
+
+process.triggerFlagsSeq = cms.Sequence(process.triggerFlagsTask)
 
 process.analysisCollectionsPath = cms.Path(
     process.METFiltersSeq
