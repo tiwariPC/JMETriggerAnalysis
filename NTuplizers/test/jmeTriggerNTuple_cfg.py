@@ -404,7 +404,52 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   fillCollectionConditions = cms.PSet(),
 
   bools = cms.PSet(
-    ele32DoubleL1ToSingleL1Flag = cms.InputTag('ele32DoubleL1ToSingleL1Flag'),
+    Flag_ele32DoubleL1ToSingleL1 = cms.InputTag('ele32DoubleL1ToSingleL1Flag'),
+
+    Flag_HLT_PFJet40_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet40:L1TSeedAccept'),
+    Flag_HLT_PFJet40_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet40:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet40_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet40:HLTPathPrescaled'),
+    Flag_HLT_PFJet40_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet40:HLTPathAccept'),
+
+    Flag_HLT_PFJet60_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet60:L1TSeedAccept'),
+    Flag_HLT_PFJet60_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet60:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet60_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet60:HLTPathPrescaled'),
+    Flag_HLT_PFJet60_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet60:HLTPathAccept'),
+
+    Flag_HLT_PFJet80_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet80:L1TSeedAccept'),
+    Flag_HLT_PFJet80_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet80:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet80_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet80:HLTPathPrescaled'),
+    Flag_HLT_PFJet80_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet80:HLTPathAccept'),
+
+    Flag_HLT_PFJet140_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet140:L1TSeedAccept'),
+    Flag_HLT_PFJet140_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet140:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet140_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet140:HLTPathPrescaled'),
+    Flag_HLT_PFJet140_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet140:HLTPathAccept'),
+
+    Flag_HLT_PFJet200_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet200:L1TSeedAccept'),
+    Flag_HLT_PFJet200_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet200:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet200_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet200:HLTPathPrescaled'),
+    Flag_HLT_PFJet200_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet200:HLTPathAccept'),
+
+    Flag_HLT_PFJet260_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet260:L1TSeedAccept'),
+    Flag_HLT_PFJet260_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet260:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet260_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet260:HLTPathPrescaled'),
+    Flag_HLT_PFJet260_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet260:HLTPathAccept'),
+
+    Flag_HLT_PFJet320_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet320:L1TSeedAccept'),
+    Flag_HLT_PFJet320_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet320:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet320_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet320:HLTPathPrescaled'),
+    Flag_HLT_PFJet320_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet320:HLTPathAccept'),
+
+    Flag_HLT_PFJet400_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet400:L1TSeedAccept'),
+    Flag_HLT_PFJet400_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet400:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet400_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet400:HLTPathPrescaled'),
+    Flag_HLT_PFJet400_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet400:HLTPathAccept'),
+
+    Flag_HLT_PFJet500_L1TSeedAccept            = cms.InputTag('triggerFlagsHLTPFJet500:L1TSeedAccept'),
+    Flag_HLT_PFJet500_L1TSeedPrescaledOrMasked = cms.InputTag('triggerFlagsHLTPFJet500:L1TSeedPrescaledOrMasked'),
+    Flag_HLT_PFJet500_HLTPathPrescaled         = cms.InputTag('triggerFlagsHLTPFJet500:HLTPathPrescaled'),
+    Flag_HLT_PFJet500_HLTPathAccept            = cms.InputTag('triggerFlagsHLTPFJet500:HLTPathAccept'),
   ),
 
   recoVertexCollections = cms.PSet(
@@ -506,18 +551,46 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 )
 
-from JMETriggerAnalysis.NTuplizers.hltPrinter_cfi import hltPrinter
-process.hltPrinter = hltPrinter.clone()
+#from JMETriggerAnalysis.NTuplizers.hltPrinter_cfi import hltPrinter
+#process.hltPrinter = hltPrinter.clone()
+
+from JMETriggerAnalysis.NTuplizers.triggerFlagsProducer_cfi import triggerFlagsProducer
+process.triggerFlagsHLTPFJet40 = triggerFlagsProducer.clone(
+  triggerResults = 'TriggerResults::HLT',
+  pathName = 'HLT_PFJet40',
+  ignorePathVersion = True,
+)
+
+process.triggerFlagsHLTPFJet60 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet60')
+process.triggerFlagsHLTPFJet80 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet80')
+process.triggerFlagsHLTPFJet140 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet140')
+process.triggerFlagsHLTPFJet200 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet200')
+process.triggerFlagsHLTPFJet260 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet260')
+process.triggerFlagsHLTPFJet320 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet320')
+process.triggerFlagsHLTPFJet400 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet400')
+process.triggerFlagsHLTPFJet500 = process.triggerFlagsHLTPFJet40.clone(pathName = 'HLT_PFJet500')
+
+process.triggerFlagsSeq = cms.Sequence(
+    process.triggerFlagsHLTPFJet40
+  + process.triggerFlagsHLTPFJet60
+  + process.triggerFlagsHLTPFJet80
+  + process.triggerFlagsHLTPFJet140
+  + process.triggerFlagsHLTPFJet200
+  + process.triggerFlagsHLTPFJet260
+  + process.triggerFlagsHLTPFJet320
+  + process.triggerFlagsHLTPFJet400
+  + process.triggerFlagsHLTPFJet500
+)
 
 process.analysisCollectionsPath = cms.Path(
-    process.hltPrinter
-  + process.METFiltersSeq
+    process.METFiltersSeq
   + process.userMuonsSeq
   + process.userElectronsSeq
   + process.userLeptons
   + process.userLeptonsMultiplicityFilter
   + process.userJetsAK04PFCHSSeq
   + process.ele32DoubleL1ToSingleL1Flag
+  + process.triggerFlagsSeq
   + process.JMETriggerNTuple
 )
 
