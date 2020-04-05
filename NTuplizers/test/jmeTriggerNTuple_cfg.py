@@ -182,7 +182,7 @@ else:
 
 ## METFilters
 from JMETriggerAnalysis.NTuplizers.METFilters_cff import METFilters
-process = METFilters(process, era=opts.era)
+process = METFilters(process, era=opts.era, isData=opts.isData)
 
 ## Muons
 from JMETriggerAnalysis.NTuplizers.userMuons_cff import userMuons
@@ -226,19 +226,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResultsFilterAND = cms.vstring(),
 
   TriggerResultsCollections = cms.vstring(
-    'Flag_goodVertices',
-    'Flag_globalSuperTightHalo2016Filter',
-    'Flag_HBHENoiseFilter',
-    'Flag_HBHENoiseIsoFilter',
-    'Flag_EcalDeadCellTriggerPrimitiveFilter',
-    'Flag_BadPFMuonFilter',
-    'Flag_BadChargedCandidateFilter',
-    'Flag_eeBadScFilter',
-
     'HLT_IsoMu24',
     'HLT_IsoMu24_eta2p1',
     'HLT_IsoMu27',
 
+    'HLT_Ele27_WPTight_Gsf',
     'HLT_Ele32_WPTight_Gsf',
     'HLT_Ele32_WPTight_Gsf_L1DoubleEG',
     'HLT_Ele35_WPTight_Gsf',
