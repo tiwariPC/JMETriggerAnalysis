@@ -10,8 +10,8 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
-//#include <iostream>
-//#define LogTrace(X) std::cout << std::endl
+#include <iostream>
+#define LogTrace(X) std::cout << std::endl
 
 class TriggerObjMatchValueMapsProducer : public edm::stream::EDProducer<> {
  public:
@@ -149,7 +149,13 @@ void TriggerObjMatchValueMapsProducer::beginRun(edm::Run const& iRun, edm::Event
     for(size_t idx=0; idx<moduleLabels.size(); ++idx){
       auto const& moduleLabel(moduleLabels.at(idx));
 
-      if((hltConfigProvider_.moduleEDMType(moduleLabel) != "EDFilter") or (hltConfigProvider_.moduleType(moduleLabel) != "HLTPrescaler") or (moduleLabel == "hltTriggerType") or (moduleLabel == "hltBoolEnd")){
+      auto const& moduleEDMType(hltConfigProvider_.moduleEDMType(moduleLabel));
+      if(moduleEDMType != "EDFilter"){
+        continue;
+      }
+
+      auto const& moduleType(hltConfigProvider_.moduleType(moduleLabel));
+      if((moduleType == "HLTTriggerTypeFilter") or (moduleType == "HLTBool") or (moduleType == "HLTPrescaler")){
         continue;
       }
 

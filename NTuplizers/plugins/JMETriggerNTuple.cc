@@ -86,7 +86,6 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   unsigned long long event_ = 0;
 
   class FillCollectionConditionsMap {
-
    public:
     explicit FillCollectionConditionsMap();
 
@@ -94,9 +93,7 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
     int init(const edm::ParameterSet&);
 
     struct condition {
-
       condition(const std::string& a_path, const bool a_accept=false) : path(a_path), accept(a_accept) {}
-
       const std::string path;
       bool accept;
     };
@@ -107,11 +104,36 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
     int update(const edm::TriggerResults&, const edm::Event&);
 
    protected:
-
     std::map<std::string, condition> condMap_;
   };
 
   FillCollectionConditionsMap fillCollectionConditionMap_;
+
+  template <typename T>
+  class ValueMapContainerMap {
+   public:
+    explicit ValueMapContainerMap() { clear(); }
+    void clear() { map_.clear(); }
+
+    template <typename M>
+    int init(const edm::ParameterSet&, M&);
+
+    struct Entry {
+      Entry(const std::string& aName) : name(aName) { values.clear(); }
+      const std::string name;
+      edm::EDGetTokenT<edm::ValueMap<T>> token;
+      edm::Handle<edm::ValueMap<T>> handle;
+      std::vector<T> values;
+    };
+
+    bool has(const std::string& foo) const { return (map_.find(foo) != map_.end()); }
+    std::vector<Entry>& at(const std::string&);
+
+   protected:
+    std::map<std::string, std::vector<Entry>> map_;
+  };
+
+  ValueMapContainerMap<bool> boolValueMapContainerMap_;
 };
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
@@ -120,17 +142,21 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   , TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string>>("TriggerResultsFilterAND"))
   , outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string>>("outputBranchesToBeDropped")) {
 
-  const auto& TriggerResultsInputTag = iConfig.getParameter<edm::InputTag>("TriggerResults");
-  const auto& TriggerResultsCollections = iConfig.getParameter<std::vector<std::string>>("TriggerResultsCollections");
+  auto const& TriggerResultsInputTag(iConfig.getParameter<edm::InputTag>("TriggerResults"));
+  auto const& TriggerResultsCollections(iConfig.getParameter<std::vector<std::string>>("TriggerResultsCollections"));
 
   triggerResultsContainer_ptr_.reset(new TriggerResultsContainer(TriggerResultsCollections, TriggerResultsInputTag.label(), this->consumes<edm::TriggerResults>(TriggerResultsInputTag)));
 
   // fillCollectionConditions
   fillCollectionConditionMap_.clear();
-
   if(iConfig.exists("fillCollectionConditions")){
-
     fillCollectionConditionMap_.init(iConfig.getParameter<edm::ParameterSet>("fillCollectionConditions"));
+  }
+
+  // boolValueMaps
+  boolValueMapContainerMap_.clear();
+  if(iConfig.exists("boolValueMaps")){
+    boolValueMapContainerMap_.init(iConfig.getParameter<edm::ParameterSet>("boolValueMaps"), *this);
   }
 
   // stringCutObjectSelectors
@@ -181,7 +207,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::VertexCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::Vertex> >(inputTag)));
+      v_recoVertexCollectionContainer_.emplace_back(RecoVertexCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::Vertex>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -207,7 +233,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFCandidate> >(inputTag)));
+      v_recoPFCandidateCollectionContainer_.emplace_back(RecoPFCandidateCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::PFCandidate>>(inputTag)));
       v_recoPFCandidateCollectionContainer_.back().orderByHighestPt(true);
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
@@ -234,7 +260,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::PackedCandidateCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::PackedCandidate> >(inputTag)));
+      v_patPackedCandidateCollectionContainer_.emplace_back(PATPackedCandidateCollectionContainer(label, inputTag.label(), this->consumes<edm::View<pat::PackedCandidate>>(inputTag)));
       v_patPackedCandidateCollectionContainer_.back().orderByHighestPt(true);
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
@@ -261,7 +287,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::GenJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoGenJetCollectionContainer_.emplace_back(RecoGenJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::GenJet> >(inputTag)));
+      v_recoGenJetCollectionContainer_.emplace_back(RecoGenJetCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::GenJet>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -287,7 +313,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::CaloJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoCaloJetCollectionContainer_.emplace_back(RecoCaloJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::CaloJet> >(inputTag)));
+      v_recoCaloJetCollectionContainer_.emplace_back(RecoCaloJetCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::CaloJet>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -313,7 +339,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFClusterJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFClusterJetCollectionContainer_.emplace_back(RecoPFClusterJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFClusterJet> >(inputTag)));
+      v_recoPFClusterJetCollectionContainer_.emplace_back(RecoPFClusterJetCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::PFClusterJet>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -339,7 +365,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFJetCollectionContainer_.emplace_back(RecoPFJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFJet> >(inputTag)));
+      v_recoPFJetCollectionContainer_.emplace_back(RecoPFJetCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::PFJet>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -365,7 +391,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::JetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patJetCollectionContainer_.emplace_back(PATJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Jet> >(inputTag)));
+      v_patJetCollectionContainer_.emplace_back(PATJetCollectionContainer(label, inputTag.label(), this->consumes<edm::View<pat::Jet>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -391,7 +417,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::GenMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoGenMETCollectionContainer_.emplace_back(RecoGenMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::GenMET> >(inputTag)));
+      v_recoGenMETCollectionContainer_.emplace_back(RecoGenMETCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::GenMET>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -417,7 +443,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::CaloMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::CaloMET> >(inputTag)));
+      v_recoCaloMETCollectionContainer_.emplace_back(RecoCaloMETCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::CaloMET>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -443,7 +469,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFClusterMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFClusterMETCollectionContainer_.emplace_back(RecoPFClusterMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFClusterMET> >(inputTag)));
+      v_recoPFClusterMETCollectionContainer_.emplace_back(RecoPFClusterMETCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::PFClusterMET>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -469,7 +495,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding reco::PFMETCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<reco::PFMET> >(inputTag)));
+      v_recoPFMETCollectionContainer_.emplace_back(RecoPFMETCollectionContainer(label, inputTag.label(), this->consumes<edm::View<reco::PFMET>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -495,7 +521,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::METCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::MET> >(inputTag)));
+      v_patMETCollectionContainer_.emplace_back(PATMETCollectionContainer(label, inputTag.label(), this->consumes<edm::View<pat::MET>>(inputTag)));
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
@@ -521,7 +547,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::MuonCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patMuonCollectionContainer_.emplace_back(PATMuonCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Muon> >(inputTag)));
+      v_patMuonCollectionContainer_.emplace_back(PATMuonCollectionContainer(label, inputTag.label(), this->consumes<edm::View<pat::Muon>>(inputTag)));
       v_patMuonCollectionContainer_.back().orderByHighestPt(true);
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
@@ -548,7 +574,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
       LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding pat::ElectronCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
 
-      v_patElectronCollectionContainer_.emplace_back(PATElectronCollectionContainer(label, inputTag.label(), this->consumes<std::vector<pat::Electron> >(inputTag)));
+      v_patElectronCollectionContainer_.emplace_back(PATElectronCollectionContainer(label, inputTag.label(), this->consumes<edm::View<pat::Electron>>(inputTag)));
       v_patElectronCollectionContainer_.back().orderByHighestPt(true);
 
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
@@ -562,16 +588,13 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
-
   if(not fs){
-
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
   ttree_ = fs->make<TTree>(TTreeName_.c_str(), TTreeName_.c_str());
 
   if(not ttree_){
-
     throw edm::Exception(edm::errors::Configuration, "failed to create TTree via TFileService::make<TTree>");
   }
 
@@ -580,17 +603,14 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   this->addBranch("event", &event_);
 
   for(const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()){
-
     this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
   }
 
   for(auto& boolContainer_i : v_boolContainer_){
-
     this->addBranch(boolContainer_i.name(), &boolContainer_i.value());
   }
 
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
-
     this->addBranch(recoVertexCollectionContainer_i.name()+"_tracksSize", &recoVertexCollectionContainer_i.vec_tracksSize());
     this->addBranch(recoVertexCollectionContainer_i.name()+"_isFake", &recoVertexCollectionContainer_i.vec_isFake());
     this->addBranch(recoVertexCollectionContainer_i.name()+"_chi2", &recoVertexCollectionContainer_i.vec_chi2());
@@ -696,6 +716,12 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patJetCollectionContainer_i.name()+"_electronMultiplicity", &patJetCollectionContainer_i.vec_electronMultiplicity());
     this->addBranch(patJetCollectionContainer_i.name()+"_photonMultiplicity", &patJetCollectionContainer_i.vec_photonMultiplicity());
     this->addBranch(patJetCollectionContainer_i.name()+"_muonMultiplicity", &patJetCollectionContainer_i.vec_muonMultiplicity());
+
+    if(boolValueMapContainerMap_.has(patJetCollectionContainer_i.name())){
+      for(auto& vmapEntry : boolValueMapContainerMap_.at(patJetCollectionContainer_i.name())){
+        this->addBranch(patJetCollectionContainer_i.name()+"_"+vmapEntry.name, &vmapEntry.values);
+      }
+    }
   }
 
   for(auto& recoGenMETCollectionContainer_i : v_recoGenMETCollectionContainer_){
@@ -827,12 +853,10 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     triggerResultsContainer_ptr_->clear();
   }
   else {
-
     // exit method for events that do not pass the logical OR of the specified HLT paths (if any)
     if(TriggerResultsFilterOR_.size() > 0){
 
       if(not this->passesTriggerResults_logicalOR(*triggerResults_handle, iEvent, TriggerResultsFilterOR_)){
-
         return;
       }
     }
@@ -841,7 +865,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     if(TriggerResultsFilterAND_.size() > 0){
 
       if(not this->passesTriggerResults_logicalAND(*triggerResults_handle, iEvent, TriggerResultsFilterAND_)){
-
         return;
       }
     }
@@ -887,7 +910,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::Vertex> > i_handle;
+    edm::Handle<edm::View<reco::Vertex>> i_handle;
     iEvent.getByToken(recoVertexCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -912,7 +935,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::PFCandidate> > i_handle;
+    edm::Handle<edm::View<reco::PFCandidate>> i_handle;
     iEvent.getByToken(recoPFCandidateCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -937,7 +960,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<pat::PackedCandidate> > i_handle;
+    edm::Handle<edm::View<pat::PackedCandidate>> i_handle;
     iEvent.getByToken(patPackedCandidateCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -964,7 +987,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         continue;
       }
 
-      edm::Handle<std::vector<reco::GenJet> > i_handle;
+      edm::Handle<edm::View<reco::GenJet>> i_handle;
       iEvent.getByToken(recoGenJetCollectionContainer_i.token(), i_handle);
 
       if(not i_handle.isValid()){
@@ -990,7 +1013,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::CaloJet> > i_handle;
+    edm::Handle<edm::View<reco::CaloJet>> i_handle;
     iEvent.getByToken(recoCaloJetCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1015,7 +1038,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::PFClusterJet> > i_handle;
+    edm::Handle<edm::View<reco::PFClusterJet>> i_handle;
     iEvent.getByToken(recoPFClusterJetCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1040,7 +1063,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::PFJet> > i_handle;
+    edm::Handle<edm::View<reco::PFJet>> i_handle;
     iEvent.getByToken(recoPFJetCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1065,16 +1088,40 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<pat::Jet> > i_handle;
+    edm::Handle<edm::View<pat::Jet>> i_handle;
     iEvent.getByToken(patJetCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
-
       edm::LogWarning("JMETriggerNTuple::analyze")
         << "invalid handle for input collection: \"" << patJetCollectionContainer_i.inputTagLabel()
         << "\" (NTuple branches: \"" << patJetCollectionContainer_i.name() << "_*\")";
     }
     else {
+      // fill boolValueMapContainerMap
+      auto const& vmcKey(patJetCollectionContainer_i.name());
+      if(boolValueMapContainerMap_.has(vmcKey)){
+
+        for(auto& vmcEntry : boolValueMapContainerMap_.at(vmcKey)){
+          vmcEntry.values.clear();
+          iEvent.getByToken(vmcEntry.token, vmcEntry.handle);
+          if(not vmcEntry.handle.isValid()){
+            throw cms::Exception("Input")
+              << "invalid handle for input collection: \"" //!! << boolContainer_i.inputTagLabel()
+              << "\" (NTuple branch: \"" << vmcKey << "_" << vmcEntry.name << "\")";
+          }
+          else {
+            if(vmcEntry.handle.isValid()){
+              vmcEntry.values.reserve(i_handle->size());
+              for(size_t idx=0; idx<i_handle->size(); ++idx){
+                vmcEntry.values.emplace_back((*vmcEntry.handle)[i_handle->ptrAt(idx)]);
+              }
+            }
+            else {
+              throw cms::Exception("") << vmcKey << " " << vmcEntry.name;
+            }
+          }
+        }
+      }
 
       patJetCollectionContainer_i.fill(*i_handle);
     }
@@ -1088,11 +1135,10 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       recoGenMETCollectionContainer_i.clear();
 
       if(fillCollectionConditionMap_.has(recoGenMETCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(recoGenMETCollectionContainer_i.name()))){
-
         continue;
       }
 
-      edm::Handle<std::vector<reco::GenMET> > i_handle;
+      edm::Handle<edm::View<reco::GenMET>> i_handle;
       iEvent.getByToken(recoGenMETCollectionContainer_i.token(), i_handle);
 
       if(not i_handle.isValid()){
@@ -1118,7 +1164,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::CaloMET> > i_handle;
+    edm::Handle<edm::View<reco::CaloMET>> i_handle;
     iEvent.getByToken(recoCaloMETCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1143,7 +1189,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::PFClusterMET> > i_handle;
+    edm::Handle<edm::View<reco::PFClusterMET>> i_handle;
     iEvent.getByToken(recoPFClusterMETCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1168,7 +1214,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<reco::PFMET> > i_handle;
+    edm::Handle<edm::View<reco::PFMET>> i_handle;
     iEvent.getByToken(recoPFMETCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1193,7 +1239,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<pat::MET> > i_handle;
+    edm::Handle<edm::View<pat::MET>> i_handle;
     iEvent.getByToken(patMETCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1218,7 +1264,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<pat::Muon> > i_handle;
+    edm::Handle<edm::View<pat::Muon>> i_handle;
     iEvent.getByToken(patMuonCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1243,7 +1289,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       continue;
     }
 
-    edm::Handle<std::vector<pat::Electron> > i_handle;
+    edm::Handle<edm::View<pat::Electron>> i_handle;
     iEvent.getByToken(patElectronCollectionContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
@@ -1474,7 +1520,7 @@ int JMETriggerNTuple::FillCollectionConditionsMap::update(const edm::TriggerResu
 
           map_entry.second.accept = triggerResults.at(idx).accept();
 
-	  LogDebug("FillCollectionConditionsMap::update") << "triggerResults entry \"" << triggerNames.at(idx)
+          LogDebug("FillCollectionConditionsMap::update") << "triggerResults entry \"" << triggerNames.at(idx)
             << "\" matches condition \"" << map_entry.second.path << "\" for collection \"" << map_entry.first
             << "\" (accept=" << map_entry.second.accept << ")";
         }
@@ -1485,16 +1531,53 @@ int JMETriggerNTuple::FillCollectionConditionsMap::update(const edm::TriggerResu
   return 0;
 }
 
+template<typename T>
+template<typename M>
+int JMETriggerNTuple::ValueMapContainerMap<T>::init(const edm::ParameterSet& pset, M& module){
+
+  clear();
+
+  auto const& pSets(pset.getParameterNamesForType<edm::ParameterSet>());
+
+  for(auto const& name : pSets){
+    if(not has(name)){
+      auto const& objPSet(pset.getParameter<edm::ParameterSet>(name));
+      auto const& objPSetNames(objPSet.getParameterNamesForType<edm::InputTag>());
+      std::vector<Entry> entries;
+      entries.reserve(objPSetNames.size());
+      for(auto const& objPSetName : objPSetNames){
+        Entry ent(objPSetName);
+        ent.token = module.template consumes<edm::ValueMap<T>>(objPSet.getParameter<edm::InputTag>(objPSetName));
+        entries.emplace_back(ent);
+      }
+
+      map_.insert({name, entries});
+    }
+  }
+
+  return 0;
+}
+
+template<typename T>
+std::vector<typename JMETriggerNTuple::ValueMapContainerMap<T>::Entry>& JMETriggerNTuple::ValueMapContainerMap<T>::at(const std::string& name){
+
+  if(not has(name)){
+    throw cms::Exception("LogicError") << "internal map has no entry associated to key \"" << name << "\"";
+  }
+
+  return map_.at(name);
+}
+
 void JMETriggerNTuple::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
 
   edm::ParameterSetDescription desc;
   desc.setUnknown();
 //  desc.add<std::string>("TTreeName", "TTreeName")->setComment("Name of TTree");
-//  desc.add<std::vector<std::string> >("TriggerResultsFilterOR")->setComment("List of HLT paths (without version) used in OR to select events in the output TTree");
-//  desc.add<std::vector<std::string> >("TriggerResultsFilterAND")->setComment("List of HLT paths (without version) used in AND to select events in the output TTree");
-//  desc.add<std::vector<std::string> >("outputBranchesToBeDropped")->setComment("Names of branches not to be included in the output TTree");
+//  desc.add<std::vector<std::string>>("TriggerResultsFilterOR")->setComment("List of HLT paths (without version) used in OR to select events in the output TTree");
+//  desc.add<std::vector<std::string>>("TriggerResultsFilterAND")->setComment("List of HLT paths (without version) used in AND to select events in the output TTree");
+//  desc.add<std::vector<std::string>>("outputBranchesToBeDropped")->setComment("Names of branches not to be included in the output TTree");
 //  desc.add<edm::InputTag>("TriggerResults", edm::InputTag("TriggerResults"))->setComment("edm::InputTag for edm::TriggerResults");
-//  desc.add<std::vector<std::string> >("TriggerResultsCollections")->setComment("List of HLT paths (without version) to be saved in the output TTree");
+//  desc.add<std::vector<std::string>>("TriggerResultsCollections")->setComment("List of HLT paths (without version) to be saved in the output TTree");
 
 //  edm::ParameterSetDescription recoCaloMETCollections;
 //  desc.add<edm::ParameterSetDescription>("recoCaloMETCollections", recoCaloMETCollections);

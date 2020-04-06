@@ -512,6 +512,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 #    hltAK8PFJetsCorrected = cms.string('pt > 80'),
   ),
 
+  boolValueMaps = cms.PSet(
+    offlineJetsAK04PFCHS = cms.PSet(),
+  ),
+
   outputBranchesToBeDropped = cms.vstring(
 #    'offlinePrimaryVertices_tracksSize',
 #
@@ -575,6 +579,47 @@ for _hltPathUnv in hltPathsWithTriggerFlags:
 
 process.triggerFlagsSeq = cms.Sequence(process.triggerFlagsTask)
 
+## TriggerObjMatch ValueMaps
+process.triggerObjMatchValueMapsTask = cms.Task()
+
+hltPathsWithTriggerObjMatchFlags = [
+  'HLT_PFJet40',
+  'HLT_PFJet60',
+  'HLT_PFJet80',
+  'HLT_PFJet140',
+  'HLT_PFJet200',
+  'HLT_PFJet260',
+  'HLT_PFJet320',
+  'HLT_PFJet400',
+  'HLT_PFJet500',
+]
+
+from JMETriggerAnalysis.NTuplizers.triggerObjMatchValueMapsProducer_cfi import triggerObjMatchValueMapsProducer
+
+for _hltPathUnv in hltPathsWithTriggerObjMatchFlags:
+    _triggerObjMatchValueMapsModName = 'triggerObjMatchValueMaps'+_hltPathUnv.replace('_','')
+    setattr(process, _triggerObjMatchValueMapsModName, triggerObjMatchValueMapsProducer.clone(
+      triggerResults = 'TriggerResults::HLT',
+      ignorePathVersion = True,
+      src = userJetsAK04PFCHSCollection,
+      pathName = _hltPathUnv,
+    ))
+    process.triggerObjMatchValueMapsTask.add(getattr(process, _triggerObjMatchValueMapsModName))
+
+    setattr(process.JMETriggerNTuple.boolValueMaps.offlineJetsAK04PFCHS,
+      'trigObjMatchL1TSeed_'+_hltPathUnv, cms.InputTag(_triggerObjMatchValueMapsModName+':trigObjMatchL1TSeed'),
+    )
+
+    setattr(process.JMETriggerNTuple.boolValueMaps.offlineJetsAK04PFCHS,
+      'trigObjMatchHLTLastFilter_'+_hltPathUnv, cms.InputTag(_triggerObjMatchValueMapsModName+':trigObjMatchHLTLastFilter'),
+    )
+
+    setattr(process.JMETriggerNTuple.boolValueMaps.offlineJetsAK04PFCHS,
+      'trigObjMatchHLTAllFilters_'+_hltPathUnv, cms.InputTag(_triggerObjMatchValueMapsModName+':trigObjMatchHLTAllFilters'),
+    )
+
+process.triggerObjMatchValueMapsSeq = cms.Sequence(process.triggerObjMatchValueMapsTask)
+
 process.analysisCollectionsPath = cms.Path(
     process.METFiltersSeq
   + process.userMuonsSeq
@@ -584,6 +629,7 @@ process.analysisCollectionsPath = cms.Path(
   + process.userJetsAK04PFCHSSeq
   + process.ele32DoubleL1ToSingleL1Flag
   + process.triggerFlagsSeq
+  + process.triggerObjMatchValueMapsSeq
   + process.JMETriggerNTuple
 )
 

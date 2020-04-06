@@ -13,7 +13,7 @@ class VRecoCandidateCollectionContainer : public VCollectionContainer<T> {
   explicit VRecoCandidateCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
   virtual ~VRecoCandidateCollectionContainer() {}
 
-  virtual void fill(const std::vector<T>&, const bool clear_before_filling=true);
+  virtual void fill(const edm::View<T>&, const bool clear_before_filling=true);
 
   virtual void clear() = 0;
   virtual void reserve(const size_t) = 0;
@@ -37,7 +37,7 @@ VRecoCandidateCollectionContainer<T>::VRecoCandidateCollectionContainer(
 }
 
 template<class T>
-void VRecoCandidateCollectionContainer<T>::fill(const std::vector<T>& coll, const bool clear_before_filling){
+void VRecoCandidateCollectionContainer<T>::fill(const edm::View<T>& coll, const bool clear_before_filling){
 
   if(clear_before_filling){
 
@@ -62,11 +62,8 @@ void VRecoCandidateCollectionContainer<T>::fill(const std::vector<T>& coll, cons
   }
 
   for(uint idx=0; idx<coll.size(); ++idx){
-
-    const auto& i_obj = coll.at(orderByHighestPt_ ? idxs_.at(idx) : idx);
-
+    auto const& i_obj(coll.at(orderByHighestPt_ ? idxs_.at(idx) : idx));
     if(not this->stringCutObjectSelector_(i_obj)){
-
       continue;
     }
 
