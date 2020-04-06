@@ -76,11 +76,11 @@ opts.parseArguments()
 ###
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("ANALYSIS")
+process = cms.Process('ANALYSIS')
 
 process.load('Configuration.StandardSequences.Services_cff')
-process.load("Configuration.Geometry.GeometryDB_cff")
-process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load('Configuration.Geometry.GeometryDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_cff')
 
 ###
 ### PoolSource (EDM input)
@@ -113,12 +113,12 @@ process.options = cms.untracked.PSet(
 ###
 ### Global Tag
 ###
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 if opts.globalTag is not None:
    from Configuration.AlCa.GlobalTag import GlobalTag
    process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
 else:
-   raise RuntimeError('failed to specify name of the GlobalTag (use "globalTag=XYZ")"')
+   raise RuntimeError('failed to specify name of the GlobalTag (use "globalTag=XYZ")')
 
 ###
 ### TFileService
@@ -172,7 +172,7 @@ if opts.logs:
      ),
    )
 else:
-   process.load("FWCore.MessageLogger.MessageLogger_cfi")
+   process.load('FWCore.MessageLogger.MessageLogger_cfi')
    process.MessageLogger.cerr.threshold = 'INFO'
    process.MessageLogger.cerr.FwkReport.reportEvery = opts.reportEvery
 
@@ -221,6 +221,16 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResults = cms.InputTag('TriggerResults::'+('HLT' if opts.isData else 'PAT')),
 
   TriggerResultsFilterOR = cms.vstring(
+    # IsoMu
+    'HLT_IsoMu24',
+    'HLT_IsoMu24_eta2p1',
+    'HLT_IsoMu27',
+
+    # Ele
+    'HLT_Ele27_WPTight_Gsf',
+    'HLT_Ele32_WPTight_Gsf',
+    'HLT_Ele32_WPTight_Gsf_L1DoubleEG',
+    'HLT_Ele35_WPTight_Gsf',
   ),
 
   TriggerResultsFilterAND = cms.vstring(),
@@ -596,27 +606,26 @@ hltPathsWithTriggerObjMatchFlags = [
 
 from JMETriggerAnalysis.NTuplizers.triggerObjMatchValueMapsProducer_cfi import triggerObjMatchValueMapsProducer
 
-for _hltPathUnv in hltPathsWithTriggerObjMatchFlags:
-    _triggerObjMatchValueMapsModName = 'triggerObjMatchValueMaps'+_hltPathUnv.replace('_','')
-    setattr(process, _triggerObjMatchValueMapsModName, triggerObjMatchValueMapsProducer.clone(
-      triggerResults = 'TriggerResults::HLT',
-      ignorePathVersion = True,
-      src = userJetsAK04PFCHSCollection,
-      pathName = _hltPathUnv,
-    ))
-    process.triggerObjMatchValueMapsTask.add(getattr(process, _triggerObjMatchValueMapsModName))
+for _jetColl in process.JMETriggerNTuple.patJetCollections.parameterNames_():
+    _jetCollInputTag = process.JMETriggerNTuple.patJetCollections.getParameter(_jetColl)
 
-    setattr(process.JMETriggerNTuple.boolValueMaps.offlineJetsAK04PFCHS,
-      'trigObjMatchL1TSeed_'+_hltPathUnv, cms.InputTag(_triggerObjMatchValueMapsModName+':trigObjMatchL1TSeed'),
-    )
+    for _hltPathUnv in hltPathsWithTriggerObjMatchFlags:
+        _triggerObjMatchValueMapsModName = 'triggerObjMatchValueMaps'+_hltPathUnv.replace('_','')
+        setattr(process, _triggerObjMatchValueMapsModName, triggerObjMatchValueMapsProducer.clone(
+          triggerResults = 'TriggerResults::HLT',
+          ignorePathVersion = True,
+          src = _jetCollInputTag,
+          pathName = _hltPathUnv,
+          deltaR = 0.2,
+        ))
+        process.triggerObjMatchValueMapsTask.add(getattr(process, _triggerObjMatchValueMapsModName))
 
-    setattr(process.JMETriggerNTuple.boolValueMaps.offlineJetsAK04PFCHS,
-      'trigObjMatchHLTLastFilter_'+_hltPathUnv, cms.InputTag(_triggerObjMatchValueMapsModName+':trigObjMatchHLTLastFilter'),
-    )
+        if not hasattr(process.JMETriggerNTuple.boolValueMaps, _jetColl):
+           setattr(process.JMETriggerNTuple.boolValueMaps, _jetColl, cms.PSet())
+        _vmapPSet = getattr(process.JMETriggerNTuple.boolValueMaps, _jetColl)
 
-    setattr(process.JMETriggerNTuple.boolValueMaps.offlineJetsAK04PFCHS,
-      'trigObjMatchHLTAllFilters_'+_hltPathUnv, cms.InputTag(_triggerObjMatchValueMapsModName+':trigObjMatchHLTAllFilters'),
-    )
+        for _trigObjMatchTag in ['trigObjMatchL1TSeed', 'trigObjMatchHLTLastFilter', 'trigObjMatchHLTAllFilters']:
+            setattr(_vmapPSet, _trigObjMatchTag+'_'+_hltPathUnv, cms.InputTag(_triggerObjMatchValueMapsModName+':'+_trigObjMatchTag))
 
 process.triggerObjMatchValueMapsSeq = cms.Sequence(process.triggerObjMatchValueMapsTask)
 
