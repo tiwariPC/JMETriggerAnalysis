@@ -9,8 +9,8 @@ Set up CMSSW area:
 
  * `10_2_X`:
 ```shell
-cmsrel CMSSW_10_2_21
-cd CMSSW_10_2_21/src
+cmsrel CMSSW_10_2_22
+cd CMSSW_10_2_22/src
 cmsenv
 
 git clone https://github.com/cms-egamma/EgammaPostRecoTools.git EgammaUser/EgammaPostRecoTools -b master -o cms-egamma
