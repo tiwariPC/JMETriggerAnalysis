@@ -39,7 +39,7 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
-opts.register('gt', None,
+opts.register('globalTag', None,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
@@ -582,8 +582,8 @@ process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 #process.HLTSchedule.extend([process.analysisNTupleEndPath])
 
 # update process.GlobalTag.globaltag
-if opts.gt is not None:
-   process.GlobalTag.globaltag = opts.gt
+if opts.globalTag is not None:
+   process.GlobalTag.globaltag = opts.globalTag
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
