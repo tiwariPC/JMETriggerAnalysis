@@ -204,12 +204,27 @@ process.ele32DoubleL1ToSingleL1Flag = ele32DoubleL1ToSingleL1FlagProducer.clone(
 )
 
 ## Event Selection
-process.userLeptons = cms.EDProducer('CandViewMerger',
-  src = cms.VInputTag(userMuonsCollection, userElectronsCollection)
+
+from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
+process.evtselMuons = selectedPatMuons.clone(
+  src = cms.InputTag(userMuonsCollection),
+  cut = cms.string('(pt > 24.) && (userInt("IDMedium") > 0) && (userFloat("pfIsoR04") < 0.25)'),
 )
 
-process.userLeptonsMultiplicityFilter = cms.EDFilter('CandViewCountFilter',
-  src = cms.InputTag('userLeptons'),
+from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
+process.evtselElectrons = selectedPatElectrons.clone(
+  src = cms.InputTag(userElectronsCollection),
+  cut = cms.string('(pt > 27.) && (userInt("IDCutBasedMedium") > 0)'),
+)
+
+process.evtselLeptons = cms.EDProducer('CandViewMerger',
+  src = cms.VInputTag('evtselMuons', 'evtselElectrons')
+)
+
+process.evtselTask = cms.Task(process.evtselMuons, process.evtselElectrons, process.evtselLeptons)
+
+process.evtselLeptonsMultiplicityFilter = cms.EDFilter('CandViewCountFilter',
+  src = cms.InputTag('evtselLeptons'),
   minNumber = cms.uint32(1),
 )
 
@@ -218,7 +233,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TTreeName = cms.string('Events'),
 
-  TriggerResults = cms.InputTag('TriggerResults::'+('HLT' if opts.isData else 'PAT')),
+  TriggerResults = cms.InputTag('TriggerResults::HLT'),
 
   TriggerResultsFilterOR = cms.vstring(
     # IsoMu
@@ -523,7 +538,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   boolValueMaps = cms.PSet(
-    offlineJetsAK04PFCHS = cms.PSet(),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
@@ -633,8 +647,10 @@ process.analysisCollectionsPath = cms.Path(
     process.METFiltersSeq
   + process.userMuonsSeq
   + process.userElectronsSeq
-  + process.userLeptons
-  + process.userLeptonsMultiplicityFilter
+  + process.evtselMuons
+  + process.evtselElectrons
+  + process.evtselLeptons
+  + process.evtselLeptonsMultiplicityFilter
   + process.userJetsAK04PFCHSSeq
   + process.ele32DoubleL1ToSingleL1Flag
   + process.triggerFlagsSeq

@@ -143,7 +143,7 @@ def userJets_AK04PFCHS(process, era, isData):
     from PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi import selectedPatJets
     process.selectedJets = selectedPatJets.clone(
       src = _lastJetCollection,
-      cut = '(pt > 14.) && (abs(eta) < 5.0)',
+      cut = '(pt > 18.) && (abs(eta) < 5.0)',
     )
     process.userJetsAK04PFCHSTask.add(process.selectedJets)
     _lastJetCollection = 'selectedJets'

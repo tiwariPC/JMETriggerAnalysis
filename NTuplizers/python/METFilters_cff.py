@@ -42,7 +42,7 @@ def METFilters(process, era, isData):
 
     from JMETriggerAnalysis.NTuplizers.triggerResultsFilter_cfi import triggerResultsFilter
     process.metFilterFlagsFilter = triggerResultsFilter.clone(
-      triggerResults = 'TriggerResults::RECO',
+      triggerResults = 'TriggerResults::'+('RECO' if isData else 'PAT'),
       pathNames = METFilterNames,
       ignoreIfMissing = False,
       useLogicalAND = True,
