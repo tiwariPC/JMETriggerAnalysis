@@ -72,6 +72,69 @@ opts.parseArguments()
 if opts.reco == 'HLT':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
 
+elif opts.reco == 'HLT_globalPixelTracks_v01':
+   from JMETriggerAnalysis.NTuplizers.HLT_globalPixelTracks_v01 import cms, process
+
+   # add path: MC_AK4PFJets_v1
+   process.hltPreMCAK4PFJets = cms.EDFilter('HLTPrescaler',
+     L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
+     offset = cms.uint32(0)
+   )
+
+   process.hltAK4PFJetCollection20Filter = cms.EDFilter('HLT1PFJet',
+     MaxEta = cms.double(3.0),
+     MaxMass = cms.double(-1.0),
+     MinE = cms.double(-1.0),
+     MinEta = cms.double(-1.0),
+     MinMass = cms.double(-1.0),
+     MinN = cms.int32(1),
+     MinPt = cms.double(20.0),
+     inputTag = cms.InputTag('hltAK4PFJetsCorrected'),
+     saveTags = cms.bool(True),
+     triggerType = cms.int32(85)
+   )
+
+   process.MC_AK4PFJets_v1 = cms.Path(
+       process.HLTBeginSequence
+     + process.hltPreMCAK4PFJets
+     + process.HLTAK4PFJetsSequence
+     + process.hltAK4PFJetCollection20Filter
+     + process.HLTEndSequence
+   )
+
+   # add path: MC_PFMETNoMu_v1
+   process.hltPreMCPFMET = cms.EDFilter('HLTPrescaler',
+     L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
+     offset = cms.uint32(0)
+   )
+
+   process.hltPFMETOpenFilter = cms.EDFilter('HLT1PFMET',
+     MaxEta = cms.double(-1.0),
+     MaxMass = cms.double(-1.0),
+     MinE = cms.double(-1.0),
+     MinEta = cms.double(-1.0),
+     MinMass = cms.double(-1.0),
+     MinN = cms.int32(1),
+     MinPt = cms.double(-1.0),
+     inputTag = cms.InputTag('hltPFMETProducer'),
+     saveTags = cms.bool(True),
+     triggerType = cms.int32(87)
+   )
+
+   process.MC_PFMET_v1 = cms.Path(
+       process.HLTBeginSequence
+     + process.hltPreMCPFMET
+     + process.HLTAK4PFJetsSequence
+     + process.hltPFMETProducer
+     + process.hltPFMETOpenFilter
+     + process.HLTEndSequence
+   )
+
+elif opts.reco == 'HLT_trkIter2GlobalPtSeed0p9':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   from JMETriggerAnalysis.NTuplizers.customise_HLT_trkIter2Global import *
+   process = customise_HLT_trkIter2Global(process, ptMin = 0.9)
+
 elif opts.reco == 'HLT_pfBlockAlgoRemovePS':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
    from JMETriggerAnalysis.NTuplizers.customise_HLT_pfBlockAlgoRemovePS import *
@@ -92,11 +155,6 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed5p0':
 elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
    process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
-
-elif opts.reco == 'HLT_trkIter2GlobalPtSeed0p9':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   from JMETriggerAnalysis.NTuplizers.customise_HLT_trkIter2Global import *
-   process = customise_HLT_trkIter2Global(process, ptMin = 0.9)
 
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
