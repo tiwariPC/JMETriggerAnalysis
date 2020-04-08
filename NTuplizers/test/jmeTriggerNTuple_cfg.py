@@ -75,6 +75,19 @@ if opts.reco == 'HLT':
 elif opts.reco == 'HLT_globalPixelTracks_v01':
    from JMETriggerAnalysis.NTuplizers.HLT_globalPixelTracks_v01 import cms, process
 
+   ## modules
+   process.hltParticleFlowNoMu = cms.EDFilter('GenericPFCandidateSelector',
+     src = cms.InputTag('hltParticleFlow'),
+     cut = cms.string('particleId != 3'),
+   )
+
+   process.hltPFMETNoMuProducer = cms.EDProducer('PFMETProducer',
+     alias = cms.string('pfMetNoMu'),
+     calculateSignificance = cms.bool(False),
+     globalThreshold = cms.double(0.0),
+     src = cms.InputTag('hltParticleFlowNoMu')
+   )
+
    # add path: MC_AK4PFJets_v1
    process.hltPreMCAK4PFJets = cms.EDFilter('HLTPrescaler',
      L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
