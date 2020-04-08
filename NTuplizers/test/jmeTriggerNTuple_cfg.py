@@ -169,15 +169,7 @@ process.MC_PuppiMET_v1 = cms.Path(
   + process.HLTEndSequence
 )
 # add path MC_PuppiMETNoMu_v2
-
-#from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
 process.hltPreMCPuppiMETNoMu = process.hltPreMCPFMET.clone()
-#
-##makePuppies(process)
-#makePuppiesFromMiniAOD(process,True)
-##process.puppi.useExistingWeights = False
-#process.hltPuppiForMET = process.puppiForMET.clone()
-#process.hltPuppiMETNoMuv2 = process.hltPFMETProducer.clone(src = 'hltPuppiForMET', alias = '')
 # Puppi candidates for MET
 _particleFlowCands='hltParticleFlow'
 _primaryVerticesGood = "hltPixelVertices"
@@ -193,18 +185,11 @@ process.puppiNoLep = puppi.clone(
   candName = 'pfNoLepPUPPI',
   vertexName = _primaryVerticesGood,
 )
-process.puppiMerged = cms.EDProducer('CandViewMerger',
+process.puppiNoLep.PtMaxPhotons = 20.
+process.hltPuppiForMET = cms.EDProducer('CandViewMerger',
   src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET' ),
 )
-from CommonTools.PileupAlgos.PhotonPuppi_cff import puppiPhoton
-process.hltPuppiForMET = puppiPhoton.clone(
-  candName = _particleFlowCands,
-  puppiCandName = 'puppiMerged',
-  # the line below replaces reference linking with delta-R matching
-  # because the puppi references after merging are not consistent
-  # with those of the original PF collection
-  useRefs = False,
-)
+###
 process.hltPuppiMETNoMuv2 = cms.EDProducer( 'PFMETProducer',
   src = cms.InputTag( 'hltPuppiForMET' ),
   globalThreshold = cms.double( 0.0 ),
@@ -215,7 +200,6 @@ process.hltPuppiMETNoMuSequencev2 = cms.Sequence(
     (process.pfNoLepPUPPI
       * process.puppiNoLep
       + process.pfLeptonsPUPPET)
-      * process.puppiMerged
       * process.hltPuppiForMET
       * process.hltPuppiMETNoMuv2
 )
