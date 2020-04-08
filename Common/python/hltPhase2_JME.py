@@ -1,7 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
 from CommonTools.PileupAlgos.Puppi_cff import *
-from CommonTools.PileupAlgos.PhotonPuppi_cff import puppiPhoton
 from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets, ak4PFJetsCHS, ak4PFJetsPuppi
 from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets, ak8PFJetsCHS, ak8PFJetsPuppi
@@ -717,17 +716,10 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     process.puppiNoLep = puppi.clone(
       candName = 'pfNoLepPUPPI',
       vertexName = _primaryVerticesGood,
+      PtMaxPhotons = 20.,
     )
-    process.puppiMerged = cms.EDProducer('CandViewMerger',
+    process.hltPuppiForMET = cms.EDProducer('CandViewMerger',
       src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET' ),
-    )
-    process.hltPuppiForMET = puppiPhoton.clone(
-      candName = _particleFlowCands,
-      puppiCandName = 'puppiMerged',
-      # the line below replaces reference linking with delta-R matching
-      # because the puppi references after merging are not consistent
-      # with those of the original PF collection
-      useRefs = False,
     )
     process.hltPuppiMET = cms.EDProducer( 'PFMETProducer',
       src = cms.InputTag( 'hltPuppiForMET' ),
@@ -758,7 +750,6 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
        (process.pfNoLepPUPPI
       * process.puppiNoLep
       + process.pfLeptonsPUPPET)
-      * process.puppiMerged
       * process.hltPuppiForMET
       * process.hltPuppiMET
       + process.hltPuppi
