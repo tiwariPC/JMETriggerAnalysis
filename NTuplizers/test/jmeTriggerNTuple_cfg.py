@@ -84,6 +84,9 @@ else:
 ###
 process.analysisCollectionsSequence = cms.Sequence()
 
+process.hltPuppiMETv0 = process.hltPuppiMET.clone(src = 'hltPuppi')
+process.reconstruction += process.hltPuppiMETv0
+
 ### Muons
 #process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
 #process.analysisCollectionsSequence *= process.userMuonsSequence
@@ -188,6 +191,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMETSoftKiller = cms.InputTag('hltPFMETSoftKiller'),
     hltPuppiMET = cms.InputTag('hltPuppiMET'),
     hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'),
+    hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
   ),
 
   patMETCollections = cms.PSet(
