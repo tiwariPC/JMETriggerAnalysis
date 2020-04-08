@@ -168,9 +168,66 @@ process.MC_PuppiMET_v1 = cms.Path(
   + process.hltPuppiMETOpenFilter
   + process.HLTEndSequence
 )
+# add path MC_PuppiMETNoMu_v2
+
+#from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
+process.hltPreMCPuppiMETNoMu = process.hltPreMCPFMET.clone()
+#
+##makePuppies(process)
+#makePuppiesFromMiniAOD(process,True)
+##process.puppi.useExistingWeights = False
+#process.hltPuppiForMET = process.puppiForMET.clone()
+#process.hltPuppiMETNoMuv2 = process.hltPFMETProducer.clone(src = 'hltPuppiForMET', alias = '')
+# Puppi candidates for MET
+_particleFlowCands='hltParticleFlow'
+_primaryVerticesGood = "hltPixelVertices"
+process.pfNoLepPUPPI = cms.EDFilter('PdgIdCandViewSelector',
+  src = cms.InputTag( _particleFlowCands ),
+  pdgId = cms.vint32( 1, 2, 22, 111, 130, 310, 2112, 211, -211, 321, -321, 999211, 2212, -2212 )
+)
+process.pfLeptonsPUPPET = cms.EDFilter('PdgIdCandViewSelector',
+  src = cms.InputTag( _particleFlowCands ),
+  pdgId = cms.vint32( -11, 11, -13, 13 ),
+)
+process.puppiNoLep = puppi.clone(
+  candName = 'pfNoLepPUPPI',
+  vertexName = _primaryVerticesGood,
+)
+process.puppiMerged = cms.EDProducer('CandViewMerger',
+  src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET' ),
+)
+from CommonTools.PileupAlgos.PhotonPuppi_cff import puppiPhoton
+process.hltPuppiForMET = puppiPhoton.clone(
+  candName = _particleFlowCands,
+  puppiCandName = 'puppiMerged',
+  # the line below replaces reference linking with delta-R matching
+  # because the puppi references after merging are not consistent
+  # with those of the original PF collection
+  useRefs = False,
+)
+process.hltPuppiMETNoMuv2 = cms.EDProducer( 'PFMETProducer',
+  src = cms.InputTag( 'hltPuppiForMET' ),
+  globalThreshold = cms.double( 0.0 ),
+  calculateSignificance = cms.bool( False ),
+)
+#process.hltPuppiMETNoMuOpenFilterv2 = process.hltPFMETOpenFilter.clone(inputTag = 'hltPuppiMETNoMuv2')
+process.hltPuppiMETNoMuSequencev2 = cms.Sequence(
+    (process.pfNoLepPUPPI
+      * process.puppiNoLep
+      + process.pfLeptonsPUPPET)
+      * process.puppiMerged
+      * process.hltPuppiForMET
+      * process.hltPuppiMETNoMuv2
+)
+process.MC_PuppiMETNoMu_v2 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCPuppiMETNoMu
+  + process.hltPuppiMETNoMuSequencev2
+#  + process.hltPuppiMETNoMuOpenFilterv2
+  + process.HLTEndSequence
+)
 
 # add path: MC_PuppiMETNoMu_v1
-process.hltPreMCPuppiMETNoMu = process.hltPreMCPFMET.clone()
 
 process.hltPuppiNoMu = process.hltParticleFlowNoMu.clone(src = 'hltPuppi')
 
@@ -475,6 +532,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMETNoMu = cms.InputTag('hltPFMETNoMuProducer'),
     hltPuppiMET = cms.InputTag('hltPuppiMET'),
     hltPuppiMETNoMu = cms.InputTag('hltPuppiMETNoMu'),
+    hltPuppiMETNoMuv2 = cms.InputTag('hltPuppiMETNoMuv2'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
   ),
 
