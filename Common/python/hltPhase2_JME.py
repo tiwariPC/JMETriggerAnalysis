@@ -830,12 +830,25 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     if (not hasattr(process, 'globalreco_tracking')) and hasattr(process, 'globalreco_trackingTask'):
        process.globalreco_tracking = cms.Sequence(process.globalreco_trackingTask)
 
+    process.tofPIDSequence = cms.Sequence(
+        process.unsortedOfflinePrimaryVertices4DnoPID
+      + process.tofPID4DnoPID
+      + process.unsortedOfflinePrimaryVertices4D
+      + process.tofPID
+    )
+
     process.globalreco = cms.Sequence(
         process.caloTowersRec
       + process.ecalClusters
 #      + process.egammaGlobalReco
+
+        # tracking
       + process.globalreco_tracking
+      + process.standalonemuontracking # needs to be included for early muons of PF
+
+        # timing
       + process.fastTimingGlobalReco # necessary for MTD inputs to PF
+      + process.tofPIDSequence # contains tofPID maps
 
         # insert CaloJets sequence in process.globalreco
         # (module muons1stStep from muonGlobalReco requires AK4CaloJets [*])
