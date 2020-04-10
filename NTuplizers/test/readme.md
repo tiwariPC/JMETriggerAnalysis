@@ -30,13 +30,13 @@ cmsDriver.py step3 \
   --mc \
   --nThreads 4 \
   --nStreams 4 \
-  --python_filename hltPhase2_TRKv02_cfg.py \
   --no_exec \
   -n 10 \
   --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
   --customise JMETriggerAnalysis/Common/hltPhase2_TRKv02.customize_hltPhase2_TRKv02 \
   --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_JME \
-  --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n'
+  --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n' \
+  --python_filename hltPhase2_TRKv02_cfg.py
 ```
 
 ----
