@@ -506,7 +506,6 @@ def customize_hltPhase2_TRKv02(process):
       + process.highPtTripletStepTrackingRegions
       + process.highPtTripletStepHitDoublets
       + process.highPtTripletStepHitTriplets
-      + process.highPtTripletStepSeedLayers
       + process.highPtTripletStepSeeds
       + process.highPtTripletStepTrackCandidates
       + process.highPtTripletStepTracks
@@ -516,45 +515,27 @@ def customize_hltPhase2_TRKv02(process):
     )
 
     process.vertexReco = cms.Sequence(
-        process.unsortedOfflinePrimaryVertices4DnoPID
+        process.ak4CaloJetsForTrk
       + process.unsortedOfflinePrimaryVertices
-      + process.trackWithVertexRefSelectorBeforeSorting4DnoPID
       + process.trackWithVertexRefSelectorBeforeSorting
-      + process.trackRefsForJetsBeforeSorting4DnoPID
       + process.trackRefsForJetsBeforeSorting
-      + process.tpClusterProducer
-      + process.tofPID4DnoPID
-      + process.unsortedOfflinePrimaryVertices4D
-      + process.trackWithVertexRefSelectorBeforeSorting4D
-      + process.trackRefsForJetsBeforeSorting4D
-      + process.tofPID
-      + process.quickTrackAssociatorByHits
-      + process.trackTimeValueMapProducer
-      + process.caloTowerForTrk
-      + process.ak4CaloJetsForTrk
-#      + process.offlinePrimaryVertices4DnoPIDWithBS
-#      + process.offlinePrimaryVertices4DWithBS
-#      + process.offlinePrimaryVertices4D
-      + process.offlinePrimaryVerticesWithBS
       + process.offlinePrimaryVertices
-#      + process.generalV0Candidates
+      + process.offlinePrimaryVerticesWithBS
       + process.inclusiveVertexFinder
       + process.vertexMerger
       + process.trackVertexArbitrator
       + process.inclusiveSecondaryVertices
-#      + process.offlinePrimaryVertices4DnoPID
     )
 
     process.globalreco_tracking = cms.Sequence(
         process.itLocalReco
       + process.otLocalReco
-      + process.offlineBeamSpot #cmssw_10_6
+      + process.offlineBeamSpot
       + process.trackerClusterCheck
       + process.initialStepSequence
       + process.highPtTripletStepSequence
       + process.generalTracks
       + process.vertexReco 
-      + process.standalonemuontracking # needs to be included for early muons of PF
     )
 
     # remove globalreco_trackingTask to avoid any ambiguities
