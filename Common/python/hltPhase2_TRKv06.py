@@ -1229,7 +1229,7 @@ def customize_hltPhase2_TRKv06(process):
     )
 
     # clones of hltPhase2GeneralTracks and process.hltPhase2OfflinePrimaryVertices
-    # to reduce the need for modications in downstream modules
+    # to reduce the need for modifications in downstream modules
     process.generalTracks = process.hltPhase2GeneralTracks.clone()
     process.offlinePrimaryVertices = process.hltPhase2OfflinePrimaryVertices.clone()
 
@@ -1238,7 +1238,7 @@ def customize_hltPhase2_TRKv06(process):
       + process.offlinePrimaryVertices
     )
 
-    # remove globalreco_trackingTask to avoid any ambiguities
+    # remove task globalreco_trackingTask to avoid any ambiguities
     # with the updated sequence process.globalreco_tracking
     if hasattr(process, 'globalreco_trackingTask'):
        del process.globalreco_trackingTask
