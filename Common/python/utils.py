@@ -31,13 +31,23 @@ def getModuleDependencies(module):
     for _ikey in module.parameters_():
         if not hasattr(module, _ikey):
            raise RuntimeError('key "'+_ikey+'" not found in module: '+module.dumpPython())
-        ret += getParameterDependencies(getattr(module, _ikey))
+
+        # caveat: workaround for TRK-related modules
+        #  - skip selected string parameters to avoid false self- and circular-dependencies
+        _ipar = getattr(module, _ikey)
+        if ((type(_ipar) == cms.string) or (type(_ipar) == cms.untracked.string)) \
+           and (module.label_() == str(_ipar.value())) \
+           and ((_ikey == 'alias') or (_ikey == 'ComponentName') or (_ikey == 'ComponentType') or (_ikey == 'passLabel')):
+           continue
+        if ((type(_ipar) == cms.string) or (type(_ipar) == cms.untracked.string)) \
+           and ((_ikey == 'AlgorithmName')):
+           continue
+
+        ret += getParameterDependencies(_ipar)
     return ret
 
 def processHasModule(process, module):
-    if hasattr(process, module):
-       return True
-
+    return hasattr(process, module)
 #    for _tmp in process.es_sources_():
 #        print(_tmp, '=', getattr(process, _tmp).dumpPython())
 #    for _tmp in process.es_prefers_():
@@ -45,11 +55,14 @@ def processHasModule(process, module):
 #    for _tmp in process.es_producers_():
 #        print(_tmp, '=', getattr(process, _tmp).dumpPython())
 
-    return False
+def moduleDependencyDictFromSequence(process, sequenceName):
+    if not isinstance(sequenceName, str):
+       raise RuntimeError('sequence name argument is not of type "str": "'+str(sequenceName)+'"')
+    elif not hasattr(process, sequenceName):
+       raise RuntimeError('process does not have attribute "'+sequenceName+'"')
 
-def moduleDependencyDictFromSequence(process, sequence):
     ret = {}
-    for _modname in getattr(process, sequence).moduleNames():
+    for _modname in getattr(process, sequenceName).moduleNames():
         if not hasattr(process, _modname):
            raise RuntimeError(_modname)
         ret[_modname] = getModuleDependencies(getattr(process, _modname))
@@ -57,6 +70,20 @@ def moduleDependencyDictFromSequence(process, sequence):
         ret[_modname] = sorted(list(set(ret[_modname])))
         # retain only labels corresponding to a member of process (ignore dependencies from collections in input EDM file)
         ret[_modname] = [_tmp for _tmp in ret[_modname] if (_tmp and processHasModule(process, _tmp))]
+
+    # add indirect dependencies
+    while True:
+       ret2 = []
+       for _modname in ret:
+           for _modname2 in ret[_modname]:
+               if (_modname2 not in ret) and processHasModule(process, _modname2):
+                  ret2 += [_modname2]
+       if not ret2: break
+       for _modname2 in ret2:
+           ret[_modname2] = getModuleDependencies(getattr(process, _modname2))
+           ret[_modname2] = sorted(list(set(ret[_modname2])))
+           ret[_modname2] = [_tmp for _tmp in ret[_modname2] if (_tmp and processHasModule(process, _tmp))]
+
     # verify absence of self-dependencies and circular-dependencies
     for _modname in ret:
         for _dep in ret[_modname]:
@@ -91,11 +118,11 @@ class Graph:
                self.topoSortVisit(v, visited, sortlist)
         return sortlist
 
-def orderedListOfModuleNamesFromSequence(process, sequence):
-    depeDict = moduleDependencyDictFromSequence(process, sequence)
+def orderedListOfModuleNamesFromSequence(process, sequenceName):
+    depeDict = moduleDependencyDictFromSequence(process, sequenceName)
     depeGraph = Graph(directed=True)
-    moduleNames = sorted(list(getattr(process, sequence).moduleNames()))
-    for _tmp in depeDict:
+    moduleNames = sorted(list(set(depeDict.keys())))
+    for _tmp in moduleNames:
         for _tmp2 in depeDict[_tmp]:
             if _tmp2 in moduleNames:
                depeGraph.addEdge(moduleNames.index(_tmp2), moduleNames.index(_tmp))
