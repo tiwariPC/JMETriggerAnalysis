@@ -40,22 +40,22 @@ if [ ! -d ${JDIR} ]; then
 fi
 
 RECOS=(
- hltPhase2_TRKv02
- hltPhase2_TRKv06
+  hltPhase2_TRKv02
+  hltPhase2_TRKv06
 )
 
 SAMPLES=(
-# Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
- Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200
- Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU
- Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
+#  Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
+  Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200
+  Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU
+  Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
 )
 
 for reco_i in "${RECOS[@]}"; do
 
     for sample_i in "${SAMPLES[@]}"; do
 
-        htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 3000 --runtime 10800 \
+        htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
           -d ${JDIR}/${sample_i}.json -p 1 \
           -o ${ODIR}/${reco_i}/${sample_i} \
           -m ${NEVT} pfdqm=1 trkdqm=1 reco=${reco_i}
