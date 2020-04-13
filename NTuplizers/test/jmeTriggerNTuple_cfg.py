@@ -285,8 +285,10 @@ process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.ou
 
 # Tracking Monitoring
 if opts.trkdqm:
-   process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
-   process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
+
+   if reco == 'hltPhase2_TRKv02':
+      process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
+      process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
 
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
    process.TrackHistograms_pixelTracks = TrackHistogrammer.clone(src = 'pixelTracks')
