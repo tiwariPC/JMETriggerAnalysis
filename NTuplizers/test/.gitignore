@@ -4,3 +4,4 @@ log*.txt
 crab.log
 crab_*/
 out_*/
+output_*/
