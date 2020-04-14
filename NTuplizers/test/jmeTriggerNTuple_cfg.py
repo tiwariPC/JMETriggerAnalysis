@@ -708,23 +708,29 @@ process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.ou
 
 # Tracking Monitoring
 if opts.trkdqm:
+   process.trkMonitoringSeq = cms.Sequence()
+
+   # tracks
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-   process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'hltPixelTracks')
-   process.TrackHistograms_hltPFMuonMerging = TrackHistogrammer.clone(src = 'hltPFMuonMerging')
+   for _trkColl in [
+     'hltPixelTracks',
+     'hltMergedTracks',
+     'hltIter0PFlowTrackSelectionHighPurity',
+   ]:
+     if hasattr(process, _trkColl):
+        setattr(process, 'TrackHistograms_'+_trkColl, TrackHistogrammer.clone(src = _trkColl))
+        process.trkMonitoringSeq += getattr(process, 'TrackHistograms_'+_trkColl)
 
-   process.trkMonitoringSeq = cms.Sequence(
-       process.TrackHistograms_hltPixelTracks
-     + process.TrackHistograms_hltPFMuonMerging
-   )
-
+   # vertices
    from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
-   process.VertexHistograms_hltTrimmedPixelVertices = VertexHistogrammer.clone(src = 'hltTrimmedPixelVertices')
-   process.VertexHistograms_hltVerticesPF = VertexHistogrammer.clone(src = 'hltVerticesPF')
-
-   process.trkMonitoringSeq += cms.Sequence(
-       process.VertexHistograms_hltTrimmedPixelVertices
-     + process.VertexHistograms_hltVerticesPF
-   )
+   for _vtxColl in [
+     'hltPixelVertices',
+     'hltTrimmedPixelVertices',
+     'hltVerticesPF',
+   ]:
+     if hasattr(process, _vtxColl):
+        setattr(process, 'VertexHistograms_'+_vtxColl, VertexHistogrammer.clone(src = _vtxColl))
+        process.trkMonitoringSeq += getattr(process, 'VertexHistograms_'+_vtxColl)
 
 #   from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
 #   process.vertexAnalysis = vertexAnalysis.clone(vertexRecoCollections = ['offlinePrimaryVertices'])
