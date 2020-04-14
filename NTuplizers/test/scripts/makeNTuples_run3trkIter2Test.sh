@@ -38,13 +38,13 @@ if [ ! -d ${OUTDIR_JSON} ]; then
 fi
 
 recos=(
- HLT
- HLT_pfBlockAlgoRemovePS
- HLT_trkIter2RegionalPtSeed0p9
- HLT_trkIter2RegionalPtSeed2p0
- HLT_trkIter2RegionalPtSeed5p0
- HLT_trkIter2RegionalPtSeed10p0
- HLT_trkIter2GlobalPtSeed0p9
+  HLT
+  HLT_pfBlockAlgoRemovePS
+  HLT_trkIter2RegionalPtSeed0p9
+  HLT_trkIter2RegionalPtSeed2p0
+  HLT_trkIter2RegionalPtSeed5p0
+  HLT_trkIter2RegionalPtSeed10p0
+  HLT_trkIter2GlobalPtSeed0p9
 )
 
 for reco in "${recos[@]}"; do
