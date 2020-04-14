@@ -567,7 +567,7 @@ def customize_hltPhase2_TRKv06(process):
         originalQualVals = cms.InputTag('initialStepTrackCutClassifier','QualityMasks'),
         originalSource = cms.InputTag('initialStepTracks')
     )
-    
+
     process.highPtTripletStepClusters = cms.EDProducer('TrackClusterRemoverPhase2',
         TrackQuality = cms.string('highPurity'),
         maxChi2 = cms.double(9.0),
@@ -578,9 +578,9 @@ def customize_hltPhase2_TRKv06(process):
         phase2OTClusters = cms.InputTag('siPhase2Clusters'),
         phase2pixelClusters = cms.InputTag('siPixelClusters'),
         trackClassifier = cms.InputTag('','QualityMasks'),
-        trajectories = cms.InputTag('initialStepTracks')
+        trajectories = cms.InputTag('initialStepTrackSelectionHighPurity')
     )
-    
+
     process.highPtTripletStepSeedLayers = cms.EDProducer('SeedingLayersEDProducer',
         BPix = cms.PSet(
             HitProducer = cms.string('siPixelRecHits'),
