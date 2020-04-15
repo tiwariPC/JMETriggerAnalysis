@@ -114,7 +114,7 @@ elif opts.reco == 'HLT_globalPixelTracks_v01':
      src = cms.InputTag('hltParticleFlowNoMu')
    )
 
-   # add path: MC_AK4PFJets_v1
+   ## add path: MC_AK4PFJets_v1
    process.hltPreMCAK4PFJets = cms.EDFilter('HLTPrescaler',
      L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
      offset = cms.uint32(0)
@@ -141,7 +141,7 @@ elif opts.reco == 'HLT_globalPixelTracks_v01':
      + process.HLTEndSequence
    )
 
-   # add path: MC_PFMETNoMu_v1
+   ## add path: MC_PFMETNoMu_v1
    process.hltPreMCPFMET = cms.EDFilter('HLTPrescaler',
      L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
      offset = cms.uint32(0)
@@ -198,23 +198,33 @@ for _modname in process.endpaths_():
 if hasattr(process, 'MessageLogger'):
    del process.MessageLogger
 
-# add path: MC_PFMETNoMu_v1
+## add path: MC_PFMETNoMu_v1
 process.hltPreMCPFMETNoMu = process.hltPreMCPFMET.clone()
 
-process.hltPFMETNoMuOpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPFMETNoMuProducer')
+process.hltPFMETNoMuOpenFilter = process.hltPFMETOpenFilter.clone(
+  inputTag = 'hltPFMETNoMuProducer'
+)
+
+process.HLTParticleFlowJMESequence = cms.Sequence(
+    process.HLTPreAK4PFJetsRecoSequence
+  + process.HLTL2muonrecoSequence
+  + process.HLTL3muonrecoSequence
+  + process.HLTTrackReconstructionForPF
+  + process.HLTParticleFlowSequence
+)
 
 process.MC_PFMETNoMu_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCPFMETNoMu
-  + process.HLTAK4PFJetsSequence
+  + process.HLTParticleFlowJMESequence
   + process.hltParticleFlowNoMu
   + process.hltPFMETNoMuProducer
   + process.hltPFMETNoMuOpenFilter
   + process.HLTEndSequence
 )
 
-# add path: MC_PuppiMETv0_v1
-process.hltPreMCPuppiMETv0 = process.hltPreMCPFMET.clone()
+## add path: MC_AK4PuppiJets_v1
+process.hltPreMCAK4PuppiJets = process.hltPreMCAK4PFJets.clone()
 
 from CommonTools.PileupAlgos.Puppi_cff import *
 process.hltPuppi = puppi.clone(
@@ -222,49 +232,88 @@ process.hltPuppi = puppi.clone(
   vertexName = 'hltPixelVertices',
   vtxNdofCut = 0,
 )
-process.hltPuppiMETv0 = process.hltPFMETProducer.clone(src = 'hltPuppi', alias = '')
 
-process.hltPuppiMETv0Sequence = cms.Sequence(
-    process.hltPuppi
+process.HLTPuppiSequence = cms.Sequence(
+    process.HLTParticleFlowJMESequence
+  + process.hltPuppi
+)
+
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
+process.hltAK4PuppiJets = ak4PFJetsPuppi.clone(
+  src = 'hltPuppi',
+)
+
+process.HLTAK4PuppiJetsSequence = cms.Sequence(
+    process.HLTPuppiSequence
+  + process.hltAK4PuppiJets
+)
+
+process.hltAK4PuppiJetCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK4PuppiJets'
+)
+
+process.MC_AK4PuppiJets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK4PuppiJets
+  + process.HLTAK4PuppiJetsSequence
+  + process.hltAK4PuppiJetCollection20Filter
+  + process.HLTEndSequence
+)
+
+## add path: MC_PuppiMETv0_v1
+process.hltPreMCPuppiMETv0 = process.hltPreMCPFMET.clone()
+
+process.hltPuppiMETv0 = process.hltPFMETProducer.clone(
+  src = 'hltPuppi',
+  alias = ''
+)
+
+process.HLTPuppiMETv0Sequence = cms.Sequence(
+    process.HLTPuppiSequence
   + process.hltPuppiMETv0
 )
 
-process.hltPuppiMETv0OpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPuppiMETv0')
+process.hltPuppiMETv0OpenFilter = process.hltPFMETOpenFilter.clone(
+  inputTag = 'hltPuppiMETv0'
+)
 
 process.MC_PuppiMETv0_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCPuppiMETv0
-  + process.HLTAK4PFJetsSequence
-  + process.hltPuppiMETv0Sequence
+  + process.HLTPuppiMETv0Sequence
   + process.hltPuppiMETv0OpenFilter
   + process.HLTEndSequence
 )
 
-# add path: MC_PuppiMETv0NoMu_v1
+## add path: MC_PuppiMETv0NoMu_v1
 process.hltPreMCPuppiMETv0NoMu = process.hltPreMCPFMET.clone()
 
 process.hltPuppiNoMu = process.hltParticleFlowNoMu.clone(src = 'hltPuppi')
 
-process.hltPuppiMETv0NoMu = process.hltPFMETProducer.clone(src = 'hltPuppiNoMu', alias = '')
+process.hltPuppiMETv0NoMu = process.hltPFMETProducer.clone(
+  src = 'hltPuppiNoMu',
+  alias = ''
+)
 
-process.hltPuppiMETv0NoMuSequence = cms.Sequence(
-    process.hltPuppi
+process.HLTPuppiMETv0NoMuSequence = cms.Sequence(
+    process.HLTPuppiSequence
   + process.hltPuppiNoMu
   + process.hltPuppiMETv0NoMu
 )
 
-process.hltPuppiMETv0NoMuOpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPuppiMETv0NoMu')
+process.hltPuppiMETv0NoMuOpenFilter = process.hltPFMETOpenFilter.clone(
+  inputTag = 'hltPuppiMETv0NoMu'
+)
 
 process.MC_PuppiMETv0NoMu_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCPuppiMETv0NoMu
-  + process.HLTAK4PFJetsSequence
-  + process.hltPuppiMETv0NoMuSequence
+  + process.HLTPuppiMETv0NoMuSequence
   + process.hltPuppiMETv0NoMuOpenFilter
   + process.HLTEndSequence
 )
 
-# add path: MC_PuppiMETv1_v1
+## add path: MC_PuppiMETv1_v1
 process.hltPreMCPuppiMETv1 = process.hltPreMCPFMET.clone()
 
 # Puppi candidates for MET
@@ -283,35 +332,40 @@ process.hltPuppiNoLeptons = puppi.clone(
   vtxNdofCut = 0,
 )
 process.hltPuppiForMET = cms.EDProducer('CandViewMerger',
-  src = cms.VInputTag( 'hltPuppiNoLeptons','hltParticleFlowLeptons' ),
+  src = cms.VInputTag( 'hltPuppiNoLeptons', 'hltParticleFlowLeptons' ),
 )
 
-process.hltPuppiForMETSequence = cms.Sequence(
-    process.hltParticleFlowNoLeptons
+process.HLTPuppiForMETSequence = cms.Sequence(
+    process.HLTParticleFlowJMESequence
+  + process.hltParticleFlowNoLeptons
   + process.hltParticleFlowLeptons
   + process.hltPuppiNoLeptons
   + process.hltPuppiForMET
 )
 
-process.hltPuppiMETv1 = process.hltPFMETProducer.clone(src = 'hltPuppiForMET', alias = '')
+process.hltPuppiMETv1 = process.hltPFMETProducer.clone(
+  src = 'hltPuppiForMET',
+  alias = ''
+)
 
-process.hltPuppiMETv1Sequence = cms.Sequence(
-    process.hltPuppiForMETSequence
+process.HLTPuppiMETv1Sequence = cms.Sequence(
+    process.HLTPuppiForMETSequence
   + process.hltPuppiMETv1
 )
 
-process.hltPuppiMETv1OpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPuppiMETv1')
+process.hltPuppiMETv1OpenFilter = process.hltPFMETOpenFilter.clone(
+  inputTag = 'hltPuppiMETv1'
+)
 
 process.MC_PuppiMETv1_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCPuppiMETv1
-  + process.HLTAK4PFJetsSequence
-  + process.hltPuppiMETv1Sequence
+  + process.HLTPuppiMETv1Sequence
   + process.hltPuppiMETv1OpenFilter
   + process.HLTEndSequence
 )
 
-# add path: MC_PuppiMETv1NoMu_v1
+## add path: MC_PuppiMETv1NoMu_v1
 process.hltPreMCPuppiMETv1NoMu = process.hltPreMCPFMET.clone()
 
 process.hltParticleFlowElectrons = cms.EDFilter('PdgIdCandViewSelector',
@@ -322,28 +376,113 @@ process.hltPuppiForMETNoMu = process.hltPuppiForMET.clone(
   src = ['hltPuppiNoLeptons', 'hltParticleFlowElectrons'],
 )
 
-process.hltPuppiForMETNoMuSequence = cms.Sequence(
-    process.hltParticleFlowNoLeptons
+process.HLTPuppiForMETNoMuSequence = cms.Sequence(
+    process.HLTParticleFlowJMESequence
+  + process.hltParticleFlowNoLeptons
   + process.hltParticleFlowElectrons
   + process.hltPuppiNoLeptons
   + process.hltPuppiForMETNoMu
 )
 
-process.hltPuppiMETv1NoMu = process.hltPFMETProducer.clone(src = 'hltPuppiForMETNoMu', alias = '')
+process.hltPuppiMETv1NoMu = process.hltPFMETProducer.clone(
+  src = 'hltPuppiForMETNoMu',
+  alias = ''
+)
 
-process.hltPuppiMETv1NoMuSequence = cms.Sequence(
-    process.hltPuppiForMETNoMuSequence
+process.HLTPuppiMETv1NoMuSequence = cms.Sequence(
+    process.HLTPuppiForMETNoMuSequence
   + process.hltPuppiMETv1NoMu
 )
 
-process.hltPuppiMETv1NoMuOpenFilter = process.hltPFMETOpenFilter.clone(inputTag = 'hltPuppiMETv1NoMu')
+process.hltPuppiMETv1NoMuOpenFilter = process.hltPFMETOpenFilter.clone(
+  inputTag = 'hltPuppiMETv1NoMu'
+)
 
 process.MC_PuppiMETv1NoMu_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCPuppiMETv1NoMu
-  + process.HLTAK4PFJetsSequence
-  + process.hltPuppiMETv1NoMuSequence
+  + process.HLTPuppiMETv1NoMuSequence
   + process.hltPuppiMETv1NoMuOpenFilter
+  + process.HLTEndSequence
+)
+
+## add path: MC_AK4PFCHSJets_v1
+process.hltPreMCAK4PFCHSJets = process.hltPreMCAK4PFJets.clone()
+
+process.hltParticleFlowPtrs = cms.EDProducer('PFCandidateFwdPtrProducer',
+  src = cms.InputTag('hltParticleFlow')
+)
+process.hltParticleFlowPileUpJME = cms.EDProducer('PFPileUp',
+  Enable = cms.bool(True),
+  PFCandidates = cms.InputTag('hltParticleFlowPtrs'),
+  Vertices = cms.InputTag('hltPixelVertices'),
+  checkClosestZVertex = cms.bool(True),
+  verbose = cms.untracked.bool(False)
+)
+process.hltParticleFlowNoPileUpJME = cms.EDProducer('TPPFCandidatesOnPFCandidates',
+  enable = cms.bool(True),
+  bottomCollection = cms.InputTag('hltParticleFlowPtrs'),
+  name = cms.untracked.string('pileUpOnPFCandidates'),
+  topCollection = cms.InputTag('hltParticleFlowPileUpJME'),
+  verbose = cms.untracked.bool(False)
+)
+
+process.HLTParticleFlowCHSPtrsSequence = cms.Sequence(
+    process.HLTParticleFlowJMESequence
+  + process.hltParticleFlowPtrs
+  + process.hltParticleFlowPileUpJME
+  + process.hltParticleFlowNoPileUpJME
+)
+
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsCHS
+process.hltAK4PFCHSJets = ak4PFJetsCHS.clone(
+  src = 'hltParticleFlowNoPileUpJME',
+)
+
+process.HLTAK4PFCHSJetsSequence = cms.Sequence(
+    process.HLTParticleFlowCHSPtrsSequence
+  + process.hltAK4PFCHSJets
+)
+
+process.hltAK4PFCHSJetCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK4PFCHSJets'
+)
+
+process.MC_AK4PFCHSJets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK4PFCHSJets
+  + process.HLTAK4PFCHSJetsSequence
+  + process.hltAK4PFCHSJetCollection20Filter
+  + process.HLTEndSequence
+)
+
+## add path: MC_PFCHSMET_v1
+process.hltPreMCPFCHSMET = process.hltPreMCPFMET.clone()
+
+process.hltParticleFlowCHS = cms.EDProducer('FwdPtrRecoPFCandidateConverter',
+  src = process.hltAK4PFCHSJets.src,
+)
+
+process.hltPFCHSMET = process.hltPFMETProducer.clone(
+  src = 'hltParticleFlowCHS',
+  alias = ''
+)
+
+process.HLTPFCHSMETSequence = cms.Sequence(
+    process.HLTParticleFlowCHSPtrsSequence
+  + process.hltParticleFlowCHS
+  + process.hltPFCHSMET
+)
+
+process.hltPFCHSMETOpenFilter = process.hltPFMETOpenFilter.clone(
+  inputTag = 'hltPFCHSMET'
+)
+
+process.MC_PFCHSMET_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCPFCHSMET
+  + process.HLTPFCHSMETSequence
+  + process.hltPFCHSMETOpenFilter
   + process.HLTEndSequence
 )
 
@@ -603,6 +742,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFJetCollections = cms.PSet(
     hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
+    hltAK4PFCHSJets = cms.InputTag('hltAK4PFCHSJets'),
+    hltAK4PuppiJets = cms.InputTag('hltAK4PuppiJets'),
 
     hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
     hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
@@ -624,9 +765,9 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   recoPFMETCollections = cms.PSet(
-
     hltPFMET = cms.InputTag('hltPFMETProducer'),
     hltPFMETNoMu = cms.InputTag('hltPFMETNoMuProducer'),
+    hltPFCHSMET = cms.InputTag('hltPFCHSMET'),
     hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
     hltPuppiMETv0NoMu = cms.InputTag('hltPuppiMETv0NoMu'),
     hltPuppiMETv1 = cms.InputTag('hltPuppiMETv1'),
@@ -644,7 +785,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   stringCutObjectSelectors = cms.PSet(
-
     ak4GenJetsNoNu = cms.string('pt > 12'),
     ak8GenJetsNoNu = cms.string('pt > 50'),
 
@@ -657,12 +797,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4PFJets = cms.string('pt > 12'),
     hltAK4PFJetsCorrected = cms.string('pt > 12'),
 
+    hltAK4PFCHSJets = cms.string('pt > 12'),
+    hltAK4PuppiJets = cms.string('pt > 12'),
+
     hltAK8PFJets = cms.string('pt > 80'),
     hltAK8PFJetsCorrected = cms.string('pt > 80'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
-
 #    'offlinePrimaryVertices_tracksSize',
 #
 ##    'hltPFMet_ChargedEMEtFraction',
