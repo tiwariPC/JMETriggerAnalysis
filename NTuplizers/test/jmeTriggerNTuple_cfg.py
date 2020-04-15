@@ -70,7 +70,33 @@ opts.parseArguments()
 ### base configuration file
 ###
 if opts.reco == 'HLT':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+
+elif opts.reco == 'HLT_trkIter2GlobalPtSeed0p9':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+   from JMETriggerAnalysis.NTuplizers.customise_HLT_trkIter2Global import *
+   process = customise_HLT_trkIter2Global(process, ptMin = 0.9)
+
+elif opts.reco == 'HLT_pfBlockAlgoRemovePS':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+   from JMETriggerAnalysis.NTuplizers.customise_HLT_pfBlockAlgoRemovePS import *
+   process = customise_HLT_pfBlockAlgoRemovePS(process)
+
+elif opts.reco == 'HLT_trkIter2RegionalPtSeed0p9':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 0.9
+
+elif opts.reco == 'HLT_trkIter2RegionalPtSeed2p0':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 2.0
+
+elif opts.reco == 'HLT_trkIter2RegionalPtSeed5p0':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 5.0
+
+elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
+   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
 elif opts.reco == 'HLT_globalPixelTracks_v01':
    from JMETriggerAnalysis.NTuplizers.HLT_globalPixelTracks_v01 import cms, process
@@ -142,32 +168,6 @@ elif opts.reco == 'HLT_globalPixelTracks_v01':
      + process.hltPFMETOpenFilter
      + process.HLTEndSequence
    )
-
-elif opts.reco == 'HLT_trkIter2GlobalPtSeed0p9':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   from JMETriggerAnalysis.NTuplizers.customise_HLT_trkIter2Global import *
-   process = customise_HLT_trkIter2Global(process, ptMin = 0.9)
-
-elif opts.reco == 'HLT_pfBlockAlgoRemovePS':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   from JMETriggerAnalysis.NTuplizers.customise_HLT_pfBlockAlgoRemovePS import *
-   process = customise_HLT_pfBlockAlgoRemovePS(process)
-
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed0p9':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 0.9
-
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed2p0':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 2.0
-
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed5p0':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 5.0
-
-elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
-   from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_configDump import cms, process
-   process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
