@@ -54,27 +54,27 @@ for reco in "${recos[@]}"; do
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
    -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_15to3000_Flat_14TeV.json -p 0 \
    -o ${OUTDIR_ROOT}/Run3Winter20_QCD_Pt_15to3000_Flat_14TeV \
-   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=auto:phase1_2021_realistic
+   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
    -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_50to80_14TeV.json -p 0 \
    -o ${OUTDIR_ROOT}/Run3Winter20_QCD_Pt_50to80_14TeV \
-   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=auto:phase1_2021_realistic
+   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
    -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_170to300_14TeV.json -p 0 \
    -o ${OUTDIR_ROOT}/Run3Winter20_QCD_Pt_170to300_14TeV \
-   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=auto:phase1_2021_realistic
+   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
    -d ${OUTDIR_JSON}/Run3Winter20_DYToLL_M50_14TeV.json -p 0 \
    -o ${OUTDIR_ROOT}/Run3Winter20_DYToLL_M50_14TeV \
-   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=auto:phase1_2021_realistic
+   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
    -d ${OUTDIR_JSON}/Run3Winter20_ZprimeToMuMu_M6000_14TeV.json -p 0 \
    -o ${OUTDIR_ROOT}/Run3Winter20_ZprimeToMuMu_M6000_14TeV \
-   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=auto:phase1_2021_realistic
+   -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   unset -v OUTDIR_ROOT
 
