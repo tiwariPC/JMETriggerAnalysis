@@ -114,21 +114,6 @@ elif opts.reco == 'HLT_globalPixelTracks_v01':
      src = cms.InputTag('hltParticleFlowNoMu')
    )
 
-   ## add path: MC_CaloMET_v1
-   process.hltPreMCCaloMET = process.hltPreMCPFMET.clone()
-
-   process.hltCaloMETOpenFilter = process.hltPFMETOpenFilter.clone(
-     inputTag = 'hltMet'
-   )
-
-   process.MC_CaloMET_v1 = cms.Path(
-       process.HLTBeginSequence
-     + process.hltPreMCCaloMET
-     + process.HLTRecoMETSequence
-     + process.hltCaloMETOpenFilter
-     + process.HLTEndSequence
-   )
-
    ## add path: MC_AK4PFJets_v1
    process.hltPreMCAK4PFJets = cms.EDFilter('HLTPrescaler',
      L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
@@ -181,6 +166,30 @@ elif opts.reco == 'HLT_globalPixelTracks_v01':
      + process.HLTAK4PFJetsSequence
      + process.hltPFMETProducer
      + process.hltPFMETOpenFilter
+     + process.HLTEndSequence
+   )
+
+   ## add path: MC_CaloMET_v1
+   process.hltPreMCCaloMET = process.hltPreMCPFMET.clone()
+
+   process.hltCaloMETOpenFilter = cms.EDFilter('HLT1CaloMET',
+     MaxEta = cms.double(-1.0),
+     MaxMass = cms.double(-1.0),
+     MinE = cms.double(-1.0),
+     MinEta = cms.double(-1.0),
+     MinMass = cms.double(-1.0),
+     MinN = cms.int32(1),
+     MinPt = cms.double(0.0),
+     inputTag = cms.InputTag('hltMet'),
+     saveTags = cms.bool(True),
+     triggerType = cms.int32(87)
+   )
+
+   process.MC_CaloMET_v1 = cms.Path(
+       process.HLTBeginSequence
+     + process.hltPreMCCaloMET
+     + process.HLTRecoMETSequence
+     + process.hltCaloMETOpenFilter
      + process.HLTEndSequence
    )
 
@@ -506,15 +515,10 @@ process.MC_PFCHSMET_v1 = cms.Path(
 ###
 process.analysisCollectionsSequence = cms.Sequence()
 
-### Muons
-#process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
-#process.analysisCollectionsSequence *= process.userMuonsSequence
-#
-### Electrons
-#process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
-#process.analysisCollectionsSequence *= process.userElectronsSequence
-
-## Event Selection (none yet)
+## Muons
+from JMETriggerAnalysis.NTuplizers.userMuons_cff import userMuons
+process, userMuonsCollection = userMuons(process)
+process.analysisCollectionsSequence += process.userMuonsSequence
 
 ## JMETrigger NTuple
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
@@ -765,6 +769,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   patJetCollections = cms.PSet(
+    offlineAK4PFCHSJets = cms.InputTag('slimmedJets'),
+    offlineAK4PuppiJets = cms.InputTag('slimmedJetsPuppi'),
   ),
 
   recoGenMETCollections = cms.PSet(
@@ -791,9 +797,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   patMETCollections = cms.PSet(
+    offlineMETs = cms.InputTag('slimmedMETs'),
+    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
   ),
 
   patMuonCollections = cms.PSet(
+    offlineMuons = cms.InputTag(userMuonsCollection)
   ),
 
   patElectronCollections = cms.PSet(
@@ -803,20 +812,23 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     ak4GenJetsNoNu = cms.string('pt > 12'),
     ak8GenJetsNoNu = cms.string('pt > 50'),
 
-    hltAK4CaloJets = cms.string('pt > 12'),
-    hltAK4CaloJetsCorrected = cms.string('pt > 12'),
+    hltAK4CaloJets = cms.string('pt > 20'),
+    hltAK4CaloJetsCorrected = cms.string('pt > 20'),
 
     hltAK8CaloJets = cms.string('pt > 80'),
     hltAK8CaloJetsCorrected = cms.string('pt > 80'),
 
-    hltAK4PFJets = cms.string('pt > 12'),
-    hltAK4PFJetsCorrected = cms.string('pt > 12'),
+    hltAK4PFJets = cms.string('pt > 20'),
+    hltAK4PFJetsCorrected = cms.string('pt > 20'),
 
-    hltAK4PFCHSJets = cms.string('pt > 12'),
-    hltAK4PuppiJets = cms.string('pt > 12'),
+    hltAK4PFCHSJets = cms.string('pt > 20'),
+    hltAK4PuppiJets = cms.string('pt > 20'),
 
     hltAK8PFJets = cms.string('pt > 80'),
     hltAK8PFJetsCorrected = cms.string('pt > 80'),
+
+    offlineAK4PFCHSJets = cms.string('pt > 20'),
+    offlineAK4PuppiJets = cms.string('pt > 20'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
@@ -988,7 +1000,7 @@ if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
    process.source.fileNames = [
-     '/store/mc/Run3Winter20DRPremixMiniAOD/QCD_Pt_170to300_TuneCP5_14TeV_pythia8/GEN-SIM-RAW/110X_mcRun3_2021_realistic_v6-v2/40000/A623EE66-618D-FC43-B4FC-6C4029CD68FB.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/MINIAODSIM/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/06046A61-F68D-364A-B48B-9B8B71D99980.root',
    ]
 
 # input EDM files [secondary]
@@ -1000,7 +1012,22 @@ if opts.secondaryInputFiles == ['None']:
 elif opts.secondaryInputFiles != []:
    process.source.secondaryFileNames = opts.secondaryInputFiles
 else:
-   process.source.secondaryFileNames = []
+   process.source.secondaryFileNames = [
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/1E007C6B-0236-774C-AE76-16FF40129ED8.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/28B01ED8-0D18-7546-BA43-0237889F3BA7.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/2A97FB7E-1CAF-C14F-B35D-73109005BFD0.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/2CBC0309-9AA0-A047-8AA0-E099EA6B4745.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/460E3EEF-6F6E-D94A-AD05-7F20945D96C6.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/6CC199A5-0BBA-CD4D-AC64-86BA65281EBB.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/75CD4F71-FC10-4F40-9A59-540A2367FDF8.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/79961B00-117B-994F-8425-E9DC19AF6823.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/9275A076-96E6-2347-A859-ED4F3835FDFB.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/AEF78A17-5BF6-714C-BA73-8916E7684185.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/C1A22F6E-FE7C-4A45-9D0D-B6A568011166.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/CC44A2B7-BB6B-914F-9AC2-571448730AFF.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/D3198660-A789-5C43-A589-0994A675CD75.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/E7C3A195-4EBA-5B41-B611-8431BE3DB069.root',
+   ]
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:

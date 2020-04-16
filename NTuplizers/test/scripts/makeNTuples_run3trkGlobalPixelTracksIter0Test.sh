@@ -16,24 +16,24 @@ if [ ! -d ${OUTDIR_JSON} ]; then
 
   mkdir -p ${OUTDIR_JSON}
 
-  das_jsondump -v -m ${NEVT} \
-   -d /QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/Run3Winter20DRMiniAOD-DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/GEN-SIM-RAW \
+  das_jsondump -p 1 -v -m ${NEVT} \
+   -d /QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/Run3Winter20DRMiniAOD-DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_15to3000_Flat_14TeV.json
 
-  das_jsondump -v \
-   -d /QCD_Pt_50to80_TuneCP5_14TeV_pythia8/Run3Winter20DRPremixMiniAOD-110X_mcRun3_2021_realistic_v6-v2/GEN-SIM-RAW \
+  das_jsondump -p 1 -v \
+   -d /QCD_Pt_50to80_TuneCP5_14TeV_pythia8/Run3Winter20DRPremixMiniAOD-110X_mcRun3_2021_realistic_v6-v2/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_50to80_14TeV.json
 
-  das_jsondump -v \
-   -d /QCD_Pt_170to300_TuneCP5_14TeV_pythia8/Run3Winter20DRPremixMiniAOD-110X_mcRun3_2021_realistic_v6-v2/GEN-SIM-RAW \
+  das_jsondump -p 1 -v \
+   -d /QCD_Pt_170to300_TuneCP5_14TeV_pythia8/Run3Winter20DRPremixMiniAOD-110X_mcRun3_2021_realistic_v6-v2/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_170to300_14TeV.json
 
-  das_jsondump -v -m ${NEVT} \
-   -d /DYToLL_M-50_TuneCP5_14TeV-pythia8/Run3Winter20DRMiniAOD-DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/GEN-SIM-RAW \
+  das_jsondump -p 1 -v -m ${NEVT} \
+   -d /DYToLL_M-50_TuneCP5_14TeV-pythia8/Run3Winter20DRMiniAOD-DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_DYToLL_M50_14TeV.json
 
-  das_jsondump -v -m ${NEVT} \
-   -d /ZprimeToMuMu_M-6000_TuneCP5_14TeV-pythia8/Run3Winter20DRMiniAOD-FlatPU0to80_110X_mcRun3_2021_realistic_v6-v3/GEN-SIM-RAW \
+  das_jsondump -p 1 -v -m ${NEVT} \
+   -d /ZprimeToMuMu_M-6000_TuneCP5_14TeV-pythia8/Run3Winter20DRMiniAOD-FlatPU0to80_110X_mcRun3_2021_realistic_v6-v3/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_ZprimeToMuMu_M6000_14TeV.json
 fi
 
@@ -52,27 +52,27 @@ for reco in "${recos[@]}"; do
   fi
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
-   -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_15to3000_Flat_14TeV.json -p 0 \
+   -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_15to3000_Flat_14TeV.json -p 1 \
    -o ${OUTDIR_ROOT}/Run3Winter20_QCD_Pt_15to3000_Flat_14TeV \
    -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
-   -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_50to80_14TeV.json -p 0 \
+   -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_50to80_14TeV.json -p 1 \
    -o ${OUTDIR_ROOT}/Run3Winter20_QCD_Pt_50to80_14TeV \
    -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
-   -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_170to300_14TeV.json -p 0 \
+   -d ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_170to300_14TeV.json -p 1 \
    -o ${OUTDIR_ROOT}/Run3Winter20_QCD_Pt_170to300_14TeV \
    -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
-   -d ${OUTDIR_JSON}/Run3Winter20_DYToLL_M50_14TeV.json -p 0 \
+   -d ${OUTDIR_JSON}/Run3Winter20_DYToLL_M50_14TeV.json -p 1 \
    -o ${OUTDIR_ROOT}/Run3Winter20_DYToLL_M50_14TeV \
    -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
   htc_driver -c jmeTriggerNTuple_cfg.py -n 2000 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
-   -d ${OUTDIR_JSON}/Run3Winter20_ZprimeToMuMu_M6000_14TeV.json -p 0 \
+   -d ${OUTDIR_JSON}/Run3Winter20_ZprimeToMuMu_M6000_14TeV.json -p 1 \
    -o ${OUTDIR_ROOT}/Run3Winter20_ZprimeToMuMu_M6000_14TeV \
    -m ${NEVT} reco=${reco} trkdqm=1 pfdqm=1 globalTag=110X_mcRun3_2021_realistic_v6
 
