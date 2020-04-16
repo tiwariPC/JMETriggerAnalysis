@@ -34,6 +34,10 @@ def monitor(options, log=''):
     if which(BATCH_RESUB_EXE, permissive=True) is None:
        return False
 
+    if options.release:
+       EXE('condor_release '+os.environ['USER'], verbose=options.verbose, dry_run=options.dry_run)
+       EXE('sleep 3', verbose=options.verbose, dry_run=options.dry_run)
+
     ADD_OPTIONS = []
 
     if options.runtime is not None:
@@ -182,6 +186,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-f', '--frequency', dest='frequency', action='store', type=int, default=3600,
                         help='interval of time in seconds between executions of the monitor (has no effect if --repeat is not specified)')
+
+    parser.add_argument('--release', dest='release', action='store_true', default=False,
+                        help='run "condor_release ${USER}" before monitoring, to release jobs in the "HOLD" state')
 
     parser.add_argument('--show-resubmitted', dest='show_resubmitted', action='store_true', default=False,
                         help='show batch jobs flagged for resubmission')
