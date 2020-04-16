@@ -114,6 +114,21 @@ elif opts.reco == 'HLT_globalPixelTracks_v01':
      src = cms.InputTag('hltParticleFlowNoMu')
    )
 
+   ## add path: MC_CaloMET_v1
+   process.hltPreMCCaloMET = process.hltPreMCPFMET.clone()
+
+   process.hltCaloMETOpenFilter = process.hltPFMETOpenFilter.clone(
+     inputTag = 'hltMet'
+   )
+
+   process.MC_CaloMET_v1 = cms.Path(
+       process.HLTBeginSequence
+     + process.hltPreMCCaloMET
+     + process.HLTRecoMETSequence
+     + process.hltCaloMETOpenFilter
+     + process.HLTEndSequence
+   )
+
    ## add path: MC_AK4PFJets_v1
    process.hltPreMCAK4PFJets = cms.EDFilter('HLTPrescaler',
      L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
