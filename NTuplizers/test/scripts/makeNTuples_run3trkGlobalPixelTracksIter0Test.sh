@@ -20,11 +20,11 @@ if [ ! -d ${OUTDIR_JSON} ]; then
    -d /QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/Run3Winter20DRMiniAOD-DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_15to3000_Flat_14TeV.json
 
-  das_jsondump -p 1 -v \
+  das_jsondump -p 1 -v -m ${NEVT} \
    -d /QCD_Pt_50to80_TuneCP5_14TeV_pythia8/Run3Winter20DRPremixMiniAOD-110X_mcRun3_2021_realistic_v6-v2/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_50to80_14TeV.json
 
-  das_jsondump -p 1 -v \
+  das_jsondump -p 1 -v -m ${NEVT} \
    -d /QCD_Pt_170to300_TuneCP5_14TeV_pythia8/Run3Winter20DRPremixMiniAOD-110X_mcRun3_2021_realistic_v6-v2/MINIAODSIM \
    -o ${OUTDIR_JSON}/Run3Winter20_QCD_Pt_170to300_14TeV.json
 
