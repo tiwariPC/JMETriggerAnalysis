@@ -8,7 +8,7 @@ import json
 
 from JMETriggerAnalysis.NTuplizers.utils.common import *
 
-def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=2, verbose=False):
+def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=2, files_prefix='', verbose=False):
 
     if verbose:
        print(colored_text(das_name, ['1']))
@@ -59,14 +59,14 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
         i_file_parents2 = []
         if parentFiles_levels > 0:
            i_file_parents1 = command_output_lines('dasgoclient --query "parent file='+str(i_file)+'"')
-           i_file_parents1 = [_tmp for _tmp in i_file_parents1 if _tmp != '']
+           i_file_parents1 = [files_prefix+_tmp for _tmp in i_file_parents1 if _tmp]
            i_file_parents1 = sorted(list(set(i_file_parents1)))
            if parentFiles_levels > 1:
               i_file_parents2 = []
               for i_file_aodf in i_file_parents1:
                   i_file_parents2_tmp = command_output_lines('dasgoclient --query "parent file='+str(i_file_aodf)+'"')
                   i_file_parents2_tmp = [_tmp.replace(' ', '') for _tmp in i_file_parents2_tmp]
-                  i_file_parents2_tmp = [_tmp for _tmp in i_file_parents2_tmp if _tmp != '']
+                  i_file_parents2_tmp = [files_prefix+_tmp for _tmp in i_file_parents2_tmp if _tmp]
                   i_file_parents2_tmp = sorted(list(set(i_file_parents2_tmp)))
                   i_file_parents2 += i_file_parents2_tmp
               i_file_parents2 = sorted(list(set(i_file_parents2)))
@@ -76,7 +76,7 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
                print(' '*5, _tmp)
 
         dset_data['files'] += [{
-          'file': i_file,
+          'file': files_prefix+i_file,
           'nevents': i_file_nevents,
           'parentFiles_1': i_file_parents1,
           'parentFiles_2': i_file_parents2,

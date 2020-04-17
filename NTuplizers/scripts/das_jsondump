@@ -30,6 +30,9 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--parentFiles-levels', dest='parentFiles_levels', action='store', type=int, default=2,
                         help='levels of parentFiles included in the query')
 
+    parser.add_argument('--prefix', dest='prefix', action='store', default='',
+                        help='prefix to path of EDM files')
+
     parser.add_argument('--dry-run', dest='dry_run', action='store_true', default=False,
                         help='enable dry-run mode')
 
@@ -60,7 +63,7 @@ if __name__ == '__main__':
     ### -> list of dictionaries, each containing DAS name, files, number of events per file, and parent files
     which('dasgoclient')
 
-    input_dset = load_dataset_data(das_name=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, parentFiles_levels=opts.parentFiles_levels, verbose=opts.verbose)
+    input_dset = load_dataset_data(das_name=opts.dataset, max_files=opts.max_files, max_events=opts.max_events, parentFiles_levels=opts.parentFiles_levels, files_prefix=opts.prefix, verbose=opts.verbose)
 
     ### copy dataset information in .json format
     if not opts.dry_run:
