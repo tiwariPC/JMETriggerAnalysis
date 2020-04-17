@@ -508,7 +508,7 @@ from CommonTools.PileupAlgos.Puppi_cff import *
 process.hltPuppi = puppi.clone(
   candName = 'hltParticleFlow',
   vertexName = 'hltVerticesPF',
-  vtxNdofCut = 0,
+#  vtxNdofCut = 0,
 )
 
 process.HLTPuppiSequence = cms.Sequence(
@@ -610,7 +610,7 @@ process.hltPuppiNoLeptons = puppi.clone(
   candName = 'hltParticleFlowNoLeptons',
   vertexName = 'hltVerticesPF',
   PtMaxPhotons = 20.,
-  vtxNdofCut = 0,
+#  vtxNdofCut = 0,
 )
 process.hltPuppiForMET = cms.EDProducer('CandViewMerger',
   src = cms.VInputTag( 'hltPuppiNoLeptons', 'hltParticleFlowLeptons' ),
