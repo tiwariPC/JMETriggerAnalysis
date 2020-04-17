@@ -101,6 +101,36 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
 elif opts.reco == 'HLT_globalPixelTracks_v01':
    from JMETriggerAnalysis.NTuplizers.HLT_globalPixelTracks_v01 import cms, process
 
+   ## enforce sorting of Pixel Vertices
+   process.hltUnsortedPixelVertices = process.hltPixelVertices.clone()
+
+   process.hltPixelVertices = cms.EDProducer('PixelVerticesSelector',
+
+     src = cms.InputTag('hltUnsortedPixelVertices'),
+
+     minSumPt2 = cms.double( -1. ),
+     minSumPt2FractionWrtMax = cms.double( -1. ),
+
+     # criterion to rank pixel vertices
+     # (utilizes PVClusterComparer to compute
+     # the vertex SumPtSquared f.o.m. using a sub-set of tracks)
+     ranker = cms.PSet(
+       refToPSet_ = cms.string('HLTPSetPvClusterComparerForIT')
+#       track_chi2_max = cms.double( 20.0 ),
+#       track_pt_max = cms.double( 20.0 ),
+#       track_prob_min = cms.double( -1.0 ),
+#       track_pt_min = cms.double( 1.0 )
+     ),
+
+     # retain only first N vertices
+     maxNVertices = cms.int32( -1 ),
+   )
+
+   process.HLTRecopixelvertexingSequence.insert(
+     process.HLTRecopixelvertexingSequence.index(process.hltPixelVertices),
+     process.hltUnsortedPixelVertices
+   )
+
    ## modules
    process.hltParticleFlowNoMu = cms.EDFilter('GenericPFCandidateSelector',
      src = cms.InputTag('hltParticleFlow'),
@@ -510,6 +540,154 @@ process.MC_PFCHSMET_v1 = cms.Path(
   + process.HLTEndSequence
 )
 
+## add path: MC_AK4PFCHSJetsV2_v1
+if not hasattr(process, 'hltVerticesPF'):
+   process.hltVerticesPF = cms.EDProducer('PrimaryVertexProducer',
+     TkClusParameters = cms.PSet(
+        TkDAClusParameters = cms.PSet(
+            Tmin = cms.double(2.4),
+            Tpurge = cms.double(2.0),
+            Tstop = cms.double(0.5),
+            coolingFactor = cms.double(0.6),
+            d0CutOff = cms.double(999.0),
+            dzCutOff = cms.double(4.0),
+            uniquetrkweight = cms.double(0.9),
+            use_vdt = cms.untracked.bool(True),
+            vertexSize = cms.double(0.15),
+            zmerge = cms.double(0.01)
+        ),
+        algorithm = cms.string('DA_vect')
+     ),
+     TkFilterParameters = cms.PSet(
+        algorithm = cms.string('filter'),
+        maxD0Significance = cms.double(999.0),
+        maxEta = cms.double(100.0),
+        maxNormalizedChi2 = cms.double(20.0),
+        minPixelLayersWithHits = cms.int32(2),
+        minPt = cms.double(0.0),
+        minSiliconLayersWithHits = cms.int32(5),
+        trackQuality = cms.string('any')
+     ),
+     TrackLabel = cms.InputTag('hltPFMuonMerging'),
+     beamSpotLabel = cms.InputTag('hltOnlineBeamSpot'),
+     verbose = cms.untracked.bool(False),
+     vertexCollections = cms.VPSet(
+        cms.PSet(
+            algorithm = cms.string('AdaptiveVertexFitter'),
+            chi2cutoff = cms.double(3.0),
+            label = cms.string(''),
+            maxDistanceToBeam = cms.double(1.0),
+            minNdof = cms.double(0.0),
+            useBeamConstraint = cms.bool(False)
+        ),
+        cms.PSet(
+            algorithm = cms.string('AdaptiveVertexFitter'),
+            chi2cutoff = cms.double(3.0),
+            label = cms.string('WithBS'),
+            maxDistanceToBeam = cms.double(1.0),
+            minNdof = cms.double(0.0),
+            useBeamConstraint = cms.bool(True)
+        )
+     )
+   )
+
+if not hasattr(process, 'hltVerticesPFSelector'):
+   process.hltVerticesPFSelector = cms.EDFilter('PrimaryVertexObjectFilter',
+     filterParams = cms.PSet(
+       maxRho = cms.double(2.0),
+       maxZ = cms.double(24.0),
+       minNdof = cms.double(4.0),
+       pvSrc = cms.InputTag('hltVerticesPF')
+     ),
+     src = cms.InputTag('hltVerticesPF')
+   )
+
+if not hasattr(process, 'hltVerticesPFFilter'):
+   process.hltVerticesPFFilter = cms.EDFilter('VertexSelector',
+     cut = cms.string('!isFake'),
+     filter = cms.bool(True),
+     src = cms.InputTag('hltVerticesPFSelector')
+   )
+
+process.hltPreMCAK4PFCHSJetsV2 = process.hltPreMCAK4PFJets.clone()
+
+process.hltParticleFlowPileUpJMEv2 = cms.EDProducer('PFPileUp',
+  Enable = cms.bool(True),
+  PFCandidates = cms.InputTag('hltParticleFlowPtrs'),
+  Vertices = cms.InputTag('hltVerticesPFFilter'),
+  checkClosestZVertex = cms.bool(False),
+  verbose = cms.untracked.bool(True)
+)
+process.hltParticleFlowNoPileUpJMEv2 = cms.EDProducer('TPPFCandidatesOnPFCandidates',
+  enable = cms.bool(True),
+  bottomCollection = cms.InputTag('hltParticleFlowPtrs'),
+  name = cms.untracked.string('pileUpOnPFCandidates'),
+  topCollection = cms.InputTag('hltParticleFlowPileUpJMEv2'),
+  verbose = cms.untracked.bool(False)
+)
+
+process.HLTParticleFlowCHSPtrsV2Sequence = cms.Sequence(
+    process.HLTParticleFlowJMESequence
+  + process.hltVerticesPF
+  + process.hltVerticesPFSelector
+  + process.hltVerticesPFFilter
+  + process.hltParticleFlowPtrs
+  + process.hltParticleFlowPileUpJMEv2
+  + process.hltParticleFlowNoPileUpJMEv2
+)
+
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsCHS
+process.hltAK4PFCHSJetsV2 = ak4PFJetsCHS.clone(
+  src = 'hltParticleFlowNoPileUpJMEv2',
+)
+
+process.HLTAK4PFCHSJetsV2Sequence = cms.Sequence(
+    process.HLTParticleFlowCHSPtrsV2Sequence
+  + process.hltAK4PFCHSJetsV2
+)
+
+process.hltAK4PFCHSJetsV2Collection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK4PFCHSJetsV2'
+)
+
+process.MC_AK4PFCHSJetsV2_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK4PFCHSJetsV2
+  + process.HLTAK4PFCHSJetsV2Sequence
+  + process.hltAK4PFCHSJetsV2Collection20Filter
+  + process.HLTEndSequence
+)
+
+## add path: MC_PFCHSMETv2_v1
+process.hltPreMCPFCHSMETv2 = process.hltPreMCPFMET.clone()
+
+process.hltParticleFlowCHSv2 = cms.EDProducer('FwdPtrRecoPFCandidateConverter',
+  src = process.hltAK4PFCHSJetsV2.src,
+)
+
+process.hltPFCHSMETv2 = process.hltPFMETProducer.clone(
+  src = 'hltParticleFlowCHSv2',
+  alias = ''
+)
+
+process.HLTPFCHSMETv2Sequence = cms.Sequence(
+    process.HLTParticleFlowCHSPtrsV2Sequence
+  + process.hltParticleFlowCHSv2
+  + process.hltPFCHSMETv2
+)
+
+process.hltPFCHSMETv2OpenFilter = process.hltPFMETOpenFilter.clone(
+  inputTag = 'hltPFCHSMETv2'
+)
+
+process.MC_PFCHSMETv2_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCPFCHSMETv2
+  + process.HLTPFCHSMETv2Sequence
+  + process.hltPFCHSMETv2OpenFilter
+  + process.HLTEndSequence
+)
+
 ###
 ### add analysis sequence (JMETrigger NTuple)
 ###
@@ -724,30 +902,29 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   fillCollectionConditions = cms.PSet(),
 
   recoVertexCollections = cms.PSet(
-
+    hltUnsortedPixelVertices = cms.InputTag('hltUnsortedPixelVertices'),#!!
     hltPixelVertices = cms.InputTag('hltPixelVertices'),
     hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
-    hltVerticesPF = cms.InputTag('hltVerticesPF'),
+    hltVerticesPFFilter = cms.InputTag('hltVerticesPFFilter'),
+    offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
   ),
 
   recoPFCandidateCollections = cms.PSet(
-
-#    hltParticleFlow = cms.InputTag('hltParticleFlow'),
+    hltParticleFlow = cms.InputTag('hltParticleFlow'),#!!
+    hltParticleFlowCHS = cms.InputTag('hltParticleFlowCHS'),#!!
+    hltParticleFlowCHSv2 = cms.InputTag('hltParticleFlowCHSv2'),#!!
   ),
 
   patPackedCandidateCollections = cms.PSet(
-
-#    offlinePFCandidates = cms.InputTag('packedPFCandidates'),
+    offlineParticleFlow = cms.InputTag('packedPFCandidates'),#!!
   ),
 
   recoGenJetCollections = cms.PSet(
-
     ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
     ak8GenJetsNoNu = cms.InputTag('ak8GenJetsNoNu::HLT'),
   ),
 
   recoCaloJetCollections = cms.PSet(
-
     hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
     hltAK4CaloJetsCorrected = cms.InputTag('hltAK4CaloJetsCorrected'),
 
@@ -762,6 +939,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
     hltAK4PFCHSJets = cms.InputTag('hltAK4PFCHSJets'),
+    hltAK4PFCHSJetsV2 = cms.InputTag('hltAK4PFCHSJetsV2'),
     hltAK4PuppiJets = cms.InputTag('hltAK4PuppiJets'),
 
     hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
@@ -769,8 +947,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   patJetCollections = cms.PSet(
-    offlineAK4PFCHSJets = cms.InputTag('slimmedJets'),
-    offlineAK4PuppiJets = cms.InputTag('slimmedJetsPuppi'),
+    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
+    offlineAK4PuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
   ),
 
   recoGenMETCollections = cms.PSet(
@@ -789,6 +967,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMET = cms.InputTag('hltPFMETProducer'),
     hltPFMETNoMu = cms.InputTag('hltPFMETNoMuProducer'),
     hltPFCHSMET = cms.InputTag('hltPFCHSMET'),
+    hltPFCHSMETv2 = cms.InputTag('hltPFCHSMETv2'),
     hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
     hltPuppiMETv0NoMu = cms.InputTag('hltPuppiMETv0NoMu'),
     hltPuppiMETv1 = cms.InputTag('hltPuppiMETv1'),
@@ -819,16 +998,16 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK8CaloJetsCorrected = cms.string('pt > 80'),
 
     hltAK4PFJets = cms.string('pt > 20'),
-    hltAK4PFJetsCorrected = cms.string('pt > 20'),
-
     hltAK4PFCHSJets = cms.string('pt > 20'),
+    hltAK4PFCHSJetsV2 = cms.string('pt > 20'),
     hltAK4PuppiJets = cms.string('pt > 20'),
+    hltAK4PFJetsCorrected = cms.string('pt > 20'),
 
     hltAK8PFJets = cms.string('pt > 80'),
     hltAK8PFJetsCorrected = cms.string('pt > 80'),
 
-    offlineAK4PFCHSJets = cms.string('pt > 20'),
-    offlineAK4PuppiJets = cms.string('pt > 20'),
+    offlineAK4PFCHSJetsCorrected = cms.string('pt > 20'),
+    offlineAK4PuppiJetsCorrected = cms.string('pt > 20'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
@@ -895,7 +1074,7 @@ if opts.trkdqm:
    for _vtxColl in [
      'hltPixelVertices',
      'hltTrimmedPixelVertices',
-     'hltVerticesPF',
+     'hltVerticesPFFilter',
    ]:
      if hasattr(process, _vtxColl):
         setattr(process, 'VertexHistograms_'+_vtxColl, VertexHistogrammer.clone(src = _vtxColl))
@@ -916,10 +1095,14 @@ if opts.trkdqm:
 # ParticleFlow Monitoring
 if opts.pfdqm:
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerRecoPFCandidate_cfi import pfCandidateHistogrammerRecoPFCandidate
+   from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
 
    _candTags = [
      ('_hltParticleFlow', 'hltParticleFlow', '', pfCandidateHistogrammerRecoPFCandidate),
+     ('_hltParticleFlowCHS', 'hltParticleFlowCHS', '', pfCandidateHistogrammerRecoPFCandidate),
+     ('_hltParticleFlowCHSv2', 'hltParticleFlowCHSv2', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltPuppi', 'hltPuppi', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
+     ('_offlineParticleFlow', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
    ]
 
    _regTags = [

@@ -13,6 +13,9 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoPixelVertexing/PixelVertexFinding/interface/PVClusterComparer.h"
 
+//#include <iostream>
+//#define LogTrace(X) std::cout << std::endl
+
 class PixelVerticesSelector : public edm::stream::EDProducer<> {
 
  public:
@@ -24,7 +27,7 @@ class PixelVerticesSelector : public edm::stream::EDProducer<> {
  protected:
   void produce(edm::Event&, const edm::EventSetup&) override;
 
-  edm::EDGetToken token_src_;
+  edm::EDGetTokenT<edm::View<reco::Vertex>> token_src_;
 
   const double minSumPt2_;
   const double minSumPt2FractionWrtMax_;
@@ -44,7 +47,7 @@ class PixelVerticesSelector : public edm::stream::EDProducer<> {
 };
 
 PixelVerticesSelector::PixelVerticesSelector(const edm::ParameterSet& iConfig)
-  : token_src_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("src")))
+  : token_src_(consumes<edm::View<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("src")))
   , minSumPt2_(iConfig.getParameter<double>("minSumPt2"))
   , minSumPt2FractionWrtMax_(iConfig.getParameter<double>("minSumPt2FractionWrtMax"))
   , ranker_pset_(iConfig.getParameter<edm::ParameterSet>("ranker"))
@@ -67,11 +70,9 @@ PixelVerticesSelector::PixelVerticesSelector(const edm::ParameterSet& iConfig)
 
 void PixelVerticesSelector::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
-  edm::Handle<reco::VertexCollection> vertices;
-  iEvent.getByToken(token_src_, vertices);
+  auto const& vertices(iEvent.getHandle(token_src_));
 
   if(not vertices.isValid()){
-
     edm::LogWarning("Input") << "invalid handle for input collection of vertices";
     return;
   }
@@ -83,7 +84,8 @@ void PixelVerticesSelector::produce(edm::Event& iEvent, const edm::EventSetup& i
 
     vec_indexAndFOM.emplace_back(PixelVerticesSelector::indexAndFOM(idx, pvComparer_->pTSquaredSum(vertices->at(idx))));
 
-    LogDebug("Input") << "input vertex #" << vec_indexAndFOM.back().index << ": z=" << vertices->at(idx).z()
+    LogTrace("") << "[PixelVerticesSelector::produce] "
+      << "input vertex #" << vec_indexAndFOM.back().index << ": z=" << vertices->at(idx).z()
       << ", pTSquaredSum=" << vec_indexAndFOM.back().fom;
   }
 
@@ -96,20 +98,25 @@ void PixelVerticesSelector::produce(edm::Event& iEvent, const edm::EventSetup& i
   auto out_vertices = std::make_unique<reco::VertexCollection>();
   out_vertices->reserve((maxNVertices_ >= 0) ? maxNVertices_ : vertices->size());
 
-  for(const auto& idxNfom : vec_indexAndFOM){
+  for(auto const& idxNfom : vec_indexAndFOM){
 
-    if((maxNVertices_ >= 0) && (out_vertices->size() >= ((uint) maxNVertices_))){ break; }
+    if((maxNVertices_ >= 0) && (out_vertices->size() >= ((uint) maxNVertices_))){
+      break;
+    }
 
-    if((idxNfom.fom > minSumPt2_) && (idxNfom.fom > minSumPt2_rel)){
+    if((idxNfom.fom > minSumPt2_) && ((idxNfom.fom > minSumPt2_rel) || (minSumPt2FractionWrtMax_ < 0.))){
 
-      LogDebug("Output") << "output vertex #" << out_vertices->size() << ": z=" << vertices->at(idxNfom.index).z()
+      LogTrace("") << "[PixelVerticesSelector::produce] "
+        << "output vertex #" << out_vertices->size() << ": z=" << vertices->at(idxNfom.index).z()
         << ", pTSquaredSum=" << idxNfom.fom << " (input index=" << idxNfom.index << ")";
 
       out_vertices->emplace_back(vertices->at(idxNfom.index));
     }
   }
 
-  LogDebug("Output") << "output collection contains " << out_vertices->size() << " vertices (input: " << vertices->size() << " vertices)";
+  LogTrace("") << "[PixelVerticesSelector::produce] "
+    << "output collection contains " << out_vertices->size()
+    << " vertices (input: " << vertices->size() << " vertices)";
 
   iEvent.put(std::move(out_vertices));
 }
@@ -122,15 +129,15 @@ void PixelVerticesSelector::fillDescriptions(edm::ConfigurationDescriptions& des
   desc.add<double>("minSumPt2FractionWrtMax", 0.3)->setComment("minimum sumPt2 fraction relative to the highest sumPt2 (for sumPt2 calculation, see ranker)");
 
   edm::ParameterSetDescription rankerPSet;
-  rankerPSet.add<double>("track_pt_min", 1.0)->setComment("minimum track pT");
-  rankerPSet.add<double>("track_pt_max", 10.0)->setComment("maximum track pT");
-  rankerPSet.add<double>("track_chi2_max", 99999.)->setComment("maximum track chi2");
+  rankerPSet.add<double>("track_pt_min", 1.)->setComment("minimum track pT");
+  rankerPSet.add<double>("track_pt_max", 20.)->setComment("maximum track pT");
+  rankerPSet.add<double>("track_chi2_max", 20.)->setComment("maximum track chi2");
   rankerPSet.add<double>("track_prob_min", -1.)->setComment("minimum track probability");
   desc.add<edm::ParameterSetDescription>("ranker", rankerPSet)->setComment("parameters of PVClusterComparer to select tracks used in sumPt2 calculation");
 
   desc.add<int>("maxNVertices", -1)->setComment("maximum number of vertices in output collection (if negative, no limit is applied)");
 
-  descriptions.add("PixelVerticesSelector", desc);
+  descriptions.add("pixelVerticesSelector", desc);
 }
 
 DEFINE_FWK_MODULE(PixelVerticesSelector);
