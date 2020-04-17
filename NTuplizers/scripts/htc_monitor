@@ -35,7 +35,7 @@ def monitor(options, log=''):
        return False
 
     if options.release:
-       EXE('condor_release '+os.environ['USER'], verbose=options.verbose, dry_run=options.dry_run)
+       EXE('condor_release '+os.environ['USER'], suspend=False, verbose=options.verbose, dry_run=options.dry_run)
        EXE('sleep 3', verbose=options.verbose, dry_run=options.dry_run)
 
     ADD_OPTIONS = []
