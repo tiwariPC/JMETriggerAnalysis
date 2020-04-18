@@ -1264,9 +1264,9 @@ if opts.pfdqm:
      ('_hltParticleFlowCHSv1', 'hltParticleFlowCHSv1', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltParticleFlowCHSv2', 'hltParticleFlowCHSv2', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltPuppiV1', 'hltPuppiV1', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
-     ('_hltPuppiV2', 'hltPuppiV2', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
+#     ('_hltPuppiV2', 'hltPuppiV2', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltPuppiV3', 'hltPuppiV3', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
-     ('_hltPuppiV4', 'hltPuppiV4', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
+#     ('_hltPuppiV4', 'hltPuppiV4', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
      ('_offlineParticleFlow', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
    ]
 
