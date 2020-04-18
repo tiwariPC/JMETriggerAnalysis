@@ -394,6 +394,31 @@ process.MC_AK4PFCHSv1Jets_v1 = cms.Path(
   + process.HLTEndSequence
 )
 
+## add path: MC_AK8PFCHSv1Jets_v1
+process.hltPreMCAK8PFCHSv1Jets = process.hltPreMCAK4PFJets.clone()
+
+from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsCHS
+process.hltAK8PFCHSv1Jets = ak8PFJetsCHS.clone(
+  src = 'hltParticleFlowCHSv1NoPileUp',
+)
+
+process.HLTAK8PFCHSv1JetsSequence = cms.Sequence(
+    process.HLTParticleFlowCHSv1PtrsSequence
+  + process.hltAK8PFCHSv1Jets
+)
+
+process.hltAK8PFCHSv1JetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK8PFCHSv1Jets'
+)
+
+process.MC_AK8PFCHSv1Jets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK8PFCHSv1Jets
+  + process.HLTAK8PFCHSv1JetsSequence
+  + process.hltAK8PFCHSv1JetsCollection20Filter
+  + process.HLTEndSequence
+)
+
 ## add path: MC_PFCHSv1MET_v1
 process.hltPreMCPFCHSv1MET = process.hltPreMCPFMET.clone()
 
@@ -470,6 +495,30 @@ process.MC_AK4PFCHSv2Jets_v1 = cms.Path(
   + process.HLTEndSequence
 )
 
+## add path: MC_AK8PFCHSv2Jets_v1
+process.hltPreMCAK8PFCHSv2Jets = process.hltPreMCAK4PFJets.clone()
+
+process.hltAK8PFCHSv2Jets = ak8PFJetsCHS.clone(
+  src = 'hltParticleFlowCHSv2NoPileUp',
+)
+
+process.HLTAK8PFCHSv2JetsSequence = cms.Sequence(
+    process.HLTParticleFlowCHSv2PtrsSequence
+  + process.hltAK8PFCHSv2Jets
+)
+
+process.hltAK8PFCHSv2JetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK8PFCHSv2Jets'
+)
+
+process.MC_AK8PFCHSv2Jets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK8PFCHSv2Jets
+  + process.HLTAK8PFCHSv2JetsSequence
+  + process.hltAK8PFCHSv2JetsCollection20Filter
+  + process.HLTEndSequence
+)
+
 ## add path: MC_PFCHSv2MET_v1
 process.hltPreMCPFCHSv2MET = process.hltPreMCPFMET.clone()
 
@@ -536,6 +585,31 @@ process.MC_AK4PuppiV1Jets_v1 = cms.Path(
   + process.hltPreMCAK4PuppiV1Jets
   + process.HLTAK4PuppiV1JetsSequence
   + process.hltAK4PuppiV1JetCollection20Filter
+  + process.HLTEndSequence
+)
+
+## add path: MC_AK8PuppiV1Jets_v1
+process.hltPreMCAK8PuppiV1Jets = process.hltPreMCAK4PFJets.clone()
+
+from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsPuppi
+process.hltAK8PuppiV1Jets = ak8PFJetsPuppi.clone(
+  src = 'hltPuppiV1',
+)
+
+process.HLTAK8PuppiV1JetsSequence = cms.Sequence(
+    process.HLTPuppiV1Sequence
+  + process.hltAK8PuppiV1Jets
+)
+
+process.hltAK8PuppiV1JetCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK8PuppiV1Jets'
+)
+
+process.MC_AK8PuppiV1Jets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK8PuppiV1Jets
+  + process.HLTAK8PuppiV1JetsSequence
+  + process.hltAK8PuppiV1JetCollection20Filter
   + process.HLTEndSequence
 )
 
@@ -713,6 +787,30 @@ process.MC_AK4PuppiV3Jets_v1 = cms.Path(
   + process.hltPreMCAK4PuppiV3Jets
   + process.HLTAK4PuppiV3JetsSequence
   + process.hltAK4PuppiV3JetCollection20Filter
+  + process.HLTEndSequence
+)
+
+## add path: MC_AK8PuppiV3Jets_v1
+process.hltPreMCAK8PuppiV3Jets = process.hltPreMCAK4PFJets.clone()
+
+process.hltAK8PuppiV3Jets = ak8PFJetsPuppi.clone(
+  src = 'hltPuppiV3',
+)
+
+process.HLTAK8PuppiV3JetsSequence = cms.Sequence(
+    process.HLTPuppiV3Sequence
+  + process.hltAK8PuppiV3Jets
+)
+
+process.hltAK8PuppiV3JetCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK8PuppiV3Jets'
+)
+
+process.MC_AK8PuppiV3Jets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK8PuppiV3Jets
+  + process.HLTAK8PuppiV3JetsSequence
+  + process.hltAK8PuppiV3JetCollection20Filter
   + process.HLTEndSequence
 )
 
@@ -1090,18 +1188,23 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFJetCollections = cms.PSet(
     hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
-    hltAK4PFCHSv2Jets = cms.InputTag('hltAK4PFCHSv2Jets'),
     hltAK4PFCHSv1Jets = cms.InputTag('hltAK4PFCHSv1Jets'),
+    hltAK4PFCHSv2Jets = cms.InputTag('hltAK4PFCHSv2Jets'),
     hltAK4PuppiV1Jets = cms.InputTag('hltAK4PuppiV1Jets'),
     hltAK4PuppiV3Jets = cms.InputTag('hltAK4PuppiV3Jets'),
 
     hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
     hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
+    hltAK8PFCHSv1Jets = cms.InputTag('hltAK8PFCHSv1Jets'),
+    hltAK8PFCHSv2Jets = cms.InputTag('hltAK8PFCHSv2Jets'),
+    hltAK8PuppiV1Jets = cms.InputTag('hltAK8PuppiV1Jets'),
+    hltAK8PuppiV3Jets = cms.InputTag('hltAK8PuppiV3Jets'),
   ),
 
   patJetCollections = cms.PSet(
     offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
     offlineAK4PuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
+    offlineAK8PuppiJetsCorrected = cms.InputTag('slimmedJetsAK8'),
   ),
 
   recoGenMETCollections = cms.PSet(
@@ -1159,17 +1262,22 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK8CaloJetsCorrected = cms.string('pt > 80'),
 
     hltAK4PFJets = cms.string('pt > 20'),
-    hltAK4PFCHSv2Jets = cms.string('pt > 20'),
+    hltAK4PFJetsCorrected = cms.string('pt > 20'),
     hltAK4PFCHSv1Jets = cms.string('pt > 20'),
+    hltAK4PFCHSv2Jets = cms.string('pt > 20'),
     hltAK4PuppiV1Jets = cms.string('pt > 20'),
     hltAK4PuppiV3Jets = cms.string('pt > 20'),
-    hltAK4PFJetsCorrected = cms.string('pt > 20'),
 
     hltAK8PFJets = cms.string('pt > 80'),
     hltAK8PFJetsCorrected = cms.string('pt > 80'),
+    hltAK8PFCHSv1Jets = cms.string('pt > 80'),
+    hltAK8PFCHSv2Jets = cms.string('pt > 80'),
+    hltAK8PuppiV1Jets = cms.string('pt > 80'),
+    hltAK8PuppiV3Jets = cms.string('pt > 80'),
 
     offlineAK4PFCHSJetsCorrected = cms.string('pt > 20'),
     offlineAK4PuppiJetsCorrected = cms.string('pt > 20'),
+    offlineAK8PuppiJetsCorrected = cms.string('pt > 80'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
