@@ -3,7 +3,7 @@
 set -e
 
 if [ $# -lt 1 ]; then
-  echo ">> argument missing - specify path to output directory"
+  printf "\n%s\n\n" ">> argument missing - specify path to output directory"
   exit 1
 fi
 
@@ -22,9 +22,9 @@ if [ ! -d ${JDIR} ]; then
 
   mkdir -p ${JDIR}
 
-#  das_jsondump -v -m ${NEVT} \
-#   -d  \
-#   -o ${JDIR}/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU.json
+  das_jsondump -v -m ${NEVT} \
+   -d /QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/Phase2HLTTDRWinter20RECOMiniAOD-NoPU_castor_all_pt_tracks_110X_mcRun4_realistic_v3-v2/MINIAODSIM \
+   -o ${JDIR}/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU.json
 
   das_jsondump -v -m ${NEVT} \
    -d /QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/Phase2HLTTDRWinter20RECOMiniAOD-PU200_castor_110X_mcRun4_realistic_v3-v2/MINIAODSIM \
@@ -45,7 +45,7 @@ RECOS=(
 )
 
 SAMPLES=(
-#  Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
+  Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
   Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200
   Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU
   Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
