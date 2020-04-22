@@ -649,7 +649,9 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       vertexName = _primaryVerticesGood,
     )
     process.hltAK4PuppiJets = ak4PFJetsPuppi.clone(
-      src = 'hltPuppi',
+      src = _particleFlowCands,
+      applyWeight = True,
+      srcWeights = 'hltPuppi',
 #      jetPtMin = 10.,
     )
     process.hltAK4PuppiJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
@@ -679,7 +681,9 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ## Jets: Puppi AK8
     process.hltAK8PuppiJets = ak8PFJetsPuppi.clone(
-      src = 'hltPuppi',
+      src = _particleFlowCands,
+      applyWeight = True,
+      srcWeights = 'hltPuppi',
 #      jetPtMin = 80.,
     )
     process.hltAK8PuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
