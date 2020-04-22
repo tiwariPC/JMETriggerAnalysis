@@ -39,7 +39,7 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
-opts.register('gt', None,
+opts.register('globalTag', None,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
@@ -74,9 +74,11 @@ opts.parseArguments()
 ###
 ### base configuration file
 ###
-if opts.reco == 'hltPhase2_TRKv02':
+if opts.reco == 'HLT_TRKv00':
+   from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv00_cfg import cms, process
+elif opts.reco == 'HLT_TRKv02':
    from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv02_cfg import cms, process
-elif opts.reco == 'hltPhase2_TRKv06':
+elif opts.reco == 'HLT_TRKv06':
    from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv06_cfg import cms, process
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
@@ -257,8 +259,8 @@ process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 process.schedule.extend([process.analysisNTupleEndPath])
 
 # update process.GlobalTag.globaltag
-if opts.gt is not None:
-   process.GlobalTag.globaltag = opts.gt
+if opts.globalTag is not None:
+   process.GlobalTag.globaltag = opts.globalTag
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents

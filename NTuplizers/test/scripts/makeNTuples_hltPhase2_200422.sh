@@ -40,8 +40,9 @@ if [ ! -d ${JDIR} ]; then
 fi
 
 RECOS=(
-  hltPhase2_TRKv02
-  hltPhase2_TRKv06
+#  HLT_TRKv00
+  HLT_TRKv02
+  HLT_TRKv06
 )
 
 SAMPLES=(
@@ -53,17 +54,16 @@ SAMPLES=(
 
 for reco_i in "${RECOS[@]}"; do
 
-    for sample_i in "${SAMPLES[@]}"; do
+  for sample_i in "${SAMPLES[@]}"; do
 
-        htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
-          -d ${JDIR}/${sample_i}.json -p 1 \
-          -o ${ODIR}/${reco_i}/${sample_i} \
-          -m ${NEVT} pfdqm=1 trkdqm=1 reco=${reco_i}
-    done
-    unset -v sample_i
+    htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
+      -d ${JDIR}/${sample_i}.json -p 1 \
+      -o ${ODIR}/${reco_i}/${sample_i} \
+      -m ${NEVT} reco=${reco_i} globalTag=110X_mcRun4_realistic_v3 trkdqm=1 pfdqm=1
+  done
+  unset -v sample_i
 done
 unset -v reco_i
 
-unset -v RECOS SAMPLES
-
 unset -v NEVT ODIR JDIR
+unset -v RECOS SAMPLES
