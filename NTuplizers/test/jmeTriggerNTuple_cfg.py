@@ -191,8 +191,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     hltPFMET = cms.InputTag('hltPFMET'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
-    hltPFMETCHS = cms.InputTag('hltPFMETCHS'),
-    hltPFMETSoftKiller = cms.InputTag('hltPFMETSoftKiller'),
+    hltPFCHSMET = cms.InputTag('hltPFCHSMET'),
+    hltPFSoftKillerMET = cms.InputTag('hltPFSoftKillerMET'),
     hltPuppiMET = cms.InputTag('hltPuppiMET'),
     hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'),
     hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
@@ -200,8 +200,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patMETCollections = cms.PSet(
 
-    offlineMETs = cms.InputTag('slimmedMETs'),
-    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
+    offlinePFMET = cms.InputTag('slimmedMETs'),
+    offlinePuppiMET = cms.InputTag('slimmedMETsPuppi'),
   ),
 
   patMuonCollections = cms.PSet(
@@ -216,16 +216,16 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   stringCutObjectSelectors = cms.PSet(
     # GEN
-    ak4GenJetsNoNu = cms.string('pt > 12'),
+    ak4GenJetsNoNu = cms.string('pt > 15'),
     ak8GenJetsNoNu = cms.string('pt > 50'),
 
     # HLT AK4
-    hltAK4CaloJets = cms.string('pt > 12'),
-    hltAK4PFClusterJets = cms.string('pt > 12'),
-    hltAK4PFJets = cms.string('pt > 12'),
-    hltAK4PFJetsCorrected = cms.string('pt > 12'),
-    hltAK4PFCHSJetsCorrected = cms.string('pt > 12'),
-    hltAK4PuppiJetsCorrected = cms.string('pt > 12'),
+    hltAK4CaloJets = cms.string('pt > 20'),
+    hltAK4PFClusterJets = cms.string('pt > 20'),
+    hltAK4PFJets = cms.string('pt > 20'),
+    hltAK4PFJetsCorrected = cms.string('pt > 20'),
+    hltAK4PFCHSJetsCorrected = cms.string('pt > 20'),
+    hltAK4PuppiJetsCorrected = cms.string('pt > 20'),
 
     # HLT AK8
     hltAK8CaloJets = cms.string('pt > 80'),
@@ -235,8 +235,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK8PuppiJetsCorrected = cms.string('pt > 80'),
 
     # Offline
-    offlineAK4PFCHSJetsCorrected = cms.string('pt > 12'),
-    offlineAK4PuppiJetsCorrected = cms.string('pt > 12'),
+    offlineAK4PFCHSJetsCorrected = cms.string('pt > 20'),
+    offlineAK4PuppiJetsCorrected = cms.string('pt > 20'),
     offlineAK8PuppiJetsCorrected = cms.string('pt > 80'),
   ),
 
