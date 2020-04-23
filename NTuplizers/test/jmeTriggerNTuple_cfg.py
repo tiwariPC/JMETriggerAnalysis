@@ -288,7 +288,7 @@ process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.ou
 # Tracking Monitoring
 if opts.trkdqm:
 
-   if reco == 'hltPhase2_TRKv02':
+   if opts.reco in ['HLT_TRKv00', 'HLT_TRKv00_TICL', 'HLT_TRKv02', 'HLT_TRKv02_TICL']:
       process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
       process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
 

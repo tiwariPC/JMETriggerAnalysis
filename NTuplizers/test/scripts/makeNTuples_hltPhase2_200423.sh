@@ -40,9 +40,12 @@ if [ ! -d ${JDIR} ]; then
 fi
 
 RECOS=(
-#  HLT_TRKv00
-  HLT_TRKv02
+  HLT_TRKv00
+  HLT_TRKv00_TICL
+#  HLT_TRKv02
+#  HLT_TRKv02_TICL
   HLT_TRKv06
+  HLT_TRKv06_TICL
 )
 
 SAMPLES=(
