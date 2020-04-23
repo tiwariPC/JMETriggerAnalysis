@@ -8,6 +8,8 @@ from RecoMET.METProducers.PFClusterMET_cfi import pfClusterMet
 
 from CondCore.CondDB.CondDB_cfi import CondDB
 
+from RecoHGCal.TICL.iterativeTICL_cff import injectTICLintoPF
+
 def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ### Guidelines to browse the code below:
@@ -802,11 +804,11 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     process.hgcalLocalRecoSequence = cms.Sequence(
         process.HGCalUncalibRecHit
       + process.HGCalRecHit
-#      + process.hgcalLayerClusters
-#      + process.hgcalMultiClusters
+      + process.hgcalLayerClusters
+      + process.hgcalMultiClusters
       + process.particleFlowRecHitHGC
       + process.particleFlowClusterHGCal
-#      + process.particleFlowClusterHGCalFromMultiCl
+      + process.particleFlowClusterHGCalFromMultiCl
     )
 
     process.calolocalreco = cms.Sequence(
@@ -899,5 +901,20 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     # Add an ESPrefer to override JEC that might be available from the global tag
     process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
+
+    return process
+
+def customize_hltPhase2_TICL(process):
+
+    # Note: at the moment, this is not really a self-contained customization function
+    # please use it only after "customize_hltPhase2_JME"
+
+    #### check if TICL task exists
+    if not hasattr(process, 'iterTICLTask'):
+       raise RuntimeError('process.iterTICLTask not found')
+
+    process.iterTICLSequence = cms.Sequence(process.iterTICLTask)
+    process.globalreco += process.iterTICLSequence
+    process = injectTICLintoPF(process)
 
     return process
