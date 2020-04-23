@@ -615,16 +615,16 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     process.hltParticleFlowCHS = cms.EDProducer('FwdPtrRecoPFCandidateConverter',
       src = process.hltAK4PFCHSJets.src,
     )
-    process.hltPFMETCHS = cms.EDProducer( 'PFMETProducer',
+    process.hltPFCHSMET = cms.EDProducer( 'PFMETProducer',
       src = cms.InputTag( 'hltParticleFlowCHS' ),
       globalThreshold = cms.double( 0.0 ),
       calculateSignificance = cms.bool( False ),
     )
 
     ## Sequence: MET CHS
-    process.HLTPFMETCHSReconstruction = cms.Sequence(
+    process.HLTPFCHSMETReconstruction = cms.Sequence(
         process.hltParticleFlowCHS
-      * process.hltPFMETCHS
+      * process.hltPFCHSMET
     )
 
     ## MET: SoftKiller
@@ -633,16 +633,16 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       Rho_EtaMax = cms.double( 5.0 ),
       rParam = cms.double( 0.4 )
     )
-    process.hltPFMETSoftKiller = cms.EDProducer( 'PFMETProducer',
+    process.hltPFSoftKillerMET = cms.EDProducer( 'PFMETProducer',
       src = cms.InputTag( 'hltParticleFlowSoftKiller' ),
       globalThreshold = cms.double( 0.0 ),
       calculateSignificance = cms.bool( False )
     )
 
     ## Sequence: MET SoftKiller
-    process.HLTPFMETSoftKillerReconstruction = cms.Sequence(
+    process.HLTPFSoftKillerMETReconstruction = cms.Sequence(
         process.hltParticleFlowSoftKiller
-      * process.hltPFMETSoftKiller
+      * process.hltPFSoftKillerMET
     )
 
     ## Jets: Puppi AK4
@@ -785,8 +785,8 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       + process.HLTAK8PFJetsReconstruction
       + process.HLTPFJetsCHSReconstruction
       + process.HLTPFMETReconstruction
-      + process.HLTPFMETCHSReconstruction
-      + process.HLTPFMETSoftKillerReconstruction
+      + process.HLTPFCHSMETReconstruction
+      + process.HLTPFSoftKillerMETReconstruction
       + process.HLTPuppiJMEReconstruction
     ))
 
