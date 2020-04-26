@@ -293,24 +293,26 @@ if opts.trkdqm:
       process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
 
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-   process.TrackHistograms_pixelTracks = TrackHistogrammer.clone(src = 'pixelTracks')
-   process.TrackHistograms_generalTracks = TrackHistogrammer.clone(src = 'generalTracks')
-
-   from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
-   process.VertexHistograms_pixelVertices = VertexHistogrammer.clone(src = 'pixelVertices')
-   process.VertexHistograms_offlinePrimaryVertices = VertexHistogrammer.clone(src = 'offlinePrimaryVertices')
+   process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'pixelTracks')
+   process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
 
    process.trkMonitoringSeq = cms.Sequence(
-       process.TrackHistograms_pixelTracks
-     + process.TrackHistograms_generalTracks
+       process.TrackHistograms_hltPixelTracks
+     + process.TrackHistograms_hltGeneralTracks
    )
 
    if opts.skimTracks:
-      process.TrackHistograms_generalTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
-      process.trkMonitoringSeq += process.TrackHistograms_generalTracksOriginal
+      process.TrackHistograms_hltGeneralTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
+      process.trkMonitoringSeq += process.TrackHistograms_hltGeneralTracksOriginal
+
+   from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
+   process.VertexHistograms_hltPixelVertices = VertexHistogrammer.clone(src = 'pixelVertices')
+   process.VertexHistograms_hltPrimaryVertices = VertexHistogrammer.clone(src = 'offlinePrimaryVertices')
+   process.VertexHistograms_offlinePrimaryVertices = VertexHistogrammer.clone(src = 'offlineSlimmedPrimaryVertices')
 
    process.trkMonitoringSeq += cms.Sequence(
-       process.VertexHistograms_pixelVertices
+       process.VertexHistograms_hltPixelVertices
+     + process.VertexHistograms_hltPrimaryVertices
      + process.VertexHistograms_offlinePrimaryVertices
    )
 
