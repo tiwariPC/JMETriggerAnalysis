@@ -333,24 +333,24 @@ if opts.pfdqm:
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
 
    _candTags = [
-     ('_simPFCands', 'simPFProducer', pfCandidateHistogrammerRecoPFCandidate),
-     ('_hltPFCands', 'particleFlowTmp', pfCandidateHistogrammerRecoPFCandidate),
-     ('_hltPuppiCands', 'hltPuppi', pfCandidateHistogrammerRecoPFCandidate),
-     ('_offlinePFCands', 'packedPFCandidates', pfCandidateHistogrammerPatPackedCandidate),
+     ('_simPFCands', 'simPFProducer', '', pfCandidateHistogrammerRecoPFCandidate),
+     ('_hltPFCands', 'particleFlowTmp', '', pfCandidateHistogrammerRecoPFCandidate),
+     ('_hltPuppiCands', 'hltPuppi', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
+     ('_offlinePFCands', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
    ]
 
    _regTags = [
      ['', ''],
-     ['_HB', '(0.0<=abs(eta) && abs(eta)<1.5)'],
+     ['_HB'   , '(0.0<=abs(eta) && abs(eta)<1.5)'],
      ['_HGCal', '(1.5<=abs(eta) && abs(eta)<3.0)'],
-     ['_HF', '(3.0<=abs(eta) && abs(eta)<5.0)'],
+     ['_HF'   , '(3.0<=abs(eta) && abs(eta)<5.0)'],
    ]
 
    _pidTags = [
      ['', ''],
      ['_chargedHadrons', '(abs(pdgId) == 211)'],
      ['_neutralHadrons', '(abs(pdgId) == 130)'],
-     ['_photons', '(abs(pdgId) == 22)'],
+     ['_photons'       , '(abs(pdgId) ==  22)'],
    ]
 
    process.pfMonitoringSeq = cms.Sequence()
@@ -358,9 +358,9 @@ if opts.pfdqm:
      for _regTag in _regTags:
        for _pidTag in _pidTags:
          _modName = 'PFCandidateHistograms'+_candTag[0]+_regTag[0]+_pidTag[0]
-         setattr(process, _modName, _candTag[2].clone(
+         setattr(process, _modName, _candTag[3].clone(
            src = _candTag[1],
-           cut = ' && '.join([_tmp for _tmp in [_regTag[1], _pidTag[1]] if _tmp]),
+           cut = ' && '.join([_tmp for _tmp in [_candTag[2], _regTag[1], _pidTag[1]] if _tmp]),
          ))
          process.pfMonitoringSeq += getattr(process, _modName)
 
