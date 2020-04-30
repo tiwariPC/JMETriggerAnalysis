@@ -1,6 +1,5 @@
 #include "JMETriggerAnalysis/Common/plugins/PFCandidateHistogrammer.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 
 typedef PFCandidateHistogrammer<reco::PFCandidate> RecoPFCandidateHistogrammer;
