@@ -54,9 +54,9 @@ opts.register('trkdqm', False,
               vpo.VarParsing.varType.bool,
               'added monitoring histograms for selected Tracks and Vertices')
 
-opts.register('pfdqm', False,
+opts.register('pfdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
+              vpo.VarParsing.varType.int,
               'added monitoring histograms for selected PF-Candidates')
 
 opts.register('skimTracks', False,
@@ -329,17 +329,32 @@ if opts.trkdqm:
    process.schedule.extend([process.trkMonitoringEndPath])
 
 # ParticleFlow Monitoring
-if opts.pfdqm:
+if opts.pfdqm > 0:
 
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerRecoPFCandidate_cfi import pfCandidateHistogrammerRecoPFCandidate
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
 
    _candTags = [
-     ('_simPFCands', 'simPFProducer', '', pfCandidateHistogrammerRecoPFCandidate),
-     ('_hltPFCands', 'particleFlowTmp', '', pfCandidateHistogrammerRecoPFCandidate),
-     ('_hltPuppiCands', 'hltPuppi', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
-     ('_offlinePFCands', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
+     ('_offlineParticleFlow', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
+     ('_particleFlowTmp', 'particleFlowTmp', '', pfCandidateHistogrammerRecoPFCandidate),
+     ('_hltPuppi', 'hltPuppi', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
    ]
+
+   if 'TICL' in opts.reco:
+      _candTags += [
+        ('_pfTICL', 'pfTICL', '', pfCandidateHistogrammerRecoPFCandidate),
+      ]
+   else:
+      _candTags += [
+        ('_simPFProducer', 'simPFProducer', '', pfCandidateHistogrammerRecoPFCandidate),
+      ]
+
+   if opts.pfdqm > 1:
+      _tmpCandTags = []
+      for _tmp in _candTags:
+          _tmpCandTags += [(_tmp[0]+'_2GeV', _tmp[1], '(pt > 2.)', _tmp[3])]
+      _candTags += _tmpCandTags
+      del _tmpCandTags
 
    _regTags = [
      ['', ''],
@@ -350,9 +365,11 @@ if opts.pfdqm:
 
    _pidTags = [
      ['', ''],
-     ['_chargedHadrons', '(abs(pdgId) == 211)'],
-     ['_neutralHadrons', '(abs(pdgId) == 130)'],
-     ['_photons'       , '(abs(pdgId) ==  22)'],
+     ['_h', '(abs(pdgId) == 211)'],
+     ['_e', '(abs(pdgId) == 11)'],
+     ['_mu', '(abs(pdgId) == 13)'],
+     ['_gamma', '(abs(pdgId) == 22)'],
+     ['_h0', '(abs(pdgId) == 130)'],
    ]
 
    process.pfMonitoringSeq = cms.Sequence()

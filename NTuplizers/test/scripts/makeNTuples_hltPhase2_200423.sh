@@ -62,7 +62,7 @@ for reco_i in "${RECOS[@]}"; do
     htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
       -d ${JDIR}/${sample_i}.json -p 1 \
       -o ${ODIR}/${reco_i}/${sample_i} \
-      -m ${NEVT} reco=${reco_i} globalTag=110X_mcRun4_realistic_v3 trkdqm=1 pfdqm=1
+      -m ${NEVT} reco=${reco_i} globalTag=110X_mcRun4_realistic_v3 trkdqm=1 pfdqm=2
   done
   unset -v sample_i
 done
