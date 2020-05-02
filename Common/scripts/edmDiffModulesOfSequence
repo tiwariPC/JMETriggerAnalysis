@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
-A script to output modules differing across two cmsRun configuration files
+Description:
+ Script to show modules of a sequence that differ across two cmsRun configuration files
 """
 from __future__ import print_function
 import argparse
@@ -18,7 +19,7 @@ def getProcess(filepath):
 #### main
 if __name__ == '__main__':
    ### args
-   parser = argparse.ArgumentParser(description=__doc__)
+   parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 
    parser.add_argument('-r', '--reference', dest='reference', action='store', default=None,
                        help='path to the reference configuration file [optional]')
