@@ -54,9 +54,9 @@ opts.register('trkdqm', False,
               vpo.VarParsing.varType.bool,
               'added monitoring histograms for selected Tracks and Vertices')
 
-opts.register('pfdqm', False,
+opts.register('pfdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
+              vpo.VarParsing.varType.int,
               'added monitoring histograms for selected PF-Candidates')
 
 opts.register('output', 'out.root',
@@ -1363,20 +1363,27 @@ if opts.trkdqm:
 #   process.HLTSchedule.extend([process.trkMonitoringEndPath])
 
 # ParticleFlow Monitoring
-if opts.pfdqm:
+if opts.pfdqm > 0:
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerRecoPFCandidate_cfi import pfCandidateHistogrammerRecoPFCandidate
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
 
    _candTags = [
+     ('_offlineParticleFlow', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
      ('_hltParticleFlow', 'hltParticleFlow', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltParticleFlowCHSv1', 'hltParticleFlowCHSv1', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltParticleFlowCHSv2', 'hltParticleFlowCHSv2', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltPuppiV1', 'hltPuppiV1', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
-#     ('_hltPuppiV2', 'hltPuppiV2', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
+#    ('_hltPuppiV2', 'hltPuppiV2', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltPuppiV3', 'hltPuppiV3', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
-#     ('_hltPuppiV4', 'hltPuppiV4', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
-     ('_offlineParticleFlow', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
+#    ('_hltPuppiV4', 'hltPuppiV4', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
    ]
+
+   if opts.pfdqm > 1:
+      _tmpCandTags = []
+      for _tmp in _candTags:
+          _tmpCandTags += [(_tmp[0]+'_2GeV', _tmp[1], '(pt > 2.)', _tmp[3])]
+      _candTags += _tmpCandTags
+      del _tmpCandTags
 
    _regTags = [
      ['', ''],
@@ -1387,9 +1394,11 @@ if opts.pfdqm:
 
    _pidTags = [
      ['', ''],
-     ['_chargedHadrons', '(abs(pdgId) == 211)'],
-     ['_neutralHadrons', '(abs(pdgId) == 130)'],
-     ['_photons', '(abs(pdgId) == 22)'],
+     ['_h', '(abs(pdgId) == 211)'],
+     ['_e', '(abs(pdgId) == 11)'],
+     ['_mu', '(abs(pdgId) == 13)'],
+     ['_gamma', '(abs(pdgId) == 22)'],
+     ['_h0', '(abs(pdgId) == 130)'],
    ]
 
    process.pfMonitoringSeq = cms.Sequence()
