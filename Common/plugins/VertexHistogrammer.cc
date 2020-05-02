@@ -21,32 +21,29 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
  private:
-  void beginJob() override {}
   void analyze(const edm::Event&, const edm::EventSetup&) override;
-  void endJob() override {}
 
   const edm::InputTag vertices_tag_;
-  edm::EDGetTokenT<reco::VertexCollection> vertices_token_;
+  const edm::EDGetTokenT<reco::VertexCollection> vertices_token_;
 
-  TH1D *h_vertex_mult_;
-  TH1D *h_vertex_x_;
-  TH1D *h_vertex_y_;
-  TH1D *h_vertex_z_;
-  TH1D *h_vertex_normChi2_;
-  TH1D *h_vertex_ndof_;
-  TH1D *h_vertex_nTracks_;
+  TH1D *h_vertex_mult_ = nullptr;
+  TH1D *h_vertex_x_ = nullptr;
+  TH1D *h_vertex_y_ = nullptr;
+  TH1D *h_vertex_z_ = nullptr;
+  TH1D *h_vertex_normChi2_ = nullptr;
+  TH1D *h_vertex_ndof_ = nullptr;
+  TH1D *h_vertex_nTracks_ = nullptr;
 
-  TH1D *h_track_pt_;
-  TH1D *h_track_eta_;
-  TH1D *h_track_phi_;
-  TH1D *h_track_dxy_;
-  TH1D *h_track_dz_;
+  TH1D *h_track_pt_ = nullptr;
+  TH1D *h_track_eta_ = nullptr;
+  TH1D *h_track_phi_ = nullptr;
+  TH1D *h_track_dxy_ = nullptr;
+  TH1D *h_track_dz_ = nullptr;
 };
 
 VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
-  : vertices_tag_(iConfig.getParameter<edm::InputTag>("src")){
-
-  vertices_token_ = consumes<reco::VertexCollection>(vertices_tag_);
+  : vertices_tag_(iConfig.getParameter<edm::InputTag>("src"))
+  , vertices_token_(consumes<reco::VertexCollection>(vertices_tag_)) {
 
   usesResource(TFileService::kSharedResource);
 

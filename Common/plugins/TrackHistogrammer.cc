@@ -19,26 +19,23 @@ class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
  private:
-  void beginJob() override {}
   void analyze(const edm::Event&, const edm::EventSetup&) override;
-  void endJob() override {}
 
   const edm::InputTag tracks_tag_;
-  edm::EDGetTokenT<reco::TrackCollection> tracks_token_;
+  const edm::EDGetTokenT<reco::TrackCollection> tracks_token_;
 
-  TH1D *h_track_mult_;
-  TH1D *h_track_pt_;
-  TH1D *h_track_eta_;
-  TH1D *h_track_phi_;
-  TH1D *h_track_outerPt_;
-  TH1D *h_track_outerEta_;
-  TH1D *h_track_outerPhi_;
+  TH1D *h_track_mult_ = nullptr;
+  TH1D *h_track_pt_ = nullptr;
+  TH1D *h_track_eta_ = nullptr;
+  TH1D *h_track_phi_ = nullptr;
+  TH1D *h_track_outerPt_ = nullptr;
+  TH1D *h_track_outerEta_ = nullptr;
+  TH1D *h_track_outerPhi_ = nullptr;
 };
 
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
-  : tracks_tag_(iConfig.getParameter<edm::InputTag>("src")){
-
-  tracks_token_ = consumes<reco::TrackCollection>(tracks_tag_);
+  : tracks_tag_(iConfig.getParameter<edm::InputTag>("src"))
+  , tracks_token_(consumes<reco::TrackCollection>(tracks_tag_)) {
 
   usesResource(TFileService::kSharedResource);
 
