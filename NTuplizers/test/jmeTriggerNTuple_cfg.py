@@ -1240,8 +1240,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   patMETCollections = cms.PSet(
-    offlineMETs = cms.InputTag('slimmedMETs'),
-    offlineMETsPuppi = cms.InputTag('slimmedMETsPuppi'),
+    offlinePFMET = cms.InputTag('slimmedMETs'),
+    offlinePuppiMET = cms.InputTag('slimmedMETsPuppi'),
   ),
 
   patMuonCollections = cms.PSet(
