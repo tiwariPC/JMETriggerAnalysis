@@ -103,6 +103,8 @@ elif opts.reco.startswith('HLT_singleTrkIterWithPatatrack_v01'):
 
    if opts.reco.endswith('_pixVtxFrac0p01'):
       process.hltTrimmedPixelVertices.fractionSumPt2 = 0.01
+   elif opts.reco.endswith('_pixVtxFrac0p10'):
+      process.hltTrimmedPixelVertices.fractionSumPt2 = 0.10
 
    ## enforce sorting of Pixel Vertices
    process.hltUnsortedPixelVertices = process.hltPixelVertices.clone()
