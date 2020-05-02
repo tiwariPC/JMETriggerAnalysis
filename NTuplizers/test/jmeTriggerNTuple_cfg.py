@@ -98,8 +98,11 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
    process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
-elif opts.reco == 'HLT_singleTrkIterWithPatatrackPixelTracks_v01':
+elif opts.reco.startswith('HLT_singleTrkIterWithPatatrackPixelTracks_v01'):
    from JMETriggerAnalysis.NTuplizers.HLT_singleTrkIterWithPatatrackPixelTracks_v01 import cms, process
+
+   if opts.reco.endswith('_pixVtxFrac0p01'):
+      process.hltTrimmedPixelVertices.fractionSumPt2 = 0.01
 
    ## enforce sorting of Pixel Vertices
    process.hltUnsortedPixelVertices = process.hltPixelVertices.clone()
@@ -1332,6 +1335,7 @@ if opts.trkdqm:
    from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
    for _trkColl in [
      'hltPixelTracks',
+     'hltPixelTracksClean',
      'hltMergedTracks',
      'hltIter0PFlowTrackSelectionHighPurity',
    ]:
