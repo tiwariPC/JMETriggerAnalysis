@@ -146,8 +146,43 @@ def HTCondor_jobIDs(username=None):
 def HTCondor_jobExecutables(username=None):
 
     if not username:
-       if 'USER' in os.environ:
-          username = os.environ['USER']
+       if 'USER' in os.environ: username = os.environ['USER']
+
+    if not username:
+       KILL('HTCondor_jobExecutables -- unspecified argument "username"')
+
+    _condorq_jobExes = []
+
+    _condorq_lines = get_output('condor_q -long '+username)[0].split('\n')
+
+    for _i_condorq in _condorq_lines:
+
+        if not _i_condorq.startswith('Cmd = '): continue
+
+        _i_condorq_cmd_pieces = _i_condorq.split(' = ')
+
+        if len(_i_condorq_cmd_pieces) != 2: continue
+
+        _exe_path = _i_condorq_cmd_pieces[1]
+        _exe_path = _exe_path.replace(' ', '')
+
+        if len(_exe_path) == 0: continue
+
+        if _exe_path.startswith('"'): _exe_path = _exe_path[+1:]
+        if _exe_path.endswith  ('"'): _exe_path = _exe_path[:-1]
+
+        _exe_path = os.path.abspath(os.path.realpath(_exe_path))
+
+        _condorq_jobExes += [_exe_path]
+
+    _condorq_jobExes = sorted(list(set(_condorq_jobExes)))
+
+    return _condorq_jobExes
+
+def HTCondor_jobExecutables_2(username=None):
+
+    if not username:
+       if 'USER' in os.environ: username = os.environ['USER']
 
     if not username:
        KILL('HTCondor_jobExecutables -- unspecified argument "username"')
