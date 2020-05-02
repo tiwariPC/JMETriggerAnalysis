@@ -49,11 +49,6 @@ opts.register('reco', 'HLT',
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
 
-opts.register('hltTrimmedPixelVerticesFractionSumPt2', -1.,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.float,
-              'value of hltTrimmedPixelVertices.fractionSumPt2 (modified only if value is non-negative)')
-
 opts.register('trkdqm', False,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.bool,
@@ -103,8 +98,11 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
    process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
-elif opts.reco == 'HLT_singleTrkIterWithPatatrack_v01':
+elif opts.reco.startswith('HLT_singleTrkIterWithPatatrack_v01'):
    from JMETriggerAnalysis.NTuplizers.HLT_singleTrkIterWithPatatrack_v01 import cms, process
+
+   if opts.reco.endswith('_pixVtxFrac0p01'):
+      process.hltTrimmedPixelVertices.fractionSumPt2 = 0.01
 
    ## enforce sorting of Pixel Vertices
    process.hltUnsortedPixelVertices = process.hltPixelVertices.clone()
@@ -226,11 +224,6 @@ elif opts.reco == 'HLT_singleTrkIterWithPatatrack_v01':
 
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
-
-# hltTrimmedPixelVerticesFractionSumPt2:
-# minimum sum-pt2 fraction of selected pixel vertices relative to the leading pixel vertex
-if opts.hltTrimmedPixelVerticesFractionSumPt2 >= 0.:
-   process.hltTrimmedPixelVertices.fractionSumPt2 = opts.hltTrimmedPixelVerticesFractionSumPt2
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
