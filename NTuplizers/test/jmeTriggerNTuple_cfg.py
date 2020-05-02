@@ -98,8 +98,8 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
    process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
-elif opts.reco == 'HLT_globalPixelTracks_v01':
-   from JMETriggerAnalysis.NTuplizers.HLT_globalPixelTracks_v01 import cms, process
+elif opts.reco == 'HLT_singleTrkIterWithPatatrackPixelTracks_v01':
+   from JMETriggerAnalysis.NTuplizers.HLT_singleTrkIterWithPatatrackPixelTracks_v01 import cms, process
 
    ## enforce sorting of Pixel Vertices
    process.hltUnsortedPixelVertices = process.hltPixelVertices.clone()
