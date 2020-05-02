@@ -98,8 +98,8 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
    from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
    process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
-elif opts.reco.startswith('HLT_singleTrkIterWithPatatrackPixelTracks_v01'):
-   from JMETriggerAnalysis.NTuplizers.HLT_singleTrkIterWithPatatrackPixelTracks_v01 import cms, process
+elif opts.reco.startswith('HLT_singleTrkIterWithPatatrack_v01'):
+   from JMETriggerAnalysis.NTuplizers.HLT_singleTrkIterWithPatatrack_v01 import cms, process
 
    if opts.reco.endswith('_pixVtxFrac0p01'):
       process.hltTrimmedPixelVertices.fractionSumPt2 = 0.01
