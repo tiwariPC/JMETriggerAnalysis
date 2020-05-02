@@ -27,9 +27,12 @@ class PFCandidateHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedReso
  private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
-  edm::EDGetTokenT<std::vector<PFCandType>> pfCands_token_;
+  const edm::InputTag pfCands_tag_;
+  const edm::EDGetTokenT<std::vector<PFCandType>> pfCands_token_;
 
   const StringCutObjectSelector<PFCandType> stringCutSelector_;
+
+  const reco::PFCandidate dummyPFCandToUseTranslatePdgId_;
 
   TH1D *h_pfcand_mult_ = nullptr;
   TH1D *h_pfcand_mult_X_ = nullptr;
@@ -53,7 +56,8 @@ class PFCandidateHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedReso
 
 template <typename PFCandType>
 PFCandidateHistogrammer<PFCandType>::PFCandidateHistogrammer(const edm::ParameterSet& iConfig)
-  : pfCands_token_(consumes<std::vector<PFCandType>>(iConfig.getParameter<edm::InputTag>("src")))
+  : pfCands_tag_(iConfig.getParameter<edm::InputTag>("src"))
+  , pfCands_token_(consumes<std::vector<PFCandType>>(pfCands_tag_))
   , stringCutSelector_(iConfig.getParameter<std::string>("cut")){
 
   usesResource(TFileService::kSharedResource);
@@ -98,58 +102,59 @@ PFCandidateHistogrammer<PFCandType>::PFCandidateHistogrammer(const edm::Paramete
 template <typename PFCandType>
 void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
-  auto const& pfCands = iEvent.get(pfCands_token_);
+  auto const& pfCands_handle(iEvent.getHandle(pfCands_token_));
 
-  uint pfcand_mult(0), pfcand_mult_X(0), pfcand_mult_h(0), pfcand_mult_e(0),
-       pfcand_mult_mu(0), pfcand_mult_gamma(0), pfcand_mult_h0(0),
-       pfcand_mult_hHF(0), pfcand_mult_egammaHF(0);
+  if(pfCands_handle.isValid()){
+    uint pfcand_mult(0), pfcand_mult_X(0), pfcand_mult_h(0), pfcand_mult_e(0),
+         pfcand_mult_mu(0), pfcand_mult_gamma(0), pfcand_mult_h0(0),
+         pfcand_mult_hHF(0), pfcand_mult_egammaHF(0);
 
-  static const reco::PFCandidate dummyPFCandToUseTranslatePdgId;
+    for(auto const& pfc : *pfCands_handle){
+      if(not stringCutSelector_(pfc)){
+        continue;
+      }
 
-  for(auto const& pfc : pfCands){
+      ++pfcand_mult;
 
-    if(not stringCutSelector_(pfc)){
-      continue;
+      auto const pid(dummyPFCandToUseTranslatePdgId_.translatePdgIdToType(pfc.pdgId()));
+
+      if(pid == reco::PFCandidate::X){ ++pfcand_mult_X; } // undefined
+      else if(pid == reco::PFCandidate::h){ ++pfcand_mult_h; } // charged hadron
+      else if(pid == reco::PFCandidate::e){ ++pfcand_mult_e; } // electron
+      else if(pid == reco::PFCandidate::mu){ ++pfcand_mult_mu; } // muon
+      else if(pid == reco::PFCandidate::gamma){ ++pfcand_mult_gamma; } // photon
+      else if(pid == reco::PFCandidate::h0){ ++pfcand_mult_h0; } // neutral hadron
+      else if(pid == reco::PFCandidate::h_HF){ ++pfcand_mult_hHF; } // HF tower identified as a hadron
+      else if(pid == reco::PFCandidate::egamma_HF){ ++pfcand_mult_egammaHF; } // HF tower identified as an EM particle
+
+      h_pfcand_particleId_->Fill(pid + 0.5);
+      h_pfcand_pt_->Fill(pfc.pt());
+      h_pfcand_pt_2_->Fill(pfc.pt());
+      h_pfcand_eta_->Fill(pfc.eta());
+      h_pfcand_phi_->Fill(pfc.phi());
+      h_pfcand_mass_->Fill(pfc.mass());
+      h_pfcand_vx_->Fill(pfc.vx());
+      h_pfcand_vy_->Fill(pfc.vy());
+      h_pfcand_vz_->Fill(pfc.vz());
     }
 
-    ++pfcand_mult;
-
-    auto const pid(dummyPFCandToUseTranslatePdgId.translatePdgIdToType(pfc.pdgId()));
-
-    if(pid == reco::PFCandidate::X){ ++pfcand_mult_X; } // undefined
-    else if(pid == reco::PFCandidate::h){ ++pfcand_mult_h; } // charged hadron
-    else if(pid == reco::PFCandidate::e){ ++pfcand_mult_e; } // electron
-    else if(pid == reco::PFCandidate::mu){ ++pfcand_mult_mu; } // muon
-    else if(pid == reco::PFCandidate::gamma){ ++pfcand_mult_gamma; } // photon
-    else if(pid == reco::PFCandidate::h0){ ++pfcand_mult_h0; } // neutral hadron
-    else if(pid == reco::PFCandidate::h_HF){ ++pfcand_mult_hHF; } // HF tower identified as a hadron
-    else if(pid == reco::PFCandidate::egamma_HF){ ++pfcand_mult_egammaHF; } // HF tower identified as an EM particle
-
-    h_pfcand_particleId_->Fill(pid + 0.5);
-    h_pfcand_pt_->Fill(pfc.pt());
-    h_pfcand_pt_2_->Fill(pfc.pt());
-    h_pfcand_eta_->Fill(pfc.eta());
-    h_pfcand_phi_->Fill(pfc.phi());
-    h_pfcand_mass_->Fill(pfc.mass());
-    h_pfcand_vx_->Fill(pfc.vx());
-    h_pfcand_vy_->Fill(pfc.vy());
-    h_pfcand_vz_->Fill(pfc.vz());
+    h_pfcand_mult_->Fill(pfcand_mult);
+    h_pfcand_mult_X_->Fill(pfcand_mult_X);
+    h_pfcand_mult_h_->Fill(pfcand_mult_h);
+    h_pfcand_mult_e_->Fill(pfcand_mult_e);
+    h_pfcand_mult_mu_->Fill(pfcand_mult_mu);
+    h_pfcand_mult_gamma_->Fill(pfcand_mult_gamma);
+    h_pfcand_mult_h0_->Fill(pfcand_mult_h0);
+    h_pfcand_mult_hHF_->Fill(pfcand_mult_hHF);
+    h_pfcand_mult_egammaHF_->Fill(pfcand_mult_egammaHF);
   }
-
-  h_pfcand_mult_->Fill(pfcand_mult);
-  h_pfcand_mult_X_->Fill(pfcand_mult_X);
-  h_pfcand_mult_h_->Fill(pfcand_mult_h);
-  h_pfcand_mult_e_->Fill(pfcand_mult_e);
-  h_pfcand_mult_mu_->Fill(pfcand_mult_mu);
-  h_pfcand_mult_gamma_->Fill(pfcand_mult_gamma);
-  h_pfcand_mult_h0_->Fill(pfcand_mult_h0);
-  h_pfcand_mult_hHF_->Fill(pfcand_mult_hHF);
-  h_pfcand_mult_egammaHF_->Fill(pfcand_mult_egammaHF);
+  else {
+    edm::LogWarning("Input") << "invalid handle to input collection : " << pfCands_tag_.encode();
+  }
 }
 
 template <typename PFCandType>
 void PFCandidateHistogrammer<PFCandType>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("src", edm::InputTag("particleFlow"))->setComment("edm::InputTag of PF candidates collection");
   desc.add<std::string>("cut", "")->setComment("string selector for PF candidates collection");
