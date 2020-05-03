@@ -1616,9 +1616,8 @@ if opts.trkdqm:
      'hltMergedTracks',
      'hltIter0PFlowTrackSelectionHighPurity',
    ]:
-     if hasattr(process, _trkColl):
-        setattr(process, 'TrackHistograms_'+_trkColl, TrackHistogrammer.clone(src = _trkColl))
-        process.trkMonitoringSeq += getattr(process, 'TrackHistograms_'+_trkColl)
+     setattr(process, 'TrackHistograms_'+_trkColl, TrackHistogrammer.clone(src = _trkColl))
+     process.trkMonitoringSeq += getattr(process, 'TrackHistograms_'+_trkColl)
 
    # vertices
    from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
@@ -1628,9 +1627,8 @@ if opts.trkdqm:
      'hltVerticesPF',
      'offlineSlimmedPrimaryVertices',
    ]:
-     if hasattr(process, _vtxColl):
-        setattr(process, 'VertexHistograms_'+_vtxColl, VertexHistogrammer.clone(src = _vtxColl))
-        process.trkMonitoringSeq += getattr(process, 'VertexHistograms_'+_vtxColl)
+     setattr(process, 'VertexHistograms_'+_vtxColl, VertexHistogrammer.clone(src = _vtxColl))
+     process.trkMonitoringSeq += getattr(process, 'VertexHistograms_'+_vtxColl)
 
 #   from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
 #   process.vertexAnalysis = vertexAnalysis.clone(vertexRecoCollections = ['offlinePrimaryVertices'])
