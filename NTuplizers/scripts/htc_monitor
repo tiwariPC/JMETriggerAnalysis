@@ -81,14 +81,14 @@ def monitor(options, log=''):
 
         dirs_undone = []
         for _tmp in job_dirs:
+            if not os.path.isfile(_tmp+'exe.sh'): continue
 
             if os.path.isfile(_tmp+'flag.done'):
                counter_completed += 1
-               for _tmp2 in [_tmp+'flag.queue', _tmp+'flag.submitted']:
-                   if os.path.isfile(_tmp2):
+               for _tmp2 in glob.glob(_tmp+'flag.*'):
+                   if (_tmp2 != _tmp+'flag.done') and os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
-
-            elif os.path.isfile(_tmp+'/flag.queue') or os.path.isfile(_tmp+'/flag.submitted'):
+            else:
                dirs_undone += [os.path.abspath(_tmp)]
 
         for _tmp_dirname in dirs_undone:
@@ -101,12 +101,12 @@ def monitor(options, log=''):
                counter_running += 1
                if os.path.isfile(_tmp_dirname+'/flag.queue'):
                   EXE('rm '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
-               if not os.path.isfile(_tmp_dirname+'/flag.submitted'):
-                  EXE('touch '+_tmp_dirname+'/flag.submitted', verbose=options.verbose, dry_run=options.dry_run)
+               if not os.path.isfile(_tmp_dirname+'/flag.skip'):
+                  EXE('touch '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
             elif options.local:
                counter_completed += 1
                local_exefiles = [_tmp_dirname+'/exe.sh']
-               for _tmp2 in [_tmp_dirname+'/flag.queue', _tmp_dirname+'/flag.submitted']:
+               for _tmp2 in [_tmp_dirname+'/flag.queue', _tmp_dirname+'/flag.skip']:
                    if os.path.isfile(_tmp2):
                       EXE('rm -f '+_tmp2, verbose=options.verbose, dry_run=options.dry_run)
             else:
@@ -117,8 +117,8 @@ def monitor(options, log=''):
 
                if resubmit_job:
                   counter_resubmitted += 1
-                  if os.path.isfile(_tmp_dirname+'/flag.submitted'):
-                     EXE('rm '+_tmp_dirname+'/flag.submitted', verbose=options.verbose, dry_run=options.dry_run)
+                  if os.path.isfile(_tmp_dirname+'/flag.skip'):
+                     EXE('rm '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
                   if not os.path.isfile(_tmp_dirname+'/flag.queue'):
                      EXE('touch '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
 
@@ -128,8 +128,8 @@ def monitor(options, log=''):
                   counter_toResubmit += 1
                   if os.path.isfile(_tmp_dirname+'/flag.queue'):
                      EXE('rm '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
-                  if not os.path.isfile(_tmp_dirname+'/flag.submitted'):
-                     EXE('touch '+_tmp_dirname+'/flag.submitted', verbose=options.verbose, dry_run=options.dry_run)
+                  if not os.path.isfile(_tmp_dirname+'/flag.skip'):
+                     EXE('touch '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
 
     if options.local:
        local_exefiles = sorted(set([os.path.abspath(_tmp) for _tmp in local_exefiles]))

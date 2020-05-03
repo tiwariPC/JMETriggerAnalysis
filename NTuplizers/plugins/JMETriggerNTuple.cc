@@ -9,6 +9,7 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/ValueContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h"
@@ -41,9 +42,7 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
  protected:
-  void beginJob() override {}
   void analyze(const edm::Event&, const edm::EventSetup&) override;
-  void endJob() override {}
 
   template <typename... Args>
   void addBranch(const std::string&, Args...);
@@ -61,6 +60,14 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   std::unordered_map<std::string, std::string>  stringCutObjectSelectors_map_;
 
   std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
+  std::vector<ValueContainer<bool>> v_boolContainer_;
+  std::vector<ValueContainer<int>> v_intContainer_;
+  std::vector<ValueContainer<float>> v_floatContainer_;
+  std::vector<ValueContainer<double>> v_doubleContainer_;
+  std::vector<ValueContainer<std::vector<bool>>> v_vboolContainer_;
+  std::vector<ValueContainer<std::vector<int>>> v_vintContainer_;
+  std::vector<ValueContainer<std::vector<float>>> v_vfloatContainer_;
+  std::vector<ValueContainer<std::vector<double>>> v_vdoubleContainer_;
   std::vector<RecoVertexCollectionContainer> v_recoVertexCollectionContainer_;
   std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
   std::vector<PATPackedCandidateCollectionContainer> v_patPackedCandidateCollectionContainer_;
@@ -110,6 +117,12 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   };
 
   FillCollectionConditionsMap fillCollectionConditionMap_;
+
+  template<class valType>
+  int initValueContainers(std::vector<ValueContainer<valType>>&, const std::string&, const edm::ParameterSet&, const valType);
+
+  template<class valType>
+  void fillValueContainers(std::vector<ValueContainer<valType>>&, const FillCollectionConditionsMap&, const edm::Event&);
 };
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
@@ -145,6 +158,30 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
       stringCutObjectSelectors_map_[label] = pset_stringCutObjectSelectors.getParameter<std::string>(label);
     }
   }
+
+  // bools
+  this->initValueContainers(v_boolContainer_, "bools", iConfig, false);
+
+  // ints
+  this->initValueContainers(v_intContainer_, "ints", iConfig, -999);
+
+  // floats
+  this->initValueContainers(v_floatContainer_, "floats", iConfig, -999.0f);
+
+  // doubles
+  this->initValueContainers(v_doubleContainer_, "doubles", iConfig, -999.0d);
+
+  // vbools
+  this->initValueContainers(v_vboolContainer_, "vbools", iConfig, std::vector<bool>());
+
+  // vints
+  this->initValueContainers(v_vintContainer_, "vints", iConfig, std::vector<int>());
+
+  // vfloats
+  this->initValueContainers(v_vfloatContainer_, "vfloats", iConfig, std::vector<float>());
+
+  // vdoubles
+  this->initValueContainers(v_vdoubleContainer_, "vdoubles", iConfig, std::vector<double>());
 
   // reco::VertexCollection
   v_recoVertexCollectionContainer_.clear();
@@ -566,6 +603,38 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
   }
 
+  for(auto& boolContainer_i : v_boolContainer_){
+    this->addBranch(boolContainer_i.name(), &boolContainer_i.value());
+  }
+
+  for(auto& intContainer_i : v_intContainer_){
+    this->addBranch(intContainer_i.name(), &intContainer_i.value());
+  }
+
+  for(auto& floatContainer_i : v_floatContainer_){
+    this->addBranch(floatContainer_i.name(), &floatContainer_i.value());
+  }
+
+  for(auto& doubleContainer_i : v_doubleContainer_){
+    this->addBranch(doubleContainer_i.name(), &doubleContainer_i.value());
+  }
+
+  for(auto& vboolContainer_i : v_vboolContainer_){
+    this->addBranch(vboolContainer_i.name(), &vboolContainer_i.value());
+  }
+
+  for(auto& vintContainer_i : v_vintContainer_){
+    this->addBranch(vintContainer_i.name(), &vintContainer_i.value());
+  }
+
+  for(auto& vfloatContainer_i : v_vfloatContainer_){
+    this->addBranch(vfloatContainer_i.name(), &vfloatContainer_i.value());
+  }
+
+  for(auto& vdoubleContainer_i : v_vdoubleContainer_){
+    this->addBranch(vdoubleContainer_i.name(), &vdoubleContainer_i.value());
+  }
+
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
 
     this->addBranch(recoVertexCollectionContainer_i.name()+"_tracksSize", &recoVertexCollectionContainer_i.vec_tracksSize());
@@ -839,6 +908,30 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     // update fill-collection conditions
     fillCollectionConditionMap_.update(*triggerResults_handle, iEvent);
   }
+
+  // fill boolContainers
+  this->fillValueContainers(v_boolContainer_, fillCollectionConditionMap_, iEvent);
+
+  // fill intContainers
+  this->fillValueContainers(v_intContainer_, fillCollectionConditionMap_, iEvent);
+
+  // fill floatContainers
+  this->fillValueContainers(v_floatContainer_, fillCollectionConditionMap_, iEvent);
+
+  // fill doubleContainers
+  this->fillValueContainers(v_doubleContainer_, fillCollectionConditionMap_, iEvent);
+
+  // fill vboolContainers
+  this->fillValueContainers(v_vboolContainer_, fillCollectionConditionMap_, iEvent);
+
+  // fill vintContainers
+  this->fillValueContainers(v_vintContainer_, fillCollectionConditionMap_, iEvent);
+
+  // fill vfloatContainers
+  this->fillValueContainers(v_vfloatContainer_, fillCollectionConditionMap_, iEvent);
+
+  // fill vdoubleContainers
+  this->fillValueContainers(v_vdoubleContainer_, fillCollectionConditionMap_, iEvent);
 
   // fill recoVertexCollectionContainers
   for(auto& recoVertexCollectionContainer_i : v_recoVertexCollectionContainer_){
@@ -1254,7 +1347,6 @@ void JMETriggerNTuple::addBranch(const std::string& branch_name, Args... args){
   }
 }
 
-
 bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& triggerResults, const edm::Event& iEvent, const std::vector<std::string>& paths){
 
   if(paths.size() == 0){
@@ -1447,6 +1539,53 @@ int JMETriggerNTuple::FillCollectionConditionsMap::update(const edm::TriggerResu
   }
 
   return 0;
+}
+
+template<class valType>
+int JMETriggerNTuple::initValueContainers(std::vector<ValueContainer<valType>>& v_valContainers, const std::string& psetName, const edm::ParameterSet& iConfig, const valType defaultValue){
+
+  v_valContainers.clear();
+
+  if(iConfig.exists(psetName)){
+
+    auto const& pset(iConfig.getParameter<edm::ParameterSet>(psetName));
+    auto const& inputTagLabels(pset.getParameterNamesForType<edm::InputTag>());
+
+    v_valContainers.reserve(inputTagLabels.size());
+
+    for(auto const& label : inputTagLabels){
+      auto const& inputTag(pset.getParameter<edm::InputTag>(label));
+      v_valContainers.emplace_back(ValueContainer<valType>(label, inputTag.label(), this->consumes<valType>(inputTag), defaultValue));
+    }
+
+    return 0;
+  }
+
+  return 1;
+}
+
+template<class valType>
+void JMETriggerNTuple::fillValueContainers(std::vector<ValueContainer<valType>>& v_valContainers, const JMETriggerNTuple::FillCollectionConditionsMap& fillCollectionConditionMap, const edm::Event& iEvent){
+
+  for(auto& valueContainer_i : v_valContainers){
+
+    valueContainer_i.setValue(valueContainer_i.defaultValue());
+
+    if(fillCollectionConditionMap_.has(valueContainer_i.name()) and (not fillCollectionConditionMap_.accept(valueContainer_i.name()))){
+      continue;
+    }
+
+    auto const& i_handle(iEvent.getHandle(valueContainer_i.token()));
+
+    if(not i_handle.isValid()){
+      edm::LogWarning("JMETriggerNTuple::fillValueContainers")
+        << "invalid handle for input collection: \"" << valueContainer_i.inputTagLabel()
+        << "\" (NTuple branch: \"" << valueContainer_i.name() << "\")";
+    }
+    else {
+      valueContainer_i.setValue(*i_handle);
+    }
+  }
 }
 
 void JMETriggerNTuple::fillDescriptions(edm::ConfigurationDescriptions& descriptions){
