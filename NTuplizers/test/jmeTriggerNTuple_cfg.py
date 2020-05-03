@@ -1157,6 +1157,22 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   fillCollectionConditions = cms.PSet(),
 
+  bools = cms.PSet(),
+
+  ints = cms.PSet(),
+
+  floats = cms.PSet(),
+
+  doubles = cms.PSet(),
+
+  vbools = cms.PSet(),
+
+  vints = cms.PSet(),
+
+  vfloats = cms.PSet(),
+
+  vdoubles = cms.PSet(),
+
   recoVertexCollections = cms.PSet(
     hltPixelVertices = cms.InputTag('hltPixelVertices'),
     hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
