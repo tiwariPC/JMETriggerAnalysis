@@ -101,10 +101,17 @@ elif opts.reco == 'HLT_trkIter2RegionalPtSeed10p0':
 elif opts.reco.startswith('HLT_singleTrkIterWithPatatrack_v01'):
    from JMETriggerAnalysis.NTuplizers.HLT_singleTrkIterWithPatatrack_v01 import cms, process
 
-   if opts.reco.endswith('_pixVtxFrac0p01'):
+   if opts.reco.endswith('_pixVtxFrac0p00'):
+      process.hltTrimmedPixelVertices.fractionSumPt2 = -1.
+      process.hltTrimmedPixelVertices.minSumPt2 = -1.
+   elif opts.reco.endswith('_pixVtxFrac0p01'):
       process.hltTrimmedPixelVertices.fractionSumPt2 = 0.01
    elif opts.reco.endswith('_pixVtxFrac0p10'):
       process.hltTrimmedPixelVertices.fractionSumPt2 = 0.10
+   elif opts.reco.endswith('_pixVtxFrac0p30'):
+      process.hltTrimmedPixelVertices.fractionSumPt2 = 0.30
+   else:
+      raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
 
    ## enforce sorting of Pixel Vertices
    process.hltUnsortedPixelVertices = process.hltPixelVertices.clone()
@@ -118,7 +125,7 @@ elif opts.reco.startswith('HLT_singleTrkIterWithPatatrack_v01'):
 
      # criterion to rank pixel vertices
      # (utilizes PVClusterComparer to compute
-     # the vertex SumPtSquared f.o.m. using a sub-set of tracks)
+     # the vertex SumPt2 f.o.m. using a sub-set of tracks)
      ranker = cms.PSet(
        refToPSet_ = cms.string('HLTPSetPvClusterComparerForIT')
      ),
@@ -1523,6 +1530,7 @@ if opts.trkdqm:
      'hltPixelVertices',
      'hltTrimmedPixelVertices',
      'hltVerticesPF',
+     'offlineSlimmedPrimaryVertices',
    ]:
      if hasattr(process, _vtxColl):
         setattr(process, 'VertexHistograms_'+_vtxColl, VertexHistogrammer.clone(src = _vtxColl))

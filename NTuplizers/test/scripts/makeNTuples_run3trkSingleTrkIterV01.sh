@@ -42,9 +42,10 @@ fi
 
 recos=(
   HLT
-  HLT_singleTrkIterWithPatatrack_v01
+  HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p00
   HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p01
   HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p10
+  HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30
 )
 
 for reco in "${recos[@]}"; do
