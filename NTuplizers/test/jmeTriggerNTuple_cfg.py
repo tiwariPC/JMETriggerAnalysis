@@ -300,6 +300,98 @@ for _modname in process.endpaths_():
 if hasattr(process, 'MessageLogger'):
    del process.MessageLogger
 
+## add path: MC_AK4PFClusterJets_v1
+process.hltPreMCAK4PFClusterJets = process.hltPreMCAK4PFJets.clone()
+
+process.hltParticleFlowClusterRefsECALUnseeded = cms.EDProducer('PFClusterRefCandidateProducer',
+  src = cms.InputTag('hltParticleFlowClusterECALUnseeded'),
+  particleType = cms.string('pi+')
+)
+
+process.hltParticleFlowClusterRefsHCAL = cms.EDProducer('PFClusterRefCandidateProducer',
+  src = cms.InputTag('hltParticleFlowClusterHCAL'),
+  particleType = cms.string('pi+')
+)
+
+process.hltParticleFlowClusterRefsHF = cms.EDProducer('PFClusterRefCandidateProducer',
+  src = cms.InputTag('hltParticleFlowClusterHF'),
+  particleType = cms.string('pi+')
+)
+
+process.hltParticleFlowClusterRefs = cms.EDProducer('PFClusterRefCandidateMerger',
+  src = cms.VInputTag('hltParticleFlowClusterRefsECALUnseeded', 'hltParticleFlowClusterRefsHCAL', 'hltParticleFlowClusterRefsHF')
+)
+
+from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets
+process.hltAK4PFClusterJets = ak4PFClusterJets.clone(
+  src = 'hltParticleFlowClusterRefs',
+  doPVCorrection = False,
+)
+
+process.HLTPFClusterRefsSequence = cms.Sequence(
+    process.HLTParticleFlowSequence
+  + process.hltParticleFlowClusterRefsECALUnseeded
+  + process.hltParticleFlowClusterRefsHCAL
+  + process.hltParticleFlowClusterRefsHF
+  + process.hltParticleFlowClusterRefs
+)
+
+process.HLTAK4PFClusterJetsSequence = cms.Sequence(
+    process.HLTPFClusterRefsSequence
+  + process.hltAK4PFClusterJets
+)
+
+process.hltAK4PFClusterJetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK4PFClusterJets'
+)
+
+process.MC_AK4PFClusterJets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK4PFClusterJets
+  + process.HLTAK4PFClusterJetsSequence
+  + process.hltAK4PFClusterJetsCollection20Filter
+  + process.HLTEndSequence
+)
+
+## add path: MC_AK8PFClusterJets_v1
+process.hltPreMCAK8PFClusterJets = process.hltPreMCAK4PFJets.clone()
+
+process.hltAK8PFClusterJets = process.hltAK4PFClusterJets.clone(rParam = 0.8)
+
+process.HLTAK8PFClusterJetsSequence = cms.Sequence(
+    process.HLTPFClusterRefsSequence
+  + process.hltAK8PFClusterJets
+)
+
+process.hltAK8PFClusterJetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+  inputTag = 'hltAK8PFClusterJets'
+)
+
+process.MC_AK8PFClusterJets_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCAK8PFClusterJets
+  + process.HLTAK8PFClusterJetsSequence
+  + process.hltAK8PFClusterJetsCollection20Filter
+  + process.HLTEndSequence
+)
+
+## add path: MC_PFClusterMET_v1
+process.hltPreMCPFClusterMET = process.hltPreMCPFMET.clone()
+
+process.hltPFClusterMET = cms.EDProducer('PFClusterMETProducer',
+  src = cms.InputTag('hltParticleFlowClusterRefs'),
+  globalThreshold = cms.double(0.0),
+  alias = cms.string('')
+)
+
+process.MC_PFClusterMET_v1 = cms.Path(
+    process.HLTBeginSequence
+  + process.hltPreMCPFClusterMET
+  + process.HLTPFClusterRefsSequence
+  + process.hltPFClusterMET
+  + process.HLTEndSequence
+)
+
 ## add path: MC_PFMETNoMu_v1
 process.hltPreMCPFMETNoMu = process.hltPreMCPFMET.clone()
 
@@ -1353,6 +1445,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   recoPFClusterJetCollections = cms.PSet(
+    hltAK4PFClusterJets = cms.InputTag('hltAK4PFClusterJets'),
+    hltAK8PFClusterJets = cms.InputTag('hltAK8PFClusterJets'),
   ),
 
   recoPFJetCollections = cms.PSet(
@@ -1435,6 +1529,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     hltAK4CaloJets             = cms.string('pt > 20'),
     hltAK4CaloJetsCorrected    = cms.string('pt > 20'),
+    hltAK4PFClusterJets        = cms.string('pt > 20'),
     hltAK4PFJets               = cms.string('pt > 20'),
     hltAK4PFJetsCorrected      = cms.string('pt > 20'),
     hltAK4PFCHSv1Jets          = cms.string('pt > 20'),
@@ -1448,6 +1543,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     hltAK8CaloJets             = cms.string('pt > 80'),
     hltAK8CaloJetsCorrected    = cms.string('pt > 80'),
+    hltAK8PFClusterJets        = cms.string('pt > 80'),
     hltAK8PFJets               = cms.string('pt > 80'),
     hltAK8PFJetsCorrected      = cms.string('pt > 80'),
     hltAK8PFCHSv1Jets          = cms.string('pt > 80'),
