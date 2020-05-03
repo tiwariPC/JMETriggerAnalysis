@@ -141,4 +141,4 @@ if __name__ == '__main__':
    for _tmp in collections:
        mean_val = mean(values[_tmp])
        rms_val = rms(values[_tmp])
-       print '{:<30} {:>10.3f} {:>10.3f}'.format(_tmp, mean_val, rms_val)
+       print '{:<30} {:>10.3f} {:>10.3f}'.format(_tmp, mean_val, rms_val/mean_val)
