@@ -561,6 +561,7 @@ from CommonTools.PileupAlgos.Puppi_cff import *
 process.hltPuppiV1 = puppi.clone(
   candName = 'hltParticleFlow',
   vertexName = 'hltVerticesPF',
+#  puppiDiagnostics = True,
 )
 
 process.HLTPuppiV1Sequence = cms.Sequence(
@@ -767,6 +768,7 @@ process.hltPuppiV3 = puppi.clone(
   vertexName = 'hltPixelVertices',
   UseFromPVLooseTight = True,
   vtxNdofCut = 0,
+#  puppiDiagnostics = True,
 )
 
 process.HLTPuppiV3Sequence = cms.Sequence(
@@ -1163,7 +1165,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   floats = cms.PSet(),
 
-  doubles = cms.PSet(),
+  doubles = cms.PSet(
+#    hltPuppiV1_PuppiNAlgos = cms.InputTag('hltPuppiV1:PuppiNAlgos'),
+#    hltPuppiV3_PuppiNAlgos = cms.InputTag('hltPuppiV3:PuppiNAlgos'),
+  ),
 
   vbools = cms.PSet(),
 
@@ -1171,7 +1176,17 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   vfloats = cms.PSet(),
 
-  vdoubles = cms.PSet(),
+  vdoubles = cms.PSet(
+#    hltPuppiV1_PuppiAlphas = cms.InputTag('hltPuppiV1:PuppiAlphas'),
+#    hltPuppiV1_PuppiAlphasMed = cms.InputTag('hltPuppiV1:PuppiAlphasMed'),
+#    hltPuppiV1_PuppiAlphasRms = cms.InputTag('hltPuppiV1:PuppiAlphasRms'),
+#    hltPuppiV1_PuppiRawAlphas = cms.InputTag('hltPuppiV1:PuppiRawAlphas'),
+
+#    hltPuppiV3_PuppiAlphas = cms.InputTag('hltPuppiV3:PuppiAlphas'),
+#    hltPuppiV3_PuppiAlphasMed = cms.InputTag('hltPuppiV3:PuppiAlphasMed'),
+#    hltPuppiV3_PuppiAlphasRms = cms.InputTag('hltPuppiV3:PuppiAlphasRms'),
+#    hltPuppiV3_PuppiRawAlphas = cms.InputTag('hltPuppiV3:PuppiRawAlphas'),
+  ),
 
   recoVertexCollections = cms.PSet(
     hltPixelVertices = cms.InputTag('hltPixelVertices'),
@@ -1182,8 +1197,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFCandidateCollections = cms.PSet(
 #    hltParticleFlow = cms.InputTag('hltParticleFlow'),
-#    hltParticleFlowCHSv2 = cms.InputTag('hltParticleFlowCHSv2'),
 #    hltParticleFlowCHSv1 = cms.InputTag('hltParticleFlowCHSv1'),
+#    hltParticleFlowCHSv2 = cms.InputTag('hltParticleFlowCHSv2'),
+
+#    hltPuppiV1 = cms.InputTag('hltPuppiV1'),
+#    hltPuppiV3 = cms.InputTag('hltPuppiV3'),
   ),
 
   patPackedCandidateCollections = cms.PSet(
