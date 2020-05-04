@@ -341,15 +341,10 @@ process.HLTAK4PFClusterJetsSequence = cms.Sequence(
   + process.hltAK4PFClusterJets
 )
 
-process.hltAK4PFClusterJetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
-  inputTag = 'hltAK4PFClusterJets'
-)
-
 process.MC_AK4PFClusterJets_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCAK4PFClusterJets
   + process.HLTAK4PFClusterJetsSequence
-  + process.hltAK4PFClusterJetsCollection20Filter
   + process.HLTEndSequence
 )
 
@@ -363,15 +358,10 @@ process.HLTAK8PFClusterJetsSequence = cms.Sequence(
   + process.hltAK8PFClusterJets
 )
 
-process.hltAK8PFClusterJetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
-  inputTag = 'hltAK8PFClusterJets'
-)
-
 process.MC_AK8PFClusterJets_v1 = cms.Path(
     process.HLTBeginSequence
   + process.hltPreMCAK8PFClusterJets
   + process.HLTAK8PFClusterJetsSequence
-  + process.hltAK8PFClusterJetsCollection20Filter
   + process.HLTEndSequence
 )
 
