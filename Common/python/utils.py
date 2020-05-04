@@ -37,7 +37,8 @@ def getModuleDependencies(module):
         _ipar = getattr(module, _ikey)
         if ((type(_ipar) == cms.string) or (type(_ipar) == cms.untracked.string)) \
            and (module.label_() == str(_ipar.value())) \
-           and ((_ikey == 'alias') or (_ikey == 'ComponentName') or (_ikey == 'ComponentType') or (_ikey == 'passLabel')):
+           and ((_ikey == 'alias') or (_ikey == 'ComponentName') or (_ikey == 'ComponentType') or \
+                (_ikey == 'passLabel') or (_ikey == 'algo_name') or (_ikey == 'recAlgo')):
            continue
         if ((type(_ipar) == cms.string) or (type(_ipar) == cms.untracked.string)) \
            and ((_ikey == 'AlgorithmName')):
