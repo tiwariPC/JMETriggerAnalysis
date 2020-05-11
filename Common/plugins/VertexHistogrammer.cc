@@ -35,6 +35,7 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
   TH1D *h_vertex_nTracks_ = nullptr;
 
   TH1D *h_track_pt_ = nullptr;
+  TH1D *h_track_pt_2_ = nullptr;
   TH1D *h_track_eta_ = nullptr;
   TH1D *h_track_phi_ = nullptr;
   TH1D *h_track_dxy_ = nullptr;
