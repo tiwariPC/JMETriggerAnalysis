@@ -262,6 +262,13 @@ process.schedule.extend([process.analysisNTupleEndPath])
 if opts.globalTag is not None:
    process.GlobalTag.globaltag = opts.globalTag
 
+# fix for AK4PF Phase-2 JECs
+process.GlobalTag.toGet.append(cms.PSet(
+  record = cms.string('JetCorrectionsRecord'),
+  tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_AK4PF'),
+  label = cms.untracked.string('AK4PF'),
+))
+
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
 
