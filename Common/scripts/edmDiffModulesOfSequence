@@ -39,11 +39,14 @@ if __name__ == '__main__':
    parser.add_argument('-n', '--name-only', dest='name_only', action='store_true', default=False,
                        help='show only name of modules')
 
-   parser.add_argument('-i', '--ignore', dest='ignore', nargs='+', type=str, default=[],
+   parser.add_argument('-i', '--module-ignore', dest='module_ignore', nargs='+', type=str, default=[],
                        help='list of modules to be ignored in the target configuration file')
 
-   parser.add_argument('-c', '--consider-only', dest='consider_only', nargs='+', type=str, default=[],
+   parser.add_argument('-o', '--module-only', dest='module_only', nargs='+', type=str, default=[],
                        help='list of the only modules to be considered in the target configuration file (takes precedence over --ignore, if module appears in both lists)')
+
+   parser.add_argument('-k', '--module-keep', dest='module_keep', nargs='+', type=str, default=[],
+                       help='list of the modules to be kept in the target configuration file (takes precedence over --ignore, if module appears in both lists)')
 
    parser.add_argument('-p', '--prefix-output', dest='prefix_output', action='store', default='',
                        help='string used as prefix to the names of output modules (example: prefix="process.")')
@@ -73,10 +76,12 @@ if __name__ == '__main__':
    else:
       process2 = getProcess(opts.target)
 
-   modulesToBeIgnored = sorted(list(set(opts.ignore)))
-   onlyModulesToBeConsidered = sorted(list(set(opts.consider_only)))
+   modulesToBeIgnored = sorted(list(set(opts.module_ignore)))
+   modulesToBeKept = sorted(list(set(opts.module_keep)))
+   onlyModulesToBeConsidered = sorted(list(set(opts.module_only)))
 
    orderedListOfModuleNames = orderedListOfModuleNamesFromSequence(process2, opts.sequence)
+
    depModuleNames = []
    if opts.include_dependencies:
       for _tmp in orderedListOfModuleNames:
@@ -93,6 +98,13 @@ if __name__ == '__main__':
               if (_tmp not in listOfModuleNames) and (_tmp not in orderedListOfModuleNames):
                  listOfModuleNames += [_tmp]
    listOfModuleNames += orderedListOfModuleNames
+
+   for _tmp in reversed(modulesToBeKept):
+       if _tmp in listOfModuleNames:
+          continue
+       if processHasModule(process2, _tmp):
+          listOfModuleNames.insert(0, _tmp)
+
    for _tmp in listOfModuleNames:
        if _tmp in modulesToBeIgnored:
           continue
