@@ -115,28 +115,20 @@ def customize_hltPhase2_TRKv06(process):
             TTRHBuilder = cms.string('WithTrackAngle')
         ),
         MTEC = cms.PSet(
-    
         ),
         MTIB = cms.PSet(
-    
         ),
         MTID = cms.PSet(
-    
         ),
         MTOB = cms.PSet(
-    
         ),
         TEC = cms.PSet(
-    
         ),
         TIB = cms.PSet(
-    
         ),
         TID = cms.PSet(
-    
         ),
         TOB = cms.PSet(
-    
         ),
         layerList = cms.vstring(
             'BPix1+BPix2+BPix3+BPix4', 
@@ -158,7 +150,7 @@ def customize_hltPhase2_TRKv06(process):
             'FPix5_neg+FPix6_neg+FPix7_neg+FPix8_neg'
         )
     )
-    
+
     process.pixelTracksHitDoublets = cms.EDProducer('HitPairEDProducer',
         clusterCheck = cms.InputTag(''),
         layerPairs = cms.vuint32(0, 1, 2),
@@ -170,7 +162,7 @@ def customize_hltPhase2_TRKv06(process):
         trackingRegions = cms.InputTag('pixelTracksTrackingRegions'),
         trackingRegionsSeedingLayers = cms.InputTag('')
     )
-    
+
     process.pixelTracksHitQuadruplets = cms.EDProducer('CAHitQuadrupletEDProducer',
         CAHardPtCut = cms.double(0.0),
         CAPhiCut = cms.double(0.2),
@@ -194,7 +186,7 @@ def customize_hltPhase2_TRKv06(process):
         mightGet = cms.untracked.vstring('IntermediateHitDoublets_pixelTracksHitDoublets__RECO'),
         useBendingCorrection = cms.bool(True)
     )
-    
+
     process.pixelTrackFilterByKinematics = cms.EDProducer('PixelTrackFilterByKinematicsProducer',
         chi2 = cms.double(1000.0),
         nSigmaInvPtTolerance = cms.double(0.0),
@@ -202,18 +194,18 @@ def customize_hltPhase2_TRKv06(process):
         ptMin = cms.double(0.9),
         tipMax = cms.double(1.0)
     )
-    
+
     process.pixelTrackCleanerBySharedHits = cms.ESProducer('PixelTrackCleanerBySharedHitsESProducer',
         ComponentName = cms.string('pixelTrackCleanerBySharedHits'),
         appendToDataLabel = cms.string(''),
         useQuadrupletAlgo = cms.bool(False)
     )
-    
+
     process.pixelFitterByHelixProjections = cms.EDProducer('PixelFitterByHelixProjectionsProducer',
         scaleErrorsForBPix1 = cms.bool(False),
         scaleFactor = cms.double(0.65)
     )
-    
+
     process.pixelTracks = cms.EDProducer('PixelTrackProducer',
         Cleaner = cms.string('pixelTrackCleanerBySharedHits'),
         Filter = cms.InputTag('pixelTrackFilterByKinematics'),
@@ -225,13 +217,14 @@ def customize_hltPhase2_TRKv06(process):
         ),
         passLabel = cms.string('pixelTracks')
     )
-    
+
     process.pSetPvClusterComparerForIT = cms.PSet(
         track_chi2_max = cms.double(20.0),
         track_prob_min = cms.double(-1.0),
         track_pt_max = cms.double(20.0),
         track_pt_min = cms.double(1.0)
     )
+
     process.pixelVertices = cms.EDProducer('PixelVertexProducer',
         Finder = cms.string('DivisiveVertexFinder'),
         Method2 = cms.bool(True),
@@ -248,7 +241,7 @@ def customize_hltPhase2_TRKv06(process):
         ZSeparation = cms.double(0.05),
         beamSpot = cms.InputTag('offlineBeamSpot')
     )
-    
+
     process.trimmedPixelVertices = cms.EDProducer('PixelVertexCollectionTrimmer',
         PVcomparer = cms.PSet(
             refToPSet_ = cms.string('pSetPvClusterComparerForIT')
@@ -258,7 +251,7 @@ def customize_hltPhase2_TRKv06(process):
         minSumPt2 = cms.double(0.0),
         src = cms.InputTag('pixelVertices')
     )
-    
+
     process.initialStepSeeds = cms.EDProducer('SeedCreatorFromRegionConsecutiveHitsTripletOnlyEDProducer',
         MinOneOverPtError = cms.double(1),
         OriginTransverseErrorMultiplier = cms.double(1),
@@ -279,9 +272,9 @@ def customize_hltPhase2_TRKv06(process):
             'RegionsSeedingHitSets_pixelTracksHitQuadruplets__RECO'
         ),
         propagator = cms.string('PropagatorWithMaterial'),
-        seedingHitSets = cms.InputTag('pixelTracksHitQuadruplets')
+        seedingHitSets = cms.InputTag('initialStepHitQuadruplets')
     )
-    
+
     process.highPtTripletStepTrajectoryCleanerBySharedHits = cms.ESProducer('TrajectoryCleanerESProducer',
         ComponentName = cms.string('highPtTripletStepTrajectoryCleanerBySharedHits'),
         ComponentType = cms.string('TrajectoryCleanerBySharedHits'),
@@ -520,12 +513,12 @@ def customize_hltPhase2_TRKv06(process):
         useHitsSplitting = cms.bool(False),
         useSimpleMF = cms.bool(False)
     )
-    
+
     process.initialStepTrackRefsForJets = cms.EDProducer('ChargedRefCandidateProducer',
         particleType = cms.string('pi+'),
         src = cms.InputTag('initialStepTracks')
     )
-    
+
     process.initialStepTrackCutClassifier = cms.EDProducer('TrackCutClassifier',
         beamspot = cms.InputTag('offlineBeamSpot'),
         ignoreVertices = cms.bool(False),
@@ -542,13 +535,13 @@ def customize_hltPhase2_TRKv06(process):
                 dz_par1 = cms.vdouble(0.9, 0.8, 0.7),
                 dz_par2 = cms.vdouble(0.8, 0.7, 0.55)
             ),
-            maxChi2 = cms.vdouble(9999.0, 9999.0, 9999.0),
+            maxChi2 = cms.vdouble( 9999.0, 25.0, 16.0 ), 
             maxChi2n = cms.vdouble(2.0, 1.4, 1.2),
             maxDr = cms.vdouble(0.5, 0.03, 3.40282346639e+38),
             maxDz = cms.vdouble(0.5, 0.2, 3.40282346639e+38),
             maxDzWrtBS = cms.vdouble(3.40282346639e+38, 24.0, 15.0),
             maxLostLayers = cms.vint32(3, 2, 2),
-            min3DLayers = cms.vint32(3, 3, 4),
+            min3DLayers = cms.vint32(3, 3, 3),
             minLayers = cms.vint32(3, 3, 3),
             minNVtxTrk = cms.int32(3),
             minNdof = cms.vdouble(1e-05, 1e-05, 1e-05),
@@ -867,12 +860,12 @@ def customize_hltPhase2_TRKv06(process):
                 dz_par1 = cms.vdouble(0.8, 0.7, 0.7),
                 dz_par2 = cms.vdouble(0.6, 0.6, 0.55)
             ),
-            maxChi2 = cms.vdouble(3.40282346639e+38, 3.40282346639e+38, 3.40282346639e+38),
+            maxChi2 = cms.vdouble(9999.0, 9999.0, 9999.0 ),
             maxChi2n = cms.vdouble(2.0, 1.0, 0.8),
             maxDr = cms.vdouble(0.5, 0.03, 3.40282346639e+38),
             maxDz = cms.vdouble(0.5, 0.2, 3.40282346639e+38),
             maxDzWrtBS = cms.vdouble(3.40282346639e+38, 24.0, 15.0),
-            maxLostLayers = cms.vint32(3, 2, 2),
+            maxLostLayers = cms.vint32(3, 3, 2),
             min3DLayers = cms.vint32(3, 3, 4),
             minLayers = cms.vint32(3, 3, 4),
             minNVtxTrk = cms.int32(3),
@@ -1177,11 +1170,11 @@ def customize_hltPhase2_TRKv06(process):
     )
 
     process.initialStepSequence = cms.Sequence(
-#       process.initialStepSeedLayers
-#     + process.initialStepTrackingRegions
-#     + process.initialStepHitDoublets
-#     + process.initialStepHitQuadruplets
-        process.initialStepSeeds
+        process.initialStepSeedLayers
+      + process.initialStepTrackingRegions
+      + process.initialStepHitDoublets
+      + process.initialStepHitQuadruplets
+      + process.initialStepSeeds
       + process.initialStepTrackCandidates
       + process.initialStepTracks
 #     + process.initialStepPVSequence # use pixelVertices
