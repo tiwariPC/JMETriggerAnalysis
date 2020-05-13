@@ -21,7 +21,7 @@ if [ ${showHelpMsg} == true ]; then
 Usage: makeTRKCustomizationFunction.sh -f <config file> -l <name of cms.Path/Task/Sequence>
 
 Description:
-  create a customization function for TRK, isolating changing with respect to the Offline reconstruction (RECO step)
+  create a customization function for TRK, isolating changes with respect to the Offline reconstruction (RECO step)
 @EOF
 
   exit 0
@@ -67,16 +67,46 @@ cmsDriver.py step3 \
 
 edmConfigDump offline_cfg.py > offline_configDump.py
 
-cp ${trkDump} trk_configDump.py
-
-for firstLet in {a..z}; do
-  sed -i "s|hltPhase2${firstLet^^}|${firstLet}|g" trk_configDump.py
-done
-unset -v firstLet
+edmConfigDump ${trkDump} > trk_configDump.py
 
 diffCmd="edmDiffModulesOfSequence -r offline_configDump.py -t trk_configDump.py -s ${psetName} -d -e -p process. -k TrackProducer -i GlobalTag es_hardcode mix"
 
-${diffCmd} > diff.py
-${diffCmd} -n
+cat <<@EOF > diff.py
+import FWCore.ParameterSet.Config as cms
+
+def customize_hltPhase2_TRKvX(process):
+
+    ###
+    ### Modules (taken from configuration developed by TRK POG)
+    ###
+
+@EOF
+
+${diffCmd} | sed 's/^/    /' >> diff.py
+
+cat <<@EOF >> diff.py
+    ###
+    ### Sequences
+    ###
+
+    #!! ADD SEQUENCES HERE
+
+    process.globalreco_tracking = cms.Sequence(
+      #!! ADD FINAL SET OF SEQUENCES
+    )
+
+    # remove globalreco_trackingTask to avoid any ambiguities
+    # with the updated sequence process.globalreco_tracking
+    if hasattr(process, 'globalreco_trackingTask'):
+       del process.globalreco_trackingTask
+
+    return process
+@EOF
+
+# revert renaming
+for firstLet in {a..z}; do
+  sed -i "s|hltPhase2${firstLet^^}|${firstLet}|g" diff.py
+done
+unset -v firstLet
 
 unset -v diffCmd trkDump psetName showHelpMsg
