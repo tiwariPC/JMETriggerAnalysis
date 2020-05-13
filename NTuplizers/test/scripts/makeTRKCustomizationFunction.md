@@ -78,7 +78,7 @@ and give the exact same outputs as the starting TRK configuration.
 Attention needs to be paid in every step,
 and sometimes manual adjustments are necessary.
 Once the customization function technically works,
-it remains necessary to cross-check that the output tracks and vertices
+it remains necessary to verify that the output tracks and vertices
 are the same as those obtained with the original TRK configuration.
 
 ---------
