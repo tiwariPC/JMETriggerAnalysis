@@ -10,12 +10,11 @@
   (in what follows, this will be referred to as `TRKvX_configDump.py`).
 
 * Execute
-
-```
-${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/test/scripts/makeTRKCustomizationFunction.sh \
--f TRKvX_configDump.py \
--p MC_Tracking_vX
-```
+  ```
+  ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/test/scripts/makeTRKCustomizationFunction.sh \
+  -f TRKvX_configDump.py \
+  -p MC_Tracking_vX
+  ```
   **Note**:
   the previous script only compares modules with the same exact name in the two configurations;
   several modules in the TRK configuration are currently renamed to include a prefix (`hltPhase2`, in recent versions),
@@ -65,10 +64,10 @@ ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/test/scripts/makeTRKCustomizatio
   the deletion of the object `process.globalreco_trackingTask`,
   in order to avoid inconsistencies between this `cms.Task` of the Offline reconstruction
   and the new definition of `process.globalreco_tracking`:
-```
-    if hasattr(process, 'globalreco_trackingTask'):
-       del process.globalreco_trackingTask
-```
+  ```
+      if hasattr(process, 'globalreco_trackingTask'):
+         del process.globalreco_trackingTask
+  ```
 
 **Note**:
 the above is not an exact procedure; unfortunately,
