@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+"""
+Description:
+ Script to show modules of a sequence
+"""
+from __future__ import print_function
+import argparse
+import os
+import imp
+
+from JMETriggerAnalysis.Common.utils import *
+
+def getProcess(filepath):
+    _procTmp = imp.load_source('name', os.path.abspath(filepath))
+    if not hasattr(_procTmp, 'process'):
+       raise RuntimeError('getProcess("'+filepath+'")')
+    return getattr(_procTmp, 'process')
+
+#### main
+if __name__ == '__main__':
+   ### args
+   parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+
+   parser.add_argument('-c', '--config', dest='config', action='store', default=None, required=True,
+                       help='path to the configuration file')
+
+   parser.add_argument('-s', '--sequence', dest='sequence', action='store', default=None, required=True,
+                       help='name of the sequence in the target file')
+
+   parser.add_argument('-d', '--include-dependencies', dest='include_dependencies', action='store_true', default=False,
+                       help='include dependencies not included in the sequence of the target configuration file')
+
+   parser.add_argument('-e', '--include-es', dest='include_es', action='store_true', default=False,
+                       help='include ES modules (ESPrefer, ESSource, ESProducer)')
+
+   parser.add_argument('-n', '--name-only', dest='name_only', action='store_true', default=False,
+                       help='show only name of modules')
+
+   parser.add_argument('-i', '--ignore', dest='ignore', nargs='+', type=str, default=[],
+                       help='list of modules to be ignored in the target configuration file')
+
+   parser.add_argument('-o', '--only', dest='only', nargs='+', type=str, default=[],
+                       help='list of the only modules to be considered in the configuration file (takes precedence over --ignore, if module appears in both lists)')
+
+   parser.add_argument('-p', '--prefix-output', dest='prefix_output', action='store', default='',
+                       help='string used as prefix to the names of output modules (example: prefix="process.")')
+
+   parser.add_argument('-v', '--verbosity', dest='verbosity', action='store', type=int, default=0,
+                       help='verbosity of log messages')
+
+   opts, opts_unknown = parser.parse_known_args()
+   ###
+
+   log_prx = os.path.basename(__file__)+' -- '
+
+   process = None
+   if not os.path.isfile(opts.config):
+      raise RuntimeError(log_prx+'invalid path to configuration file [-c]: '+opts.config)
+   else:
+      process = getProcess(opts.config)
+
+   modulesToBeIgnored = sorted(list(set(opts.ignore)))
+   onlyModulesToBeConsidered = sorted(list(set(opts.only)))
+
+   orderedListOfModuleNames = orderedListOfModuleNamesFromSequence(process, opts.sequence)
+   depModuleNames = []
+   if opts.include_dependencies:
+      for _tmp in orderedListOfModuleNames:
+          depModuleNames += getModuleDependencies(getattr(process, _tmp))
+      depModuleNames = sorted(list(set(depModuleNames)))
+      depModuleNames = [_tmp for _tmp in depModuleNames if ((_tmp not in orderedListOfModuleNames) and processHasModule(process, _tmp))]
+
+   listOfModuleNames = []
+   if opts.include_dependencies:
+      listOfModuleNames += depModuleNames[:]
+   if opts.include_es:
+      for _tmp_set in [process.es_prefers_(), process.es_sources_(), process.es_producers_()]:
+          for _tmp in _tmp_set:
+              if (_tmp not in listOfModuleNames) and (_tmp not in orderedListOfModuleNames):
+                 listOfModuleNames += [_tmp]
+   listOfModuleNames += orderedListOfModuleNames
+   for _tmp in listOfModuleNames:
+       if _tmp in modulesToBeIgnored:
+          continue
+       if onlyModulesToBeConsidered and (_tmp not in onlyModulesToBeConsidered):
+          continue
+       _mod_dump = getattr(process, _tmp).dumpPython()
+       print(opts.prefix_output+_tmp+(not opts.name_only)*(' = '+_mod_dump))
