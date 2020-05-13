@@ -13,6 +13,9 @@ cmsrel CMSSW_11_1_0_pre6
 cd CMSSW_11_1_0_pre6/src
 cmsenv
 
+# [HGCal] fix to PID+EnergyRegression in TICL
+git cms-merge-topic cms-sw:29799
+
 # temporary workaround for PFSimParticle::trackerSurfaceMomentum
 # ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
 git cms-addpkg FastSimulation/Event
