@@ -10,7 +10,8 @@
   (in what follows, this will be referred to as `TRKvX_configDump.py`).
 
 * Execute
-  ```
+
+```
 ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/test/scripts/makeTRKCustomizationFunction.sh \
 -f TRKvX_configDump.py \
 -p MC_Tracking_vX
