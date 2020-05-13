@@ -330,9 +330,9 @@ def customize_hltPhase2_TRKv06(process):
         EcalSeveritiesToBeUsedInBadTowers = cms.vstring(),
         EcutTower = cms.double(-1000.0),
         HBGrid = cms.vdouble(-1.0, 1.0, 10.0, 100.0, 1000.0),
-        HBThreshold = cms.double(0.3),
-        HBThreshold1 = cms.double(0.1),
-        HBThreshold2 = cms.double(0.2),
+        HBThreshold = cms.double(1.2),
+        HBThreshold1 = cms.double(0.8),
+        HBThreshold2 = cms.double(1.2),
         HBWeight = cms.double(1.0),
         HBWeights = cms.vdouble(1.0, 1.0, 1.0, 1.0, 1.0),
         HEDGrid = cms.vdouble(-1.0, 1.0, 10.0, 100.0, 1000.0),
@@ -1431,7 +1431,7 @@ def customize_hltPhase2_TRKv06(process):
     )
 
     process.vertexReco = cms.Sequence(
-        process.initialStepPVSequence # pixelVertices moved to here, for now still keeping it
+        process.initialStepPVSequence
       + process.unsortedOfflinePrimaryVertices
       + process.trackWithVertexRefSelectorBeforeSorting
       + process.trackRefsForJetsBeforeSorting
@@ -1448,8 +1448,8 @@ def customize_hltPhase2_TRKv06(process):
       + process.offlineBeamSpot
       + process.otLocalReco
       + process.trackerClusterCheck
-      + process.pixelTracksSequence # pixeltracks
-      + process.pixelVerticesSequence # pixelvertices
+      + process.pixelTracksSequence
+      + process.pixelVerticesSequence
       + process.initialStepSequence
       + process.highPtTripletStepSequence
       + process.generalTracks
