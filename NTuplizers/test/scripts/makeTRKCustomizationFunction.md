@@ -69,6 +69,8 @@
          del process.globalreco_trackingTask
   ```
 
+---------
+
 **Note**:
 the above is not an exact procedure; unfortunately,
 there is no guarantee that the end-result will work,
@@ -78,3 +80,5 @@ and sometimes manual adjustments are necessary.
 Once the customization function technically works,
 it remains necessary to cross-check that the output tracks and vertices
 are the same as those obtained with the original TRK configuration.
+
+---------
