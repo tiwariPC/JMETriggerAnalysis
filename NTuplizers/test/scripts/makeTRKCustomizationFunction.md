@@ -15,27 +15,28 @@ ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/test/scripts/makeTRKCustomizatio
 -f TRKvX_configDump.py \
 -p MC_Tracking_vX
 ```
-
-* **Note**: since the modules in TRK configuration are sometimes renamed to include a prefix (currently, `hltPhase2`),
+  **Note**:
   the previous script only compares modules with the same exact name in the two configurations;
   several modules in the TRK configuration are currently renamed to include a prefix (`hltPhase2`, in recent versions),
   and these modules will thus not be compared to any in the Offline configuration
   (if a module included in the specified `cms.Path`/`Task`/`Sequence`
   has no homonym in the Offline configuration file,
-  it will be included in the output of the previous step).
+  it will be included by default in the output of the previous step).
   Therefore, due to this renaming, one might find more differences
   (with respect to the Offline configuration) than there actually are.
-  Ultimately, at the end of the previous step,
+  Ultimately, at the end of the previous step
   the renaming of the TRK modules is reverted
   in order to use the names of the Offline collections,
   and maintain full compatibility with the downstream modules.
-  This is necessary for a better integration of modules
+  This is necessary for a better integration of parts of the reconstruction
   for which we largely rely on developments done for
   the Offline reconstruction (e.g. PF, HGCal, MTD);
-  those modules will work without further modifications
-  only if the TRK modules are named as in the Offline reconstruction.
+  the corresponding modules will work without further modifications
+  only if the TRK modules are named as in the Offline reconstruction
+  (alternatively, every single test of new downstream modules that depend on tracking
+  would potentially require ad-hoc modifications to cope with the renaming of the TRK modules).
 
-* If this steps succeeds, its outputs can be found in a directory called `tmp`;
+* If this step succeeds, its outputs can be found in a directory called `tmp`;
   this contains the input configuration files (for TRK and Offline),
   and the modules in `MC_Tracking_vX` that differ across the two files; the latter list of modules is in the file `tmp/diff.py`,
   which includes the base of the final customization function.
@@ -51,7 +52,7 @@ ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/test/scripts/makeTRKCustomizatio
   use a `cms.Sequence` named `process.globalreco_tracking`
   (i.e. the name of the TRK reconstruction sequence in the Offline reconstruction).
 
-* **Note**: since we are currently using sequences instead of tasks,
+  **Note**: since we are currently using sequences instead of tasks,
   some modifications (usually, additions) might need to be made inside the TRK sequences
   in order to respect the modules' dependencies; for example,
   if any of the TRK sequences includes the module `process.caloTowerForTrk`,
@@ -68,11 +69,12 @@ ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/test/scripts/makeTRKCustomizatio
        del process.globalreco_trackingTask
 ```
 
-* **Note**: the above is not an exact procedure; unfortunately,
-  there is no guarantee that the end-result will work,
-  and give the exact same outputs as the starting TRK configuration.
-  Attention needs to be paid in every step,
-  and sometimes manual adjustments are necessary.
-  Once the customization function technically works,
-  it remains necessary to cross-check that the output tracks and vertices
-  are the same as those obtained with the original TRK configuration.
+**Note**:
+the above is not an exact procedure; unfortunately,
+there is no guarantee that the end-result will work,
+and give the exact same outputs as the starting TRK configuration.
+Attention needs to be paid in every step,
+and sometimes manual adjustments are necessary.
+Once the customization function technically works,
+it remains necessary to cross-check that the output tracks and vertices
+are the same as those obtained with the original TRK configuration.
