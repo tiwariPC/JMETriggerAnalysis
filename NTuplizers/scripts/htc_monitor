@@ -126,10 +126,11 @@ def monitor(options, log=''):
                      condor_subfiles += [_tmp_dirname+'/../condor.sub']
                else:
                   counter_toResubmit += 1
-                  if os.path.isfile(_tmp_dirname+'/flag.queue'):
-                     EXE('rm '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
-                  if not os.path.isfile(_tmp_dirname+'/flag.skip'):
-                     EXE('touch '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
+                  if options.resubmit:
+                     if os.path.isfile(_tmp_dirname+'/flag.queue'):
+                        EXE('rm '+_tmp_dirname+'/flag.queue', verbose=options.verbose, dry_run=options.dry_run)
+                     if not os.path.isfile(_tmp_dirname+'/flag.skip'):
+                        EXE('touch '+_tmp_dirname+'/flag.skip', verbose=options.verbose, dry_run=options.dry_run)
 
     if options.local:
        local_exefiles = sorted(set([os.path.abspath(_tmp) for _tmp in local_exefiles]))
