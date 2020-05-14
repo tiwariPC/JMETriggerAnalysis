@@ -13,7 +13,7 @@ ODIR=$1
 
 if [ -d ${ODIR} ]; then
   echo "output directory already exists: ${ODIR}"
-  return
+  exit 1
 fi
 
 JDIR=${1}_json
