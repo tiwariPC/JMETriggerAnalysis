@@ -56,7 +56,8 @@
   for the final object that combines all the (sub-)sequences
   relevant to track and vertex reconstruction
   use a `cms.Sequence` named `process.globalreco_tracking`
-  (i.e. the name of the TRK reconstruction sequence in the Offline reconstruction).
+  (use this exact name, as this is assumed to be the name of the TRK sequence
+  in other customization functions, e.g. the one for Jets/MET).
 
   **Note**: since we are currently using sequences instead of tasks,
   some modifications (usually, additions) might need to be made inside the TRK sequences
