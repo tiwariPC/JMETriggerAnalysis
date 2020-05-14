@@ -26,11 +26,9 @@ class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
   TH1D *h_track_mult_ = nullptr;
   TH1D *h_track_pt_ = nullptr;
+  TH1D *h_track_pt_2_ = nullptr;
   TH1D *h_track_eta_ = nullptr;
   TH1D *h_track_phi_ = nullptr;
-  TH1D *h_track_outerPt_ = nullptr;
-  TH1D *h_track_outerEta_ = nullptr;
-  TH1D *h_track_outerPhi_ = nullptr;
 };
 
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
@@ -45,14 +43,11 @@ TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
-  h_track_mult_ = fs->make<TH1D>("track_mult", "track_mult", 240, 0, 12000);
+  h_track_mult_ = fs->make<TH1D>("track_mult", "track_mult", 240, 0, 12000.);
   h_track_pt_ = fs->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
+  h_track_pt_2_ = fs->make<TH1D>("track_pt_2", "track_pt_2", 600, 0, 600.);
   h_track_eta_ = fs->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
   h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
-
-  h_track_outerPt_ = fs->make<TH1D>("track_outerPt", "track_outerPt", 600, 0, 5.);
-  h_track_outerEta_ = fs->make<TH1D>("track_outerEta", "track_outerEta", 600, -5., 5.);
-  h_track_outerPhi_ = fs->make<TH1D>("track_outerPhi", "track_outerPhi", 600, -3., 3.);
 }
 
 void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
@@ -62,11 +57,9 @@ void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     h_track_mult_->Fill(tracks->size());
     for(auto const& trk : *tracks){
       h_track_pt_->Fill(trk.pt());
+      h_track_pt_2_->Fill(trk.pt());
       h_track_eta_->Fill(trk.eta());
       h_track_phi_->Fill(trk.phi());
-      h_track_outerPt_->Fill(trk.outerPt());
-      h_track_outerEta_->Fill(trk.outerEta());
-      h_track_outerPhi_->Fill(trk.outerPhi());
     }
   }
   else {
