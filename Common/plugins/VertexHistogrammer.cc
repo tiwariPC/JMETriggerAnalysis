@@ -35,6 +35,7 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
   TH1D *h_vertex_nTracks_ = nullptr;
 
   TH1D *h_track_pt_ = nullptr;
+  TH1D *h_track_pt_2_ = nullptr;
   TH1D *h_track_eta_ = nullptr;
   TH1D *h_track_phi_ = nullptr;
   TH1D *h_track_dxy_ = nullptr;
@@ -62,6 +63,7 @@ VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
   h_vertex_nTracks_ = fs->make<TH1D>("vertex_nTracks", "vertex_nTracks", 120, 0, 480);
 
   h_track_pt_ = fs->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
+  h_track_pt_2_ = fs->make<TH1D>("track_pt_2", "track_pt_2", 600, 0, 600.);
   h_track_eta_ = fs->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
   h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
   h_track_dxy_ = fs->make<TH1D>("track_dxy", "track_dxy", 600, -1., 1.);
@@ -85,6 +87,7 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
       if(vtx.hasRefittedTracks()){
         for(auto const& trk : vtx.refittedTracks()){
           h_track_pt_->Fill(trk.pt());
+          h_track_pt_2_->Fill(trk.pt());
           h_track_eta_->Fill(trk.eta());
           h_track_phi_->Fill(trk.phi());
           h_track_dxy_->Fill(trk.dxy(vtx.position()));
@@ -93,11 +96,13 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
       }
       else {
         for(std::vector<reco::TrackBaseRef>::const_iterator trk_it = vtx.tracks_begin(); trk_it != vtx.tracks_end(); ++trk_it){
-          h_track_pt_->Fill((*trk_it)->pt());
-          h_track_eta_->Fill((*trk_it)->eta());
-          h_track_phi_->Fill((*trk_it)->phi());
-          h_track_dxy_->Fill((*trk_it)->dxy(vtx.position()));
-          h_track_dz_->Fill((*trk_it)->dz(vtx.position()));
+          auto const& trk_ref(*trk_it);
+          h_track_pt_->Fill(trk_ref->pt());
+          h_track_pt_2_->Fill(trk_ref->pt());
+          h_track_eta_->Fill(trk_ref->eta());
+          h_track_phi_->Fill(trk_ref->phi());
+          h_track_dxy_->Fill(trk_ref->dxy(vtx.position()));
+          h_track_dz_->Fill(trk_ref->dz(vtx.position()));
         }
       }
     }
