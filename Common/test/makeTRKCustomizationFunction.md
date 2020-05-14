@@ -4,10 +4,10 @@
   and open the TRK `cff` file that contains the definition of the TRK sequence of interest
   (this will be referred to in the following as `MC_Tracking_vX_cff.py`);
   if necessary, adjust the configuration in order to have the final
-  track-reconstruction sequence (usually called `MC_Tracking_vX`) and vertex-reconstruction sequence (usually called `vertexReco`)
+  track-reconstruction sequence/path (usually called `MC_Tracking_vX`) and vertex-reconstruction sequence (usually called `vertexReco`)
   inside the same `cms.Path`/`Task`/`Sequence` (this will be referred to in the following as `MC_Tracking_vX`);
   the goal is to have a single `cms.Path`/`Task`/`Sequence` that contains
-  all (and only) the modules we plan to include in the customization function.
+  all (and *only*) the modules we plan to include in the customization function.
 
 * Create the full TRK configuration file by dumping the TRK `cfg` file via `edmConfigDump`
   (in what follows, this will be referred to as `TRKvX_configDump.py`).
@@ -46,14 +46,15 @@
   the latter list of modules is in the file `tmp/diff.py`,
   which constitutes the base of the final customization function.
 
-* Modify the name of customization function in the file `tmp/diff.py`, if necessary.
+* Modify the name of the customization function in the file `tmp/diff.py`, if necessary.
 
 * Go back to the file `MC_Tracking_vX_cff.py`,
   copy all the sequences relevant to track and vertex reconstruction,
   and add them at the bottom of the customization function in `tmp/diff.py` (before the `return` statement);
   if needed, revert the renaming of the modules inside said sequences,
   to be consistent with the modules already present in the function;
-  for the final object that combines all the (sub-)sequences relevant to track	and vertex reconstruction
+  for the final object that combines all the (sub-)sequences
+  relevant to track and vertex reconstruction
   use a `cms.Sequence` named `process.globalreco_tracking`
   (i.e. the name of the TRK reconstruction sequence in the Offline reconstruction).
 
@@ -61,7 +62,7 @@
   some modifications (usually, additions) might need to be made inside the TRK sequences
   in order to respect the modules' dependencies; for example,
   if any of the TRK sequences includes the module `process.caloTowerForTrk`,
-  this must be preceeded by the sequence `process.hcalGlobalRecoSequence`
+  this usually has to be preceeded by the sequence `process.hcalGlobalRecoSequence`
   (see [here](https://github.com/missirol/JMETriggerAnalysis/blob/0b0729437e6563838e790d37dabf4707da834ae4/Common/python/hltPhase2_TRKv06.py#L1166) for an example).
 
 * Although not strictly necessary,
