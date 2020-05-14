@@ -1219,6 +1219,7 @@ def customize_hltPhase2_TRKv02(process):
     process.initialStepPVSequence = cms.Sequence(
         process.firstStepPrimaryVerticesUnsorted
       + process.initialStepTrackRefsForJets
+      + process.hcalGlobalRecoSequence
       + process.caloTowerForTrk
       + process.ak4CaloJetsForTrk
       + process.firstStepPrimaryVertices
