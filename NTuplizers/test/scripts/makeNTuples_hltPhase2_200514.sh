@@ -29,6 +29,8 @@ recoKeys=(
   HLT_TRKv02_TICL
   HLT_TRKv06
   HLT_TRKv06_TICL
+  HLT_TRKv06_skimmedTracks
+  HLT_TRKv06_TICL_skimmedTracks
 )
 
 JDIR=${1}_json
