@@ -6,23 +6,13 @@ def customize_hltPhase2_TRKv06(process):
     ### Modules (taken from configuration developed by TRK POG)
     ###
 
-    process.TrackProducer = cms.EDProducer('TrackProducer',
-        AlgorithmName = cms.string('undefAlgorithm'),
-        Fitter = cms.string('KFFittingSmootherWithOutliersRejectionAndRK'),
-        GeometricInnerState = cms.bool(False),
-        MeasurementTracker = cms.string(''),
-        MeasurementTrackerEvent = cms.InputTag('MeasurementTrackerEvent'),
-        NavigationSchool = cms.string('SimpleNavigationSchool'),
-        Propagator = cms.string('RungeKuttaTrackerPropagator'),
-        SimpleMagneticField = cms.string(''),
-        TTRHBuilder = cms.string('WithTrackAngle'),
-        TrajectoryInEvent = cms.bool(False),
-        alias = cms.untracked.string('ctfWithMaterialTracks'),
-        beamSpot = cms.InputTag('offlineBeamSpot'),
-        clusterRemovalInfo = cms.InputTag(''),
-        src = cms.InputTag('ckfTrackCandidates'),
-        useHitsSplitting = cms.bool(False),
-        useSimpleMF = cms.bool(False)
+    process.TTRHBuilderAngleAndTemplate = cms.ESProducer('TkTransientTrackingRecHitBuilderESProducer',
+        ComponentName = cms.string('WithAngleAndTemplate'),
+        ComputeCoarseLocalPositionFromDisk = cms.bool(False),
+        Matcher = cms.string('StandardMatcher'),
+        Phase2StripCPE = cms.string('Phase2StripCPE'),
+        PixelCPE = cms.string('PixelCPEGeneric'),
+        StripCPE = cms.string('StripCPEfromTrackAngle')
     )
     
     process.PixelCPEGenericESProducer = cms.ESProducer('PixelCPEGenericESProducer',
