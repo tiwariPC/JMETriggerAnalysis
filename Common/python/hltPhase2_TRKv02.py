@@ -6,23 +6,13 @@ def customize_hltPhase2_TRKv02(process):
     ### Modules (taken from configuration developed by TRK POG)
     ###
 
-    process.TrackProducer = cms.EDProducer('TrackProducer',
-        AlgorithmName = cms.string('undefAlgorithm'),
-        Fitter = cms.string('KFFittingSmootherWithOutliersRejectionAndRK'),
-        GeometricInnerState = cms.bool(False),
-        MeasurementTracker = cms.string(''),
-        MeasurementTrackerEvent = cms.InputTag('MeasurementTrackerEvent'),
-        NavigationSchool = cms.string('SimpleNavigationSchool'),
-        Propagator = cms.string('RungeKuttaTrackerPropagator'),
-        SimpleMagneticField = cms.string(''),
-        TTRHBuilder = cms.string('WithTrackAngle'),
-        TrajectoryInEvent = cms.bool(False),
-        alias = cms.untracked.string('ctfWithMaterialTracks'),
-        beamSpot = cms.InputTag('offlineBeamSpot'),
-        clusterRemovalInfo = cms.InputTag(''),
-        src = cms.InputTag('ckfTrackCandidates'),
-        useHitsSplitting = cms.bool(False),
-        useSimpleMF = cms.bool(False)
+    process.TTRHBuilderAngleAndTemplate = cms.ESProducer('TkTransientTrackingRecHitBuilderESProducer',
+        ComponentName = cms.string('WithAngleAndTemplate'),
+        ComputeCoarseLocalPositionFromDisk = cms.bool(False),
+        Matcher = cms.string('StandardMatcher'),
+        Phase2StripCPE = cms.string('Phase2StripCPE'),
+        PixelCPE = cms.string('PixelCPEGeneric'),
+        StripCPE = cms.string('StripCPEfromTrackAngle')
     )
     
     process.PixelCPEGenericESProducer = cms.ESProducer('PixelCPEGenericESProducer',
@@ -166,9 +156,9 @@ def customize_hltPhase2_TRKv02(process):
         EcalSeveritiesToBeUsedInBadTowers = cms.vstring(),
         EcutTower = cms.double(-1000.0),
         HBGrid = cms.vdouble(-1.0, 1.0, 10.0, 100.0, 1000.0),
-        HBThreshold = cms.double(0.3),
-        HBThreshold1 = cms.double(0.1),
-        HBThreshold2 = cms.double(0.2),
+        HBThreshold = cms.double(1.2),
+        HBThreshold1 = cms.double(0.8),
+        HBThreshold2 = cms.double(1.2),
         HBWeight = cms.double(1.0),
         HBWeights = cms.vdouble(1.0, 1.0, 1.0, 1.0, 1.0),
         HEDGrid = cms.vdouble(-1.0, 1.0, 10.0, 100.0, 1000.0),
@@ -1200,7 +1190,7 @@ def customize_hltPhase2_TRKv02(process):
         minSignificance = cms.double(10.0),
         secondaryVertices = cms.InputTag('trackVertexArbitrator')
     )
-
+    
     ###
     ### Sequences
     ###
@@ -1253,16 +1243,16 @@ def customize_hltPhase2_TRKv02(process):
     )
 
     process.vertexReco = cms.Sequence(
-        process.ak4CaloJetsForTrk +
-        process.unsortedOfflinePrimaryVertices +
-        process.trackWithVertexRefSelectorBeforeSorting +
-        process.trackRefsForJetsBeforeSorting +
-        process.offlinePrimaryVertices +
-        process.offlinePrimaryVerticesWithBS +
-        process.inclusiveVertexFinder +
-        process.vertexMerger +
-        process.trackVertexArbitrator +
-        process.inclusiveSecondaryVertices
+        process.ak4CaloJetsForTrk
+      + process.unsortedOfflinePrimaryVertices
+      + process.trackWithVertexRefSelectorBeforeSorting
+      + process.trackRefsForJetsBeforeSorting
+      + process.offlinePrimaryVertices
+      + process.offlinePrimaryVerticesWithBS
+      + process.inclusiveVertexFinder
+      + process.vertexMerger
+      + process.trackVertexArbitrator
+      + process.inclusiveSecondaryVertices
     )
 
     process.globalreco_tracking = cms.Sequence(
