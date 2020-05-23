@@ -44,7 +44,7 @@ opts.register('globalTag', None,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
 
-opts.register('reco', 'hltPhase2',
+opts.register('reco', 'HLT_TRKv06_TICL',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
@@ -58,6 +58,11 @@ opts.register('pfdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
               'added monitoring histograms for selected PF-Candidates')
+
+opts.register('verbosity', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'level of output verbosity')
 
 opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
@@ -527,16 +532,17 @@ if opts.dumpPython is not None:
    open(opts.dumpPython, 'w').write(process.dumpPython())
 
 # print-outs
-print '--- jmeTriggerNTuple_cfg.py ---'
-print ''
-print 'option: output =', opts.output
-print 'option: reco =', opts.reco, '(skimTracks = '+str(opt_skimTracks)+')'
-print 'option: trkdqm =', opts.trkdqm
-print 'option: pfdqm =', opts.pfdqm
-print 'option: dumpPython =', opts.dumpPython
-print ''
-print 'process.GlobalTag =', process.GlobalTag.dumpPython()
-print 'process.source =', process.source.dumpPython()
-print 'process.maxEvents =', process.maxEvents.dumpPython()
-print 'process.options =', process.options.dumpPython()
-print '-------------------------------'
+if opts.verbosity > 0:
+   print '--- jmeTriggerNTuple_cfg.py ---'
+   print ''
+   print 'option: output =', opts.output
+   print 'option: reco =', opts.reco, '(skimTracks = '+str(opt_skimTracks)+')'
+   print 'option: trkdqm =', opts.trkdqm
+   print 'option: pfdqm =', opts.pfdqm
+   print 'option: dumpPython =', opts.dumpPython
+   print ''
+   print 'process.GlobalTag =', process.GlobalTag.dumpPython()
+   print 'process.source =', process.source.dumpPython()
+   print 'process.maxEvents =', process.maxEvents.dumpPython()
+   print 'process.options =', process.options.dumpPython()
+   print '-------------------------------'
