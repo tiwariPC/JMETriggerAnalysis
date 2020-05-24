@@ -61,8 +61,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
     by HGCal to include TICL in the reconstruction;
     apply this customization only after the JME customization function.
 
-* **Example**: configuration file to run TRK(v06)+TICL+JME HLT-like reconstruction on RAW
-  (remove the `--customise_commands` directive in order to create the EDM output files).
+* **Example**: configuration file to run TRK(v06)+TICL+JME HLT-like reconstruction on RAW.
   ```shell
   cmsDriver.py step3 \
     --geometry Extended2026D49 --era Phase2C9 \
