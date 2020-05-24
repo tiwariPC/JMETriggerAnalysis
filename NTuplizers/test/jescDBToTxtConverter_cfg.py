@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process('JESCTXT')
 
 process.load('Configuration.StandardSequences.Services_cff')
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
@@ -12,6 +12,11 @@ opts.register('gt', None,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
+
+opts.register('onlyHLT', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'include only HLT-JECs')
 
 opts.parseArguments()
 
@@ -28,28 +33,42 @@ process.GlobalTag.globaltag = opts.gt
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 process.source = cms.Source('EmptySource')
 
-process.readAK4PF = cms.EDAnalyzer('JetCorrectorDBReader',  
-  # below is the communication to the database 
-  payloadName = cms.untracked.string('AK4PF'),
-  # this is used ONLY for the name of the printed txt files.
-  # You can use any name that you like, but it is recommended to use the GT name that you retrieved the files from.
-  globalTag = cms.untracked.string(opts.tag),
+process.readAK4CaloHLT = cms.EDAnalyzer('JetCorrectorDBReader',
+  # label of DB record
+  payloadName = cms.untracked.string('AK4CaloHLT'),
+
+  # print to stdout
   printScreen = cms.untracked.bool(False),
+
+  # create output .txt file(s)
   createTextFile = cms.untracked.bool(True),
+
+  # prefix of name of output .txt file(s)
+  globalTag = cms.untracked.string(opts.tag),
 )
 
-process.readAK4PFchs   = process.readAK4PF.clone(payloadName = 'AK4PFchs')
-process.readAK4PFPuppi = process.readAK4PF.clone(payloadName = 'AK4PFPuppi')
-
-process.readAK8PF      = process.readAK4PF.clone(payloadName = 'AK8PF')
-process.readAK8PFchs   = process.readAK4PF.clone(payloadName = 'AK8PFchs')
-process.readAK8PFPuppi = process.readAK4PF.clone(payloadName = 'AK8PFPuppi')
+process.readAK8CaloHLT = process.readAK4CaloHLT.clone(payloadName = 'AK8CaloHLT')
+process.readAK4PFHLT   = process.readAK4CaloHLT.clone(payloadName = 'AK4PFHLT')
+process.readAK8PFHLT   = process.readAK4CaloHLT.clone(payloadName = 'AK8PFHLT')
 
 process.p = cms.Path(
-    process.readAK4PF
-  * process.readAK4PFchs
-  * process.readAK4PFPuppi
-  * process.readAK8PF
-  * process.readAK8PFchs
-  * process.readAK8PFPuppi
+    process.readAK4CaloHLT
+  + process.readAK8CaloHLT
+  + process.readAK4PFHLT
+  + process.readAK8PFHLT
 )
+
+if not opts.onlyHLT:
+   process.readAK4PF      = process.readAK4CaloHLT.clone(payloadName = 'AK4PF')
+   process.readAK4PFchs   = process.readAK4CaloHLT.clone(payloadName = 'AK4PFchs')
+   process.readAK4PFPuppi = process.readAK4CaloHLT.clone(payloadName = 'AK4PFPuppi')
+   process.readAK8PF      = process.readAK4CaloHLT.clone(payloadName = 'AK8PF')
+   process.readAK8PFchs   = process.readAK4CaloHLT.clone(payloadName = 'AK8PFchs')
+   process.readAK8PFPuppi = process.readAK4CaloHLT.clone(payloadName = 'AK8PFPuppi')
+
+   process.p += process.readAK4PF
+   process.p += process.readAK4PFchs
+   process.p += process.readAK4PFPuppi
+   process.p += process.readAK8PF
+   process.p += process.readAK8PFchs
+   process.p += process.readAK8PFPuppi
