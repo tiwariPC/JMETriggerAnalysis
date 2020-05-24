@@ -4,8 +4,6 @@ JMETriggerAnalysis
 CMSSW Packages for JetMET Trigger Studies
 
 #### Setup
-
-Set up CMSSW area:
 ```shell
 cmsrel CMSSW_11_1_0_pre6
 cd CMSSW_11_1_0_pre6/src
@@ -90,6 +88,8 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
 * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
   [NTuplizers/python/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/NTuplizers/python).
 
+---------
+
 #### Notes
 
  * [HLT Phase-2 Twiki](https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2)
@@ -98,3 +98,5 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
    ```shell
    dasgoclient --query="dataset dataset=/*/Phase2HLTTDRWinter20*/*RAW*"
    ```
+
+---------
