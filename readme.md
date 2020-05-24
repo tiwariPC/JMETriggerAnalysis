@@ -36,33 +36,32 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
 * Customization functions are available under
   [`Common/python/`](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python):
 
-  - [*TRKv00*](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv00.py#L3),
-    [*TRKv02*](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv02.py#L3),
-    [*TRKv06*](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv06.py#L3):
+  - [**TRKv00**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv00.py#L3),
+    [**TRKv02**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv02.py#L3),
+    [**TRKv06**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv06.py#L3):
     customizations extracted from standalone configs developed by the TRK POG;
     guidelines to create such a customization function
     from a standalone `trackingOnly` configuration can be found in
-    [Common/test/makeTRKCustomizationFunction.md]
-    (https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/test/makeTRKCustomizationFunction.md).
+    [Common/test/makeTRKCustomizationFunction.md](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/test/makeTRKCustomizationFunction.md).
 
-  - [*``skimmedTracks''*](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_skimmedTracks.py#L3):
+  - [**``skimmedTracks''**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_skimmedTracks.py#L3):
     an addon to the standard TRK sequence,
     to select a subset of tracks based on their compatibility
     with the leading pixel vertices.
     If using one of the TRK customization functions,
     apply the skimmedTracks customization only after the TRK customization function.
 
-  - [*JME*](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L13):
+  - [**JME**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L13):
     customizations to build HLT-like Jets and MET collections;
     currently, the JME function also includes the backbone of
     the reconstruction sequence (largely taken from the `RECO` step),
     incl. some HLT-like modifications to the ParticleFlow modules.
 
-  - [*TICL*](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L885):
+  - [**TICL**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L885):
     a wrapper to apply the customization function maintained
     by HGCal to include TICL in the reconstruction.
 
-* *Example*: create configuration file to run TRK(v06)+TICL+JME HLT-like reconstruction on RAW:
+* **Example**: create configuration file to run TRK(v06)+TICL+JME HLT-like reconstruction on RAW:
   ```shell
   cmsDriver.py step3 \
     --geometry Extended2026D49 --era Phase2C9 \
