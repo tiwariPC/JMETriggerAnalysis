@@ -44,12 +44,13 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
     from a standalone `trackingOnly` configuration can be found in
     [Common/test/makeTRKCustomizationFunction.md](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/test/makeTRKCustomizationFunction.md).
 
-  - [**``skimmedTracks''**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_skimmedTracks.py#L3):
+  - [**''skimmed tracks''**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_skimmedTracks.py#L3):
     an addon to the standard TRK sequence,
     to select a subset of tracks based on their compatibility
     with the leading pixel vertices.
     If using one of the TRK customization functions,
-    apply the skimmedTracks customization only after the TRK customization function.
+    apply the ''skimmed tracks'' customization only after the TRK customization function;
+    this function can be applied after any of TRK customization functions.
 
   - [**JME**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L13):
     customizations to build HLT-like Jets and MET collections;
@@ -59,7 +60,8 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
 
   - [**TICL**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L885):
     a wrapper to apply the customization function maintained
-    by HGCal to include TICL in the reconstruction.
+    by HGCal to include TICL in the reconstruction;
+    apply this customization only after the JME customization function.
 
 * **Example**: create configuration file to run TRK(v06)+TICL+JME HLT-like reconstruction on RAW:
   ```shell
