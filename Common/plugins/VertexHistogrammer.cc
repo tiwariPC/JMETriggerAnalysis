@@ -33,6 +33,12 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
   TH1D *h_vertex_normChi2_ = nullptr;
   TH1D *h_vertex_ndof_ = nullptr;
   TH1D *h_vertex_nTracks_ = nullptr;
+  TH1D *h_vertex0_x_ = nullptr;
+  TH1D *h_vertex0_y_ = nullptr;
+  TH1D *h_vertex0_z_ = nullptr;
+  TH1D *h_vertex0_normChi2_ = nullptr;
+  TH1D *h_vertex0_ndof_ = nullptr;
+  TH1D *h_vertex0_nTracks_ = nullptr;
 
   TH1D *h_track_pt_ = nullptr;
   TH1D *h_track_pt_2_ = nullptr;
@@ -61,6 +67,12 @@ VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
   h_vertex_normChi2_ = fs->make<TH1D>("vertex_normChi2", "vertex_normChi2", 600, 0, 12);
   h_vertex_ndof_ = fs->make<TH1D>("vertex_ndof", "vertex_ndof", 120, 0, 480);
   h_vertex_nTracks_ = fs->make<TH1D>("vertex_nTracks", "vertex_nTracks", 120, 0, 480);
+  h_vertex0_x_ = fs->make<TH1D>("vertex0_x", "vertex0_x", 600, -0.1, 0.1);
+  h_vertex0_y_ = fs->make<TH1D>("vertex0_y", "vertex0_y", 600, -0.1, 0.1);
+  h_vertex0_z_ = fs->make<TH1D>("vertex0_z", "vertex0_z", 600, -30, 30);
+  h_vertex0_normChi2_ = fs->make<TH1D>("vertex0_normChi2", "vertex0_normChi2", 600, 0, 12);
+  h_vertex0_ndof_ = fs->make<TH1D>("vertex0_ndof", "vertex0_ndof", 120, 0, 480);
+  h_vertex0_nTracks_ = fs->make<TH1D>("vertex0_nTracks", "vertex0_nTracks", 120, 0, 480);
 
   h_track_pt_ = fs->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
   h_track_pt_2_ = fs->make<TH1D>("track_pt_2", "track_pt_2", 600, 0, 600.);
@@ -76,7 +88,18 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
   if(vertices.isValid()){
     h_vertex_mult_->Fill(vertices->size());
 
-    for(auto const& vtx : *vertices){
+    for(uint idx=0; idx<vertices->size(); ++idx){
+      auto const& vtx(vertices->at(idx));
+
+      if(idx == 0){
+        h_vertex0_x_->Fill(vtx.x());
+        h_vertex0_y_->Fill(vtx.y());
+        h_vertex0_z_->Fill(vtx.z());
+        h_vertex0_normChi2_->Fill(vtx.normalizedChi2());
+        h_vertex0_ndof_->Fill(vtx.ndof());
+        h_vertex0_nTracks_->Fill(vtx.nTracks());
+      }
+
       h_vertex_x_->Fill(vtx.x());
       h_vertex_y_->Fill(vtx.y());
       h_vertex_z_->Fill(vtx.z());
