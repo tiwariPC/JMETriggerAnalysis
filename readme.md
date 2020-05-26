@@ -64,7 +64,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
 
    - [**TICL**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L885):
      a wrapper to apply the customization function maintained
-     by HGCal to include TICL in the reconstruction;
+     by the HGCal DPG to include TICL in the reconstruction;
      apply this customization only after the JME customization function.
 
  * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
