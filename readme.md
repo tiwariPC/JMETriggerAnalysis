@@ -1,7 +1,7 @@
 ### Tools for JME studies on the Phase-2 HLT reconstruction
 
 * [Setup](#setup)
-* [Instructions to generate configuration file(s) for HLT Phase-2 reconstruction](#instructions-to-generate-configuration-file(s)-for-hlt-phase-2-reconstruction)
+* [Instructions to generate configuration files for HLT Phase-2 reconstruction](#instructions-to-generate-configuration-files-for-hlt-phase-2-reconstruction)
 * [Inputs for the HLT Jet Energy Scale Corrections](#inputs-for-the-hlt-jet-energy-scale-corrections)
 * [Additional Notes](#additional-notes)
 
@@ -25,7 +25,7 @@ git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phas
 scram b
 ```
 
-### Instructions to generate configuration file(s) for HLT Phase-2 reconstruction
+### Instructions to generate configuration files for HLT Phase-2 reconstruction
 
 Configuration files are created via `cmsDriver.py`,
 adding (HLT) customizations to the Phase-2 Offline reconstruction;
