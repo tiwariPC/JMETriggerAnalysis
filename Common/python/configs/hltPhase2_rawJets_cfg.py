@@ -1,4 +1,4 @@
-from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv06_TICL_cfg import cms, process
+from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
 
 # command-line options
 import FWCore.ParameterSet.VarParsing as vpo

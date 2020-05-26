@@ -91,7 +91,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
    ```
 
  * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
-   [NTuplizers/python/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/NTuplizers/python).
+   [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs).
 
 ----------
 
@@ -100,11 +100,11 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
 A standalone configuration file to create inputs
 for the HLT Jet Energy Scale Corrections (JESC) derivation
 can be found under
-[NTuplizers/python/hltPhase2_rawJets_cfg.py](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/NTuplizers/python/hltPhase2_rawJets_cfg.py).
+[Common/python/configs/hltPhase2_rawJets_cfg.py](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/configs/hltPhase2_rawJets_cfg.py).
 
   * The configuration file loads the latest baseline reconstruction sequence
     (usually, as defined in one of the files in
-    [NTuplizers/python/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/NTuplizers/python)
+    [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs)
 
   * It runs on RAW (without 2-file solution),
     and creates an EDM file that contains

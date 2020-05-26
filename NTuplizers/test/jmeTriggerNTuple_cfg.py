@@ -83,12 +83,12 @@ if opt_reco.endswith('_skimmedTracks'):
    opt_reco = opt_reco[:-len('_skimmedTracks')]
    opt_skimTracks = True
 
-if   opt_reco == 'HLT_TRKv00':      from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv00_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv00_TICL': from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv00_TICL_cfg import cms, process
-elif opt_reco == 'HLT_TRKv02':      from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv02_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv02_TICL': from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv02_TICL_cfg import cms, process
-elif opt_reco == 'HLT_TRKv06':      from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv06_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv06_TICL': from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv06_TICL_cfg import cms, process
+if   opt_reco == 'HLT_TRKv00':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg      import cms, process
+elif opt_reco == 'HLT_TRKv00_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg import cms, process
+elif opt_reco == 'HLT_TRKv02':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg      import cms, process
+elif opt_reco == 'HLT_TRKv02_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg import cms, process
+elif opt_reco == 'HLT_TRKv06':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg      import cms, process
+elif opt_reco == 'HLT_TRKv06_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
 
