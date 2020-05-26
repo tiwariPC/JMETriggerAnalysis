@@ -277,7 +277,7 @@ process.RECOoutput = cms.OutputModule('PoolOutputModule',
   fileName = cms.untracked.string(opts.output),
   outputCommands = cms.untracked.vstring((
     'drop *',
-    'keep *_triggerResults_*_*',
+    'keep edmTriggerResults_*_*_*',
   )),
   splitLevel = cms.untracked.int32(0)
 )
