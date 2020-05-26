@@ -2,6 +2,7 @@
 
 * [Setup](#setup)
 * [Instructions to generate configuration files for HLT Phase-2 reconstruction](#instructions-to-generate-configuration-files-for-hlt-phase-2-reconstruction)
+* [Configuration with JME trigger paths for testing](#configuration-with-jme-trigger-paths-for-testing)
 * [Inputs for HLT Jet Energy Scale Corrections workflow](#inputs-for-hlt-jet-energy-scale-corrections-workflow)
 * [Additional Notes](#additional-notes)
 
@@ -92,6 +93,23 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n' \
      --python_filename hltPhase2_TRKv06_TICL_cfg.py
    ```
+
+----------
+
+### Configuration with JME trigger paths for testing
+
+A standalone configuration file including
+a set of Single-Jet and MET trigger paths
+is available for testing under
+[Common/python/configs/testTriggerPaths_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs/testTriggerPaths_cfg.py)
+
+It can be tested as follows:
+```
+cmsRun Common/python/configs/testTriggerPaths_cfg.py [reco=TRKv06_TICL] [maxEvents=1]
+```
+where the parts in parentheses denote some of the optional command-line arguments.
+The option `reco`, in particular, can be used to choose the inputs to the PF reconstruction (e.g. TRKv6+TICL);
+the keywords supported for `reco` can be checked by running `python testTriggerPaths_cfg.py reco=None`.
 
 ----------
 
