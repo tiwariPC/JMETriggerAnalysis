@@ -69,14 +69,14 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
                 source_towers = cms.InputTag("towerMaker"),
                 superClustersArePF = cms.bool(True)
             ), 
-#            cms.PSet(	
+#            cms.PSet(
 #                importerName = cms.string('ConversionTrackImporter'),
 #                source = cms.InputTag("pfConversions")
-#            ), 
+#            ),
 #            cms.PSet(
 #                importerName = cms.string('NuclearInteractionTrackImporter'),
 #                source = cms.InputTag("pfDisplacedTrackerVertex")
-#            ), 
+#            ),
             cms.PSet(
                 DPtOverPtCuts_byTrackAlgo = cms.vdouble(
                     10.0, 10.0, 10.0, 10.0, 10.0, 
@@ -93,32 +93,32 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
                 source = cms.InputTag("pfTrack"),
                 useIterativeTracking = cms.bool(True),
                 veto = cms.InputTag("hgcalTrackCollection","TracksInHGCal")
-            ), 
+            ),
             cms.PSet(
                 BCtoPFCMap = cms.InputTag("particleFlowSuperClusterECAL","PFClusterAssociationEBEE"),
                 importerName = cms.string('ECALClusterImporter'),
                 source = cms.InputTag("particleFlowClusterECAL")
-            ), 
+            ),
             cms.PSet(
                 importerName = cms.string('GenericClusterImporter'),
                 source = cms.InputTag("particleFlowClusterHCAL")
-            ), 
+            ),
             cms.PSet(
                 importerName = cms.string('GenericClusterImporter'),
                 source = cms.InputTag("particleFlowBadHcalPseudoCluster")
-            ), 
+            ),
             cms.PSet(
                 importerName = cms.string('GenericClusterImporter'),
                 source = cms.InputTag("particleFlowClusterHO")
-            ), 
+            ),
             cms.PSet(
                 importerName = cms.string('GenericClusterImporter'),
                 source = cms.InputTag("particleFlowClusterHF")
-            ), 
+            ),
             cms.PSet(
                 importerName = cms.string('GenericClusterImporter'),
                 source = cms.InputTag("particleFlowClusterPS")
-            ), 
+            ),
             cms.PSet(
                 importerName = cms.string('TrackTimingImporter'),
                 timeErrorMap = cms.InputTag("tofPID","sigmat0"),
@@ -600,7 +600,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     )
 
     ## Sequence: MET PF, Raw and Type-1
-    process.HLTPFMETReconstruction = cms.Sequence(
+    process.HLTPFMETsReconstruction = cms.Sequence(
         process.hltPFMET
       +(process.hltPFMETJetCorrectorL1
       * process.hltPFMETJetCorrectorL2
@@ -784,7 +784,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       + process.HLTAK4PFJetsReconstruction
       + process.HLTAK8PFJetsReconstruction
       + process.HLTPFJetsCHSReconstruction
-      + process.HLTPFMETReconstruction
+      + process.HLTPFMETsReconstruction
       + process.HLTPFCHSMETReconstruction
       + process.HLTPFSoftKillerMETReconstruction
       + process.HLTPuppiJMEReconstruction
