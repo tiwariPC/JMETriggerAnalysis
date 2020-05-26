@@ -1,9 +1,9 @@
 ### Tools for JME studies on the Phase-2 HLT reconstruction
 
 * [Setup](#setup)
-* [Instructions to generate configuration file(s) for HLT Phase-2 reconstruction](#instr-configs)
-* [Inputs for the HLT Jet Energy Scale Corrections](#inputs-jesc)
-* [Additional Notes](#notes)
+* [Instructions to generate configuration file(s) for HLT Phase-2 reconstruction](#instructions-to-generate-configuration-file(s)-for-hlt-phase-2-reconstruction)
+* [Inputs for the HLT Jet Energy Scale Corrections](#inputs-for-the-hlt-jet-energy-scale-corrections)
+* [Additional Notes](#additional-notes)
 
 ### Setup
 ```shell
