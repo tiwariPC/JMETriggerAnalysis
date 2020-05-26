@@ -101,15 +101,15 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
 A standalone configuration file including
 a set of Single-Jet and MET trigger paths
 is available for testing under
-[Common/python/configs/testTriggerPaths_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs/testTriggerPaths_cfg.py)
-
+[Common/python/configs/testTriggerPaths_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs/testTriggerPaths_cfg.py).
 It can be tested as follows:
 ```
 cmsRun Common/python/configs/testTriggerPaths_cfg.py [reco=TRKv06_TICL] [maxEvents=1]
 ```
 where the parts in parentheses denote some of the optional command-line arguments.
 The option `reco`, in particular, can be used to choose the inputs to the PF reconstruction (e.g. TRKv6+TICL);
-the keywords supported for `reco` can be checked by running `python testTriggerPaths_cfg.py reco=None`.
+the keywords supported for `reco` can be checked by running
+`python Common/python/configs/testTriggerPaths_cfg.py reco=''`.
 
 ----------
 
