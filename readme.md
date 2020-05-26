@@ -1,7 +1,9 @@
-JMETriggerAnalysis
-==================
+#### Tools for JME studies on the Phase-2 HLT reconstruction
 
-CMSSW Packages for JetMET Trigger Studies
+[Setup](#setup)
+[Instructions to generate configuration file(s) for HLT Phase-2 reconstruction](#instructions-to-generate-configuration-file(s)-for-hlt-phase-2-reconstruction)
+[Inputs for the HLT Jet Energy Scale Corrections](#inputs-for-the-hlt-jet-energy-scale-corrections)
+[Additional Notes](#additional-notes)
 
 #### Setup
 ```shell
@@ -87,15 +89,34 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
 * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
   [NTuplizers/python/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/NTuplizers/python).
 
----------
+#### Inputs for the HLT Jet Energy Scale Corrections
 
-#### Notes
+A standalone configuration file to create inputs
+for the HLT Jet Energy Scale Corrections (JESC) derivation
+can be found under
+[NTuplizers/python/hltPhase2_rawJets_cfg.py](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/NTuplizers/python/hltPhase2_rawJets_cfg.py).
+
+  * The configuration file loads the latest baseline reconstruction sequence
+    (usually, as defined in one of the files in
+    [NTuplizers/python/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/NTuplizers/python)
+
+  * It runs on RAW (without 2-file solution),
+    and creates an EDM file that contains
+    only the products needed for
+    the HLT-JESCs derivation
+    (e.g. uncorrected jets).
+
+  * **Example**: outputs can be produced as follows
+    (parts in parentheses denote some of the optional command-line parameters).
+    ```
+    cmsRun hltPhase2_rawJets_cfg.py [inputFiles=file:raw.root] [output=out.root] [globalTag=TheGT] [maxEvents=1]
+    ```
+
+#### Additional Notes
 
  * [HLT Phase-2 Twiki](https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2)
 
- * DAS query for Phase-2 MC samples (RAW):
+ * DAS query for the latest Phase-2 MC samples (RAW):
    ```shell
    dasgoclient --query="dataset dataset=/*/Phase2HLTTDRWinter20*/*RAW*"
    ```
-
----------
