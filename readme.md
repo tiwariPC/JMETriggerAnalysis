@@ -5,6 +5,8 @@
 * [Inputs for HLT Jet Energy Scale Corrections workflow](#inputs-for-hlt-jet-energy-scale-corrections-workflow)
 * [Additional Notes](#additional-notes)
 
+----------
+
 ### Setup
 ```shell
 cmsrel CMSSW_11_1_0_pre6
@@ -24,6 +26,8 @@ git cherry-pick 0cf67551731c80dc85130e4b8ec73c8f44d53cb0
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
 scram b
 ```
+
+----------
 
 ### Instructions to generate configuration files for HLT Phase-2 reconstruction
 
@@ -89,6 +93,8 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
  * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
    [NTuplizers/python/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/NTuplizers/python).
 
+----------
+
 ### Inputs for HLT Jet Energy Scale Corrections workflow
 
 A standalone configuration file to create inputs
@@ -112,6 +118,8 @@ can be found under
     cmsRun hltPhase2_rawJets_cfg.py [inputFiles=file:raw.root] [output=out.root] [globalTag=TheGT] [maxEvents=1]
     ```
 
+----------
+
 ### Additional Notes
 
  * [HLT Phase-2 Twiki](https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2)
@@ -120,3 +128,5 @@ can be found under
    ```shell
    dasgoclient --query="dataset dataset=/*/Phase2HLTTDRWinter20*/*RAW*"
    ```
+
+----------
