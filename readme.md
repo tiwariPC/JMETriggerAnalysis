@@ -67,6 +67,9 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      by HGCal to include TICL in the reconstruction;
      apply this customization only after the JME customization function.
 
+ * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
+   [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs).
+
  * **Example**: configuration file to run TRK(v06)+TICL+JME HLT-like reconstruction on RAW.
    ```shell
    cmsDriver.py step3 \
@@ -89,9 +92,6 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n' \
      --python_filename hltPhase2_TRKv06_TICL_cfg.py
    ```
-
- * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
-   [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs).
 
 ----------
 
