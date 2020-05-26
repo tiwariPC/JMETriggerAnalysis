@@ -2,7 +2,7 @@
 
 * [Setup](#setup)
 * [Instructions to generate configuration files for HLT Phase-2 reconstruction](#instructions-to-generate-configuration-files-for-hlt-phase-2-reconstruction)
-* [Inputs for the HLT Jet Energy Scale Corrections](#inputs-for-the-hlt-jet-energy-scale-corrections)
+* [Inputs for HLT Jet Energy Scale Corrections workflow](#inputs-for-hlt-jet-energy-scale-corrections-workflow)
 * [Additional Notes](#additional-notes)
 
 ### Setup
@@ -89,7 +89,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
  * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
    [NTuplizers/python/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/NTuplizers/python).
 
-### Inputs for the HLT Jet Energy Scale Corrections
+### Inputs for HLT Jet Energy Scale Corrections workflow
 
 A standalone configuration file to create inputs
 for the HLT Jet Energy Scale Corrections (JESC) derivation
