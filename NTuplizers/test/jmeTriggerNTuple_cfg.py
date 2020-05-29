@@ -511,9 +511,9 @@ process.hltAK4PFCHSv1Jets = ak4PFJetsCHS.clone(
   src = 'hltParticleFlowCHSv1NoPileUp',
 )
 
-process.hltAK4PFCHSv1L1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK4PFchs'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
-process.hltAK4PFCHSv1L2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFchs'), level = cms.string('L2Relative'))
-process.hltAK4PFCHSv1L3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFchs'), level = cms.string('L3Absolute'))
+process.hltAK4PFCHSv1L1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
+process.hltAK4PFCHSv1L2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFHLT'), level = cms.string('L2Relative'))
+process.hltAK4PFCHSv1L3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFHLT'), level = cms.string('L3Absolute'))
 process.hltAK4PFCHSv1Corrector = cms.EDProducer('ChainedJetCorrectorProducer', correctors = cms.VInputTag('hltAK4PFCHSv1L1Corrector','hltAK4PFCHSv1L2Corrector','hltAK4PFCHSv1L3Corrector'))
 process.hltAK4PFCHSv1JetsCorrected = cms.EDProducer('CorrectedPFJetProducer', src = cms.InputTag('hltAK4PFCHSv1Jets'), correctors = cms.VInputTag('hltAK4PFCHSv1Corrector'))
 
@@ -548,9 +548,9 @@ process.hltAK8PFCHSv1Jets = ak8PFJetsCHS.clone(
   src = 'hltParticleFlowCHSv1NoPileUp',
 )
 
-process.hltAK8PFCHSv1L1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK8PFchs'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
-process.hltAK8PFCHSv1L2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFchs'), level = cms.string('L2Relative'))
-process.hltAK8PFCHSv1L3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFchs'), level = cms.string('L3Absolute'))
+process.hltAK8PFCHSv1L1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK8PFHLT'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
+process.hltAK8PFCHSv1L2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFHLT'), level = cms.string('L2Relative'))
+process.hltAK8PFCHSv1L3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFHLT'), level = cms.string('L3Absolute'))
 process.hltAK8PFCHSv1Corrector = cms.EDProducer('ChainedJetCorrectorProducer', correctors = cms.VInputTag('hltAK8PFCHSv1L1Corrector','hltAK8PFCHSv1L2Corrector','hltAK8PFCHSv1L3Corrector'))
 process.hltAK8PFCHSv1JetsCorrected = cms.EDProducer('CorrectedPFJetProducer', src = cms.InputTag('hltAK8PFCHSv1Jets'), correctors = cms.VInputTag('hltAK8PFCHSv1Corrector'))
 
@@ -636,9 +636,9 @@ process.hltAK4PFCHSv2Jets = ak4PFJetsCHS.clone(
   src = 'hltParticleFlowCHSv2NoPileUp',
 )
 
-process.hltAK4PFCHSv2L1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK4PFchs'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
-process.hltAK4PFCHSv2L2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFchs'), level = cms.string('L2Relative'))
-process.hltAK4PFCHSv2L3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFchs'), level = cms.string('L3Absolute'))
+process.hltAK4PFCHSv2L1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
+process.hltAK4PFCHSv2L2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFHLT'), level = cms.string('L2Relative'))
+process.hltAK4PFCHSv2L3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK4PFHLT'), level = cms.string('L3Absolute'))
 process.hltAK4PFCHSv2Corrector = cms.EDProducer('ChainedJetCorrectorProducer', correctors = cms.VInputTag('hltAK4PFCHSv2L1Corrector','hltAK4PFCHSv2L2Corrector','hltAK4PFCHSv2L3Corrector'))
 process.hltAK4PFCHSv2JetsCorrected = cms.EDProducer('CorrectedPFJetProducer', src = cms.InputTag('hltAK4PFCHSv2Jets'), correctors = cms.VInputTag('hltAK4PFCHSv2Corrector'))
 
@@ -754,8 +754,8 @@ process.hltAK4PuppiV1Jets = ak4PFJetsPuppi.clone(
   src = 'hltPuppiV1',
 )
 
-process.hltAK4PuppiV1L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFPuppi'), level = cms.string('L2Relative'))
-process.hltAK4PuppiV1L3Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFPuppi'), level = cms.string('L3Absolute'))
+process.hltAK4PuppiV1L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L2Relative'))
+process.hltAK4PuppiV1L3Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L3Absolute'))
 process.hltAK4PuppiV1Corrector = cms.EDProducer('ChainedJetCorrectorProducer', correctors = cms.VInputTag('hltAK4PuppiV1L2Corrector','hltAK4PuppiV1L3Corrector'))
 process.hltAK4PuppiV1JetsCorrected = cms.EDProducer('CorrectedPFJetProducer', src = cms.InputTag('hltAK4PuppiV1Jets'), correctors = cms.VInputTag('hltAK4PuppiV1Corrector'))
 
@@ -975,8 +975,8 @@ process.hltAK4PuppiV3Jets = ak4PFJetsPuppi.clone(
   src = 'hltPuppiV3',
 )
 
-process.hltAK4PuppiV3L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFPuppi'), level = cms.string('L2Relative'))
-process.hltAK4PuppiV3L3Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFPuppi'), level = cms.string('L3Absolute'))
+process.hltAK4PuppiV3L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L2Relative'))
+process.hltAK4PuppiV3L3Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L3Absolute'))
 process.hltAK4PuppiV3Corrector = cms.EDProducer('ChainedJetCorrectorProducer', correctors = cms.VInputTag('hltAK4PuppiV3L2Corrector','hltAK4PuppiV3L3Corrector'))
 process.hltAK4PuppiV3JetsCorrected = cms.EDProducer('CorrectedPFJetProducer', src = cms.InputTag('hltAK4PuppiV3Jets'), correctors = cms.VInputTag('hltAK4PuppiV3Corrector'))
 
