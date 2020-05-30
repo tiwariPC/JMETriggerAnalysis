@@ -69,7 +69,7 @@ opts.parseArguments()
 ###
 ### HLT configuration
 ###
-from JMETriggerAnalysis.NTuplizers.customisedHLTProcess import *
+from JMETriggerAnalysis.Common.customisedHLTProcess import *
 cms, process = customisedHLTProcess(opts.reco)
 
 # remove cms.OutputModule objects from HLT config-dump

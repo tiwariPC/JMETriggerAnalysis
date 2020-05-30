@@ -1,36 +1,36 @@
 def customisedHLTProcess(keyword):
 
     if keyword == 'HLT':
-       from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
 
     elif keyword == 'HLT_trkIter2GlobalPtSeed0p9':
-       from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
-       from JMETriggerAnalysis.NTuplizers.customise_HLT_trkIter2Global import customise_HLT_trkIter2Global
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.customise_HLT_trkIter2Global import customise_HLT_trkIter2Global
        process = customise_HLT_trkIter2Global(process, ptMin = 0.9)
 
     elif keyword == 'HLT_pfBlockAlgoRemovePS':
-       from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
-       from JMETriggerAnalysis.NTuplizers.customise_HLT_pfBlockAlgoRemovePS import customise_HLT_pfBlockAlgoRemovePS
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.customise_HLT_pfBlockAlgoRemovePS import customise_HLT_pfBlockAlgoRemovePS
        process = customise_HLT_pfBlockAlgoRemovePS(process)
 
     elif keyword == 'HLT_trkIter2RegionalPtSeed0p9':
-       from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 0.9
 
     elif keyword == 'HLT_trkIter2RegionalPtSeed2p0':
-       from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 2.0
 
     elif keyword == 'HLT_trkIter2RegionalPtSeed5p0':
-       from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 5.0
 
     elif keyword == 'HLT_trkIter2RegionalPtSeed10p0':
-       from JMETriggerAnalysis.NTuplizers.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
     elif keyword.startswith('HLT_singleTrkIterWithPatatrack_v01'):
-       from JMETriggerAnalysis.NTuplizers.HLT_singleTrkIterWithPatatrack_v01 import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_singleTrkIterWithPatatrack_v01 import cms, process
 
        if keyword.endswith('_pixVtxFrac0p00'):
           process.hltTrimmedPixelVertices.fractionSumPt2 = -1.
