@@ -39,7 +39,7 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
-opts.register('globalTag', None,
+opts.register('globalTag', '110X_mcRun3_2021_realistic_Candidate_2020_05_26_16_08_15',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
