@@ -1,10 +1,10 @@
 # /dev/CMSSW_11_0_0/GRun/V13 (CMSSW_11_0_0)
 
-# hltGetConfiguration --full --mc /dev/CMSSW_11_0_0/GRun/V13 --type GRun --unprescale --process HLT2018 --globaltag auto:run2_mc_GRun --input /store/group/phys_tracking/patatrack/scouting/ttbar/step2_356.root --no-output --paths HLTriggerFirstPath,ScoutingPFOutputimport*,FWCore DST_ZeroBias_CaloScouting_PFScouting_v
+# hltGetConfiguration --full --mc /dev/CMSSW_11_0_0/GRun/V13 --type GRun --unprescale --process HLT2 --globaltag auto:run2_mc_GRun --input /store/group/phys_tracking/patatrack/scouting/ttbar/step2_356.root --no-output --paths HLTriggerFirstPath,ScoutingPFOutputimport*,FWCore DST_ZeroBias_CaloScouting_PFScouting_v
 
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process( "HLT2018" )
+process = cms.Process( "HLT2" )
 
 process.load("HeterogeneousCore.CUDAServices.CUDAService_cfi")
 
