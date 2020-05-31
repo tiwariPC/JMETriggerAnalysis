@@ -50,7 +50,7 @@ A standalone configuration file including
 ''MC trigger paths'' (i.e. no event selection)
 with alternative HLT-Jet collections, e.g. PF-CHS Jets and Puppi Jets,
 is available for testing under
-[Common/python/configs/testTriggerPaths_configDump.py](https://github.com/missirol/JMETriggerAnalysis/tree/run3/Common/python/configs/testTriggerPaths_configDump.py).
+[Common/python/configs/jetMCTriggers_configDump.py](https://github.com/missirol/JMETriggerAnalysis/tree/run3/Common/python/configs/jetMCTriggers_configDump.py).
 
 ----------
 
