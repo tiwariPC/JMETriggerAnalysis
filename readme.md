@@ -25,7 +25,8 @@ scram b
 Configuration files corresponding to different types of HLT menus are available under
 [Common/python/configs](https://github.com/missirol/JMETriggerAnalysis/tree/run3/Common/python/configs).
 
- * [Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py):
+ * [Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py) :
+
    GRun HLT menu for `CMSSW_11_1_0_pre4`.
    ```shell
    hltGetConfiguration /dev/CMSSW_11_1_0/GRun/V5 --full --offline --mc --unprescale --process HLT2 \
@@ -39,7 +40,8 @@ Configuration files corresponding to different types of HLT menus are available 
     > ${CMSSW_BASE}/src/JMETriggerAnalysis/Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5_configDump.py
    ```
 
- * [Common/python/configs/HLT_singleTrkIterWithPatatrack_v01.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_singleTrkIterWithPatatrack_v01.py):
+ * [testing] [Common/python/configs/HLT_singleTrkIterWithPatatrack_v01.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_singleTrkIterWithPatatrack_v01.py) :
+
    HLT menu with single (global) tracking iteration seeded by Patatrack pixel tracks.
 
 ----------
@@ -61,11 +63,7 @@ for the HLT Jet Energy Scale Corrections (JESC) derivation
 can be found under
 [Common/python/configs/hltRun3_rawJets_cfg.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/hltRun3_rawJets_cfg.py).
 
-  * The configuration file loads the latest baseline reconstruction sequence
-    (usually, as defined in one of the files in
-    [Common/python/configs](https://github.com/missirol/JMETriggerAnalysis/tree/run3/Common/python/configs)
-
-  * It runs on RAW (without 2-file solution),
+  * The configuration file runs on RAW (without 2-file solution),
     and creates an EDM file that contains
     only the products needed for
     the HLT-JESCs derivation
