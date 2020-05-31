@@ -26,7 +26,6 @@ Configuration files corresponding to different types of HLT menus are available 
 [Common/python/configs](https://github.com/missirol/JMETriggerAnalysis/tree/run3/Common/python/configs).
 
  * [Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py) :
-
    GRun HLT menu for `CMSSW_11_1_0_pre4`.
    ```shell
    hltGetConfiguration /dev/CMSSW_11_1_0/GRun/V5 --full --offline --mc --unprescale --process HLT2 \
@@ -41,7 +40,6 @@ Configuration files corresponding to different types of HLT menus are available 
    ```
 
  * [testing] [Common/python/configs/HLT_singleTrkIterWithPatatrack_v01.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_singleTrkIterWithPatatrack_v01.py) :
-
    HLT menu with single (global) tracking iteration seeded by Patatrack pixel tracks.
 
 ----------
@@ -72,7 +70,7 @@ can be found under
   * **Example**: outputs can be produced as follows
     (parts in parentheses denote some of the optional command-line parameters).
     ```
-    cmsRun hltRun3_rawJets_cfg.py [inputFiles=file:raw.root] [output=out.root] [globalTag=TheGT] [maxEvents=1]
+    cmsRun hltRun3_rawJets_cfg.py [inputFiles=file:raw.root] [output=out.root] [globalTag=GT] [maxEvents=1]
     ```
 
 ----------
