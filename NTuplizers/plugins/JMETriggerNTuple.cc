@@ -1575,7 +1575,8 @@ void JMETriggerNTuple::fillValueContainers(std::vector<ValueContainer<valType>>&
       continue;
     }
 
-    auto const& i_handle(iEvent.getHandle(valueContainer_i.token()));
+    edm::Handle<valType> i_handle;
+    iEvent.getByToken(valueContainer_i.token(), i_handle);
 
     if(not i_handle.isValid()){
       edm::LogWarning("JMETriggerNTuple::fillValueContainers")

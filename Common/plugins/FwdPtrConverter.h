@@ -35,13 +35,14 @@ FwdPtrConverter<T>::FwdPtrConverter(const edm::ParameterSet& iConfig)
 }
 
 template<class T>
-void FwdPtrConverter<T>::produce(edm::Event& iEvent,const edm::EventSetup& iSetup){
-  auto const& coll(iEvent.get(src_token_));
+void FwdPtrConverter<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
+  edm::Handle<edm::View<edm::FwdPtr<T>>> coll_handle;
+  iEvent.getByToken(src_token_, coll_handle);
 
   std::vector<T> output;
-  output.reserve(coll.size());
+  output.reserve(coll_handle->size());
 
-  for(auto const& fwdptr : coll){
+  for(auto const& fwdptr : *coll_handle){
     output.emplace_back(*fwdptr);
   }
 

@@ -51,7 +51,8 @@ TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
 }
 
 void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  auto const& tracks(iEvent.getHandle(tracks_token_));
+  edm::Handle<reco::TrackCollection> tracks;
+  iEvent.getByToken(tracks_token_, tracks);
 
   if(tracks.isValid()){
     h_track_mult_->Fill(tracks->size());

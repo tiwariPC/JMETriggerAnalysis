@@ -101,8 +101,8 @@ PFCandidateHistogrammer<PFCandType>::PFCandidateHistogrammer(const edm::Paramete
 
 template <typename PFCandType>
 void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-
-  auto const& pfCands_handle(iEvent.getHandle(pfCands_token_));
+  edm::Handle<std::vector<PFCandType>> pfCands_handle;
+  iEvent.getByToken(pfCands_token_, pfCands_handle);
 
   if(pfCands_handle.isValid()){
     uint pfcand_mult(0), pfcand_mult_X(0), pfcand_mult_h(0), pfcand_mult_e(0),

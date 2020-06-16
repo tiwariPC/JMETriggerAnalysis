@@ -58,15 +58,15 @@ void RecoGenJetCollectionContainer::emplace_back(const reco::GenJet& obj){
 
   numberOfDaughters_.emplace_back(obj.numberOfDaughters());
 
-  chargedHadronEnergyFraction_.emplace_back(obj.energy() ? (obj.chargedHadronEnergy()/obj.energy()) : -99.);
-  neutralHadronEnergyFraction_.emplace_back(obj.energy() ? (obj.neutralHadronEnergy()/obj.energy()) : -99.);
-  electronEnergyFraction_.emplace_back(obj.energy() ? (obj.chargedEmEnergy()/obj.energy()) : -99.);
-  photonEnergyFraction_.emplace_back(obj.energy() ? (obj.neutralEmEnergy()/obj.energy()) : -99.);
-  muonEnergyFraction_.emplace_back(obj.energy() ? (obj.muonEnergy()/obj.energy()) : -99.);
-
-  chargedHadronMultiplicity_.emplace_back(obj.chargedHadronMultiplicity());
-  neutralHadronMultiplicity_.emplace_back(obj.neutralHadronMultiplicity());
-  electronMultiplicity_.emplace_back(obj.chargedEmMultiplicity());
-  photonMultiplicity_.emplace_back(obj.neutralEmMultiplicity());
-  muonMultiplicity_.emplace_back(obj.muonMultiplicity());
+//!!  chargedHadronEnergyFraction_.emplace_back(obj.energy() ? (obj.chargedHadronEnergy()/obj.energy()) : -99.);
+//!!  neutralHadronEnergyFraction_.emplace_back(obj.energy() ? (obj.neutralHadronEnergy()/obj.energy()) : -99.);
+//!!  electronEnergyFraction_.emplace_back(obj.energy() ? (obj.chargedEmEnergy()/obj.energy()) : -99.);
+//!!  photonEnergyFraction_.emplace_back(obj.energy() ? (obj.neutralEmEnergy()/obj.energy()) : -99.);
+//!!  muonEnergyFraction_.emplace_back(obj.energy() ? (obj.muonEnergy()/obj.energy()) : -99.);
+//!!
+//!!  chargedHadronMultiplicity_.emplace_back(obj.chargedHadronMultiplicity());
+//!!  neutralHadronMultiplicity_.emplace_back(obj.neutralHadronMultiplicity());
+//!!  electronMultiplicity_.emplace_back(obj.chargedEmMultiplicity());
+//!!  photonMultiplicity_.emplace_back(obj.neutralEmMultiplicity());
+//!!  muonMultiplicity_.emplace_back(obj.muonMultiplicity());
 }
