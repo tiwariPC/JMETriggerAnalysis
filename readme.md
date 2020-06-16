@@ -25,7 +25,7 @@ scram b
 Configuration files corresponding to different types of HLT menus are available under
 [Common/python/configs](https://github.com/missirol/JMETriggerAnalysis/tree/run3/Common/python/configs).
 
- * [Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5.py) :
+ * [Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5_configDump.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_dev_CMSSW_11_1_0_GRun_V5_configDump.py) :
    GRun HLT menu for `CMSSW_11_1_0_pre4`.
    ```shell
    hltGetConfiguration /dev/CMSSW_11_1_0/GRun/V5 --full --offline --mc --unprescale --process HLT2 \
