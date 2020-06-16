@@ -790,7 +790,7 @@ def customisedHLTProcess(keyword):
     process.hltPuppiV2NoLeptons = puppi.clone(
       candName = 'hltParticleFlowNoLeptons',
       vertexName = 'hltVerticesPF',
-      PtMaxPhotons = 20.,
+#!!   PtMaxPhotons = 20.,
     )
     process.hltPuppiV2 = cms.EDProducer('CandViewMerger',
       src = cms.VInputTag( 'hltPuppiV2NoLeptons', 'hltParticleFlowLeptons' ),
@@ -869,9 +869,9 @@ def customisedHLTProcess(keyword):
     process.hltPuppiV3 = puppi.clone(
       candName = 'hltParticleFlow',
       vertexName = 'hltPixelVertices',
-      UseFromPVLooseTight = True,
+#!!   UseFromPVLooseTight = True,
       vtxNdofCut = 0,
-    #  puppiDiagnostics = True,
+#     puppiDiagnostics = True,
     )
     
     process.HLTPuppiV3Sequence = cms.Sequence(
@@ -1002,9 +1002,9 @@ def customisedHLTProcess(keyword):
     process.hltPuppiV4NoLeptons = puppi.clone(
       candName = 'hltParticleFlowNoLeptons',
       vertexName = 'hltPixelVertices',
-      UseFromPVLooseTight = True,
+#!!   UseFromPVLooseTight = True,
       vtxNdofCut = 0,
-      PtMaxPhotons = 20.,
+#!!   PtMaxPhotons = 20.,
     )
     process.hltPuppiV4 = cms.EDProducer('CandViewMerger',
       src = cms.VInputTag( 'hltPuppiV4NoLeptons', 'hltParticleFlowLeptons' ),
