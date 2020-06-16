@@ -3,6 +3,9 @@ def customisedHLTProcess(keyword):
     if keyword == 'HLT':
        from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
 
+    elif keyword == 'HLT_102X':
+       from JMETriggerAnalysis.Common.configs.HLT_frozen_2018_2e34_v3p2_HLT_V1_configDump import cms, process
+
     elif keyword == 'HLT_trkIter2GlobalPtSeed0p9':
        from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
        from JMETriggerAnalysis.Common.configs.customise_HLT_trkIter2Global import customise_HLT_trkIter2Global
