@@ -18,21 +18,21 @@ output_file = input_tag+'.root'
 
 input_files_max = int(sys.argv[2])
 
-jet_n20 = ROOT.TH1D('jet_n20' , 'jet_n20' , 15, 0, 15)
-jet_n30 = ROOT.TH1D('jet_n30' , 'jet_n30' , 15, 0, 15)
-jet_n40 = ROOT.TH1D('jet_n40' , 'jet_n40' , 15, 0, 15)
+jet_n20 = ROOT.TH1D('jet_n20', 'jet_n20', 15, 0, 15)
+jet_n30 = ROOT.TH1D('jet_n30', 'jet_n30', 15, 0, 15)
+jet_n40 = ROOT.TH1D('jet_n40', 'jet_n40', 15, 0, 15)
 
-jet_pt = ROOT.TH1D('jet_pt' , 'jet_pt' , 300, 0, 300)
+jet_pt = ROOT.TH1D('jet_pt', 'jet_pt', 300, 0, 300)
 jet_eta = ROOT.TH1D('jet_eta', 'jet_eta', 100, -5, 5)
 jet_phi = ROOT.TH1D('jet_phi', 'jet_phi', 100, -3.1416, 3.1416)
 jet_jesc = ROOT.TH1D('jet_jesc', 'jet_jesc', 300, -10, 10)
 
-jet_pt_pos = ROOT.TH1D('jet_pt_pos' , 'jet_pt_pos' , 300, 0, 300)
+jet_pt_pos = ROOT.TH1D('jet_pt_pos', 'jet_pt_pos', 300, 0, 300)
 jet_eta_pos = ROOT.TH1D('jet_eta_pos', 'jet_eta_pos', 100, -5, 5)
 jet_phi_pos = ROOT.TH1D('jet_phi_pos', 'jet_phi_pos', 100, -3.1416, 3.1416)
 jet_jesc_pos = ROOT.TH1D('jet_jesc_pos', 'jet_jesc_pos', 300, -10, 10)
 
-jet_pt_neg = ROOT.TH1D('jet_pt_neg' , 'jet_pt_neg' , 300, 0, 300)
+jet_pt_neg = ROOT.TH1D('jet_pt_neg', 'jet_pt_neg', 300, 0, 300)
 jet_eta_neg = ROOT.TH1D('jet_eta_neg', 'jet_eta_neg', 100, -5, 5)
 jet_phi_neg = ROOT.TH1D('jet_phi_neg', 'jet_phi_neg', 100, -3.1416, 3.1416)
 jet_jesc_neg = ROOT.TH1D('jet_jesc_neg', 'jet_jesc_neg', 300, -10, 10)
