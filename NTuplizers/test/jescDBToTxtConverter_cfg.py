@@ -1,3 +1,6 @@
+"""
+cmsRun jescDBToTxtConverter_cfg.py gt=GlobalTag [onlyHLT=0|1] [tag=OutputPrefix]
+"""
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('JESCTXT')
@@ -28,7 +31,10 @@ process.GlobalTag.globaltag = opts.gt
 if not opts.tag:
    opts.tag = opts.gt
 
-process.GlobalTag.globaltag = opts.gt
+import os
+opts_tag_dirname = os.path.dirname(opts.tag)
+if opts_tag_dirname:
+   os.makedirs(opts_tag_dirname)
 
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 process.source = cms.Source('EmptySource')
