@@ -1,5 +1,9 @@
 *~
 *.pdf
+*.png
+*.jpg
+*.jpeg
+*.txt
 *.root
 *.pyc
 __init__.py
