@@ -14,7 +14,7 @@ List of commands to set up a local CMSSW area:
 ```shell
 scram project CMSSW_11_1_0_pre6
 cd CMSSW_11_1_0_pre6/src
-eval `scram -runtime sh`
+eval `scram runtime -sh`
 
 # [HGCal] fix to PID+EnergyRegression in TICL
 git cms-merge-topic cms-sw:29799
