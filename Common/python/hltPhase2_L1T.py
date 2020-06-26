@@ -1,8 +1,7 @@
 import FWCore.ParameterSet.Config as cms
-import FWCore.Utilities.FileUtils as FileUtils
 import os
 
-def customize_hltPhase2_L1(process):
+def customize_hltPhase2_L1T(process):
 
     GEOMETRY = "D49"
     # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT')
