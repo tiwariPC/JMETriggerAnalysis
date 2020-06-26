@@ -89,7 +89,7 @@ def customize_hltPhase2_L1(process):
         exit(1)
 
 
-    process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
+    # process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi") #conflict with customisation function of TRKv00
     process.load("SimTracker.TrackTriggerAssociation.TrackTriggerAssociator_cff")
     process.TTTrackAssociatorFromPixelDigis.TTTracks = cms.VInputTag( cms.InputTag(L1TRK_NAME, L1TRK_LABEL) )
 
