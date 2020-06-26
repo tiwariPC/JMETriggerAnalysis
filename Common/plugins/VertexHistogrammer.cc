@@ -138,7 +138,7 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
 void VertexHistogrammer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("src")->setComment("edm::InputTag of reco::VertexCollection");
-  descriptions.add("VertexHistogrammer", desc);
+  descriptions.add("vertexHistogrammer", desc);
 }
 
 DEFINE_FWK_MODULE(VertexHistogrammer);
