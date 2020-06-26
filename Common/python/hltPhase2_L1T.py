@@ -4,34 +4,18 @@ import os
 def customize_hltPhase2_L1T(process):
 
     GEOMETRY = "D49"
-    # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT')
-    L1TRKALGO = 'HYBRID'
-
-    # Write output dataset?
-    WRITE_DATA = False
-
-    if (L1TRKALGO == 'HYBRID_FLOAT'):
-        if ( not os.path.exists( os.environ['CMSSW_BASE']+'/src/L1Trigger/HybridFloat' ) ):
-            print "=== ERROR: Please checkout HybridFloat code from git before using this option ==="; exit
-
     if GEOMETRY == "D49":
-        # print "using geometry " + GEOMETRY + " (tilted)"
-        # process = cms.Process('REPR',eras.Phase2C9)
-        # process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
         process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
     else:
         print "this is not a valid geometry!!!"
 
-    # process.load('Configuration.StandardSequences.Services_cff')
-    # process.load('FWCore.MessageService.MessageLogger_cfi')
-    # process.load('Configuration.EventContent.EventContent_cff')
-    # process.load('Configuration.StandardSequences.MagneticField_cff')
-    # process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-    #
-    process.load('Configuration.StandardSequences.SimL1Emulator_cff')
-    # process.load('Configuration.StandardSequences.EndOfProcess_cff')
-    # process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+    # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT')
+    L1TRKALGO = 'HYBRID'
+    if L1TRKALGO == 'HYBRID_FLOAT':
+       if not os.path.exists(os.environ['CMSSW_BASE']+'/src/L1Trigger/HybridFloat'):
+          raise RuntimeError('customize_hltPhase2_L1T -- ERROR: Please checkout HybridFloat code before using "L1TRKALGO == \'HYBRID_FLOAT\'"')
 
+    process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 
     ############################################################
     # L1 tracking
@@ -45,9 +29,8 @@ def customize_hltPhase2_L1T(process):
 
     if GEOMETRY != "TkOnly":
         # from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import *
-        from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import TTClusterAssociatorFromPixelDigis,premix_stage2
+        from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import TTClusterAssociatorFromPixelDigis
         TTClusterAssociatorFromPixelDigis.digiSimLinks = cms.InputTag("simSiPixelDigis","Tracker")
-
 
     process.TTClusterStub = cms.Path(process.TrackTriggerClustersStubs)
     process.TTClusterStubTruth = cms.Path(process.TrackTriggerAssociatorClustersStubs)
@@ -84,23 +67,22 @@ def customize_hltPhase2_L1T(process):
         L1TRK_NAME  = "TTTracksFromTracklet"
         L1TRK_LABEL = "Level1TTTracks"
     else:
-        print "ERROR: Unknown L1TRKALGO option"
-        exit(1)
+        raise RuntimeError('customize_hltPhase2_L1T -- ERROR: unknown value for L1TRKALGO: "'+L1TRKALGO+'"')
 
-
-    # process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi") #conflict with customisation function of TRKv00
     process.load("SimTracker.TrackTriggerAssociation.TrackTriggerAssociator_cff")
     process.TTTrackAssociatorFromPixelDigis.TTTracks = cms.VInputTag( cms.InputTag(L1TRK_NAME, L1TRK_LABEL) )
 
     ## emulation
-    process.TTTracksEmulation = cms.Path(process.offlineBeamSpot*L1TRK_PROC)
-    process.TTTracksEmulationWithTruth = cms.Path(process.offlineBeamSpot*L1TRK_PROC*process.TrackTriggerAssociatorTracks)
+    if not hasattr(process, 'offlineBeamSpot'):
+       process.load('RecoVertex.BeamSpotProducer.BeamSpot_cfi')
+
+    process.TTTracksEmulation = cms.Path(process.offlineBeamSpot * L1TRK_PROC)
+    process.TTTracksEmulationWithTruth = cms.Path(process.offlineBeamSpot * L1TRK_PROC * process.TrackTriggerAssociatorTracks)
 
     process.load('SimCalorimetry.HcalTrigPrimProducers.hcaltpdigi_cff')
     process.load('CalibCalorimetry.CaloTPG.CaloTPGTranscoder_cfi')
 
     process.L1simulation_step = cms.Path(process.SimL1Emulator)
     process.schedule.extend([process.TTTracksEmulationWithTruth, process.L1simulation_step])
-
 
     return process
