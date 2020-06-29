@@ -5,24 +5,23 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "DataFormats/JetReco/interface/PFJet.h"
-
+#include "DataFormats/L1TParticleFlow/interface/PFJet.h"
 
 #include <memory>
 
 #include <TH1D.h>
 
-class JetHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+class L1TPFJetHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
  public:
-  explicit JetHistogrammer(const edm::ParameterSet&);
+  explicit L1TPFJetHistogrammer(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
  private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
   const edm::InputTag jets_tag_;
-  const edm::EDGetTokenT<reco::PFJetCollection> jets_token_;
+  const edm::EDGetTokenT<l1t::PFJetCollection> jets_token_;
 
   TH1D *h_jet_mult_ = nullptr;
   TH1D *h_jet_pt_ = nullptr;
@@ -30,9 +29,9 @@ class JetHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
   TH1D *h_jet_phi_ = nullptr;
 };
 
-JetHistogrammer::JetHistogrammer(const edm::ParameterSet& iConfig)
+L1TPFJetHistogrammer::L1TPFJetHistogrammer(const edm::ParameterSet& iConfig)
   : jets_tag_(iConfig.getParameter<edm::InputTag>("src"))
-  , jets_token_(consumes<reco::PFJetCollection>(jets_tag_)) {
+  , jets_token_(consumes<l1t::PFJetCollection>(jets_tag_)) {
 
   usesResource(TFileService::kSharedResource);
 
@@ -48,26 +47,26 @@ JetHistogrammer::JetHistogrammer(const edm::ParameterSet& iConfig)
   h_jet_phi_ = fs->make<TH1D>("jet_phi", "jet_phi", 600, -3., 3.);
 }
 
-void JetHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  auto const& tracks(iEvent.getHandle(jets_token_));
+void L1TPFJetHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+  auto const& jets(iEvent.getHandle(jets_token_));
 
-  if(tracks.isValid()){
-    h_jet_mult_->Fill(tracks->size());
-    for(auto const& trk : *tracks){
-      h_jet_pt_->Fill(trk.pt());
-      h_jet_eta_->Fill(trk.eta());
-      h_jet_phi_->Fill(trk.phi());
+  if(jets.isValid()){
+    h_jet_mult_->Fill(jets->size());
+    for(auto const& jet : *jets){
+      h_jet_pt_->Fill(jet.pt());
+      h_jet_eta_->Fill(jet.eta());
+      h_jet_phi_->Fill(jet.phi());
     }
   }
   else {
-    edm::LogWarning("Input") << "invalid handle to reco::PFJetCollection : " << jets_tag_.encode();
+    edm::LogWarning("Input") << "invalid handle to l1t::PFJetCollection : " << jets_tag_.encode();
   }
 }
 
-void JetHistogrammer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void L1TPFJetHistogrammer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
-  desc.add<edm::InputTag>("src")->setComment("edm::InputTag of reco::PFJetCollection");
-  descriptions.add("JetHistogrammer", desc);
+  desc.add<edm::InputTag>("src")->setComment("edm::InputTag of l1t::PFJetCollection");
+  descriptions.add("l1tPFJetHistogrammer", desc);
 }
 
-DEFINE_FWK_MODULE(JetHistogrammer);
+DEFINE_FWK_MODULE(L1TPFJetHistogrammer);

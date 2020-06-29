@@ -308,28 +308,28 @@ if opts.trkdqm:
       process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
       process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
 
-   from JMETriggerAnalysis.Common.TrackHistogrammer_cfi import TrackHistogrammer
-   process.TrackHistograms_hltPixelTracks = TrackHistogrammer.clone(src = 'pixelTracks')
-   process.TrackHistograms_hltGeneralTracks = TrackHistogrammer.clone(src = 'generalTracks')
+   from JMETriggerAnalysis.Common.trackHistogrammer_cfi import trackHistogrammer
+   process.trackHistograms_hltPixelTracks = trackHistogrammer.clone(src = 'pixelTracks')
+   process.trackHistograms_hltGeneralTracks = trackHistogrammer.clone(src = 'generalTracks')
 
    process.trkMonitoringSeq = cms.Sequence(
-       process.TrackHistograms_hltPixelTracks
-     + process.TrackHistograms_hltGeneralTracks
+       process.trackHistograms_hltPixelTracks
+     + process.trackHistograms_hltGeneralTracks
    )
 
    if opt_skimTracks:
-      process.TrackHistograms_hltGeneralTracksOriginal = TrackHistogrammer.clone(src = 'generalTracksOriginal')
-      process.trkMonitoringSeq += process.TrackHistograms_hltGeneralTracksOriginal
+      process.trackHistograms_hltGeneralTracksOriginal = trackHistogrammer.clone(src = 'generalTracksOriginal')
+      process.trkMonitoringSeq += process.trackHistograms_hltGeneralTracksOriginal
 
-   from JMETriggerAnalysis.Common.VertexHistogrammer_cfi import VertexHistogrammer
-   process.VertexHistograms_hltPixelVertices = VertexHistogrammer.clone(src = 'pixelVertices')
-   process.VertexHistograms_hltPrimaryVertices = VertexHistogrammer.clone(src = 'offlinePrimaryVertices')
-   process.VertexHistograms_offlinePrimaryVertices = VertexHistogrammer.clone(src = 'offlineSlimmedPrimaryVertices')
+   from JMETriggerAnalysis.Common.vertexHistogrammer_cfi import vertexHistogrammer
+   process.vertexHistograms_hltPixelVertices = vertexHistogrammer.clone(src = 'pixelVertices')
+   process.vertexHistograms_hltPrimaryVertices = vertexHistogrammer.clone(src = 'offlinePrimaryVertices')
+   process.vertexHistograms_offlinePrimaryVertices = vertexHistogrammer.clone(src = 'offlineSlimmedPrimaryVertices')
 
    process.trkMonitoringSeq += cms.Sequence(
-       process.VertexHistograms_hltPixelVertices
-     + process.VertexHistograms_hltPrimaryVertices
-     + process.VertexHistograms_offlinePrimaryVertices
+       process.vertexHistograms_hltPixelVertices
+     + process.vertexHistograms_hltPrimaryVertices
+     + process.vertexHistograms_offlinePrimaryVertices
    )
 
 #   from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
