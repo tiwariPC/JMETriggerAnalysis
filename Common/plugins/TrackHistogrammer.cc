@@ -70,7 +70,7 @@ void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 void TrackHistogrammer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("src")->setComment("edm::InputTag of reco::TrackCollection");
-  descriptions.add("TrackHistogrammer", desc);
+  descriptions.add("trackHistogrammer", desc);
 }
 
 DEFINE_FWK_MODULE(TrackHistogrammer);

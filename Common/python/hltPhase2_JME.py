@@ -54,11 +54,11 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 #                importerName = cms.string('GSFTrackImporter'),
 #                source = cms.InputTag("pfTrackElec"),
 #                superClustersArePF = cms.bool(True)
-#            ), 
+#            ),
 #            cms.PSet(
 #                importerName = cms.string('ConvBremTrackImporter'),
 #                source = cms.InputTag("pfTrackElec")
-#            ), 
+#            ),
             cms.PSet(
                 importerName = cms.string('SuperClusterImporter'),
                 maximumHoverE = cms.double(0.5),
@@ -68,7 +68,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
                 source_ee = cms.InputTag("particleFlowSuperClusterECAL","particleFlowSuperClusterECALEndcapWithPreshower"),
                 source_towers = cms.InputTag("towerMaker"),
                 superClustersArePF = cms.bool(True)
-            ), 
+            ),
 #            cms.PSet(
 #                importerName = cms.string('ConversionTrackImporter'),
 #                source = cms.InputTag("pfConversions")
@@ -79,11 +79,11 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 #            ),
             cms.PSet(
                 DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                    10.0, 10.0, 10.0, 10.0, 10.0, 
+                    10.0, 10.0, 10.0, 10.0, 10.0,
                     5.0
                 ),
                 NHitCuts_byTrackAlgo = cms.vuint32(
-                    3, 3, 3, 3, 3, 
+                    3, 3, 3, 3, 3,
                     3
                 ),
                 cleanBadConvertedBrems = cms.bool(True),
@@ -132,90 +132,90 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
                 linkType = cms.string('PS1:ECAL'),
                 linkerName = cms.string('PreshowerAndECALLinker'),
                 useKDTree = cms.bool(True)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('PS2:ECAL'),
                 linkerName = cms.string('PreshowerAndECALLinker'),
                 useKDTree = cms.bool(True)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('TRACK:ECAL'),
                 linkerName = cms.string('TrackAndECALLinker'),
                 useKDTree = cms.bool(True)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('TRACK:HCAL'),
                 linkerName = cms.string('TrackAndHCALLinker'),
                 useKDTree = cms.bool(True),
                 trajectoryLayerEntrance = cms.string('HCALEntrance'),
                 trajectoryLayerExit = cms.string('HCALExit')
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('TRACK:HO'),
                 linkerName = cms.string('TrackAndHOLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('ECAL:HCAL'),
                 linkerName = cms.string('ECALAndHCALLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('HCAL:HO'),
                 linkerName = cms.string('HCALAndHOLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('HFEM:HFHAD'),
                 linkerName = cms.string('HFEMAndHFHADLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('TRACK:TRACK'),
                 linkerName = cms.string('TrackAndTrackLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('ECAL:ECAL'),
                 linkerName = cms.string('ECALAndECALLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('GSF:ECAL'),
                 linkerName = cms.string('GSFAndECALLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('TRACK:GSF'),
                 linkerName = cms.string('TrackAndGSFLinker'),
                 useConvertedBrems = cms.bool(True),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('GSF:BREM'),
                 linkerName = cms.string('GSFAndBREMLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('GSF:GSF'),
                 linkerName = cms.string('GSFAndGSFLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('ECAL:BREM'),
                 linkerName = cms.string('ECALAndBREMLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('GSF:HCAL'),
                 linkerName = cms.string('GSFAndHCALLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('HCAL:BREM'),
                 linkerName = cms.string('HCALAndBREMLinker'),
                 useKDTree = cms.bool(False)
-            ), 
+            ),
             cms.PSet(
                 linkType = cms.string('SC:ECAL'),
                 linkerName = cms.string('SCAndECALLinker'),
@@ -288,7 +288,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 #        src = cms.InputTag( "hltAK4CaloJets" ),
 #        correctors = cms.VInputTag( 'hltAK4CaloJetCorrector' ),
 #    )
-#    
+#
 #    ## Jets: AK8 Calo Corrected
 #    process.hltAK8CaloJetCorrectorL1 = cms.EDProducer( "L1FastjetCorrectorProducer",
 #        srcRho = cms.InputTag( "hltFixedGridRhoFastjetAllCalo" ),
@@ -648,7 +648,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Jets: Puppi AK4
     process.hltPuppi = puppi.clone(
       candName = _particleFlowCands,
-      vertexName = _primaryVerticesGood,
+      vertexName = _primaryVertices,
     )
     process.hltAK4PuppiJets = ak4PFJetsPuppi.clone(
       src = _particleFlowCands,
@@ -721,7 +721,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     )
     process.puppiNoLep = puppi.clone(
       candName = 'pfNoLepPUPPI',
-      vertexName = _primaryVerticesGood,
+      vertexName = _primaryVertices,
       PtMaxPhotons = 20.,
     )
     process.hltPuppiForMET = cms.EDProducer('CandViewMerger',
