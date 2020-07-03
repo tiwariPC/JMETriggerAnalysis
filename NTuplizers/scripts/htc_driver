@@ -2,7 +2,6 @@
 """
 script to create area for submission of HTCondor batch jobs
 """
-from __future__ import print_function
 import argparse
 import os
 import sys
@@ -16,7 +15,10 @@ from JMETriggerAnalysis.NTuplizers.utils.das import load_dataset_data, skim_das_
 #### main
 if __name__ == '__main__':
     ### args
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+     prog='./'+os.path.basename(__file__),
+     formatter_class=argparse.RawDescriptionHelpFormatter,
+     description=__doc__)
 
     parser.add_argument('-c', '--cfg', dest='cmsRun_cfg', action='store', default=None, required=True,
                         help='path to cmsRun cfg file')
@@ -121,10 +123,10 @@ if __name__ == '__main__':
     cmsRun_addopts = opts_unknown[:]
 
     if opts.verbose and len(cmsRun_addopts):
-       print('-'*50)
-       print(colored_text('additional cmsRun command-line arguments:', ['1']))
-       for _tmp in cmsRun_addopts: print(' '+str(_tmp))
-       print('-'*50)
+       print '-'*50
+       print colored_text('additional cmsRun command-line arguments:', ['1'])
+       for _tmp in cmsRun_addopts: print ' '+str(_tmp)
+       print '-'*50
 
     ### extract input-files information from data set name via dasgoclient
     ### -> list of dictionaries, each containing DAS name, files, number of events per file, and parent files
@@ -344,7 +346,7 @@ if opts.dumpPython is not None:
 
                   f_exefile.write('\n'+('\n\n'.join([' \\\n '.join(_tmp) for _tmp in i_SHELL_COMMANDS]))+'\n')
 
-            print(colored_text('output:', ['1', '94']), os.path.relpath(EXEFILE_ABSPATH, os.environ['PWD']))
+            print colored_text('output:', ['1', '94']), os.path.relpath(EXEFILE_ABSPATH, os.environ['PWD'])
 
             EXE('chmod u+x '+EXEFILE_ABSPATH, verbose=opts.verbose, dry_run=opts.dry_run)
 

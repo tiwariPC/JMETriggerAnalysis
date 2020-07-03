@@ -2,8 +2,6 @@
 """
 utilities related to the CMS Data Aggregation System (DAS)
 """
-from __future__ import print_function
-
 import json
 
 from JMETriggerAnalysis.NTuplizers.utils.common import *
@@ -11,7 +9,7 @@ from JMETriggerAnalysis.NTuplizers.utils.common import *
 def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=2, files_prefix='', verbose=False):
 
     if verbose:
-       print(colored_text(das_name, ['1']))
+       print colored_text(das_name, ['1'])
 
     dataset_split = das_name.split('/')
     if len(dataset_split) != 4:
@@ -53,7 +51,7 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
            breakLoop = True
 
         if verbose:
-           print('  [ file', i_file_idx+1, '/', len(dataset_files), '] [ # events =', i_file_nevents, ']', i_file)
+           print '  [ file', i_file_idx+1, '/', len(dataset_files), '] [ # events =', i_file_nevents, ']', i_file
 
         i_file_parents1 = []
         i_file_parents2 = []
@@ -73,7 +71,7 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
 
         if verbose:
            for _tmp in i_file_parents2:
-               print(' '*5, _tmp)
+               print ' '*5, _tmp
 
         dset_data['files'] += [{
           'file': files_prefix+i_file,
