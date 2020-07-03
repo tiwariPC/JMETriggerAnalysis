@@ -4,6 +4,10 @@ import os
 def customize_hltPhase2_L1T(process):
 
     # L1T recipe for D49 geometry
+    GEOMETRY = 'D49'
+
+    if GEOMETRY != 'D49':
+       raise RuntimeError('customize_hltPhase2_L1T -- ERROR: invalid value for GEOMETRY: "'+GEOMETRY+'"')
 
     # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT')
     L1TRKALGO = 'HYBRID'
@@ -24,9 +28,9 @@ def customize_hltPhase2_L1T(process):
     process.load("SimTracker.TrackTriggerAssociation.TrackTriggerAssociator_cff")
 
     if GEOMETRY != "TkOnly":
-        # from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import *
-        from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import TTClusterAssociatorFromPixelDigis
-        TTClusterAssociatorFromPixelDigis.digiSimLinks = cms.InputTag("simSiPixelDigis","Tracker")
+       # from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import *
+       from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import TTClusterAssociatorFromPixelDigis
+       TTClusterAssociatorFromPixelDigis.digiSimLinks = cms.InputTag("simSiPixelDigis","Tracker")
 
     process.TTClusterStub = cms.Path(process.TrackTriggerClustersStubs)
     process.TTClusterStubTruth = cms.Path(process.TrackTriggerAssociatorClustersStubs)
