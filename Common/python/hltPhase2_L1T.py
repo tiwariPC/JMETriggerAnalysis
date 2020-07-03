@@ -3,11 +3,7 @@ import os
 
 def customize_hltPhase2_L1T(process):
 
-    GEOMETRY = "D49"
-    if GEOMETRY == "D49":
-        process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
-    else:
-        print "this is not a valid geometry!!!"
+    # L1T recipe for D49 geometry
 
     # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT')
     L1TRKALGO = 'HYBRID'
