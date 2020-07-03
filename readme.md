@@ -80,7 +80,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
  * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
    [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs).
 
- * **Example**: configuration file to run TRK(v06)+TICL+JME HLT-like reconstruction on RAW.
+ * **Example**: configuration file to run L1T+TRK(v06)+TICL+JME HLT-like reconstruction on RAW.
    ```shell
    cmsDriver.py step3 \
      --geometry Extended2026D49 --era Phase2C9 \
@@ -96,6 +96,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      --no_exec \
      -n 10 \
      --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
+     --customise JMETriggerAnalysis/Common/hltPhase2_L1T.customize_hltPhase2_L1T \
      --customise JMETriggerAnalysis/Common/hltPhase2_TRKv06.customize_hltPhase2_TRKv06 \
      --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_JME \
      --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_TICL \
