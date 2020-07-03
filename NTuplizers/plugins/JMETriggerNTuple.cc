@@ -14,6 +14,7 @@
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoGenJetCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/L1TPFJetCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoCaloJetCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFJetCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFClusterJetCollectionContainer.h"
@@ -72,6 +73,7 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
   std::vector<PATPackedCandidateCollectionContainer> v_patPackedCandidateCollectionContainer_;
   std::vector<RecoGenJetCollectionContainer> v_recoGenJetCollectionContainer_;
+  std::vector<L1TPFJetCollectionContainer> v_l1tPFJetCollectionContainer_;
   std::vector<RecoCaloJetCollectionContainer> v_recoCaloJetCollectionContainer_;
   std::vector<RecoPFJetCollectionContainer> v_recoPFJetCollectionContainer_;
   std::vector<RecoPFClusterJetCollectionContainer> v_recoPFClusterJetCollectionContainer_;
@@ -112,7 +114,6 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
     int update(const edm::TriggerResults&, const edm::Event&);
 
    protected:
-
     std::map<std::string, condition> condMap_;
   };
 
@@ -285,6 +286,32 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
       if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
 
         v_recoGenJetCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
+      }
+    }
+  }
+
+  // l1t::PFJetCollection
+  v_l1tPFJetCollectionContainer_.clear();
+
+  if(iConfig.exists("l1tPFJetCollections")){
+
+    const edm::ParameterSet& pset_l1tPFJetCollections = iConfig.getParameter<edm::ParameterSet>("l1tPFJetCollections");
+
+    const auto& inputTagLabels_l1tPFJetCollections = pset_l1tPFJetCollections.getParameterNamesForType<edm::InputTag>();
+
+    v_l1tPFJetCollectionContainer_.reserve(inputTagLabels_l1tPFJetCollections.size());
+
+    for(const auto& label : inputTagLabels_l1tPFJetCollections){
+
+      const auto& inputTag = pset_l1tPFJetCollections.getParameter<edm::InputTag>(label);
+
+      LogDebug("JMETriggerNTuple::JMETriggerNTuple") << "adding l1t::PFJetCollection \"" << inputTag.label() << "\" (NTuple branches: \"" << label << "_*\")";
+
+      v_l1tPFJetCollectionContainer_.emplace_back(L1TPFJetCollectionContainer(label, inputTag.label(), this->consumes<std::vector<l1t::PFJet> >(inputTag)));
+
+      if(stringCutObjectSelectors_map_.find(label) != stringCutObjectSelectors_map_.end()){
+
+        v_l1tPFJetCollectionContainer_.back().setStringCutObjectSelector(stringCutObjectSelectors_map_.at(label));
       }
     }
   }
@@ -693,6 +720,16 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoGenJetCollectionContainer_i.name()+"_muonMultiplicity", &recoGenJetCollectionContainer_i.vec_muonMultiplicity());
   }
 
+  for(auto& l1tPFJetCollectionContainer_i : v_l1tPFJetCollectionContainer_){
+
+    this->addBranch(l1tPFJetCollectionContainer_i.name()+"_pt", &l1tPFJetCollectionContainer_i.vec_pt());
+    this->addBranch(l1tPFJetCollectionContainer_i.name()+"_eta", &l1tPFJetCollectionContainer_i.vec_eta());
+    this->addBranch(l1tPFJetCollectionContainer_i.name()+"_phi", &l1tPFJetCollectionContainer_i.vec_phi());
+    this->addBranch(l1tPFJetCollectionContainer_i.name()+"_mass", &l1tPFJetCollectionContainer_i.vec_mass());
+    this->addBranch(l1tPFJetCollectionContainer_i.name()+"_jesc", &l1tPFJetCollectionContainer_i.vec_jesc());
+    this->addBranch(l1tPFJetCollectionContainer_i.name()+"_numberOfDaughters", &l1tPFJetCollectionContainer_i.vec_numberOfDaughters());
+  }
+
   for(auto& recoCaloJetCollectionContainer_i : v_recoCaloJetCollectionContainer_){
 
     this->addBranch(recoCaloJetCollectionContainer_i.name()+"_pt", &recoCaloJetCollectionContainer_i.vec_pt());
@@ -1033,6 +1070,31 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
         recoGenJetCollectionContainer_i.fill(*i_handle);
       }
+    }
+  }
+
+  // fill l1tPFJetCollectionContainers
+  for(auto& l1tPFJetCollectionContainer_i : v_l1tPFJetCollectionContainer_){
+
+    l1tPFJetCollectionContainer_i.clear();
+
+    if(fillCollectionConditionMap_.has(l1tPFJetCollectionContainer_i.name()) and (not fillCollectionConditionMap_.accept(l1tPFJetCollectionContainer_i.name()))){
+
+      continue;
+    }
+
+    edm::Handle<std::vector<l1t::PFJet> > i_handle;
+    iEvent.getByToken(l1tPFJetCollectionContainer_i.token(), i_handle);
+
+    if(not i_handle.isValid()){
+
+      edm::LogWarning("JMETriggerNTuple::analyze")
+        << "invalid handle for input collection: \"" << l1tPFJetCollectionContainer_i.inputTagLabel()
+        << "\" (NTuple branches: \"" << l1tPFJetCollectionContainer_i.name() << "_*\")";
+    }
+    else {
+
+      l1tPFJetCollectionContainer_i.fill(*i_handle);
     }
   }
 
