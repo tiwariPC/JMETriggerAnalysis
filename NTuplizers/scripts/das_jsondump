@@ -2,7 +2,6 @@
 """
 script to dump information on a CMS data set to a .json file
 """
-from __future__ import print_function
 import argparse
 import os
 import json
@@ -13,7 +12,10 @@ from JMETriggerAnalysis.NTuplizers.utils.das import load_dataset_data
 #### main
 if __name__ == '__main__':
     ### args
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+     prog='./'+os.path.basename(__file__),
+     formatter_class=argparse.RawDescriptionHelpFormatter,
+     description=__doc__)
 
     parser.add_argument('-d', '--dataset', dest='dataset', action='store', default=None, required=True,
                         help='name of input data set in DAS')

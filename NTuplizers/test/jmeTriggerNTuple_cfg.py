@@ -149,6 +149,13 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     ak8GenJetsNoNu = cms.InputTag('ak8GenJetsNoNu::HLT'),
   ),
 
+  l1tPFJetCollections = cms.PSet(
+
+    l1tAK4CaloJetsCorrected = cms.InputTag('ak4PFL1CaloCorrected'),
+    l1tAK4PFJetsCorrected = cms.InputTag('ak4PFL1PFCorrected'),
+    l1tAK4PuppiJetsCorrected = cms.InputTag('ak4PFL1PuppiCorrected'),
+  ),
+
   recoCaloJetCollections = cms.PSet(
 
     hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
@@ -170,6 +177,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
     hltAK4PuppiJetsCorrected = cms.InputTag('hltAK4PuppiJetsCorrected'),
     hltAK8PuppiJetsCorrected = cms.InputTag('hltAK8PuppiJetsCorrected'),
+
+#   l1tAK4CaloJets = cms.InputTag('ak4PFL1Calo'),
+#   l1tAK4PFJets = cms.InputTag('ak4PFL1PF'),
+#   l1tAK4PuppiJets = cms.InputTag('ak4PFL1Puppi'),
   ),
 
   patJetCollections = cms.PSet(
@@ -197,6 +208,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   recoPFMETCollections = cms.PSet(
+
+    l1tCaloMET = cms.InputTag('l1PFMetCalo'),
+    l1tPFMET = cms.InputTag('l1PFMetPF'),
+    l1tPuppiMET = cms.InputTag('l1PFMetPuppi'),
 
     hltPFMET = cms.InputTag('hltPFMET'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
@@ -227,6 +242,15 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     # GEN
     ak4GenJetsNoNu = cms.string('pt > 15'),
     ak8GenJetsNoNu = cms.string('pt > 50'),
+
+    # L1T AK4
+#   l1tAK4CaloJets = cms.string('pt > 20'),
+#   l1tAK4PFJets = cms.string('pt > 20'),
+#   l1tAK4PuppiJets = cms.string('pt > 20'),
+
+    l1tAK4CaloJetsCorrected = cms.string('pt > 20'),
+    l1tAK4PFJetsCorrected = cms.string('pt > 20'),
+    l1tAK4PuppiJetsCorrected = cms.string('pt > 20'),
 
     # HLT AK4
     hltAK4CaloJets = cms.string('pt > 20'),
@@ -309,27 +333,27 @@ if opts.trkdqm:
       process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
 
    from JMETriggerAnalysis.Common.trackHistogrammer_cfi import trackHistogrammer
-   process.trackHistograms_hltPixelTracks = trackHistogrammer.clone(src = 'pixelTracks')
-   process.trackHistograms_hltGeneralTracks = trackHistogrammer.clone(src = 'generalTracks')
+   process.TrackHistograms_hltPixelTracks = trackHistogrammer.clone(src = 'pixelTracks')
+   process.TrackHistograms_hltGeneralTracks = trackHistogrammer.clone(src = 'generalTracks')
 
    process.trkMonitoringSeq = cms.Sequence(
-       process.trackHistograms_hltPixelTracks
-     + process.trackHistograms_hltGeneralTracks
+       process.TrackHistograms_hltPixelTracks
+     + process.TrackHistograms_hltGeneralTracks
    )
 
    if opt_skimTracks:
-      process.trackHistograms_hltGeneralTracksOriginal = trackHistogrammer.clone(src = 'generalTracksOriginal')
-      process.trkMonitoringSeq += process.trackHistograms_hltGeneralTracksOriginal
+      process.TrackHistograms_hltGeneralTracksOriginal = trackHistogrammer.clone(src = 'generalTracksOriginal')
+      process.trkMonitoringSeq += process.TrackHistograms_hltGeneralTracksOriginal
 
    from JMETriggerAnalysis.Common.vertexHistogrammer_cfi import vertexHistogrammer
-   process.vertexHistograms_hltPixelVertices = vertexHistogrammer.clone(src = 'pixelVertices')
-   process.vertexHistograms_hltPrimaryVertices = vertexHistogrammer.clone(src = 'offlinePrimaryVertices')
-   process.vertexHistograms_offlinePrimaryVertices = vertexHistogrammer.clone(src = 'offlineSlimmedPrimaryVertices')
+   process.VertexHistograms_hltPixelVertices = vertexHistogrammer.clone(src = 'pixelVertices')
+   process.VertexHistograms_hltPrimaryVertices = vertexHistogrammer.clone(src = 'offlinePrimaryVertices')
+   process.VertexHistograms_offlinePrimaryVertices = vertexHistogrammer.clone(src = 'offlineSlimmedPrimaryVertices')
 
    process.trkMonitoringSeq += cms.Sequence(
-       process.vertexHistograms_hltPixelVertices
-     + process.vertexHistograms_hltPrimaryVertices
-     + process.vertexHistograms_offlinePrimaryVertices
+       process.VertexHistograms_hltPixelVertices
+     + process.VertexHistograms_hltPrimaryVertices
+     + process.VertexHistograms_offlinePrimaryVertices
    )
 
 #   from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly

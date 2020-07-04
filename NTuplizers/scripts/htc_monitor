@@ -2,7 +2,6 @@
 """
 script to monitor HTCondor batch jobs
 """
-from __future__ import print_function
 import argparse
 import os
 import math
@@ -11,7 +10,6 @@ import glob
 from JMETriggerAnalysis.NTuplizers.utils.common import *
 
 def monitor(options, log=''):
-
     # input directories
     INPUT_DIRS = []
     for i_opt in options.inputs:
@@ -44,7 +42,7 @@ def monitor(options, log=''):
        ADD_OPTIONS += ['-append "RequestMemory = '+str(options.memory)+'"']
 
     if len(ADD_OPTIONS) > 0:
-       print(' > additional options to "'+BATCH_RESUB_EXE+'":', str(ADD_OPTIONS))
+       print ' > additional options to "'+BATCH_RESUB_EXE+'":', str(ADD_OPTIONS)
 
     counter_input = 0
     counter_resubmitted = 0
@@ -113,7 +111,7 @@ def monitor(options, log=''):
                resubmit_job = options.resubmit and ((options.max_jobs < 0) or ((len(running_exes) + counter_resubmitted) < options.max_jobs))
 
                if options.show_resubmitted:
-                  print(colored_text('>> job '+('resubmitted' if resubmit_job else 'to be resubmitted')+' :', ['94']), colored_text(os.path.relpath(_tmp_dirname), ['1', '94']))
+                  print colored_text('>> job '+('resubmitted' if resubmit_job else 'to be resubmitted')+' :', ['94']), colored_text(os.path.relpath(_tmp_dirname), ['1', '94'])
 
                if resubmit_job:
                   counter_resubmitted += 1
@@ -145,25 +143,28 @@ def monitor(options, log=''):
 
     counter_format = '{:>'+str(1+int(math.log10(counter_input)))+'}' if counter_input > 0 else '{:>1}'
 
-    print('')
-    print('-'*51)
-    print('')
-    print(' Number of input  files found : '+colored_text(counter_format.format(counter_input), ['1']))
-    print(' Number of output files found : '+colored_text(counter_format.format(counter_completed), ['1', '92']))
-    print(' Number of resubmitted jobs   : '+colored_text(counter_format.format(counter_resubmitted), ['1', '94']))
-    print(' Number of jobs to resubmit   : '+colored_text(counter_format.format(counter_toResubmit), ['1', '94']))
-    print('')
-    print(' Number of jobs still running : '+counter_format.format(counter_running))
-    print('')
-    print('-'*51)
-    print('')
+    print ''
+    print '-'*51
+    print ''
+    print ' Number of input  files found : '+colored_text(counter_format.format(counter_input), ['1'])
+    print ' Number of output files found : '+colored_text(counter_format.format(counter_completed), ['1', '92'])
+    print ' Number of resubmitted jobs   : '+colored_text(counter_format.format(counter_resubmitted), ['1', '94'])
+    print ' Number of jobs to resubmit   : '+colored_text(counter_format.format(counter_toResubmit), ['1', '94'])
+    print ''
+    print ' Number of jobs still running : '+counter_format.format(counter_running)
+    print ''
+    print '-'*51
+    print ''
 
     return bool(counter_input != counter_completed)
 
 #### main
 if __name__ == '__main__':
     ### args
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+     prog='./'+os.path.basename(__file__),
+     formatter_class=argparse.RawDescriptionHelpFormatter,
+     description=__doc__)
 
     parser.add_argument('-i', '--inputs', dest='inputs', nargs='+', default=[], required=True,
                         help='list of paths to input directories')
