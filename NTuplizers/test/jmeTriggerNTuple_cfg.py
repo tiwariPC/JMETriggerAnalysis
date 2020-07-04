@@ -389,7 +389,7 @@ if opts.pfdqm > 0:
         ('_simPFProducer', 'simPFProducer', '', pfCandidateHistogrammerRecoPFCandidate),
       ]
 
-   if opts.pfdqm > 1:
+   if opts.pfdqm > 2:
       _tmpCandTags = []
       for _tmp in _candTags:
           _tmpCandTags += [(_tmp[0]+'_2GeV', _tmp[1], '(pt > 2.)', _tmp[3])]
@@ -403,14 +403,15 @@ if opts.pfdqm > 0:
      ['_HF'   , '(3.0<=abs(eta) && abs(eta)<5.0)'],
    ]
 
-   _pidTags = [
-     ['', ''],
-     ['_h', '(abs(pdgId) == 211)'],
-     ['_e', '(abs(pdgId) == 11)'],
-     ['_mu', '(abs(pdgId) == 13)'],
-     ['_gamma', '(abs(pdgId) == 22)'],
-     ['_h0', '(abs(pdgId) == 130)'],
-   ]
+   _pidTags = [['', '']]
+   if opts.pfdqm > 1:
+      _pidTags += [
+        ['_h', '(abs(pdgId) == 211)'],
+        ['_e', '(abs(pdgId) == 11)'],
+        ['_mu', '(abs(pdgId) == 13)'],
+        ['_gamma', '(abs(pdgId) == 22)'],
+        ['_h0', '(abs(pdgId) == 130)'],
+      ]
 
    process.pfMonitoringSeq = cms.Sequence()
    for _candTag in _candTags:
