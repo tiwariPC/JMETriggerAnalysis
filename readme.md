@@ -50,6 +50,10 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
  * Customization functions are available under
    [`Common/python/`](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python):
 
+   - [**L1T**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_L1T.py#L4):
+     customization to add the L1-Trigger reconstruction as implemented in the recipe provided in the
+     [``Phase-2 HLT'' TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/HighLevelTriggerPhase2?rev=69#Running_and_using_the_L1T_result).
+
    - [**TRKv00**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv00.py#L3),
      [**TRKv02**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv02.py#L3),
      [**TRKv06**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv06.py#L3):
