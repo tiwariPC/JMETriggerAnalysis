@@ -11,11 +11,11 @@ public:
                                          const edm::EDGetToken&,
                                          const std::string& strCut = "",
                                          const bool orderByHighestPt = false);
-  virtual ~RecoGenJetCollectionContainer() {}
+  ~RecoGenJetCollectionContainer() override {}
 
-  void clear();
-  void reserve(const size_t);
-  void emplace_back(const reco::GenJet&);
+  void clear() override;
+  void reserve(const size_t) override;
+  void emplace_back(const reco::GenJet&) override;
 
   std::vector<float>& vec_pt() { return pt_; }
   std::vector<float>& vec_eta() { return eta_; }

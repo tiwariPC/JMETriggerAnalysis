@@ -11,11 +11,11 @@ public:
                                                const edm::EDGetToken&,
                                                const std::string& strCut = "",
                                                const bool orderByHighestPt = false);
-  virtual ~RecoPFClusterMETCollectionContainer() {}
+  ~RecoPFClusterMETCollectionContainer() override {}
 
-  void clear();
-  void reserve(const size_t);
-  void emplace_back(const reco::PFClusterMET&);
+  void clear() override;
+  void reserve(const size_t) override;
+  void emplace_back(const reco::PFClusterMET&) override;
 
   std::vector<float>& vec_pt() { return pt_; }
   std::vector<float>& vec_phi() { return phi_; }
