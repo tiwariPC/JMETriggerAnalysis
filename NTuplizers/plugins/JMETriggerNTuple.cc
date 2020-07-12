@@ -183,10 +183,10 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   this->initValueContainers(v_intContainer_, "ints", iConfig, -999);
 
   // floats
-  this->initValueContainers(v_floatContainer_, "floats", iConfig, -999.0f);
+  this->initValueContainers(v_floatContainer_, "floats", iConfig, -999.f);
 
   // doubles
-  this->initValueContainers(v_doubleContainer_, "doubles", iConfig, -999.0d);
+  this->initValueContainers(v_doubleContainer_, "doubles", iConfig, -999.);
 
   // vbools
   this->initValueContainers(v_vboolContainer_, "vbools", iConfig, std::vector<bool>());
