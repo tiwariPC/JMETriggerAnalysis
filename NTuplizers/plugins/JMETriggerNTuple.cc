@@ -11,6 +11,7 @@
 #include "JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/ValueContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/L1TPFCandidateCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFCandidateCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/PATPackedCandidateCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoGenJetCollectionContainer.h"
@@ -70,6 +71,7 @@ class JMETriggerNTuple : public edm::one::EDAnalyzer<edm::one::SharedResources> 
   std::vector<ValueContainer<std::vector<float>>> v_vfloatContainer_;
   std::vector<ValueContainer<std::vector<double>>> v_vdoubleContainer_;
   std::vector<RecoVertexCollectionContainer> v_recoVertexCollectionContainer_;
+  std::vector<L1TPFCandidateCollectionContainer> v_l1tPFCandidateCollectionContainer_;
   std::vector<RecoPFCandidateCollectionContainer> v_recoPFCandidateCollectionContainer_;
   std::vector<PATPackedCandidateCollectionContainer> v_patPackedCandidateCollectionContainer_;
   std::vector<RecoGenJetCollectionContainer> v_recoGenJetCollectionContainer_;
@@ -193,6 +195,11 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   // reco::VertexCollection
   initCollectionContainer<RecoVertexCollectionContainer, reco::Vertex>
     (iConfig, v_recoVertexCollectionContainer_, "recoVertexCollections", "reco::VertexCollection", stringCutObjectSelectors_map_);
+
+  // l1t::PFCandidateCollection
+  initCollectionContainer<L1TPFCandidateCollectionContainer, l1t::PFCandidate>
+    (iConfig, v_l1tPFCandidateCollectionContainer_, "l1tPFCandidateCollections", "l1t::PFCandidateCollection", stringCutObjectSelectors_map_);
+  for(auto& cc_i : v_l1tPFCandidateCollectionContainer_){ cc_i.orderByHighestPt(true); }
 
   // reco::PFCandidateCollection
   initCollectionContainer<RecoPFCandidateCollectionContainer, reco::PFCandidate>
@@ -334,6 +341,19 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoVertexCollectionContainer_i.name()+"_xError", &recoVertexCollectionContainer_i.vec_xError());
     this->addBranch(recoVertexCollectionContainer_i.name()+"_yError", &recoVertexCollectionContainer_i.vec_yError());
     this->addBranch(recoVertexCollectionContainer_i.name()+"_zError", &recoVertexCollectionContainer_i.vec_zError());
+  }
+
+  for(auto& l1tPFCandidateCollectionContainer_i : v_l1tPFCandidateCollectionContainer_){
+
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_pdgId", &l1tPFCandidateCollectionContainer_i.vec_pdgId());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_pt", &l1tPFCandidateCollectionContainer_i.vec_pt());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_eta", &l1tPFCandidateCollectionContainer_i.vec_eta());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_phi", &l1tPFCandidateCollectionContainer_i.vec_phi());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_mass", &l1tPFCandidateCollectionContainer_i.vec_mass());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_vx", &l1tPFCandidateCollectionContainer_i.vec_vx());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_vy", &l1tPFCandidateCollectionContainer_i.vec_vy());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_vz", &l1tPFCandidateCollectionContainer_i.vec_vz());
+    this->addBranch(l1tPFCandidateCollectionContainer_i.name()+"_puppiWeight", &l1tPFCandidateCollectionContainer_i.vec_puppiWeight());
   }
 
   for(auto& recoPFCandidateCollectionContainer_i : v_recoPFCandidateCollectionContainer_){
@@ -632,6 +652,9 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   // reco::Vertex
   this->fillCollectionContainer<RecoVertexCollectionContainer, reco::Vertex>(iEvent, v_recoVertexCollectionContainer_, fillCollectionConditionMap_);
+
+  // l1t::PFCandidateCollection
+  this->fillCollectionContainer<L1TPFCandidateCollectionContainer, l1t::PFCandidate>(iEvent, v_l1tPFCandidateCollectionContainer_, fillCollectionConditionMap_);
 
   // reco::PFCandidateCollection
   this->fillCollectionContainer<RecoPFCandidateCollectionContainer, reco::PFCandidate>(iEvent, v_recoPFCandidateCollectionContainer_, fillCollectionConditionMap_);

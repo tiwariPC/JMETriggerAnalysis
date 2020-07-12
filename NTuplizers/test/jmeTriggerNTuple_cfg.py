@@ -131,9 +131,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
   ),
 
+  l1tPFCandidateCollections = cms.PSet(
+
+#    l1tPuppi = cms.InputTag('l1pfCandidates', 'Puppi'),
+  ),
+
   recoPFCandidateCollections = cms.PSet(
 
-#    particleFlowTmp = cms.InputTag('particleFlowTmp'),
+#    hltParticleFlow = cms.InputTag('particleFlowTmp'),
 #    hltPuppi = cms.InputTag('hltPuppi'),
 #    hltPuppiForMET = cms.InputTag('hltPuppiForMET'),
   ),
