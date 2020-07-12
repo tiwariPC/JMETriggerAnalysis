@@ -17,6 +17,6 @@ if ! [ -d ${ROOTSYS}/include ]; then
   exit 1
 fi
 
-find ${CLANGTIDY_INPUT_DIR} -regex '.*\.\(cpp\|hpp\|cu\|c\|cc\|h\)' -exec clang-tidy -fix-errors {} -- -x c++ -std=c++2a -I${CMSSW_BASE}/src -I${ROOTSYS}/include \;
+find ${CLANGTIDY_INPUT_DIR} -regex '.*\.\(cpp\|hpp\|cu\|c\|cc\|h\)' -exec clang-tidy -fix-errors {} -- -x c++ -std=c++2a -I${ROOT_INCLUDE_PATH//:/ -I} \;
 
 unset -v CLANGTIDY_INPUT_DIR
