@@ -15,33 +15,31 @@
 #include <TH1D.h>
 
 class L1TPFTrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
-
- public:
+public:
   explicit L1TPFTrackHistogrammer(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
- private:
+private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
   const edm::InputTag pfTracks_tag_;
   const edm::EDGetTokenT<l1t::PFTrackCollection> pfTracks_token_;
 
-  TH1D *h_pfTrack_mult_ = nullptr;
-  TH1D *h_pfTrack_pt_ = nullptr;
-  TH1D *h_pfTrack_pt_2_ = nullptr;
-  TH1D *h_pfTrack_eta_ = nullptr;
-  TH1D *h_pfTrack_phi_ = nullptr;
+  TH1D* h_pfTrack_mult_ = nullptr;
+  TH1D* h_pfTrack_pt_ = nullptr;
+  TH1D* h_pfTrack_pt_2_ = nullptr;
+  TH1D* h_pfTrack_eta_ = nullptr;
+  TH1D* h_pfTrack_phi_ = nullptr;
 };
 
 L1TPFTrackHistogrammer::L1TPFTrackHistogrammer(const edm::ParameterSet& iConfig)
-  : pfTracks_tag_(iConfig.getParameter<edm::InputTag>("src"))
-  , pfTracks_token_(consumes<l1t::PFTrackCollection>(pfTracks_tag_)) {
-
+    : pfTracks_tag_(iConfig.getParameter<edm::InputTag>("src")),
+      pfTracks_token_(consumes<l1t::PFTrackCollection>(pfTracks_tag_)) {
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
-  if(not fs){
+  if (not fs) {
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -52,19 +50,18 @@ L1TPFTrackHistogrammer::L1TPFTrackHistogrammer(const edm::ParameterSet& iConfig)
   h_pfTrack_phi_ = fs->make<TH1D>("pfTrack_phi", "pfTrack_phi", 600, -3., 3.);
 }
 
-void L1TPFTrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void L1TPFTrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   auto const& pfTracks(iEvent.getHandle(pfTracks_token_));
 
-  if(pfTracks.isValid()){
+  if (pfTracks.isValid()) {
     h_pfTrack_mult_->Fill(pfTracks->size());
-    for(auto const& trk : *pfTracks){
+    for (auto const& trk : *pfTracks) {
       h_pfTrack_pt_->Fill(trk.pt());
       h_pfTrack_pt_2_->Fill(trk.pt());
       h_pfTrack_eta_->Fill(trk.eta());
       h_pfTrack_phi_->Fill(trk.phi());
     }
-  }
-  else {
+  } else {
     edm::LogWarning("Input") << "invalid handle to l1t::PFTrackCollection : " << pfTracks_tag_.encode();
   }
 }
