@@ -13,7 +13,7 @@ public:
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
 private:
-  virtual bool filter(edm::Event&, const edm::EventSetup&);
+  bool filter(edm::Event&, const edm::EventSetup&) override;
 
   edm::EDGetToken online_;
   edm::EDGetToken offline_;
@@ -44,7 +44,7 @@ bool METMinDeltaPt::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     return false;
   }
 
-  if (offline_handle->size() == 0) {
+  if (offline_handle->empty()) {
     edm::LogWarning("Input") << "empty vector of candidates in input collection under \"offline\"";
 
     return false;
@@ -87,7 +87,7 @@ bool METMinDeltaPt::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     return false;
   }
 
-  if (online_handle->size() == 0) {
+  if (online_handle->empty()) {
     edm::LogWarning("Input") << "empty vector of candidates in input collection under \"online\"";
 
     return false;

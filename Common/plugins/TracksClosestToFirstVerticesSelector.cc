@@ -61,7 +61,7 @@ void TracksClosestToFirstVerticesSelector::produce(edm::Event& iEvent, const edm
   LogDebug("Input") << "size of input collections: " << tracks->size() << " tracks, " << vertices->size()
                     << " vertices";
 
-  if (vertices->size() > 0) {
+  if (!vertices->empty()) {
     for (const auto& track : *tracks) {
       double trkVtx_minDz(-1.);
       int trkVtx_minDz_vtxIdx(-1);

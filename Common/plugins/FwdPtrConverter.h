@@ -21,7 +21,7 @@ public:
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
 private:
-  void produce(edm::Event&, const edm::EventSetup&);
+  void produce(edm::Event&, const edm::EventSetup&) override;
 
   const edm::EDGetTokenT<edm::View<edm::FwdPtr<T>>> src_token_;
   const edm::EDPutTokenT<std::vector<T>> out_token_;

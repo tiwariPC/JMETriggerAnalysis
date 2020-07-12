@@ -23,7 +23,7 @@ public:
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
 private:
-  virtual void produce(edm::Event&, const edm::EventSetup&);
+  void produce(edm::Event&, const edm::EventSetup&) override;
 
   edm::EDGetToken src_;
 
@@ -129,7 +129,7 @@ void MuonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<edm::View<reco::Vertex> > recoVtxs;
   iEvent.getByToken(primaryVertices_, recoVtxs);
 
-  const auto* PV = (recoVtxs->size() > 0) ? &(recoVtxs->at(0)) : nullptr;
+  const auto* PV = (!recoVtxs->empty()) ? &(recoVtxs->at(0)) : nullptr;
 
   if (PV == nullptr) {
     edm::LogWarning("Input") << "@@@ MuonPATUserData::produce -- empty collection of primary vertices";

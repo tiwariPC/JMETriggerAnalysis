@@ -90,7 +90,7 @@ void PixelVerticesSelector::produce(edm::Event& iEvent, const edm::EventSetup& i
               return (foo1.fom > foo2.fom);
             });
 
-  const double max_sumPt2((vec_indexAndFOM.size() > 0) ? vec_indexAndFOM.at(0).fom : -1.);
+  const double max_sumPt2((!vec_indexAndFOM.empty()) ? vec_indexAndFOM.at(0).fom : -1.);
 
   const double minSumPt2_rel(minSumPt2FractionWrtMax_ * max_sumPt2);
 
