@@ -7,13 +7,8 @@ if ! [ -d ${CLANGTIDY_INPUT_DIR} ]; then
   exit 1
 fi
 
-if ! [ -d ${CMSSW_BASE}/src ]; then
-  printf "%s\n" "ERROR -- target directory does not exist [\${CMSSW_BASE}/src]: ${CMSSW_BASE}/src"
-  exit 1
-fi
-
-if ! [ -d ${ROOTSYS}/include ]; then
-  printf "%s\n" "ERROR -- target directory does not exist [\${ROOTSYS}/include]: ${ROOTSYS}/include"
+if [ -z "${ROOT_INCLUDE_PATH}" ]; then
+  printf "%s\n" "ERROR -- environment variable ROOT_INCLUDE_PATH is empty"
   exit 1
 fi
 
