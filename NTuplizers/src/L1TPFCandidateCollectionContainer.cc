@@ -1,12 +1,13 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/L1TPFCandidateCollectionContainer.h>
 
-L1TPFCandidateCollectionContainer::L1TPFCandidateCollectionContainer(
-  const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token, const std::string& strCut, const bool orderByHighestPt
-) : VRecoCandidateCollectionContainer(name, inputTagLabel, token, strCut, orderByHighestPt) {
-}
+L1TPFCandidateCollectionContainer::L1TPFCandidateCollectionContainer(const std::string& name,
+                                                                     const std::string& inputTagLabel,
+                                                                     const edm::EDGetToken& token,
+                                                                     const std::string& strCut,
+                                                                     const bool orderByHighestPt)
+    : VRecoCandidateCollectionContainer(name, inputTagLabel, token, strCut, orderByHighestPt) {}
 
-void L1TPFCandidateCollectionContainer::clear(){
-
+void L1TPFCandidateCollectionContainer::clear() {
   pdgId_.clear();
   pt_.clear();
   eta_.clear();
@@ -18,8 +19,7 @@ void L1TPFCandidateCollectionContainer::clear(){
   puppiWeight_.clear();
 }
 
-void L1TPFCandidateCollectionContainer::reserve(const size_t vec_size){
-
+void L1TPFCandidateCollectionContainer::reserve(const size_t vec_size) {
   pdgId_.reserve(vec_size);
   pt_.reserve(vec_size);
   eta_.reserve(vec_size);
@@ -31,8 +31,7 @@ void L1TPFCandidateCollectionContainer::reserve(const size_t vec_size){
   puppiWeight_.reserve(vec_size);
 }
 
-void L1TPFCandidateCollectionContainer::emplace_back(const l1t::PFCandidate& obj){
-
+void L1TPFCandidateCollectionContainer::emplace_back(const l1t::PFCandidate& obj) {
   pdgId_.emplace_back(obj.pdgId());
   pt_.emplace_back(obj.pt());
   eta_.emplace_back(obj.eta());

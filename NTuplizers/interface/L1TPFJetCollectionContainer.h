@@ -5,24 +5,27 @@
 #include <DataFormats/L1TParticleFlow/interface/PFJet.h>
 
 class L1TPFJetCollectionContainer : public VRecoCandidateCollectionContainer<l1t::PFJet> {
-
- public:
-  explicit L1TPFJetCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
+public:
+  explicit L1TPFJetCollectionContainer(const std::string&,
+                                       const std::string&,
+                                       const edm::EDGetToken&,
+                                       const std::string& strCut = "",
+                                       const bool orderByHighestPt = false);
   virtual ~L1TPFJetCollectionContainer() {}
 
   void clear();
   void reserve(const size_t);
   void emplace_back(const l1t::PFJet&);
 
-  std::vector<float>& vec_pt(){ return pt_; }
-  std::vector<float>& vec_eta(){ return eta_; }
-  std::vector<float>& vec_phi(){ return phi_; }
-  std::vector<float>& vec_mass(){ return mass_; }
+  std::vector<float>& vec_pt() { return pt_; }
+  std::vector<float>& vec_eta() { return eta_; }
+  std::vector<float>& vec_phi() { return phi_; }
+  std::vector<float>& vec_mass() { return mass_; }
 
-  std::vector<float>& vec_jesc(){ return jesc_; }
-  std::vector<uint>& vec_numberOfDaughters(){ return numberOfDaughters_; }
+  std::vector<float>& vec_jesc() { return jesc_; }
+  std::vector<uint>& vec_numberOfDaughters() { return numberOfDaughters_; }
 
- protected:
+protected:
   std::vector<float> pt_;
   std::vector<float> eta_;
   std::vector<float> phi_;

@@ -1,12 +1,13 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoPFJetCollectionContainer.h>
 
-RecoPFJetCollectionContainer::RecoPFJetCollectionContainer(
-  const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token, const std::string& strCut, const bool orderByHighestPt
-) : VRecoCandidateCollectionContainer(name, inputTagLabel, token, strCut, orderByHighestPt) {
-}
+RecoPFJetCollectionContainer::RecoPFJetCollectionContainer(const std::string& name,
+                                                           const std::string& inputTagLabel,
+                                                           const edm::EDGetToken& token,
+                                                           const std::string& strCut,
+                                                           const bool orderByHighestPt)
+    : VRecoCandidateCollectionContainer(name, inputTagLabel, token, strCut, orderByHighestPt) {}
 
-void RecoPFJetCollectionContainer::clear(){
-
+void RecoPFJetCollectionContainer::clear() {
   pt_.clear();
   eta_.clear();
   phi_.clear();
@@ -29,8 +30,7 @@ void RecoPFJetCollectionContainer::clear(){
   muonMultiplicity_.clear();
 }
 
-void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
-
+void RecoPFJetCollectionContainer::reserve(const size_t vec_size) {
   pt_.reserve(vec_size);
   eta_.reserve(vec_size);
   phi_.reserve(vec_size);
@@ -38,7 +38,8 @@ void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
 
   jesc_.reserve(vec_size);
   jetArea_.reserve(vec_size);
-  numberOfDaughters_.reserve(vec_size);;
+  numberOfDaughters_.reserve(vec_size);
+  ;
 
   chargedHadronEnergyFraction_.reserve(vec_size);
   neutralHadronEnergyFraction_.reserve(vec_size);
@@ -53,18 +54,17 @@ void RecoPFJetCollectionContainer::reserve(const size_t vec_size){
   muonMultiplicity_.reserve(vec_size);
 }
 
-void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj){
-
+void RecoPFJetCollectionContainer::emplace_back(const reco::PFJet& obj) {
   pt_.emplace_back(obj.pt());
   eta_.emplace_back(obj.eta());
   phi_.emplace_back(obj.phi());
   mass_.emplace_back(obj.mass());
 
-  const auto totFrac = obj.chargedHadronEnergyFraction() + obj.neutralHadronEnergyFraction()
-   + obj.photonEnergyFraction() + obj.electronEnergyFraction() + obj.muonEnergyFraction() +
-   + obj.HFEMEnergyFraction();
+  const auto totFrac = obj.chargedHadronEnergyFraction() + obj.neutralHadronEnergyFraction() +
+                       obj.photonEnergyFraction() + obj.electronEnergyFraction() + obj.muonEnergyFraction() +
+                       +obj.HFEMEnergyFraction();
 
-  const auto jesc = totFrac ? (1./totFrac) : 1.;
+  const auto jesc = totFrac ? (1. / totFrac) : 1.;
 
   jesc_.emplace_back(jesc);
   jetArea_.emplace_back(obj.jetArea());
