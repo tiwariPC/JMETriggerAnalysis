@@ -12,33 +12,31 @@
 #include <TH1D.h>
 
 class L1TVertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
-
- public:
+public:
   explicit L1TVertexHistogrammer(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
- private:
+private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
   const edm::InputTag vertices_tag_;
   const edm::EDGetTokenT<l1t::TkPrimaryVertexCollection> vertices_token_;
 
-  TH1D *h_vertex_mult_ = nullptr;
-  TH1D *h_vertex_z_ = nullptr;
-  TH1D *h_vertex0_z_ = nullptr;
-  TH1D *h_vertex_sum_ = nullptr;
-  TH1D *h_vertex0_sum_ = nullptr;
+  TH1D* h_vertex_mult_ = nullptr;
+  TH1D* h_vertex_z_ = nullptr;
+  TH1D* h_vertex0_z_ = nullptr;
+  TH1D* h_vertex_sum_ = nullptr;
+  TH1D* h_vertex0_sum_ = nullptr;
 };
 
 L1TVertexHistogrammer::L1TVertexHistogrammer(const edm::ParameterSet& iConfig)
-  : vertices_tag_(iConfig.getParameter<edm::InputTag>("src"))
-  , vertices_token_(consumes<l1t::TkPrimaryVertexCollection>(vertices_tag_)) {
-
+    : vertices_tag_(iConfig.getParameter<edm::InputTag>("src")),
+      vertices_token_(consumes<l1t::TkPrimaryVertexCollection>(vertices_tag_)) {
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
-  if(not fs){
+  if (not fs) {
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -50,16 +48,16 @@ L1TVertexHistogrammer::L1TVertexHistogrammer(const edm::ParameterSet& iConfig)
   h_vertex0_sum_ = fs->make<TH1D>("vertex0_sum", "vertex0_sum", 90, 0, 900);
 }
 
-void L1TVertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void L1TVertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   auto const& vertices(iEvent.getHandle(vertices_token_));
 
-  if(vertices.isValid()){
+  if (vertices.isValid()) {
     h_vertex_mult_->Fill(vertices->size());
 
-    for(uint idx=0; idx<vertices->size(); ++idx){
+    for (uint idx = 0; idx < vertices->size(); ++idx) {
       auto const& vtx(vertices->at(idx));
 
-      if(idx == 0){
+      if (idx == 0) {
         h_vertex0_z_->Fill(vtx.zvertex());
         h_vertex0_sum_->Fill(vtx.sum());
       }
@@ -67,8 +65,7 @@ void L1TVertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSe
       h_vertex_z_->Fill(vtx.zvertex());
       h_vertex_sum_->Fill(vtx.sum());
     }
-  }
-  else {
+  } else {
     edm::LogWarning("Input") << "invalid handle to l1t::TkPrimaryVertexCollection : " << vertices_tag_.encode();
   }
 }

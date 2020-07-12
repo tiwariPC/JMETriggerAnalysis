@@ -12,32 +12,29 @@
 #include <TH1D.h>
 
 class L1TPFJetHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
-
- public:
+public:
   explicit L1TPFJetHistogrammer(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
- private:
+private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
   const edm::InputTag jets_tag_;
   const edm::EDGetTokenT<l1t::PFJetCollection> jets_token_;
 
-  TH1D *h_jet_mult_ = nullptr;
-  TH1D *h_jet_pt_ = nullptr;
-  TH1D *h_jet_eta_ = nullptr;
-  TH1D *h_jet_phi_ = nullptr;
+  TH1D* h_jet_mult_ = nullptr;
+  TH1D* h_jet_pt_ = nullptr;
+  TH1D* h_jet_eta_ = nullptr;
+  TH1D* h_jet_phi_ = nullptr;
 };
 
 L1TPFJetHistogrammer::L1TPFJetHistogrammer(const edm::ParameterSet& iConfig)
-  : jets_tag_(iConfig.getParameter<edm::InputTag>("src"))
-  , jets_token_(consumes<l1t::PFJetCollection>(jets_tag_)) {
-
+    : jets_tag_(iConfig.getParameter<edm::InputTag>("src")), jets_token_(consumes<l1t::PFJetCollection>(jets_tag_)) {
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
-  if(not fs){
+  if (not fs) {
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -47,18 +44,17 @@ L1TPFJetHistogrammer::L1TPFJetHistogrammer(const edm::ParameterSet& iConfig)
   h_jet_phi_ = fs->make<TH1D>("jet_phi", "jet_phi", 600, -3., 3.);
 }
 
-void L1TPFJetHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void L1TPFJetHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   auto const& jets(iEvent.getHandle(jets_token_));
 
-  if(jets.isValid()){
+  if (jets.isValid()) {
     h_jet_mult_->Fill(jets->size());
-    for(auto const& jet : *jets){
+    for (auto const& jet : *jets) {
       h_jet_pt_->Fill(jet.pt());
       h_jet_eta_->Fill(jet.eta());
       h_jet_phi_->Fill(jet.phi());
     }
-  }
-  else {
+  } else {
     edm::LogWarning("Input") << "invalid handle to l1t::PFJetCollection : " << jets_tag_.encode();
   }
 }

@@ -5,37 +5,40 @@
 #include <DataFormats/PatCandidates/interface/Jet.h>
 
 class PATJetCollectionContainer : public VRecoCandidateCollectionContainer<pat::Jet> {
+public:
+  explicit PATJetCollectionContainer(const std::string&,
+                                     const std::string&,
+                                     const edm::EDGetToken&,
+                                     const std::string& strCut = "",
+                                     const bool orderByHighestPt = false);
+  ~PATJetCollectionContainer() override {}
 
- public:
-  explicit PATJetCollectionContainer(const std::string&, const std::string&, const edm::EDGetToken&, const std::string& strCut="", const bool orderByHighestPt=false);
-  virtual ~PATJetCollectionContainer() {}
+  void clear() override;
+  void reserve(const size_t) override;
+  void emplace_back(const pat::Jet&) override;
 
-  void clear();
-  void reserve(const size_t);
-  void emplace_back(const pat::Jet&);
+  std::vector<float>& vec_pt() { return pt_; }
+  std::vector<float>& vec_eta() { return eta_; }
+  std::vector<float>& vec_phi() { return phi_; }
+  std::vector<float>& vec_mass() { return mass_; }
 
-  std::vector<float>& vec_pt(){ return pt_; }
-  std::vector<float>& vec_eta(){ return eta_; }
-  std::vector<float>& vec_phi(){ return phi_; }
-  std::vector<float>& vec_mass(){ return mass_; }
+  std::vector<float>& vec_jesc() { return jesc_; }
+  std::vector<float>& vec_jetArea() { return jetArea_; }
+  std::vector<uint>& vec_numberOfDaughters() { return numberOfDaughters_; }
 
-  std::vector<float>& vec_jesc(){ return jesc_; }
-  std::vector<float>& vec_jetArea(){ return jetArea_; }
-  std::vector<uint>& vec_numberOfDaughters(){ return numberOfDaughters_; }
+  std::vector<float>& vec_chargedHadronEnergyFraction() { return chargedHadronEnergyFraction_; }
+  std::vector<float>& vec_neutralHadronEnergyFraction() { return neutralHadronEnergyFraction_; }
+  std::vector<float>& vec_electronEnergyFraction() { return electronEnergyFraction_; }
+  std::vector<float>& vec_photonEnergyFraction() { return photonEnergyFraction_; }
+  std::vector<float>& vec_muonEnergyFraction() { return muonEnergyFraction_; }
 
-  std::vector<float>& vec_chargedHadronEnergyFraction(){ return chargedHadronEnergyFraction_; }
-  std::vector<float>& vec_neutralHadronEnergyFraction(){ return neutralHadronEnergyFraction_; }
-  std::vector<float>& vec_electronEnergyFraction(){ return electronEnergyFraction_; }
-  std::vector<float>& vec_photonEnergyFraction(){ return photonEnergyFraction_; }
-  std::vector<float>& vec_muonEnergyFraction(){ return muonEnergyFraction_; }
+  std::vector<int>& vec_chargedHadronMultiplicity() { return chargedHadronMultiplicity_; }
+  std::vector<int>& vec_neutralHadronMultiplicity() { return neutralHadronMultiplicity_; }
+  std::vector<int>& vec_electronMultiplicity() { return electronMultiplicity_; }
+  std::vector<int>& vec_photonMultiplicity() { return photonMultiplicity_; }
+  std::vector<int>& vec_muonMultiplicity() { return muonMultiplicity_; }
 
-  std::vector<int>& vec_chargedHadronMultiplicity(){ return chargedHadronMultiplicity_; }
-  std::vector<int>& vec_neutralHadronMultiplicity(){ return neutralHadronMultiplicity_; }
-  std::vector<int>& vec_electronMultiplicity(){ return electronMultiplicity_; }
-  std::vector<int>& vec_photonMultiplicity(){ return photonMultiplicity_; }
-  std::vector<int>& vec_muonMultiplicity(){ return muonMultiplicity_; }
-
- protected:
+protected:
   std::vector<float> pt_;
   std::vector<float> eta_;
   std::vector<float> phi_;
