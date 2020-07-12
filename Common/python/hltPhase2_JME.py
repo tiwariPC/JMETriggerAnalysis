@@ -648,7 +648,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Jets: Puppi AK4
     process.hltPuppi = puppi.clone(
       candName = _particleFlowCands,
-      vertexName = _primaryVertices,
+      vertexName = _primaryVerticesGood,
     )
     process.hltAK4PuppiJets = ak4PFJetsPuppi.clone(
       src = _particleFlowCands,
@@ -721,7 +721,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     )
     process.puppiNoLep = puppi.clone(
       candName = 'pfNoLepPUPPI',
-      vertexName = _primaryVertices,
+      vertexName = _primaryVerticesGood,
       PtMaxPhotons = 20.,
     )
     process.hltPuppiForMET = cms.EDProducer('CandViewMerger',
