@@ -13,11 +13,11 @@ public:
                                       const edm::EDGetToken&,
                                       const std::string& strCut = "",
                                       const bool orderByHighestPt = false);
-  virtual ~PATMuonCollectionContainer() {}
+  ~PATMuonCollectionContainer() override {}
 
-  void clear();
-  void reserve(const size_t);
-  void emplace_back(const pat::Muon&);
+  void clear() override;
+  void reserve(const size_t) override;
+  void emplace_back(const pat::Muon&) override;
 
   std::vector<int>& vec_pdgId() { return pdgId_; }
   std::vector<float>& vec_pt() { return pt_; }

@@ -10,11 +10,11 @@ public:
                                          const std::string&,
                                          const edm::EDGetToken&,
                                          const std::string& strCut = "");
-  virtual ~RecoVertexCollectionContainer() {}
+  ~RecoVertexCollectionContainer() override {}
 
-  void clear();
-  void reserve(const size_t);
-  void emplace_back(const reco::Vertex&);
+  void clear() override;
+  void reserve(const size_t) override;
+  void emplace_back(const reco::Vertex&) override;
 
   std::vector<uint>& vec_tracksSize() { return tracksSize_; }
   std::vector<bool>& vec_isFake() { return isFake_; }

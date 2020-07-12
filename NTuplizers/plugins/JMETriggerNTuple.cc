@@ -744,14 +744,14 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     triggerResultsContainer_ptr_->clear();
   } else {
     // exit method for events that do not pass the logical OR of the specified HLT paths (if any)
-    if (TriggerResultsFilterOR_.size() > 0) {
+    if (!TriggerResultsFilterOR_.empty()) {
       if (not this->passesTriggerResults_OR(*triggerResults_handle, iEvent, TriggerResultsFilterOR_)) {
         return;
       }
     }
 
     // exit method for events that do not pass the logical AND of the specified HLT paths (if any)
-    if (TriggerResultsFilterAND_.size() > 0) {
+    if (!TriggerResultsFilterAND_.empty()) {
       if (not this->passesTriggerResults_AND(*triggerResults_handle, iEvent, TriggerResultsFilterAND_)) {
         return;
       }
@@ -892,7 +892,7 @@ void JMETriggerNTuple::addBranch(const std::string& branch_name, Args... args) {
 bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& triggerResults,
                                                const edm::Event& iEvent,
                                                const std::vector<std::string>& paths) {
-  if (paths.size() == 0) {
+  if (paths.empty()) {
     edm::LogWarning("JMETriggerNTuple::passesTriggerResults_OR")
         << "input error: empty list of paths for event selection, will return True";
     return true;
@@ -932,7 +932,7 @@ bool JMETriggerNTuple::passesTriggerResults_OR(const edm::TriggerResults& trigge
 bool JMETriggerNTuple::passesTriggerResults_AND(const edm::TriggerResults& triggerResults,
                                                 const edm::Event& iEvent,
                                                 const std::vector<std::string>& paths) {
-  if (paths.size() == 0) {
+  if (paths.empty()) {
     edm::LogWarning("JMETriggerNTuple::passesTriggerResults_AND")
         << "input error: empty list of paths for event selection, will return True";
     return true;
