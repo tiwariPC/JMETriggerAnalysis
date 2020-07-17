@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-from CommonTools.PileupAlgos.Puppi_cff import *
+from CommonTools.PileupAlgos.Puppi_cff import puppi as _puppi
+from CommonTools.PileupAlgos.Puppi_cff import puppiNoLep as _puppiNoLep
 from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets, ak4PFJetsCHS, ak4PFJetsPuppi
 from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets, ak8PFJetsCHS, ak8PFJetsPuppi
@@ -318,21 +319,21 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ## Sequence: Calo Jets
     process.HLTCaloJetsReconstruction = cms.Sequence(
-      process.hltAK4CaloJets
-    + process.hltAK8CaloJets
-#    + process.hltFixedGridRhoFastjetAllCalo
-#    *(process.hltAK4CaloJetCorrectorL1
-#    * process.hltAK4CaloJetCorrectorL2
-#    * process.hltAK4CaloJetCorrectorL3
-#    * process.hltAK4CaloJetCorrectorL2L3
-#    * process.hltAK4CaloJetCorrector
-#    * process.hltAK4CaloJetsCorrected
-#    + process.hltAK4CaloJetCorrectorL1
-#    * process.hltAK4CaloJetCorrectorL2
-#    * process.hltAK4CaloJetCorrectorL3
-#    * process.hltAK4CaloJetCorrectorL2L3
-#    * process.hltAK4CaloJetCorrector
-#    * process.hltAK4CaloJetsCorrected)
+        process.hltAK4CaloJets
+      + process.hltAK8CaloJets
+#     + process.hltFixedGridRhoFastjetAllCalo
+#     + process.hltAK4CaloJetCorrectorL1
+#     + process.hltAK4CaloJetCorrectorL2
+#     + process.hltAK4CaloJetCorrectorL3
+#     + process.hltAK4CaloJetCorrectorL2L3
+#     + process.hltAK4CaloJetCorrector
+#     + process.hltAK4CaloJetsCorrected
+#     + process.hltAK4CaloJetCorrectorL1
+#     + process.hltAK4CaloJetCorrectorL2
+#     + process.hltAK4CaloJetCorrectorL3
+#     + process.hltAK4CaloJetCorrectorL2L3
+#     + process.hltAK4CaloJetCorrector
+#     + process.hltAK4CaloJetsCorrected
     )
 
     ## MET: Calo
@@ -378,9 +379,9 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Sequence: PFClusterJets and PFClusterMET
     process.HLTPFClusterJMEReconstruction = cms.Sequence(
         process.pfClusterRefsForJets_step
-      *(process.hltAK4PFClusterJets
+      + process.hltAK4PFClusterJets
       + process.hltAK8PFClusterJets
-      + process.hltPFClusterMET)
+      + process.hltPFClusterMET
     )
 
     ## Jets: AK4 PF
@@ -416,12 +417,12 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Sequence: AK4 PF Jets
     process.HLTAK4PFJetsReconstruction = cms.Sequence(
         process.hltAK4PFJets
-      * process.hltAK4PFJetCorrectorL1
-      * process.hltAK4PFJetCorrectorL2
-      * process.hltAK4PFJetCorrectorL3
-      * process.hltAK4PFJetCorrectorL2L3
-      * process.hltAK4PFJetCorrector
-      * process.hltAK4PFJetsCorrected
+      + process.hltAK4PFJetCorrectorL1
+      + process.hltAK4PFJetCorrectorL2
+      + process.hltAK4PFJetCorrectorL3
+      + process.hltAK4PFJetCorrectorL2L3
+      + process.hltAK4PFJetCorrector
+      + process.hltAK4PFJetsCorrected
     )
 
     ## Jets: AK8 PF
@@ -457,12 +458,12 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Sequence: AK8 PF Jets
     process.HLTAK8PFJetsReconstruction = cms.Sequence(
         process.hltAK8PFJets
-      * process.hltAK8PFJetCorrectorL1
-      * process.hltAK8PFJetCorrectorL2
-      * process.hltAK8PFJetCorrectorL3
-      * process.hltAK8PFJetCorrectorL2L3
-      * process.hltAK8PFJetCorrector
-      * process.hltAK8PFJetsCorrected
+      + process.hltAK8PFJetCorrectorL1
+      + process.hltAK8PFJetCorrectorL2
+      + process.hltAK8PFJetCorrectorL3
+      + process.hltAK8PFJetCorrectorL2L3
+      + process.hltAK8PFJetCorrector
+      + process.hltAK8PFJetsCorrected
     )
 
     ## Jets: AK4 PF+CHS
@@ -553,9 +554,9 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ## MET: PF Raw
     process.hltPFMET = cms.EDProducer( 'PFMETProducer',
-        src = cms.InputTag( _particleFlowCands ),
-        globalThreshold = cms.double( 0.0 ),
-        calculateSignificance = cms.bool( False ),
+      src = cms.InputTag( _particleFlowCands ),
+      globalThreshold = cms.double( 0.0 ),
+      calculateSignificance = cms.bool( False ),
     )
 
     ## MET: PF Type-1
@@ -602,13 +603,13 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Sequence: MET PF, Raw and Type-1
     process.HLTPFMETsReconstruction = cms.Sequence(
         process.hltPFMET
-      +(process.hltPFMETJetCorrectorL1
-      * process.hltPFMETJetCorrectorL2
-      * process.hltPFMETJetCorrectorL3
-      * process.hltPFMETJetCorrectorL2L3
-      * process.hltPFMETJetCorrector
-      * process.hltPFMETTypeOneCorrector
-      * process.hltPFMETTypeOne)
+      + process.hltPFMETJetCorrectorL1
+      + process.hltPFMETJetCorrectorL2
+      + process.hltPFMETJetCorrectorL3
+      + process.hltPFMETJetCorrectorL2L3
+      + process.hltPFMETJetCorrector
+      + process.hltPFMETTypeOneCorrector
+      + process.hltPFMETTypeOne
     )
 
     ## MET: CHS
@@ -624,7 +625,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Sequence: MET CHS
     process.HLTPFCHSMETReconstruction = cms.Sequence(
         process.hltParticleFlowCHS
-      * process.hltPFCHSMET
+      + process.hltPFCHSMET
     )
 
     ## MET: SoftKiller
@@ -642,11 +643,11 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Sequence: MET SoftKiller
     process.HLTPFSoftKillerMETReconstruction = cms.Sequence(
         process.hltParticleFlowSoftKiller
-      * process.hltPFSoftKillerMET
+      + process.hltPFSoftKillerMET
     )
 
     ## Jets: Puppi AK4
-    process.hltPuppi = puppi.clone(
+    process.hltPuppi = _puppi.clone(
       candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
     )
@@ -654,7 +655,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       src = _particleFlowCands,
       applyWeight = True,
       srcWeights = 'hltPuppi',
-#      jetPtMin = 10.,
+#     jetPtMin = 10.,
     )
     process.hltAK4PuppiJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
       srcRho = cms.InputTag( 'fixedGridRhoFastjetAllTmp' ),
@@ -686,7 +687,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       src = _particleFlowCands,
       applyWeight = True,
       srcWeights = 'hltPuppi',
-#      jetPtMin = 80.,
+#     jetPtMin = 80.,
     )
     process.hltAK8PuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK8PFPuppi' ),
@@ -711,24 +712,23 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## MET: Puppi Raw
 
     # Puppi candidates for MET
-    process.pfNoLepPUPPI = cms.EDFilter('PdgIdCandViewSelector',
-      src = cms.InputTag( _particleFlowCands ),
-      pdgId = cms.vint32( 1, 2, 22, 111, 130, 310, 2112, 211, -211, 321, -321, 999211, 2212, -2212 )
-    )
-    process.pfLeptonsPUPPET = cms.EDFilter('PdgIdCandViewSelector',
-      src = cms.InputTag( _particleFlowCands ),
-      pdgId = cms.vint32( -11, 11, -13, 13 ),
-    )
-    process.puppiNoLep = puppi.clone(
-      candName = 'pfNoLepPUPPI',
+    process.hltPuppiNoLep = _puppiNoLep.clone(
+      candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
-      PtMaxPhotons = 20.,
     )
-    process.hltPuppiForMET = cms.EDProducer('CandViewMerger',
-      src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET' ),
+
+    process.hltPuppiMETv0 = cms.EDProducer( 'PFMETProducer',
+      src = cms.InputTag( _particleFlowCands ),
+      applyWeight = cms.bool( True ),
+      srcWeights = cms.InputTag( 'hltPuppi' ),
+      globalThreshold = cms.double( 0.0 ),
+      calculateSignificance = cms.bool( False ),
     )
+
     process.hltPuppiMET = cms.EDProducer( 'PFMETProducer',
-      src = cms.InputTag( 'hltPuppiForMET' ),
+      src = cms.InputTag( _particleFlowCands ),
+      applyWeight = cms.bool( True ),
+      srcWeights = cms.InputTag( 'hltPuppiNoLep' ),
       globalThreshold = cms.double( 0.0 ),
       calculateSignificance = cms.bool( False ),
     )
@@ -753,32 +753,30 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ## Sequence: Puppi Jets and MET
     process.HLTPuppiJMEReconstruction = cms.Sequence(
-       (process.pfNoLepPUPPI
-      * process.puppiNoLep
-      + process.pfLeptonsPUPPET)
-      * process.hltPuppiForMET
-      * process.hltPuppiMET
+        process.hltPuppiNoLep
+      + process.hltPuppiMET
       + process.hltPuppi
-      *(process.hltAK4PuppiJets
-      * process.hltAK4PuppiJetCorrectorL1
-      * process.hltAK4PuppiJetCorrectorL2
-      * process.hltAK4PuppiJetCorrectorL3
-      * process.hltAK4PuppiJetCorrectorL2L3
-      * process.hltAK4PuppiJetCorrector
-      * process.hltAK4PuppiJetsCorrected
-      * process.hltPuppiMETTypeOneCorrector
-      * process.hltPuppiMETTypeOne
+      + process.hltPuppiMETv0
+      + process.hltAK4PuppiJets
+      + process.hltAK4PuppiJetCorrectorL1
+      + process.hltAK4PuppiJetCorrectorL2
+      + process.hltAK4PuppiJetCorrectorL3
+      + process.hltAK4PuppiJetCorrectorL2L3
+      + process.hltAK4PuppiJetCorrector
+      + process.hltAK4PuppiJetsCorrected
+      + process.hltPuppiMETTypeOneCorrector
+      + process.hltPuppiMETTypeOne
       + process.hltAK8PuppiJets
-      * process.hltAK8PuppiJetCorrectorL2
-      * process.hltAK8PuppiJetCorrectorL3
-      * process.hltAK8PuppiJetCorrectorL2L3
-      * process.hltAK8PuppiJetCorrector
-      * process.hltAK8PuppiJetsCorrected)
+      + process.hltAK8PuppiJetCorrectorL2
+      + process.hltAK8PuppiJetCorrectorL3
+      + process.hltAK8PuppiJetCorrectorL2L3
+      + process.hltAK8PuppiJetCorrector
+      + process.hltAK8PuppiJetsCorrected
     )
 
     ## Sequence: JME Reconstruction
     setattr(process, name, cms.Sequence(
-#        process.HLTCaloJetsReconstruction
+#       process.HLTCaloJetsReconstruction
         process.HLTCaloMETReconstruction
       + process.HLTPFClusterJMEReconstruction
       + process.HLTAK4PFJetsReconstruction
@@ -857,7 +855,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       + process.tofPIDSequence # contains tofPID maps
 
         # insert CaloJets sequence in process.globalreco
-        # (module muons1stStep from muonGlobalReco requires AK4CaloJets [*])
+        # (module muons1stStep from muonGlobalReco requires AK4CaloJets [1])
       + process.HLTCaloJetsReconstruction # was: process.jetGlobalReco
 
       + process.muonGlobalReco
@@ -866,13 +864,13 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 #      + process.pfTrackingGlobalReco
     )
 
-    # [*] modify CaloJets input to muons1stStep
+    # [1] modify CaloJets input to muons1stStep
     process.muons1stStep.JetExtractorPSet.JetCollectionLabel = 'hltAK4CaloJets'
 
     # process.highlevelreco: PF + JME (w/o CaloJets)
     process.highlevelreco = cms.Sequence(
         process.particleFlowReco
-      * getattr(process, name)
+      + getattr(process, name)
     )
 
 #    # disable use of timing information in simPFProducer
