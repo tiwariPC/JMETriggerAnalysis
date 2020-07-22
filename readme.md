@@ -12,23 +12,17 @@
 
 List of commands to set up a local CMSSW area:
 ```shell
-scram project CMSSW_11_1_0_pre6
-cd CMSSW_11_1_0_pre6/src
-eval `scram runtime -sh`
+scramv1 project CMSSW CMSSW_11_1_2
+cd CMSSW_11_1_2/src
+eval `scramv1 runtime -sh`
 
-# [HGCal] fix to PID+EnergyRegression in TICL
-git cms-merge-topic cms-sw:29799
-
-# workaround for PFSimParticle::trackerSurfaceMomentum
-# ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
-git cms-addpkg FastSimulation/Event
-git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
-git fetch hatakeyamak
-git cherry-pick 0cf67551731c80dc85130e4b8ec73c8f44d53cb0
-
-# [L1T]
-git cms-merge-topic -u cms-L1TK:L1TK-integration-CMSSW_11_1_0_pre4
-git cms-merge-topic -u cms-l1t-offline:l1t-phase2-v3.0.2
+# [temporarily comment out fix for PF-Hadron calibrations]
+# # workaround for PFSimParticle::trackerSurfaceMomentum
+# # ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
+# git cms-addpkg FastSimulation/Event
+# git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
+# git fetch hatakeyamak
+# git cherry-pick 0cf67551731c80dc85130e4b8ec73c8f44d53cb0
 
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
 scram b
