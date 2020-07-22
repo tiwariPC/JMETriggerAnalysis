@@ -152,3 +152,9 @@ process = customiseLogErrorHarvesterUsingOutputCommands(process)
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
 # End adding early deletion
+
+from HLTrigger.Configuration.common import producers_by_type
+for mod_i in producers_by_type(process, 'PuppiProducer'):
+    for algo_idx in range(len(mod_i.algos)):
+        for MinNeutralPtSlope_idx in range(len(mod_i.algos[algo_idx].MinNeutralPtSlope)):
+            mod_i.algos[algo_idx].MinNeutralPtSlope[MinNeutralPtSlope_idx] *= 1.45

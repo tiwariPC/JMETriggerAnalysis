@@ -97,9 +97,6 @@ else:
 ###
 process.analysisCollectionsSequence = cms.Sequence()
 
-process.hltPuppiMETv0 = process.hltPuppiMET.clone(src = 'hltPuppi')
-process.reconstruction += process.hltPuppiMETv0
-
 ### Muons
 #process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
 #process.analysisCollectionsSequence *= process.userMuonsSequence
