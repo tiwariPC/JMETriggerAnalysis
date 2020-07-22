@@ -122,6 +122,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   fillCollectionConditions = cms.PSet(),
 
+  doubles = cms.PSet(
+    fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),
+  ),
+
   recoVertexCollections = cms.PSet(
 
     hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'),
