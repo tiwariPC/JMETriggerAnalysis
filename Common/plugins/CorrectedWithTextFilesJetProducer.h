@@ -87,10 +87,9 @@ void CorrectedWithTextFilesJetProducer<JET_TYPE>::produce(edm::Event& iEvent, co
 template <class JET_TYPE>
 void CorrectedWithTextFilesJetProducer<JET_TYPE>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
-  desc.add<edm::InputTag>("src", edm::InputTag(""))->setComment("input collection of jets");
-  desc.add<edm::FileInPath>("textFile", edm::FileInPath(""))
-      ->setComment("text file (edm::FileInPath) for JES corrections");
+  desc.add<edm::InputTag>("src")->setComment("input collection of jets");
+  desc.add<edm::FileInPath>("textFile")->setComment("text file (edm::FileInPath) for JES corrections");
   desc.add<bool>("useRho", false)->setComment("use event rho for JESC computation");
-  desc.add<edm::InputTag>("rho", edm::InputTag(""))->setComment("event rho for JESC computation");
+  desc.addOptional<edm::InputTag>("rho")->setComment("event rho for JESC computation");
   descriptions.add(defaultModuleLabel<CorrectedWithTextFilesJetProducer<JET_TYPE>>(), desc);
 }
