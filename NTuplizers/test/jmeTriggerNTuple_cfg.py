@@ -85,10 +85,11 @@ for _modname in process.endpaths_():
     if type(_mod) == cms.EndPath:
        process.__delattr__(_modname)
        print '> removed cms.EndPath:', _modname
-       
+
 # remove selected cms.Path objects from HLT config-dump
 for _modname in process.paths_():
-    if _modname.startswith('MC_') and (('Jets' in _modname) or ('MET' in _modname)):
+#    if _modname.startswith('MC_') and (('Jets' in _modname) or ('MET' in _modname)):
+    if (_modname.startswith('MC_') and 'Jets' in _modname and (('PFCluster' in _modname) or ('Calo' in _modname))):
        continue
     _mod = getattr(process, _modname)
     if type(_mod) == cms.Path:
