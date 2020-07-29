@@ -155,6 +155,9 @@ process = customiseEarlyDelete(process)
 
 from HLTrigger.Configuration.common import producers_by_type
 for mod_i in producers_by_type(process, 'PuppiProducer'):
-    for algo_idx in range(len(mod_i.algos)):
-        for MinNeutralPtSlope_idx in range(len(mod_i.algos[algo_idx].MinNeutralPtSlope)):
-            mod_i.algos[algo_idx].MinNeutralPtSlope[MinNeutralPtSlope_idx] *= 1.45
+   for algo_idx in range(len(mod_i.algos)):
+      if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
+         raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
+      for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
+         mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 18.5 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+         mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 1.45
