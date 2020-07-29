@@ -18,7 +18,7 @@ fi
 
 declare -A samplesMap
 samplesMap["Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200"]="/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/Phase2HLTTDRWinter20DIGI-PU200_castor_110X_mcRun4_realistic_v3-v2/GEN-SIM-DIGI-RAW"
-samplesMap["Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200"]="/VBF_HToInvisible_M125_14TeV_powheg_pythia8_TuneCP5/Phase2HLTTDRWinter20DIGI-PU200_110X_mcRun4_realistic_v3-v1/GEN-SIM-DIGI-RAW"
+samplesMap["Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200"]="/VBF_HToInvisible_M125_14TeV_powheg_pythia8_TuneCP5/Phase2HLTTDRWinter20DIGI-PU200_110X_mcRun4_realistic_v3-v3/GEN-SIM-DIGI-RAW"
 
 recoKeys=(
 #  HLT_TRKv00
