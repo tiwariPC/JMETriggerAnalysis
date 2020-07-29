@@ -98,7 +98,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      --customise JMETriggerAnalysis/Common/hltPhase2_TRKv06.customize_hltPhase2_TRKv06 \
      --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_JME \
      --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_TICL \
-     --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n' \
+     --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\nprocess.prune()\n' \
      --python_filename hltPhase2_TRKv06_TICL_cfg.py
    ```
 
