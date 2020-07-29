@@ -138,13 +138,19 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFJetCollections = cms.PSet(
 
     hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
+    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
     hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
+    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
 
     hltAK4PFCHSJets = cms.InputTag('hltAK4PFCHSJets'),
+    hltAK4PFCHSJetsCorrected = cms.InputTag('hltAK4PFCHSJetsCorrected'),
     hltAK8PFCHSJets = cms.InputTag('hltAK8PFCHSJets'),
+    hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
 
     hltAK4PuppiJets = cms.InputTag('hltAK4PuppiJets'),
+    hltAK4PuppiJetsCorrected = cms.InputTag('hltAK4PuppiJetsCorrected'),
     hltAK8PuppiJets = cms.InputTag('hltAK8PuppiJets'),
+    hltAK8PuppiJetsCorrected = cms.InputTag('hltAK8PuppiJetsCorrected'),
   ),
 
   stringCutObjectSelectors = cms.PSet(
@@ -156,15 +162,21 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4CaloJets = cms.string('pt > 10'),
     hltAK4PFClusterJets = cms.string('pt > 10'),
     hltAK4PFJets = cms.string('pt > 10'),
+    hltAK4PFJetsCorrected = cms.string('pt > 10'),
     hltAK4PFCHSJets = cms.string('pt > 10'),
+    hltAK4PFCHSJetsCorrected = cms.string('pt > 10'),
     hltAK4PuppiJets = cms.string('pt > 10'),
+    hltAK4PuppiJetsCorrected = cms.string('pt > 10'),
 
     # HLT AK8
     hltAK8CaloJets = cms.string('pt > 30'),
     hltAK8PFClusterJets = cms.string('pt > 30'),
     hltAK8PFJets = cms.string('pt > 30'),
+    hltAK8PFJetsCorrected = cms.string('pt > 30'),
     hltAK8PFCHSJets = cms.string('pt > 30'),
+    hltAK8PFCHSJetsCorrected = cms.string('pt > 30'),
     hltAK8PuppiJets = cms.string('pt > 30'),
+    hltAK8PuppiJetsCorrected = cms.string('pt > 30'),
   ),
 
   outputBranchesToBeDropped = cms.vstring(
