@@ -134,19 +134,19 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   l1tPFCandidateCollections = cms.PSet(
 
-#    l1tPuppi = cms.InputTag('l1pfCandidates', 'Puppi'),
+#   l1tPuppi = cms.InputTag('l1pfCandidates', 'Puppi'),
   ),
 
   recoPFCandidateCollections = cms.PSet(
 
-#    hltParticleFlow = cms.InputTag('particleFlowTmp'),
-#    hltPuppi = cms.InputTag('hltPuppi'),
-#    hltPuppiForMET = cms.InputTag('hltPuppiForMET'),
+#   hltParticleFlow = cms.InputTag('particleFlowTmp'),
+#   hltPuppi = cms.InputTag('hltPuppi'),
+#   hltPuppiForMET = cms.InputTag('hltPuppiForMET'),
   ),
 
   patPackedCandidateCollections = cms.PSet(
 
-#    offlinePFCandidates = cms.InputTag('packedPFCandidates'),
+#   offlinePFCandidates = cms.InputTag('packedPFCandidates'),
   ),
 
   recoGenJetCollections = cms.PSet(
@@ -205,7 +205,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoCaloMETCollections = cms.PSet(
 
     hltCaloMET = cms.InputTag('hltCaloMET'),
-#    hltCaloMETClean = cms.InputTag('hltMetClean'),
+#   hltCaloMETClean = cms.InputTag('hltMetClean'),
   ),
 
   recoPFClusterMETCollections = cms.PSet(
@@ -236,12 +236,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patMuonCollections = cms.PSet(
 
-#    offlineIsolatedMuons = cms.InputTag('userIsolatedMuons'),
+#   offlineIsolatedMuons = cms.InputTag('userIsolatedMuons'),
   ),
 
   patElectronCollections = cms.PSet(
 
-#    offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'),
+#   offlineIsolatedElectrons = cms.InputTag('userIsolatedElectrons'),
   ),
 
   stringCutObjectSelectors = cms.PSet(
@@ -283,8 +283,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     'offlinePrimaryVertices_tracksSize',
 
-#    'hltPFMET_ChargedEMEtFraction',
-#    'hltPFMETTypeOne_ChargedEMEtFraction',
+#   'hltPFMET_ChargedEMEtFraction',
+#   'hltPFMETTypeOne_ChargedEMEtFraction',
 
     'genMETCalo_MuonEtFraction',
     'genMETCalo_InvisibleEtFraction',
@@ -362,14 +362,14 @@ if opts.trkdqm:
      + process.VertexHistograms_offlinePrimaryVertices
    )
 
-#   from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
-#   process.vertexAnalysis = vertexAnalysis.clone(vertexRecoCollections = ['offlinePrimaryVertices'])
-#   process.pixelVertexAnalysis = pixelVertexAnalysisPixelTrackingOnly.clone(vertexRecoCollections = ['pixelVertices'])
+#  from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
+#  process.vertexAnalysis = vertexAnalysis.clone(vertexRecoCollections = ['offlinePrimaryVertices'])
+#  process.pixelVertexAnalysis = pixelVertexAnalysisPixelTrackingOnly.clone(vertexRecoCollections = ['pixelVertices'])
 #
-#   process.trkMonitoringSeq += cms.Sequence(
-#       process.vertexAnalysis
-#     + process.pixelVertexAnalysis
-#   )
+#  process.trkMonitoringSeq += cms.Sequence(
+#      process.vertexAnalysis
+#    + process.pixelVertexAnalysis
+#  )
 
    process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
    process.schedule.extend([process.trkMonitoringEndPath])
