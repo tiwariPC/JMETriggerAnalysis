@@ -59,7 +59,7 @@ opts.parseArguments()
 ###
 ### HLT configuration
 ###
-from JMETriggerAnalysis.Common.configs.dev__CMSSW_11_1_0__GRun__V11__configDump import cms, process
+from JMETriggerAnalysis.Common.configs.dev_CMSSW_11_2_0_GRun_V5_MCPaths_configDump import cms, process
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
@@ -94,11 +94,22 @@ from JMETriggerAnalysis.Common.customise_hlt import *
 process = addPath_MC_AK4PFClusterJets(process)
 process = addPath_MC_AK4PFPuppiJets(process)
 
-#process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
-##process.HLTSchedule.extend([process.analysisCollectionsPath])
-#
-#process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
-##process.HLTSchedule.extend([process.analysisNTupleEndPath])
+process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
+
+process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
+  TTreeName = cms.string('Events'),
+  TriggerResults = cms.InputTag('TriggerResults'),
+  TriggerResultsFilterOR = cms.vstring(),
+  TriggerResultsFilterAND = cms.vstring(),
+  TriggerResultsCollections = cms.vstring(),
+  outputBranchesToBeDropped = cms.vstring(),
+  recoPFCandidateCollections = cms.PSet(
+    hltPFPuppi = cms.InputTag('hltPFPuppi')
+  )
+)
+
+process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
+#process.HLTSchedule.extend([process.analysisNTupleEndPath])
 
 if opts.printSummaries:
    process.FastTimerService.printEventSummary = False
