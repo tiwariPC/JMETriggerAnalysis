@@ -1,15 +1,16 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
-  printf "%s\n" "specify if igprof shall be used [1/0]"
+if [ $# -ne 2 ]; then
+  printf "%s\n" "specify [1] if igprof shall be used (0,1), and [2] the name of the output file"
 #  printf "%s\n" "specify if igprof shall be used [1/0] and the number of threads/streams [int]"
   exit 1
 fi
 
 IGPROF=${1}
+OUTFILE=${2}
 NTHREADS=4 #${2}
 
-EXE="cmsRun jmeTriggerNTuple_cfg.py inputFiles=file:1E007C6B-0236-774C-AE76-16FF40129ED8.root secondaryInputFiles=None printSummaries=1 maxEvents=100 numThreads=${NTHREADS} numStreams=0 wantSummary=1"
+EXE="cmsRun jmeTriggerNTuple_cfg.py inputFiles=file:1E007C6B-0236-774C-AE76-16FF40129ED8.root secondaryInputFiles=None printSummaries=1 maxEvents=100 numThreads=${NTHREADS} numStreams=0 wantSummary=1 output=${OUTFILE}"
 
 if [ ${IGPROF} -ne 0 ]; then
   igprof -t cmsRun -pp -z -o igprof.jmeTriggerNTuple.pp.gz ${EXE}
