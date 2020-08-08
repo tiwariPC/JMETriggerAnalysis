@@ -79,13 +79,11 @@ can be found under
 ### Instructions for testing latest HLT menus on Run-2 data
 
 This section contains a list of recipes to test
-recent HLT menus, plus the relevant customizations,
-on Run-2 data.
-
+recent HLT menus on Run-2 data.
 This set of instructions is preliminary;
-although it draws from tools developed by HLT experts,
+although it heavily draws from tools developed by HLT experts,
 this is in no way a set of recommendations by TSG.
-Careful validation of the results is warranted; buyer beware.
+The results of the workflow reported below are yet to be validated, so let the buyer beware.
 
  1. **2018 HLT menu (10_1_X)**:
     HLT configuration as used in Run-2 (2018).
