@@ -83,7 +83,7 @@ recent HLT menus on Run-2 data.
 This set of instructions is preliminary;
 although it heavily draws from tools developed by HLT experts,
 this is in no way a set of recommendations by TSG.
-The results of the workflow reported below are yet to be validated, so let the buyer beware.
+The results of the workflows reported below are yet to be validated, so let the buyer beware.
 
  1. **2018 HLT menu (10_1_X)**:
     HLT configuration as used in Run-2 (2018).
@@ -108,11 +108,18 @@ The results of the workflow reported below are yet to be validated, so let the b
     ```
 
  1. **Run-3 HLT menus (11_1_X) to run on Run-2 data**:
-      - Run-3 HLT menus with different customizations to be able to (1) run on Run-2 data, and (2) test modifications/improvements to the menu:
-        1. current (default) HLT menu for Run-3 (in the 11_1_X release) customized to run on Run-2; 
-        1. HLT menu for Run-3 (in the 11_1_X release), plus improvements for tracking being developed for Run-3
-           (improved pixel tracks, from the Patatrack group, and single iteration for tracks used by PF);
-        1. HLT menu for Run-3, plus improvements for tracking, and replacing PFMET with a preliminary version of PuppiMET for HLT.
+    Run-3 HLT menus with different customizations to be able to (1) run on Run-2 data, and (2) test modifications/improvements to the menu:
+
+      1. current (default) HLT menu for Run-3 (in the 11_1_X release) customized to run on Run-2; 
+
+      1. HLT menu for Run-3 (in the 11_1_X release), plus improvements for tracking being developed for Run-3
+         (improved pixel tracks, from the Patatrack group, and single iteration for tracks used by PF);
+
+      1. HLT menu for Run-3, plus improvements for tracking, and replacing PF-MET with a preliminary version of Puppi-MET;
+         note that the replacement is done *everywhere in the HLT menu* (i.e. for all MET-related paths),
+         the paths are not renamed (to compare more easily to the default menu),
+         and the Puppi-MET version used here is yet to be retuned for HLT inputs.
+
     ```
     export SCRAM_ARCH=slc7_amd64_gcc820
     cmsrel CMSSW_11_1_0_Patatrack
