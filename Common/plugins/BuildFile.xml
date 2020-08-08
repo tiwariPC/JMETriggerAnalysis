@@ -4,7 +4,6 @@
   <use name="FWCore/ParameterSet"/>
   <use name="FWCore/MessageLogger"/>
   <use name="FWCore/ServiceRegistry"/>
-  <use name="CommonTools/Egamma"/>
   <use name="CommonTools/UtilAlgos"/>
   <use name="CommonTools/Utils"/>
   <use name="RecoPixelVertexing/PixelVertexFinding"/>
@@ -16,6 +15,7 @@
   <use name="DataFormats/ParticleFlowCandidate"/>
   <use name="DataFormats/PatCandidates"/>
   <use name="HLTrigger/HLTcore"/>
+  <use name="RecoEgamma/EgammaTools"/>
   <use name="rootmath"/>
   <use name="root"/>
 </library>
