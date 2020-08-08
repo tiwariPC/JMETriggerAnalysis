@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+from HLTrigger.Configuration.common import producers_by_type
+
 def customise_SiPixelClusterProducerForRun2(process):
     for producer in producers_by_type(process, 'SiPixelClusterProducer'):
         producer.VCaltoElectronGain = 47
