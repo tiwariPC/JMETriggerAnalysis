@@ -150,10 +150,10 @@ The results of the workflows reported below are yet to be validated, so let the 
      --globaltag 101X_dataRun2_HLT_v9 \
      --input /store/data/Run2018D/EphemeralHLTPhysics1/RAW/v1/000/323/775/00000/2E066536-5CF2-B340-A73B-209640F29FF6.root \
      --customise \
-     HLTrigger/Configuration/customizeHLTforPatatrack.customise_for_Patatrack_on_cpu,\
-     JMETriggerAnalysis/Common/customise_hltTRK_singleIteration.customise_hltTRK_singleIteration,\
-     HLTrigger/Configuration/customizeHLTforCMSSW.synchronizeHCALHLTofflineRun3on2018data,\
-     JMETriggerAnalysis/Common/customise_SiPixelClusterProducerForRun2.customise_SiPixelClusterProducerForRun2 \
+    HLTrigger/Configuration/customizeHLTforPatatrack.customise_for_Patatrack_on_cpu,\
+    JMETriggerAnalysis/Common/customise_hltTRK_singleIteration.customise_hltTRK_singleIteration,\
+    HLTrigger/Configuration/customizeHLTforCMSSW.synchronizeHCALHLTofflineRun3on2018data,\
+    JMETriggerAnalysis/Common/customise_SiPixelClusterProducerForRun2.customise_SiPixelClusterProducerForRun2 \
      --max-events 1000 \
      --data \
      > hltOnRun2Data_112X_Run3_newTRK_cfg.py
@@ -168,11 +168,11 @@ The results of the workflows reported below are yet to be validated, so let the 
      --globaltag 101X_dataRun2_HLT_v9 \
      --input /store/data/Run2018D/EphemeralHLTPhysics1/RAW/v1/000/323/775/00000/2E066536-5CF2-B340-A73B-209640F29FF6.root \
      --customise \
-     HLTrigger/Configuration/customizeHLTforPatatrack.customise_for_Patatrack_on_cpu,\
-     JMETriggerAnalysis/Common/customise_hltTRK_singleIteration.customise_hltTRK_singleIteration,\
-     HLTrigger/Configuration/customizeHLTforCMSSW.synchronizeHCALHLTofflineRun3on2018data,\
-     JMETriggerAnalysis/Common/customise_SiPixelClusterProducerForRun2.customise_SiPixelClusterProducerForRun2,\
-     JMETriggerAnalysis/Common/customise_hlt_MET.customise_replacePFMETWithPuppiMETBasedOnPatatrackPixelVertices \
+    HLTrigger/Configuration/customizeHLTforPatatrack.customise_for_Patatrack_on_cpu,\
+    JMETriggerAnalysis/Common/customise_hltTRK_singleIteration.customise_hltTRK_singleIteration,\
+    HLTrigger/Configuration/customizeHLTforCMSSW.synchronizeHCALHLTofflineRun3on2018data,\
+    JMETriggerAnalysis/Common/customise_SiPixelClusterProducerForRun2.customise_SiPixelClusterProducerForRun2,\
+    JMETriggerAnalysis/Common/customise_hlt_MET.customise_replacePFMETWithPuppiMETBasedOnPatatrackPixelVertices \
      --max-events 1000 \
      --data \
      > hltOnRun2Data_112X_Run3_newTRK_hltPuppiMET_cfg.py
