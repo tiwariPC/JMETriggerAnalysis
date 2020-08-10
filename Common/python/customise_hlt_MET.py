@@ -35,9 +35,9 @@ def customise_replacePFMETWithPuppiMETBasedOnPatatrackPixelVertices(process):
     # delete PFMET
     del process.hltPFMETProducer
 
-    # retuning of Puppi parameters for HLT inputs (currently dummy)
-    _nPVfit_p0 = 0.0 # dummy
-    _nPVfit_p1 = 1.0 # dummy
+    # retuning of Puppi parameters for HLT inputs
+    # tuned on hltPixelVertices with Patatrack Pixel Quadruplets
+    _nPVfit_p0, _nPVfit_p1 = 0.888, 1.415
     for mod_i in producers_by_type(process, 'PuppiProducer'):
        for algo_idx in range(len(mod_i.algos)):
           if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
