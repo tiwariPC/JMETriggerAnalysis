@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <TH1D.h>
+#include <TH2D.h>
 
 class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
@@ -47,7 +48,7 @@ TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
   h_track_pt_2_ = fs->make<TH1D>("track_pt_2", "track_pt_2", 600, 0, 600.);
   h_track_eta_ = fs->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
   h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3.1416, 3.1416);
-  h_track_etaphi_ = fs->make<TH1D>("track_etaphi", "track_etaphi", 300, -5., 5., 300, -3.1416, 3.1416);
+  h_track_etaphi_ = fs->make<TH2D>("track_etaphi", "track_etaphi", 300, -5., 5., 300, -3.1416, 3.1416);
 }
 
 void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
