@@ -307,7 +307,9 @@ if opts.dumpPython is not None:
             cmsRun_opts += ' \\\n maxEvents='+str(i_maxEvents)
             cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
             cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
-            if i_secondaryInputFiles is not None:
+            if i_secondaryInputFiles is None:
+               cmsRun_opts += ' \\\n secondaryInputFiles=None'
+            else:
                cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
             for _tmp in cmsRun_addopts:
                cmsRun_opts += ' \\\n '+str(_tmp)
