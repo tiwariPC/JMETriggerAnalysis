@@ -47,7 +47,7 @@ for sample_key in ${!samplesMap[@]}; do
     htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
       -d ${JDIR}/${sample_key}.json -p 0 \
       -o ${ODIR}/${reco_key}/${sample_key} \
-      -m ${NEVT} reco=${reco_key} globalTag=111X_mcRun4_realistic_T15_v1 trkdqm=1 pfdqm=2
+      -m ${NEVT} reco=${reco_key} globalTag=110X_mcRun4_realistic_v3 trkdqm=1 pfdqm=2
   done
   unset -v reco_key
   unset -v sample_name
