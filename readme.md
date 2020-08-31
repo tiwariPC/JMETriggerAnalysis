@@ -5,6 +5,7 @@
 * [Configuration with JME trigger paths for testing](#configuration-with-jme-trigger-paths-for-testing)
 * [Inputs for HLT Jet Energy Scale Corrections workflow](#inputs-for-hlt-jet-energy-scale-corrections-workflow)
 * [Instructions for testing latest HLT menus on Run-2 data](#instructions-for-testing-latest-hlt-menus-on-run-2-data)
+* [Instructions for testing latest HLT menus on Run-3 MC](#instructions-for-testing-latest-hlt-menus-on-run-3-mc)
 * [Miscellanea](#miscellanea)
 
 ----------
@@ -177,6 +178,30 @@ The results of the workflows reported below are yet to be validated, so let the 
      --data \
      > hltOnRun2Data_112X_Run3_newTRK_hltPuppiMET_cfg.py
     ```
+
+----------
+
+### Instructions for testing latest HLT menus on Run-3 MC
+
+```
+export SCRAM_ARCH=slc7_amd64_gcc820
+cmsrel CMSSW_11_1_3_Patatrack
+cd CMSSW_11_1_3_Patatrack/src
+git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3_devel
+cmsenv
+scram b
+
+hltGetConfiguration /dev/CMSSW_11_1_0/GRun/V11 \
+ --full \
+ --offline \
+ --unprescale \
+ --timing \
+ --process HLT2 \
+ --globaltag 111X_mcRun3_2021_realistic_v7 \
+ --input /store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6-v1/130003/1D612E3B-8CAC-9D4B-B773-79C37D3F9D12.root \
+ --max-events 1000 \
+ > HLT_dev_CMSSW_11_1_0_GRun_V11_cfg.py
+```
 
 ----------
 

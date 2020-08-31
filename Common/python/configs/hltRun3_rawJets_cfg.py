@@ -29,7 +29,7 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
-opts.register('globalTag', '110X_mcRun3_2021_realistic_Candidate_2020_05_26_16_08_15',
+opts.register('globalTag', None,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
@@ -103,7 +103,7 @@ if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
    process.source.fileNames = [
-     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/DRFlatPU30to80_110X_mcRun3_2021_realistic_v6-v2/50000/1E007C6B-0236-774C-AE76-16FF40129ED8.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6-v1/130003/1D612E3B-8CAC-9D4B-B773-79C37D3F9D12.root',
    ]
 
 # EDM output

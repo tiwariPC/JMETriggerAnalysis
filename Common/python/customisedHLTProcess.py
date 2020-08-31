@@ -1,36 +1,37 @@
 def customisedHLTProcess(keyword):
 
     if keyword == 'HLT':
-       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
 
     elif keyword == 'HLT_trkIter2GlobalPtSeed0p9':
-       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
        from JMETriggerAnalysis.Common.configs.customise_HLT_trkIter2Global import customise_HLT_trkIter2Global
        process = customise_HLT_trkIter2Global(process, ptMin = 0.9)
 
-    elif keyword == 'HLT_pfBlockAlgoRemovePS':
-       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
-       from JMETriggerAnalysis.Common.configs.customise_HLT_pfBlockAlgoRemovePS import customise_HLT_pfBlockAlgoRemovePS
-       process = customise_HLT_pfBlockAlgoRemovePS(process)
-
     elif keyword == 'HLT_trkIter2RegionalPtSeed0p9':
-       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 0.9
 
     elif keyword == 'HLT_trkIter2RegionalPtSeed2p0':
-       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 2.0
 
     elif keyword == 'HLT_trkIter2RegionalPtSeed5p0':
-       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 5.0
 
     elif keyword == 'HLT_trkIter2RegionalPtSeed10p0':
-       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V5_configDump import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
        process.hltIter2PFlowPixelTrackingRegions.RegionPSet.ptMin = 10.0
 
     elif keyword.startswith('HLT_singleTrkIterWithPatatrack_v01'):
-       from JMETriggerAnalysis.Common.configs.HLT_singleTrkIterWithPatatrack_v01 import cms, process
+       from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
+
+       from HLTrigger.Configuration.customizeHLTforPatatrack import customise_for_Patatrack_on_cpu
+       process = customise_for_Patatrack_on_cpu(process)
+
+       from JMETriggerAnalysis.Common.customise_hltTRK_singleIteration import customise_hltTRK_singleIteration
+       process = customise_hltTRK_singleIteration(process)
 
        if keyword.endswith('_pixVtxFrac0p00'):
           process.hltTrimmedPixelVertices.fractionSumPt2 = -1.
@@ -83,72 +84,72 @@ def customisedHLTProcess(keyword):
          src = cms.InputTag('hltParticleFlowNoMu')
        )
 
-       ## add path: MC_AK4PFJets_v1
-       process.hltPreMCAK4PFJets = cms.EDFilter('HLTPrescaler',
-         L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
-         offset = cms.uint32(0)
-       )
+#       ## add path: MC_AK4PFJets_v1
+#       process.hltPreMCAK4PFJets = cms.EDFilter('HLTPrescaler',
+#         L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
+#         offset = cms.uint32(0)
+#       )
+#    
+#       process.hltAK4PFJetCollection20Filter = cms.EDFilter('HLT1PFJet',
+#         MaxEta = cms.double(3.0),
+#         MaxMass = cms.double(-1.0),
+#         MinE = cms.double(-1.0),
+#         MinEta = cms.double(-1.0),
+#         MinMass = cms.double(-1.0),
+#         MinN = cms.int32(1),
+#         MinPt = cms.double(20.0),
+#         inputTag = cms.InputTag('hltAK4PFJetsCorrected'),
+#         saveTags = cms.bool(True),
+#         triggerType = cms.int32(85)
+#       )
+#    
+#       process.MC_AK4PFJets_v1 = cms.Path(
+#           process.HLTBeginSequence
+#         + process.hltPreMCAK4PFJets
+#         + process.HLTAK4PFJetsSequence
+#         + process.hltAK4PFJetCollection20Filter
+#         + process.HLTEndSequence
+#       )
     
-       process.hltAK4PFJetCollection20Filter = cms.EDFilter('HLT1PFJet',
-         MaxEta = cms.double(3.0),
-         MaxMass = cms.double(-1.0),
-         MinE = cms.double(-1.0),
-         MinEta = cms.double(-1.0),
-         MinMass = cms.double(-1.0),
-         MinN = cms.int32(1),
-         MinPt = cms.double(20.0),
-         inputTag = cms.InputTag('hltAK4PFJetsCorrected'),
-         saveTags = cms.bool(True),
-         triggerType = cms.int32(85)
-       )
-    
-       process.MC_AK4PFJets_v1 = cms.Path(
-           process.HLTBeginSequence
-         + process.hltPreMCAK4PFJets
-         + process.HLTAK4PFJetsSequence
-         + process.hltAK4PFJetCollection20Filter
-         + process.HLTEndSequence
-       )
-    
-       ## add path: MC_AK8PFJets_v1
-       process.hltPreMCAK8PFJets = process.hltPreMCAK4PFJets.clone()
-    
-       from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets
-       process.hltAK8PFJets = ak8PFJets.clone(
-         src = 'hltParticleFlow',
-       )
-    
-       process.hltAK8PFL1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK8PFHLT'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
-       process.hltAK8PFL2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFHLT'), level = cms.string('L2Relative'))
-       process.hltAK8PFL3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFHLT'), level = cms.string('L3Absolute'))
-       process.hltAK8PFCorrector = cms.EDProducer('ChainedJetCorrectorProducer', correctors = cms.VInputTag('hltAK8PFL1Corrector','hltAK8PFL2Corrector','hltAK8PFL3Corrector'))
-       process.hltAK8PFJetsCorrected = cms.EDProducer('CorrectedPFJetProducer', src = cms.InputTag('hltAK8PFJets'), correctors = cms.VInputTag('hltAK8PFCorrector'))
-    
-       # add place-holder sequence here (redefined below)
-       process.HLTParticleFlowJMESequence = cms.Sequence()
-    
-       process.HLTAK8PFJetsSequence = cms.Sequence(
-           process.HLTParticleFlowJMESequence
-         + process.hltAK8PFJets
-         + process.hltFixedGridRhoFastjetAll
-         + process.hltAK8PFL1Corrector
-         + process.hltAK8PFL2Corrector
-         + process.hltAK8PFL3Corrector
-         + process.hltAK8PFCorrector
-         + process.hltAK8PFJetsCorrected
-       )
-    
-       process.hltAK8PFJetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
-         inputTag = 'hltAK8PFJetsCorrected'
-       )
-    
-       process.MC_AK8PFJets_v1 = cms.Path(
-           process.HLTBeginSequence
-         + process.hltPreMCAK8PFJets
-         + process.HLTAK8PFJetsSequence
-         + process.hltAK8PFJetsCollection20Filter
-         + process.HLTEndSequence
-       )
+#       ## add path: MC_AK8PFJets_v1
+#       process.hltPreMCAK8PFJets = process.hltPreMCAK4PFJets.clone()
+#    
+#       from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets
+#       process.hltAK8PFJets = ak8PFJets.clone(
+#         src = 'hltParticleFlow',
+#       )
+#    
+#       process.hltAK8PFL1Corrector = cms.EDProducer('L1FastjetCorrectorProducer', algorithm = cms.string('AK8PFHLT'), level = cms.string('L1FastJet'), srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'))
+#       process.hltAK8PFL2Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFHLT'), level = cms.string('L2Relative'))
+#       process.hltAK8PFL3Corrector = cms.EDProducer('LXXXCorrectorProducer'     , algorithm = cms.string('AK8PFHLT'), level = cms.string('L3Absolute'))
+#       process.hltAK8PFCorrector = cms.EDProducer('ChainedJetCorrectorProducer', correctors = cms.VInputTag('hltAK8PFL1Corrector','hltAK8PFL2Corrector','hltAK8PFL3Corrector'))
+#       process.hltAK8PFJetsCorrected = cms.EDProducer('CorrectedPFJetProducer', src = cms.InputTag('hltAK8PFJets'), correctors = cms.VInputTag('hltAK8PFCorrector'))
+#    
+#       # add place-holder sequence here (redefined below)
+#       process.HLTParticleFlowJMESequence = cms.Sequence()
+#    
+#       process.HLTAK8PFJetsSequence = cms.Sequence(
+#           process.HLTParticleFlowJMESequence
+#         + process.hltAK8PFJets
+#         + process.hltFixedGridRhoFastjetAll
+#         + process.hltAK8PFL1Corrector
+#         + process.hltAK8PFL2Corrector
+#         + process.hltAK8PFL3Corrector
+#         + process.hltAK8PFCorrector
+#         + process.hltAK8PFJetsCorrected
+#       )
+#    
+#       process.hltAK8PFJetsCollection20Filter = process.hltAK4PFJetCollection20Filter.clone(
+#         inputTag = 'hltAK8PFJetsCorrected'
+#       )
+#    
+#       process.MC_AK8PFJets_v1 = cms.Path(
+#           process.HLTBeginSequence
+#         + process.hltPreMCAK8PFJets
+#         + process.HLTAK8PFJetsSequence
+#         + process.hltAK8PFJetsCollection20Filter
+#         + process.HLTEndSequence
+#       )
     
        ## add path: MC_PFMETNoMu_v1
        process.hltPreMCPFMET = cms.EDFilter('HLTPrescaler',
@@ -398,7 +399,7 @@ def customisedHLTProcess(keyword):
       bottomCollection = cms.InputTag('hltParticleFlowPtrs'),
       name = cms.untracked.string('pileUpOnPFCandidates'),
       topCollection = cms.InputTag('hltParticleFlowCHSv1PileUp'),
-      verbose = cms.untracked.bool(False)
+#     verbose = cms.untracked.bool(False)
     )
     
     process.HLTParticleFlowCHSv1PtrsSequence = cms.Sequence(
@@ -527,7 +528,7 @@ def customisedHLTProcess(keyword):
       bottomCollection = cms.InputTag('hltParticleFlowPtrs'),
       name = cms.untracked.string('pileUpOnPFCandidates'),
       topCollection = cms.InputTag('hltParticleFlowCHSv2PileUp'),
-      verbose = cms.untracked.bool(False)
+#     verbose = cms.untracked.bool(False)
     )
     
     process.HLTParticleFlowCHSv2PtrsSequence = cms.Sequence(
@@ -657,6 +658,7 @@ def customisedHLTProcess(keyword):
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
     process.hltAK4PuppiV1Jets = ak4PFJetsPuppi.clone(
       src = 'hltPuppiV1',
+      applyWeight = False,
     )
     
     process.hltAK4PuppiV1L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L2Relative'))
@@ -691,6 +693,7 @@ def customisedHLTProcess(keyword):
     from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsPuppi
     process.hltAK8PuppiV1Jets = ak8PFJetsPuppi.clone(
       src = 'hltPuppiV1',
+      applyWeight = False,
     )
     
     process.hltAK8PuppiV1L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK8PFPuppi'), level = cms.string('L2Relative'))
@@ -724,6 +727,7 @@ def customisedHLTProcess(keyword):
     
     process.hltPuppiV1MET = process.hltPFMETProducer.clone(
       src = 'hltPuppiV1',
+      applyWeight = False,
       alias = ''
     )
     
@@ -751,6 +755,7 @@ def customisedHLTProcess(keyword):
     
     process.hltPuppiV1METNoMu = process.hltPFMETProducer.clone(
       src = 'hltPuppiV1NoMu',
+      applyWeight = False,
       alias = ''
     )
     
@@ -794,6 +799,7 @@ def customisedHLTProcess(keyword):
     )
     process.hltPuppiV2MET = process.hltPFMETProducer.clone(
       src = 'hltPuppiV2',
+      applyWeight = False,
       alias = ''
     )
     
@@ -833,6 +839,7 @@ def customisedHLTProcess(keyword):
     )
     process.hltPuppiV2METNoMu = process.hltPFMETProducer.clone(
       src = 'hltPuppiV2NoMu',
+      applyWeight = False,
       alias = ''
     )
     
@@ -878,6 +885,7 @@ def customisedHLTProcess(keyword):
     
     process.hltAK4PuppiV3Jets = ak4PFJetsPuppi.clone(
       src = 'hltPuppiV3',
+      applyWeight = False,
     )
     
     process.hltAK4PuppiV3L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK4PFHLT'), level = cms.string('L2Relative'))
@@ -911,6 +919,7 @@ def customisedHLTProcess(keyword):
     
     process.hltAK8PuppiV3Jets = ak8PFJetsPuppi.clone(
       src = 'hltPuppiV3',
+      applyWeight = False,
     )
     
     process.hltAK8PuppiV3L2Corrector = cms.EDProducer('LXXXCorrectorProducer', algorithm = cms.string('AK8PFPuppi'), level = cms.string('L2Relative'))
@@ -944,6 +953,7 @@ def customisedHLTProcess(keyword):
     
     process.hltPuppiV3MET = process.hltPFMETProducer.clone(
       src = 'hltPuppiV3',
+      applyWeight = False,
       alias = ''
     )
     
@@ -971,6 +981,7 @@ def customisedHLTProcess(keyword):
     
     process.hltPuppiV3METNoMu = process.hltPFMETProducer.clone(
       src = 'hltPuppiV3NoMu',
+      applyWeight = False,
       alias = ''
     )
     
@@ -1003,11 +1014,14 @@ def customisedHLTProcess(keyword):
       vtxNdofCut = 0,
       PtMaxPhotons = 20.,
     )
+
     process.hltPuppiV4 = cms.EDProducer('CandViewMerger',
       src = cms.VInputTag( 'hltPuppiV4NoLeptons', 'hltParticleFlowLeptons' ),
     )
+
     process.hltPuppiV4MET = process.hltPFMETProducer.clone(
       src = 'hltPuppiV4',
+      applyWeight = False,
       alias = ''
     )
     
@@ -1040,6 +1054,7 @@ def customisedHLTProcess(keyword):
     )
     process.hltPuppiV4METNoMu = process.hltPFMETProducer.clone(
       src = 'hltPuppiV4NoMu',
+      applyWeight = False,
       alias = ''
     )
     
