@@ -115,11 +115,11 @@ from Configuration.DataProcessing.Utils import addMonitoring
 #call to customisation function addMonitoring imported from Configuration.DataProcessing.Utils
 process = addMonitoring(process)
 
-# Automatic addition of the customisation function from JMETriggerAnalysis.Common.hltPhase2_L1T
-from JMETriggerAnalysis.Common.hltPhase2_L1T import customize_hltPhase2_L1T 
-
-#call to customisation function customize_hltPhase2_L1T imported from JMETriggerAnalysis.Common.hltPhase2_L1T
-process = customize_hltPhase2_L1T(process)
+## Automatic addition of the customisation function from JMETriggerAnalysis.Common.hltPhase2_L1T
+#from JMETriggerAnalysis.Common.hltPhase2_L1T import customize_hltPhase2_L1T 
+#
+##call to customisation function customize_hltPhase2_L1T imported from JMETriggerAnalysis.Common.hltPhase2_L1T
+#process = customize_hltPhase2_L1T(process)
 
 # Automatic addition of the customisation function from JMETriggerAnalysis.Common.hltPhase2_TRKv06
 from JMETriggerAnalysis.Common.hltPhase2_TRKv06 import customize_hltPhase2_TRKv06 
