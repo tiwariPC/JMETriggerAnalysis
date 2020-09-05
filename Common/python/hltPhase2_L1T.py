@@ -83,6 +83,11 @@ def customize_hltPhase2_L1T(process):
     process.load('CalibCalorimetry.CaloTPG.CaloTPGTranscoder_cfi')
 
     process.L1simulation_step = cms.Path(process.SimL1Emulator)
-    process.schedule.extend([process.TTTracksEmulationWithTruth, process.L1simulation_step])
+
+    if process.schedule_() is not None:
+       process.schedule_().extend([
+         process.TTTracksEmulationWithTruth,
+         process.L1simulation_step,
+       ])
 
     return process

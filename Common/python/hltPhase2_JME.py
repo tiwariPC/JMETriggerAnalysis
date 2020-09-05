@@ -7,8 +7,6 @@ from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets, ak4PFJetsCHS, ak4PFJe
 from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets, ak8PFJetsCHS, ak8PFJetsPuppi
 from RecoMET.METProducers.PFClusterMET_cfi import pfClusterMet
 
-from CondCore.CondDB.CondDB_cfi import CondDB
-
 from RecoHGCal.TICL.iterativeTICL_cff import injectTICLintoPF
 
 def customize_hltPhase2_JME(process, name='HLTJMESequence'):
@@ -243,7 +241,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ## Jets: AK4 Calo
     process.hltAK4CaloJets = process.ak4CaloJets.clone(
-      src = 'towerMaker', #!! hltTowerMakerForAll
+      src = 'towerMaker',
       useDeterministicSeed = True,
       doAreaDiskApprox = True,
       doAreaFastjet = False,
@@ -253,87 +251,12 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       doPVCorrection = False,
     )
 
-    ## Jets: AK8 Calo
-    process.hltAK8CaloJets = process.hltAK4CaloJets.clone(rParam = 0.8)
-
-### --------------------------------------------------------------------------
-### Comment: JESCs to Calo Jets currently disabled (not available for Phase-2)
-### --------------------------------------------------------------------------
-#    ## Jets: AK4 Calo Corrected
-#    process.hltFixedGridRhoFastjetAllCalo = cms.EDProducer("FixedGridRhoProducerFastjet",
-#        gridSpacing = cms.double(0.55),
-#        maxRapidity = cms.double(5.0),
-#        pfCandidatesTag = cms.InputTag("towerMaker") #!! hltTowerMakerForAll
-#    )
-#    process.hltAK4CaloJetCorrectorL1 = cms.EDProducer( "L1FastjetCorrectorProducer",
-#        srcRho = cms.InputTag( "hltFixedGridRhoFastjetAllCalo" ),
-#        algorithm = cms.string( "AK4Calo" ), #!! AK4CaloHLT
-#        level = cms.string( "L1FastJet" )
-#    )
-#    process.hltAK4CaloJetCorrectorL2 = cms.EDProducer( "LXXXCorrectorProducer",
-#        algorithm = cms.string( "AK4Calo" ), #!! AK4CaloHLT
-#        level = cms.string( "L2Relative" )
-#    )
-#    process.hltAK4CaloJetCorrectorL3 = cms.EDProducer( "LXXXCorrectorProducer",
-#        algorithm = cms.string( "AK4Calo" ), #!! AK4CaloHLT
-#        level = cms.string( "L3Absolute" )
-#    )
-#    process.hltAK4CaloJetCorrectorL2L3 = cms.EDProducer( "LXXXCorrectorProducer",
-#        algorithm = cms.string( "AK4Calo" ), #!! AK4CaloHLT
-#        level = cms.string( "L2L3Residual" )
-#    )
-#    process.hltAK4CaloJetCorrector = cms.EDProducer( "ChainedJetCorrectorProducer",
-#        correctors = cms.VInputTag( 'hltAK4CaloJetCorrectorL1','hltAK4CaloJetCorrectorL2','hltAK4CaloJetCorrectorL3','hltAK4CaloJetCorrectorL2L3' )
-#    )
-#    process.hltAK4CaloJetsCorrected = cms.EDProducer( "CorrectedCaloJetProducer",
-#        src = cms.InputTag( "hltAK4CaloJets" ),
-#        correctors = cms.VInputTag( 'hltAK4CaloJetCorrector' ),
-#    )
-#
-#    ## Jets: AK8 Calo Corrected
-#    process.hltAK8CaloJetCorrectorL1 = cms.EDProducer( "L1FastjetCorrectorProducer",
-#        srcRho = cms.InputTag( "hltFixedGridRhoFastjetAllCalo" ),
-#        algorithm = cms.string( "AK8Calo" ), #!! AK8CaloHLT
-#        level = cms.string( "L1FastJet" )
-#    )
-#    process.hltAK8CaloCorrectorL2 = cms.EDProducer( "LXXXCorrectorProducer",
-#        algorithm = cms.string( "AK8Calo" ), #!! AK8CaloHLT
-#        level = cms.string( "L2Relative" )
-#    )
-#    process.hltAK8CaloJetCorrectorL3 = cms.EDProducer( "LXXXCorrectorProducer",
-#        algorithm = cms.string( "AK8Calo" ), #!! AK8CaloHLT
-#        level = cms.string( "L3Absolute" )
-#    )
-#    process.hltAK8CaloJetCorrectorL2L3 = cms.EDProducer( "LXXXCorrectorProducer",
-#        algorithm = cms.string( "AK8Calo" ), #!! AK8CaloHLT
-#        level = cms.string( "L2L3Residual" )
-#    )
-#    process.hltAK8CaloCorrector = cms.EDProducer( "ChainedJetCorrectorProducer",
-#        correctors = cms.VInputTag( 'hltAK8CaloJetCorrectorL1','hltAK8CaloCorrectorL2','hltAK8CaloJetCorrectorL3','hltAK8CaloJetCorrectorL2L3' )
-#    )
-#    process.hltAK8CaloJetsCorrected = cms.EDProducer( "CorrectedCaloJetProducer",
-#        src = cms.InputTag( "hltAK8CaloJets" ),
-#        correctors = cms.VInputTag( 'hltAK8CaloCorrector' ),
-#    )
-### --------------------------------------------------------------------------
+#    ## Jets: AK8 Calo
+#    process.hltAK8CaloJets = process.hltAK4CaloJets.clone(rParam = 0.8)
 
     ## Sequence: Calo Jets
     process.HLTCaloJetsReconstruction = cms.Sequence(
-        process.hltAK4CaloJets
-      + process.hltAK8CaloJets
-#     + process.hltFixedGridRhoFastjetAllCalo
-#     + process.hltAK4CaloJetCorrectorL1
-#     + process.hltAK4CaloJetCorrectorL2
-#     + process.hltAK4CaloJetCorrectorL3
-#     + process.hltAK4CaloJetCorrectorL2L3
-#     + process.hltAK4CaloJetCorrector
-#     + process.hltAK4CaloJetsCorrected
-#     + process.hltAK4CaloJetCorrectorL1
-#     + process.hltAK4CaloJetCorrectorL2
-#     + process.hltAK4CaloJetCorrectorL3
-#     + process.hltAK4CaloJetCorrectorL2L3
-#     + process.hltAK4CaloJetCorrector
-#     + process.hltAK4CaloJetsCorrected
+      process.hltAK4CaloJets
     )
 
     ## MET: Calo
