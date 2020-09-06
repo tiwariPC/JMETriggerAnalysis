@@ -155,10 +155,7 @@ process.HLTAK8PuppiJetsReconstruction = cms.Sequence(
 
 ## sequence: Puppi MET (Raw)
 process.HLTPuppiMETReconstruction = cms.Sequence(
-    process.pfNoLepPUPPI
-  + process.puppiNoLep
-  + process.pfLeptonsPUPPET
-  + process.hltPuppiForMET
+    process.hltPuppiNoLep
   + process.hltPuppiMET
 )
 

@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-def customize_hltPhase2_TRKv06(process):
+def customise_hltPhase2_TRKv06(process):
 
     ###
     ### Modules (taken from configuration developed by TRK POG)

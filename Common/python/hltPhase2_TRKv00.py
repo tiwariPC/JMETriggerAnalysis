@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-def customize_hltPhase2_TRKv00(process):
+def customise_hltPhase2_TRKv00(process):
 
     process.PixelCPEGenericESProducer = cms.ESProducer("PixelCPEGenericESProducer",
         Alpha2Order = cms.bool(True),

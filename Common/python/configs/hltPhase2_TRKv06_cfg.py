@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v2 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRWinter20DIGI/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/PU200_castor_110X_mcRun4_realistic_v3-v2/10000/05BFAD3E-3F91-1843-ABA2-2040324C7567.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/hltPhase2_L1T.customize_hltPhase2_L1T --customise JMETriggerAnalysis/Common/hltPhase2_TRKv06.customize_hltPhase2_TRKv06 --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_JME --customise_commands process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\nprocess.prune()\n --python_filename Common/python/configs/hltPhase2_TRKv06_cfg.py
+# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v2 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/FEVT/PU200_castor_111X_mcRun4_realistic_T15_v1-v1/100000/DA18C0FC-1189-D64B-B3B6-44F3F96F1840.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06 --customise_commands process.prune()\n --python_filename hltPhase2_TRKv06_cfg.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
@@ -29,7 +29,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/Phase2HLTTDRWinter20DIGI/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/PU200_castor_110X_mcRun4_realistic_v3-v2/10000/05BFAD3E-3F91-1843-ABA2-2040324C7567.root'),
+    fileNames = cms.untracked.vstring('/store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/FEVT/PU200_castor_111X_mcRun4_realistic_T15_v1-v1/100000/DA18C0FC-1189-D64B-B3B6-44F3F96F1840.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -115,46 +115,19 @@ from Configuration.DataProcessing.Utils import addMonitoring
 #call to customisation function addMonitoring imported from Configuration.DataProcessing.Utils
 process = addMonitoring(process)
 
-## Automatic addition of the customisation function from JMETriggerAnalysis.Common.hltPhase2_L1T
-#from JMETriggerAnalysis.Common.hltPhase2_L1T import customize_hltPhase2_L1T 
-#
-##call to customisation function customize_hltPhase2_L1T imported from JMETriggerAnalysis.Common.hltPhase2_L1T
-#process = customize_hltPhase2_L1T(process)
+# Automatic addition of the customisation function from JMETriggerAnalysis.Common.customizeHLTForPhase2
+from JMETriggerAnalysis.Common.customizeHLTForPhase2 import customise_hltPhase2_scheduleJMETriggers_TRKv06 
 
-# Automatic addition of the customisation function from JMETriggerAnalysis.Common.hltPhase2_TRKv06
-from JMETriggerAnalysis.Common.hltPhase2_TRKv06 import customize_hltPhase2_TRKv06 
-
-#call to customisation function customize_hltPhase2_TRKv06 imported from JMETriggerAnalysis.Common.hltPhase2_TRKv06
-process = customize_hltPhase2_TRKv06(process)
-
-# Automatic addition of the customisation function from JMETriggerAnalysis.Common.hltPhase2_JME
-from JMETriggerAnalysis.Common.hltPhase2_JME import customize_hltPhase2_JME 
-
-#call to customisation function customize_hltPhase2_JME imported from JMETriggerAnalysis.Common.hltPhase2_JME
-process = customize_hltPhase2_JME(process)
+#call to customisation function customise_hltPhase2_scheduleJMETriggers_TRKv06 imported from JMETriggerAnalysis.Common.customizeHLTForPhase2
+process = customise_hltPhase2_scheduleJMETriggers_TRKv06(process)
 
 # End of customisation functions
 
 # Customisation from command line
 
-process.schedule.remove(process.RECOoutput_step)
-del process.RECOoutput
 process.prune()
-
-#Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
-from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
-process = customiseLogErrorHarvesterUsingOutputCommands(process)
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
 # End adding early deletion
-
-from HLTrigger.Configuration.common import producers_by_type
-for mod_i in producers_by_type(process, 'PuppiProducer'):
-   for algo_idx in range(len(mod_i.algos)):
-      if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
-         raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
-      for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
-         mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 18.5 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
-         mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 1.45

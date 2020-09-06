@@ -7,9 +7,7 @@ from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets, ak4PFJetsCHS, ak4PFJe
 from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets, ak8PFJetsCHS, ak8PFJetsPuppi
 from RecoMET.METProducers.PFClusterMET_cfi import pfClusterMet
 
-from RecoHGCal.TICL.iterativeTICL_cff import injectTICLintoPF
-
-def customize_hltPhase2_JME(process, name='HLTJMESequence'):
+def customise_hltPhase2_JME(process):
 
     ### Guidelines to browse the code below:
     ###  - jet (MET) collections are indicated by comments starting with "## Jets: " ("## MET:")
@@ -17,10 +15,6 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ###  - HLT-related collections (sequences) start with "hlt" ("HLT")
     ###  - modifications that are temporary and/or likely to change in a more realistic HLT menu are indicated by "#!!"
     ###    (at the moment, these might simply indicate differences between the current configuration and the one used in the 2018 HLT-Menu)
-
-    #### check if process member with target output name already exists
-    if hasattr(process, name):
-       raise RuntimeError('process already has member named "'+name+'"')
 
     #### check if reconstruction sequence exists
     if not hasattr(process, 'reconstruction'):
@@ -35,209 +29,6 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
        raise RuntimeError('process has no member named "'+_primaryVertices+'"')
 
     _primaryVerticesGood = 'goodOfflinePrimaryVertices'
-
-    process.particleFlowTmpBarrel.useEGammaFilters = False
-    process.particleFlowTmpBarrel.useEGammaElectrons = False
-    process.particleFlowTmpBarrel.usePFConversions = False
-    process.particleFlowTmpBarrel.usePFDecays = False
-    process.particleFlowTmpBarrel.usePFNuclearInteractions = False
-    process.particleFlowTmpBarrel.useProtectionsForJetMET = False
-    process.pfTrack.GsfTracksInEvents = False
-
-    # redefining the PFBlockProducer removing displaced tracks
-    process.particleFlowBlock = cms.EDProducer("PFBlockProducer",
-        debug = cms.untracked.bool(False),
-        elementImporters = cms.VPSet(
-#            cms.PSet(
-#                gsfsAreSecondary = cms.bool(False),
-#                importerName = cms.string('GSFTrackImporter'),
-#                source = cms.InputTag("pfTrackElec"),
-#                superClustersArePF = cms.bool(True)
-#            ),
-#            cms.PSet(
-#                importerName = cms.string('ConvBremTrackImporter'),
-#                source = cms.InputTag("pfTrackElec")
-#            ),
-            cms.PSet(
-                importerName = cms.string('SuperClusterImporter'),
-                maximumHoverE = cms.double(0.5),
-                minPTforBypass = cms.double(100.0),
-                minSuperClusterPt = cms.double(10.0),
-                source_eb = cms.InputTag("particleFlowSuperClusterECAL","particleFlowSuperClusterECALBarrel"),
-                source_ee = cms.InputTag("particleFlowSuperClusterECAL","particleFlowSuperClusterECALEndcapWithPreshower"),
-                source_towers = cms.InputTag("towerMaker"),
-                superClustersArePF = cms.bool(True)
-            ),
-#            cms.PSet(
-#                importerName = cms.string('ConversionTrackImporter'),
-#                source = cms.InputTag("pfConversions")
-#            ),
-#            cms.PSet(
-#                importerName = cms.string('NuclearInteractionTrackImporter'),
-#                source = cms.InputTag("pfDisplacedTrackerVertex")
-#            ),
-            cms.PSet(
-                DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                    10.0, 10.0, 10.0, 10.0, 10.0,
-                    5.0
-                ),
-                NHitCuts_byTrackAlgo = cms.vuint32(
-                    3, 3, 3, 3, 3,
-                    3
-                ),
-                cleanBadConvertedBrems = cms.bool(True),
-                importerName = cms.string('GeneralTracksImporterWithVeto'),
-                maxDPtOPt = cms.double(1.0),
-                muonSrc = cms.InputTag("muons1stStep"),
-                source = cms.InputTag("pfTrack"),
-                useIterativeTracking = cms.bool(True),
-                veto = cms.InputTag("hgcalTrackCollection","TracksInHGCal")
-            ),
-            cms.PSet(
-                BCtoPFCMap = cms.InputTag("particleFlowSuperClusterECAL","PFClusterAssociationEBEE"),
-                importerName = cms.string('ECALClusterImporter'),
-                source = cms.InputTag("particleFlowClusterECAL")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("particleFlowClusterHCAL")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("particleFlowBadHcalPseudoCluster")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("particleFlowClusterHO")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("particleFlowClusterHF")
-            ),
-            cms.PSet(
-                importerName = cms.string('GenericClusterImporter'),
-                source = cms.InputTag("particleFlowClusterPS")
-            ),
-            cms.PSet(
-                importerName = cms.string('TrackTimingImporter'),
-                timeErrorMap = cms.InputTag("tofPID","sigmat0"),
-                timeErrorMapGsf = cms.InputTag("tofPID","sigmat0"),
-                timeValueMap = cms.InputTag("tofPID","t0"),
-                timeValueMapGsf = cms.InputTag("tofPID","t0")
-            )
-        ),
-        linkDefinitions = cms.VPSet(
-            cms.PSet(
-                linkType = cms.string('PS1:ECAL'),
-                linkerName = cms.string('PreshowerAndECALLinker'),
-                useKDTree = cms.bool(True)
-            ),
-            cms.PSet(
-                linkType = cms.string('PS2:ECAL'),
-                linkerName = cms.string('PreshowerAndECALLinker'),
-                useKDTree = cms.bool(True)
-            ),
-            cms.PSet(
-                linkType = cms.string('TRACK:ECAL'),
-                linkerName = cms.string('TrackAndECALLinker'),
-                useKDTree = cms.bool(True)
-            ),
-            cms.PSet(
-                linkType = cms.string('TRACK:HCAL'),
-                linkerName = cms.string('TrackAndHCALLinker'),
-                useKDTree = cms.bool(True),
-                trajectoryLayerEntrance = cms.string('HCALEntrance'),
-                trajectoryLayerExit = cms.string('HCALExit')
-            ),
-            cms.PSet(
-                linkType = cms.string('TRACK:HO'),
-                linkerName = cms.string('TrackAndHOLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('ECAL:HCAL'),
-                linkerName = cms.string('ECALAndHCALLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('HCAL:HO'),
-                linkerName = cms.string('HCALAndHOLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('HFEM:HFHAD'),
-                linkerName = cms.string('HFEMAndHFHADLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('TRACK:TRACK'),
-                linkerName = cms.string('TrackAndTrackLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('ECAL:ECAL'),
-                linkerName = cms.string('ECALAndECALLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('GSF:ECAL'),
-                linkerName = cms.string('GSFAndECALLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('TRACK:GSF'),
-                linkerName = cms.string('TrackAndGSFLinker'),
-                useConvertedBrems = cms.bool(True),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('GSF:BREM'),
-                linkerName = cms.string('GSFAndBREMLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('GSF:GSF'),
-                linkerName = cms.string('GSFAndGSFLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('ECAL:BREM'),
-                linkerName = cms.string('ECALAndBREMLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('GSF:HCAL'),
-                linkerName = cms.string('GSFAndHCALLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('HCAL:BREM'),
-                linkerName = cms.string('HCALAndBREMLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('SC:ECAL'),
-                linkerName = cms.string('SCAndECALLinker'),
-                useKDTree = cms.bool(False),
-                SuperClusterMatchByRef = cms.bool(True)
-            ),
-            cms.PSet(
-              linkType   = cms.string("TRACK:HFEM"),
-              linkerName = cms.string("TrackAndHCALLinker"),
-              useKDTree  = cms.bool(True),
-              trajectoryLayerEntrance = cms.string("VFcalEntrance"),
-              trajectoryLayerExit = cms.string("")
-            ),
-            cms.PSet(
-              linkType   = cms.string("TRACK:HFHAD"),
-              linkerName = cms.string("TrackAndHCALLinker"),
-              useKDTree  = cms.bool(True),
-              trajectoryLayerEntrance = cms.string("VFcalEntrance"),
-              trajectoryLayerExit = cms.string("")
-            ),
-        ),
-        verbose = cms.untracked.bool(False)
-    )
 
     ## Jets: AK4 Calo
     process.hltAK4CaloJets = process.ak4CaloJets.clone(
@@ -310,7 +101,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Jets: AK4 PF
     process.hltAK4PFJets = ak4PFJets.clone(
       src = _particleFlowCands,
-#      jetPtMin = 10.,
+#     jetPtMin = 10.,
     )
     process.hltAK4PFJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
       srcRho = cms.InputTag( 'fixedGridRhoFastjetAllTmp' ),
@@ -351,7 +142,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
     ## Jets: AK8 PF
     process.hltAK8PFJets = ak8PFJets.clone(
       src = _particleFlowCands,
-#      jetPtMin = 80.,
+#     jetPtMin = 80.,
     )
     process.hltAK8PFJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
       srcRho = cms.InputTag( 'fixedGridRhoFastjetAllTmp' ),
@@ -391,7 +182,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ## Jets: AK4 PF+CHS
     process.hltAK4PFCHSJets = ak4PFJetsCHS.clone(
-#      jetPtMin = 10.,
+#     jetPtMin = 10.,
     )
 
     process.hltAK4PFCHSJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
@@ -421,7 +212,7 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
 
     ## Jets: AK8 PF+CHS
     process.hltAK8PFCHSJets = ak8PFJetsCHS.clone(
-#      jetPtMin = 80.,
+#     jetPtMin = 80.,
     )
 
     process.hltAK8PFCHSJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
@@ -696,124 +487,5 @@ def customize_hltPhase2_JME(process, name='HLTJMESequence'):
       + process.hltAK8PuppiJetCorrector
       + process.hltAK8PuppiJetsCorrected
     )
-
-    ## Sequence: JME Reconstruction
-    setattr(process, name, cms.Sequence(
-#       process.HLTCaloJetsReconstruction
-        process.HLTCaloMETReconstruction
-      + process.HLTPFClusterJMEReconstruction
-      + process.HLTAK4PFJetsReconstruction
-      + process.HLTAK8PFJetsReconstruction
-      + process.HLTPFJetsCHSReconstruction
-      + process.HLTPFMETsReconstruction
-      + process.HLTPFCHSMETReconstruction
-      + process.HLTPFSoftKillerMETReconstruction
-      + process.HLTPuppiJMEReconstruction
-    ))
-
-    ####
-    #### Redefine process.reconstruction
-    ####
-
-    # redefine input to fixedGridRhoFastjetAll
-    # (in principle, this is not needed, since JESC modules are configured with 'fixedGridRhoFastjetAllTmp';
-    #  nevertheless, this modification is applied, in order to make sure _particleFlowCands is consistently used)
-    process.fixedGridRhoFastjetAll.pfCandidatesTag = _particleFlowCands
-
-    # redefine process.hgcalLocalReco sequence
-    # to disable unnecessary producers in HGCal local reconstruction
-    process.hgcalLocalRecoSequence = cms.Sequence(
-        process.HGCalUncalibRecHit
-      + process.HGCalRecHit
-      + process.hgcalLayerClusters
-      + process.hgcalMultiClusters
-      + process.particleFlowRecHitHGC
-      + process.particleFlowClusterHGCal
-      + process.particleFlowClusterHGCalFromMultiCl
-    )
-
-    process.calolocalreco = cms.Sequence(
-        process.ecalLocalRecoSequence
-      + process.hcalLocalRecoSequence
-      + process.hgcalLocalRecoSequence
-    )
-
-    process.localreco = cms.Sequence(
-        process.bunchSpacingProducer
-      + process.calolocalreco
-      + process.muonlocalreco
-      + process.trackerlocalreco
-      + process.fastTimingLocalReco
-    )
-
-    process.reconstruction = cms.Sequence(
-        process.localreco
-      + process.globalreco
-      + process.highlevelreco
-      + process.logErrorHarvester
-    )
-
-    # process.globalreco: reconstruction up to PFClusters
-    if (not hasattr(process, 'globalreco_tracking')) and hasattr(process, 'globalreco_trackingTask'):
-       process.globalreco_tracking = cms.Sequence(process.globalreco_trackingTask)
-
-    process.tofPIDSequence = cms.Sequence(
-        process.unsortedOfflinePrimaryVertices4DnoPID
-      + process.tofPID4DnoPID
-      + process.unsortedOfflinePrimaryVertices4D
-      + process.tofPID
-    )
-
-    process.globalreco = cms.Sequence(
-        process.caloTowersRec
-      + process.ecalClusters
-#      + process.egammaGlobalReco
-
-        # tracking
-      + process.globalreco_tracking
-      + process.standalonemuontracking # needs to be included for early muons of PF
-
-        # timing
-      + process.fastTimingGlobalReco # necessary for MTD inputs to PF
-      + process.tofPIDSequence # contains tofPID maps
-
-        # insert CaloJets sequence in process.globalreco
-        # (module muons1stStep from muonGlobalReco requires AK4CaloJets [1])
-      + process.HLTCaloJetsReconstruction # was: process.jetGlobalReco
-
-      + process.muonGlobalReco
-#      + process.muoncosmicreco
-      + process.particleFlowCluster
-#      + process.pfTrackingGlobalReco
-    )
-
-    # [1] modify CaloJets input to muons1stStep
-    process.muons1stStep.JetExtractorPSet.JetCollectionLabel = 'hltAK4CaloJets'
-
-    # process.highlevelreco: PF + JME (w/o CaloJets)
-    process.highlevelreco = cms.Sequence(
-        process.particleFlowReco
-      + getattr(process, name)
-    )
-
-#    # disable use of timing information in simPFProducer
-#    del process.simPFProducer.trackTimeValueMap
-
-    #### ------------------------------------------------------------
-
-    return process
-
-def customize_hltPhase2_TICL(process):
-
-    # Note: at the moment, this is not really a self-contained customization function
-    # please use it only after "customize_hltPhase2_JME"
-
-    #### check if TICL task exists
-    if not hasattr(process, 'iterTICLTask'):
-       raise RuntimeError('process.iterTICLTask not found')
-
-    process.iterTICLSequence = cms.Sequence(process.iterTICLTask)
-    process.globalreco += process.iterTICLSequence
-    process = injectTICLintoPF(process)
 
     return process

@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 import os
 
-def customize_hltPhase2_L1T(process):
+def customise_hltPhase2_L1T(process):
 
     # L1T recipe for D49 geometry
     GEOMETRY = 'D49'
@@ -13,7 +13,7 @@ def customize_hltPhase2_L1T(process):
     L1TRKALGO = 'HYBRID'
     if L1TRKALGO == 'HYBRID_FLOAT':
        if not os.path.exists(os.environ['CMSSW_BASE']+'/src/L1Trigger/HybridFloat'):
-          raise RuntimeError('customize_hltPhase2_L1T -- ERROR: Please checkout HybridFloat code before using "L1TRKALGO == \'HYBRID_FLOAT\'"')
+          raise RuntimeError('customize_hltPhase2_L1T -- ERROR: Please check out L1Trigger/HybridFloat before using "L1TRKALGO == \'HYBRID_FLOAT\'"')
 
     process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 

@@ -8,8 +8,8 @@
 #    so that the recipe can also work in non-interactive shells
 #  - do not compile with scram inside this script
 #
-scramv1 project CMSSW CMSSW_11_1_2
-cd CMSSW_11_1_2/src
+scramv1 project CMSSW CMSSW_11_1_2_patch3
+cd CMSSW_11_1_2_patch3/src
 eval `scramv1 runtime -sh`
 
 # [temporarily comment out fix for PF-Hadron calibrations]
