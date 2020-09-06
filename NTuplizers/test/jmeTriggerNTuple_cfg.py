@@ -171,8 +171,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFClusterJetCollections = cms.PSet(
 
-    hltAK4PFClusterJets = cms.InputTag('hltAK4PFClusterJets'),
-    hltAK8PFClusterJets = cms.InputTag('hltAK8PFClusterJets'),
+#   hltAK4PFClusterJets = cms.InputTag('hltAK4PFClusterJets'),
+#   hltAK8PFClusterJets = cms.InputTag('hltAK8PFClusterJets'),
   ),
 
   recoPFJetCollections = cms.PSet(
@@ -211,7 +211,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFClusterMETCollections = cms.PSet(
 
-    hltPFClusterMET = cms.InputTag('hltPFClusterMET'),
+#   hltPFClusterMET = cms.InputTag('hltPFClusterMET'),
   ),
 
   recoPFMETCollections = cms.PSet(
@@ -221,12 +221,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     l1tPuppiMET = cms.InputTag('l1PFMetPuppi'),
 
     hltPFMET = cms.InputTag('hltPFMET'),
-    hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
+#   hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
     hltPFCHSMET = cms.InputTag('hltPFCHSMET'),
-    hltPFSoftKillerMET = cms.InputTag('hltPFSoftKillerMET'),
+#   hltPFSoftKillerMET = cms.InputTag('hltPFSoftKillerMET'),
     hltPuppiMET = cms.InputTag('hltPuppiMET'),
-    hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'),
-    hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
+#   hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'),
+#   hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
   ),
 
   patMETCollections = cms.PSet(
