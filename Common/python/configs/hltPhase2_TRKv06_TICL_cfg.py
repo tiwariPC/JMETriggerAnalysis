@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v2 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/FEVT/PU200_castor_111X_mcRun4_realistic_T15_v1-v1/100000/DA18C0FC-1189-D64B-B3B6-44F3F96F1840.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06_TICL --customise_commands process.prune()\n --python_filename hltPhase2_TRKv06_TICL_cfg.py
+# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v2 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/FEVT/PU200_castor_111X_mcRun4_realistic_T15_v1-v1/100000/DA18C0FC-1189-D64B-B3B6-44F3F96F1840.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06_TICL --customise HLTrigger/Timer/FastTimer.customise_timer_service --customise HLTrigger/Timer/FastTimer.customise_timer_service_print --customise_commands process.prune()\n --python_filename hltPhase2_TRKv06_TICL_cfg.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
@@ -120,6 +120,15 @@ from JMETriggerAnalysis.Common.customizeHLTForPhase2 import customise_hltPhase2_
 
 #call to customisation function customise_hltPhase2_scheduleJMETriggers_TRKv06_TICL imported from JMETriggerAnalysis.Common.customizeHLTForPhase2
 process = customise_hltPhase2_scheduleJMETriggers_TRKv06_TICL(process)
+
+# Automatic addition of the customisation function from HLTrigger.Timer.FastTimer
+from HLTrigger.Timer.FastTimer import customise_timer_service,customise_timer_service_print 
+
+#call to customisation function customise_timer_service imported from HLTrigger.Timer.FastTimer
+process = customise_timer_service(process)
+
+#call to customisation function customise_timer_service_print imported from HLTrigger.Timer.FastTimer
+process = customise_timer_service_print(process)
 
 # End of customisation functions
 

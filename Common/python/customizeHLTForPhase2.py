@@ -174,6 +174,21 @@ def customise_hltPhase2_scheduleHLTJMERecoWithoutFilters(process):
     return process
 
 def customise_hltPhase2_scheduleJMETriggers(process):
+    ## sequence: HLT-JME objects (without filters)
+    ## (kept for now to study object performance without preselections)
+    process.HLTJMESequence = cms.Sequence(
+        process.HLTCaloMETReconstruction
+#     + process.HLTCaloJetsReconstruction
+      + process.HLTPFClusterJMEReconstruction
+      + process.HLTAK4PFJetsReconstruction
+      + process.HLTAK8PFJetsReconstruction
+      + process.HLTPFJetsCHSReconstruction
+      + process.HLTPFMETsReconstruction
+      + process.HLTPFCHSMETReconstruction
+      + process.HLTPFSoftKillerMETReconstruction
+      + process.HLTPuppiJMEReconstruction
+    )
+
     ## sequence: ParticleFlow
     process.HLTParticleFlowSequence = cms.Sequence(
         process.RawToDigi
@@ -281,6 +296,8 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.hltPuppiMET200 = _hltPFMET200.clone(inputTag = 'hltPuppiMET', MinPt = 200.)
 
     ## trigger paths
+    process.MC_JME_v1 = cms.Path(process.HLTParticleFlowSequence + process.HLTJMESequence)
+
     process.HLT_AK4PFJet100_v1 = cms.Path(process.HLTParticleFlowSequence + process.HLTAK4PFJetsReconstruction + process.hltSingleAK4PFJet100)
     process.HLT_AK8PFJet300_v1 = cms.Path(process.HLTParticleFlowSequence + process.HLTAK8PFJetsReconstruction + process.hltSingleAK8PFJet300)
 
@@ -298,6 +315,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     # FIXME: if the original schedule contains paths for L1T reco, the command below will remove them
     # so this needs to be improved if one wants to be able to run (part of) the L1T reco on a separate path
     process.setSchedule_(cms.Schedule(*[
+      process.MC_JME_v1,
 
       process.HLT_AK4PFJet100_v1,
       process.HLT_AK4PFCHSJet100_v1,

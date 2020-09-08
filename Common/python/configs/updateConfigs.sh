@@ -25,6 +25,8 @@ for opt_i in "${opts[@]}"; do
     -n 10 \
     --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
     --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_${opt_i} \
+    --customise HLTrigger/Timer/FastTimer.customise_timer_service \
+    --customise HLTrigger/Timer/FastTimer.customise_timer_service_print \
     --customise_commands 'process.prune()\n' \
     --python_filename hltPhase2_${opt_i}_cfg.py
 done
