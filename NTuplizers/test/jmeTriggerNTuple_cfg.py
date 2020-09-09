@@ -223,10 +223,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMET = cms.InputTag('hltPFMET'),
 #   hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
     hltPFCHSMET = cms.InputTag('hltPFCHSMET'),
-#   hltPFSoftKillerMET = cms.InputTag('hltPFSoftKillerMET'),
+    hltPFSoftKillerMET = cms.InputTag('hltPFSoftKillerMET'),
     hltPuppiMET = cms.InputTag('hltPuppiMET'),
 #   hltPuppiMETTypeOne = cms.InputTag('hltPuppiMETTypeOne'),
-#   hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
+    hltPuppiMETv0 = cms.InputTag('hltPuppiMETv0'),
   ),
 
   patMETCollections = cms.PSet(
@@ -261,7 +261,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     # HLT AK4
     hltAK4CaloJets = cms.string('pt > 20'),
-    hltAK4PFClusterJets = cms.string('pt > 20'),
+#   hltAK4PFClusterJets = cms.string('pt > 20'),
     hltAK4PFJets = cms.string('pt > 20'),
     hltAK4PFJetsCorrected = cms.string('pt > 20'),
     hltAK4PFCHSJetsCorrected = cms.string('pt > 20'),
@@ -269,7 +269,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     # HLT AK8
 #   hltAK8CaloJets = cms.string('pt > 80'),
-    hltAK8PFClusterJets = cms.string('pt > 80'),
+#   hltAK8PFClusterJets = cms.string('pt > 80'),
     hltAK8PFJetsCorrected = cms.string('pt > 80'),
     hltAK8PFCHSJetsCorrected = cms.string('pt > 80'),
     hltAK8PuppiJetsCorrected = cms.string('pt > 80'),
