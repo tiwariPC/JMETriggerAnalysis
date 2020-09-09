@@ -22,18 +22,25 @@ def customise_hltPhase2_enableTICLInHGCalReconstruction(process):
     return process
 
 def customise_hltPhase2_disableMTDReconstruction(process):
-    if hasattr(process, 'fastTimingLocalReco'):
-       del process.fastTimingLocalReco
-
-    if hasattr(process, 'fastTimingGlobalReco'):
-       del process.fastTimingGlobalReco
-
-    if hasattr(process, 'tofPIDSequence'):
-       del process.tofPIDSequence
+    for _tmp1 in [
+      'fastTimingLocalReco',
+      'fastTimingGlobalReco',
+      'tofPIDSequence',
+    ]:
+      if hasattr(process, _tmp1):
+        for _tmp2 in getattr(process, _tmp1).moduleNames():
+          if hasattr(process, _tmp2):
+            process.__delattr__(_tmp2)
+        process.__delattr__(_tmp1)
 
     # disable use of timing information in simPFProducer
     if hasattr(process, 'simPFProducer') and hasattr(process.simPFProducer, 'trackTimeValueMap'):
        del process.simPFProducer.trackTimeValueMap
+
+    # remove MTD element from PFBlock inputs
+    process.particleFlowBlock.elementImporters = [
+      _tmp for _tmp in process.particleFlowBlock.elementImporters if _tmp.importerName != 'TrackTimingImporter'
+    ]
 
     return process
 
