@@ -132,7 +132,7 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
 
     return process
 
-def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=False, TRK='v06', useTICL=True, useMTD=True):
+def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=False, TRK='v06', useTICL=True, useMTD=False):
     if useL1T:
        process = customise_hltPhase2_L1T(process)
 
