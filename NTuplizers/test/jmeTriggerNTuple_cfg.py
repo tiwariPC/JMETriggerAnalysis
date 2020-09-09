@@ -118,7 +118,16 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResultsFilterAND = cms.vstring(),
 
-  TriggerResultsCollections = cms.vstring(),
+  TriggerResultsCollections = cms.vstring(
+    'MC_JME_v1',
+    'HLT_AK4PFJet550_v1',
+    'HLT_AK4PFCHSJet550_v1',
+    'HLT_AK4PuppiJet550_v1',
+    'HLT_PFPuppiHT1050_v1',
+    'HLT_PFMET200_v1',
+    'HLT_PFCHSMET200_v1',
+    'HLT_PuppiMET200_v1',
+  ),
 
   fillCollectionConditions = cms.PSet(),
 
