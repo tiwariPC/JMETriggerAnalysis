@@ -15,6 +15,11 @@ def customise_hltPhase2_enableTICLInHGCalReconstruction(process):
     if not hasattr(process, 'iterTICLTask'):
        raise RuntimeError('process.iterTICLTask not found')
 
+    # remove modules specific to SIM-assisted reconstruction
+    del process.tpClusterProducer
+    del process.quickTrackAssociatorByHits
+    del process.simPFProducer
+
     process.iterTICLSequence = cms.Sequence(process.iterTICLTask)
     process.globalreco += process.iterTICLSequence
     process = injectTICLintoPF(process)
