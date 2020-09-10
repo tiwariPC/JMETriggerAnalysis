@@ -378,12 +378,15 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.setSchedule_(cms.Schedule(*[
       process.MC_JME_v1,
 
+      process.L1T_AK4PuppiJet130_v1,
       process.HLT_AK4PFJet550_v1,
       process.HLT_AK4PFCHSJet550_v1,
       process.HLT_AK4PuppiJet550_v1,
 
+      process.L1T_PFPuppiHT440_v1,
       process.HLT_PFPuppiHT1050_v1,
 
+      process.L1T_PFPuppiMET100_v1,
       process.HLT_PFMET250_v1,
       process.HLT_PFCHSMET250_v1,
       process.HLT_PuppiMET250_v1,
