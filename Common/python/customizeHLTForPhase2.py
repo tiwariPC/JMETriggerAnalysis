@@ -29,7 +29,9 @@ def customise_hltPhase2_enableTICLInHGCalReconstruction(process):
 def customise_hltPhase2_disableMTDReconstruction(process):
     for _tmp1 in [
       'fastTimingLocalReco',
+      'fastTimingLocalRecoTask',
       'fastTimingGlobalReco',
+      'fastTimingGlobalRecoTask',
       'tofPIDSequence',
     ]:
       if hasattr(process, _tmp1):
@@ -365,7 +367,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.HLT_AK4PFCHSJet550_v1 = cms.Path(process.l1tSingleAK4PFPuppiJet180 + process.HLTParticleFlowSequence + process.HLTAK4PFCHSJetsReconstruction + process.hltSingleAK4PFCHSJet550)
     process.HLT_AK4PuppiJet550_v1 = cms.Path(process.l1tSingleAK4PFPuppiJet180 + process.HLTParticleFlowSequence + process.HLTAK4PuppiJetsReconstruction + process.hltSingleAK4PuppiJet550)
 
-    process.HLT_PFPuppiHT1050_v1 = cms.Path(process.l1tPFPuppiHT + process.l1tPFPuppiHT250 + process.HLTParticleFlowSequence + process.HLTAK4PuppiJetsReconstruction + process.hltPFPuppiHT + process.hltPFPuppiHT1050)
+    process.HLT_PFPuppiHT1050_v1 = cms.Path(process.l1tPFPuppiHT + process.l1tPFPuppiHT450 + process.HLTParticleFlowSequence + process.HLTAK4PuppiJetsReconstruction + process.hltPFPuppiHT + process.hltPFPuppiHT1050)
 
     process.HLT_PFMET250_v1 = cms.Path(process.l1tPFPuppiMET200 + process.HLTParticleFlowSequence + process.hltPFMET + process.hltPFMET250)
     process.HLT_PFCHSMET250_v1 = cms.Path(process.l1tPFPuppiMET200 + process.HLTParticleFlowSequence + process.HLTPFCHSMETReconstruction + process.hltPFCHSMET250)
@@ -383,9 +385,9 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
       process.HLT_PFPuppiHT1050_v1,
 
-      process.HLT_PFMET200_v1,
-      process.HLT_PFCHSMET200_v1,
-      process.HLT_PuppiMET200_v1,
+      process.HLT_PFMET250_v1,
+      process.HLT_PFCHSMET250_v1,
+      process.HLT_PuppiMET250_v1,
     ]))
 
     return process

@@ -210,6 +210,8 @@ def customise_hltPhase2_PF(process):
 
     _modulesToKeep = ['pfTrack']
     for _tmp1 in [
+      'gedElectronPFIsolationDepositsTask',
+      'gedGsfElectronTaskTmp',
       'particleFlowEGammaFinalTask',
       'particleFlowEGammaFullTask',
       'particleFlowTrackWithDisplacedVertexTask',
