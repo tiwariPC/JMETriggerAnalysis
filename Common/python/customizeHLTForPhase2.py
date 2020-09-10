@@ -282,7 +282,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       MinPt = cms.double(100.0),
       inputTag = cms.InputTag(''),
       saveTags = cms.bool(True),
-      triggerType = cms.int32(85),
+      triggerType = cms.int32(-114),
     )
 
     _hltSinglePFJet100 = cms.EDFilter('HLT1PFJet',
