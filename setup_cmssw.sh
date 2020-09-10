@@ -12,10 +12,12 @@ scramv1 project CMSSW CMSSW_11_1_2_patch3
 cd CMSSW_11_1_2_patch3/src
 eval `scramv1 runtime -sh`
 
-# [temporarily comment out fix for PF-Hadron calibrations]
+# updates to use l1t::PFJet with HLT plugins
+git cms-merge-topic missirol:devel_hltPhase2_l1tPFJet_1112pa3
+
 # # workaround for PFSimParticle::trackerSurfaceMomentum
 # # ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
-# git cms-addpkg FastSimulation/Event
-# git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
-# git fetch hatakeyamak
-# git cherry-pick 0cf67551731c80dc85130e4b8ec73c8f44d53cb0
+git cms-addpkg FastSimulation/Event
+git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
+git fetch hatakeyamak
+git cherry-pick 0cf67551731c80dc85130e4b8ec73c8f44d53cb0^ 0cf67551731c80dc85130e4b8ec73c8f44d53cb0 | git apply
