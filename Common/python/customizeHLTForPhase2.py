@@ -267,7 +267,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     ## Single-Jet triggers: modules
-    _l1tSinglePFJet100 = cms.EDFilter('HLT1PFJet',
+    _l1tSinglePFJet100 = cms.EDFilter('HLTLevel1PFJet',
       MaxEta = cms.double(5.0),
       MaxMass = cms.double(-1.0),
       MinE = cms.double(-1.0),
@@ -293,7 +293,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       triggerType = cms.int32(85),
     )
 
-    process.l1tSingleAK4PFPuppiJet200 = _l1tSinglePFJet100.clone(inputTag = 'ak4PFL1Puppi', MinPt = 200.)
+    process.l1tSingleAK4PFPuppiJet200 = _l1tSinglePFJet100.clone(inputTag = 'ak4PFL1PuppiCorrected', MinPt = 200.)
 
     process.hltSingleAK4PFJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFJetsCorrected', MinPt = 550.)
     process.hltSingleAK4PFCHSJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFCHSJetsCorrected', MinPt = 550.)
@@ -327,7 +327,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       saveTags = cms.bool(True)
     )
 
-    process.l1tPFPuppiHT = _hltHTMHT.clone(jetsLabel = 'ak4PFL1Puppi', maxEtaJetHt = 5.0, minPtJetHt = 30.)
+    process.l1tPFPuppiHT = _hltHTMHT.clone(jetsLabel = 'ak4PFL1PuppiCorrected', maxEtaJetHt = 5.0, minPtJetHt = 30.)
     process.hltPFPuppiHT = _hltHTMHT.clone(jetsLabel = 'hltAK4PuppiJetsCorrected', maxEtaJetHt = 4.0, minPtJetHt = 30.)
 
     process.l1tPFPuppiHT250 = _hltHT100.clone(htLabels = ['l1tPFPuppiHT'], mhtLabels = ['l1tPFPuppiHT'], minHt = [250.])
