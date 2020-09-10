@@ -93,10 +93,10 @@ else:
    raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
 
 ###
-### add analysis sequence (JMETrigger NTuple)
+### analysis sequence
 ###
-process.analysisCollectionsSequence = cms.Sequence()
-
+#process.analysisCollectionsSequence = cms.Sequence()
+#
 ### Muons
 #process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
 #process.analysisCollectionsSequence *= process.userMuonsSequence
@@ -104,8 +104,9 @@ process.analysisCollectionsSequence = cms.Sequence()
 ### Electrons
 #process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
 #process.analysisCollectionsSequence *= process.userElectronsSequence
-
-## Event Selection (none yet)
+#
+#process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
+#process.schedule.extend([process.analysisCollectionsPath])
 
 ## JMETrigger NTuple
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
@@ -300,9 +301,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'genMETCalo_InvisibleEtFraction',
   ),
 )
-
-process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
-process.schedule.extend([process.analysisCollectionsPath])
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 process.schedule.extend([process.analysisNTupleEndPath])
