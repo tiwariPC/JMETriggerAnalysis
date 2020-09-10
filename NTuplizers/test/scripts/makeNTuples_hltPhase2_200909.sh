@@ -27,7 +27,7 @@ recoKeys=(
 #  HLT_TRKv00_TICL
 #  HLT_TRKv02
 #  HLT_TRKv02_TICL
-  HLT_TRKv06
+#  HLT_TRKv06
   HLT_TRKv06_TICL
 #  HLT_TRKv06_skimmedTracks
 #  HLT_TRKv06_TICL_skimmedTracks
@@ -47,7 +47,7 @@ for sample_key in ${!samplesMap[@]}; do
   fi
 
   for reco_key in "${recoKeys[@]}"; do
-    htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=1 --cpus 1 --memory 2000 --runtime 10800 \
+    htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=4 --cpus 4 --memory 8000 --runtime 10800 --jobflavour longlunch \
       -d ${JDIR}/${sample_key}.json -p 0 \
       -o ${ODIR}/${reco_key}/${sample_key} \
       -m ${NEVT} reco=${reco_key} globalTag=111X_mcRun4_realistic_T15_v2 trkdqm=1 pfdqm=2
