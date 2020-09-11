@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <TH1D.h>
+#include <TH2D.h>
 
 class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
@@ -28,6 +29,7 @@ private:
   TH1D* h_track_pt_2_ = nullptr;
   TH1D* h_track_eta_ = nullptr;
   TH1D* h_track_phi_ = nullptr;
+  TH2D* h_track_etaphi_ = nullptr;
 };
 
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
@@ -45,7 +47,8 @@ TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
   h_track_pt_ = fs->make<TH1D>("track_pt", "track_pt", 600, 0, 5.);
   h_track_pt_2_ = fs->make<TH1D>("track_pt_2", "track_pt_2", 600, 0, 600.);
   h_track_eta_ = fs->make<TH1D>("track_eta", "track_eta", 600, -5., 5.);
-  h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
+  h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3.1416, 3.1416);
+  h_track_etaphi_ = fs->make<TH2D>("track_etaphi", "track_etaphi", 300, -5., 5., 300, -3.1416, 3.1416);
 }
 
 void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -58,6 +61,7 @@ void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       h_track_pt_2_->Fill(trk.pt());
       h_track_eta_->Fill(trk.eta());
       h_track_phi_->Fill(trk.phi());
+      h_track_etaphi_->Fill(trk.eta(), trk.phi());
     }
   } else {
     edm::LogWarning("Input") << "invalid handle to reco::TrackCollection : " << tracks_tag_.encode();

@@ -12,17 +12,19 @@
 
 List of commands to set up a local CMSSW area:
 ```shell
-scramv1 project CMSSW CMSSW_11_1_2
-cd CMSSW_11_1_2/src
+scramv1 project CMSSW CMSSW_11_1_2_patch3
+cd CMSSW_11_1_2_patch3/src
 eval `scramv1 runtime -sh`
 
-# [temporarily comment out fix for PF-Hadron calibrations]
-# # workaround for PFSimParticle::trackerSurfaceMomentum
-# # ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
-# git cms-addpkg FastSimulation/Event
-# git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
-# git fetch hatakeyamak
-# git cherry-pick 0cf67551731c80dc85130e4b8ec73c8f44d53cb0
+# updates to use l1t::PFJet with HLT plugins
+git cms-merge-topic missirol:devel_hltPhase2_l1tPFJet_1112pa3 -u
+
+# workaround for PFSimParticle::trackerSurfaceMomentum
+# ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
+git cms-addpkg FastSimulation/Event
+git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
+git fetch hatakeyamak
+git diff 0cf67551731c80dc85130e4b8ec73c8f44d53cb0^ 0cf67551731c80dc85130e4b8ec73c8f44d53cb0 | git apply
 
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
 scram b
@@ -36,44 +38,47 @@ update this part of the `readme`, plus the content of the script
 ### Instructions to generate configuration files for HLT Phase-2 reconstruction
 
 Configuration files are created via `cmsDriver.py`,
-adding (HLT) customizations to the Phase-2 Offline reconstruction;
+adding (HLT) customisations to the Phase-2 Offline reconstruction;
 for an example of a `cmsDriver.py` for the Offline reconstruction (RECO step)
 can be found from the setup commands of a AOD/MINIAOD sample in McM
 ([example](https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/TSG-Phase2HLTTDRWinter20RECOMiniAOD-00010)).
 
- * Customization functions are available under
+ * Customisation functions are available under
    [`Common/python/`](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python):
 
    - [**L1T**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_L1T.py#L4):
-     customization to add the L1-Trigger reconstruction as implemented in the recipe provided in the
+     customisation to add the L1-Trigger reconstruction as implemented in the recipe provided in the
      [``Phase-2 HLT'' TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/HighLevelTriggerPhase2?rev=69#Running_and_using_the_L1T_result).
 
    - [**TRKv00**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv00.py#L3),
      [**TRKv02**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv02.py#L3),
      [**TRKv06**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_TRKv06.py#L3):
-     customizations extracted from standalone configs developed by the TRK POG;
-     guidelines to create such a customization function
+     customisations extracted from standalone configs developed by the TRK POG;
+     guidelines to create such a customisation function
      from a standalone `trackingOnly` configuration can be found in
-     [Common/test/makeTRKCustomizationFunction.md](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/test/makeTRKCustomizationFunction.md).
+     [Common/test/makeTRKCustomisationFunction.md](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/test/makeTRKCustomizationFunction.md).
 
    - [**''skimmed tracks''**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_skimmedTracks.py#L3):
      an addon to the standard TRK sequence,
      to select a subset of tracks based on their compatibility
      with the leading pixel vertices.
-     If using one of the TRK customization functions,
-     apply the ''skimmed tracks'' customization only after the TRK customization function;
-     this function can be applied after any of TRK customization functions.
+     If using one of the TRK customisation functions,
+     apply the ''skimmed tracks'' customisation only after the TRK customisation function;
+     this function can be applied after any of TRK customisation functions.
+
+   - [**PF**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_PF.py#L13):
+     customisations for the standard Particle-Flow sequence (collection: `particleFlowTmp`)
+     following the approach used for PF@HLT in Run-2.
 
    - [**JME**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L13):
-     customizations to build HLT-like Jets and MET collections;
+     customisations to build HLT-like Jets and MET collections;
      currently, the JME function also includes the backbone of
      the reconstruction sequence (largely taken from the `RECO` step),
      incl. some HLT-like modifications to the ParticleFlow modules.
 
-   - [**TICL**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L885):
-     a wrapper to apply the customization function maintained
-     by the HGCal DPG to include TICL in the reconstruction;
-     apply this customization only after the JME customization function.
+   - [**Schedule and Paths**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/customizeHLTForPhase2.py):
+     wrapper functions that combine the customisations described above for individual objects (e.g. tracks, jets);
+     see the source code for more details, and for the full set of available customisations.
 
  * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
    [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs).
@@ -82,23 +87,20 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
    ```shell
    cmsDriver.py step3 \
      --geometry Extended2026D49 --era Phase2C9 \
-     --conditions auto:phase2_realistic_T15 \
+     --conditions 111X_mcRun4_realistic_T15_v2 \
      --processName RECO2 \
      --step RAW2DIGI,RECO \
      --eventcontent RECO \
      --datatier RECO \
-     --filein /store/mc/Phase2HLTTDRWinter20DIGI/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/PU200_castor_110X_mcRun4_realistic_v3-v2/10000/05BFAD3E-3F91-1843-ABA2-2040324C7567.root \
+     --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/FEVT/PU200_castor_111X_mcRun4_realistic_T15_v1-v1/100000/DA18C0FC-1189-D64B-B3B6-44F3F96F1840.root \
      --mc \
      --nThreads 4 \
      --nStreams 4 \
      --no_exec \
      -n 10 \
      --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
-     --customise JMETriggerAnalysis/Common/hltPhase2_L1T.customize_hltPhase2_L1T \
-     --customise JMETriggerAnalysis/Common/hltPhase2_TRKv06.customize_hltPhase2_TRKv06 \
-     --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_JME \
-     --customise JMETriggerAnalysis/Common/hltPhase2_JME.customize_hltPhase2_TICL \
-     --customise_commands 'process.schedule.remove(process.RECOoutput_step)\ndel process.RECOoutput\ndel process.RECOoutput_step\n' \
+     --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06_TICL \
+     --customise_commands 'process.prune()\n' \
      --python_filename hltPhase2_TRKv06_TICL_cfg.py
    ```
 

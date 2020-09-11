@@ -11,10 +11,12 @@
   <use name="DataFormats/TrackReco"/>
   <use name="DataFormats/VertexReco"/>
   <use name="DataFormats/MuonReco"/>
+  <use name="DataFormats/JetReco"/>
   <use name="DataFormats/METReco"/>
   <use name="DataFormats/ParticleFlowCandidate"/>
   <use name="DataFormats/PatCandidates"/>
   <use name="HLTrigger/HLTcore"/>
+  <use name="CondFormats/JetMETObjects"/>
   <use name="RecoEgamma/EgammaTools"/>
   <use name="rootmath"/>
   <use name="root"/>

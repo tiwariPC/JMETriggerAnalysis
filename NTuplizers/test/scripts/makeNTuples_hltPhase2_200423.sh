@@ -35,7 +35,7 @@ if [ ! -d ${JDIR} ]; then
    -o ${JDIR}/Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU.json
 
   das_jsondump -v -m ${NEVT} \
-   -d /VBF_HToInvisible_M125_14TeV_powheg_pythia8_TuneCP5/Phase2HLTTDRWinter20RECOMiniAOD-PU200_110X_mcRun4_realistic_v3-v1/MINIAODSIM \
+   -d /VBF_HToInvisible_M125_14TeV_powheg_pythia8_TuneCP5/Phase2HLTTDRWinter20RECOMiniAOD-PU200_110X_mcRun4_realistic_v3-v3/MINIAODSIM \
    -o ${JDIR}/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200.json
 fi
 
