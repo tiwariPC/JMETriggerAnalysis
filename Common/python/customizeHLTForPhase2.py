@@ -97,6 +97,18 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
       + process.tofPID
     )
 
+    # remove unnecessary modules related
+    # to muon reconstruction
+    for _tmp1 in [
+      'muIsolationTask',
+      'muonSelectionTypeTask',
+    ]:
+      if hasattr(process, _tmp1):
+        for _tmp2 in getattr(process, _tmp1).moduleNames():
+          if hasattr(process, _tmp2):
+            process.__delattr__(_tmp2)
+        process.__delattr__(_tmp1)
+
     process.globalreco = cms.Sequence(
         process.caloTowersRec
       + process.ecalClusters
@@ -115,9 +127,9 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
       + process.hltAK4CaloJets # was: process.jetGlobalReco
 
       + process.muonGlobalReco
-#      + process.muoncosmicreco
+#     + process.muoncosmicreco
       + process.particleFlowCluster
-#      + process.pfTrackingGlobalReco
+#     + process.pfTrackingGlobalReco
     )
 
     if hasattr(process, 'hltAK4CaloJets'):
