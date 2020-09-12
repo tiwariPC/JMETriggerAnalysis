@@ -12,7 +12,7 @@ def colored_text(txt, keys=[]):
     return _tmp_out
 
 def KILL(log):
-    raise SystemExit('\n '+colored_text('@@@ FATAL', ['1','91'])+' -- '+log+'\n')
+    raise RuntimeError('\n '+colored_text('@@@ FATAL', ['1','91'])+' -- '+log+'\n')
 
 def WARNING(log):
     print '\n '+colored_text('@@@ WARNING', ['1','93'])+' -- '+log+'\n'

@@ -31,18 +31,22 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
 
     for i_file_idx, i_file in enumerate(dataset_files):
 
-        i_file_nevents = command_output_lines('dasgoclient --query "file='+str(i_file)+' | grep file.nevents"')
-        i_file_nevents = [_tmp.replace(' ', '') for _tmp in i_file_nevents]
-        i_file_nevents = [_tmp for _tmp in i_file_nevents if _tmp != '']
-        i_file_nevents = sorted(list(set(i_file_nevents)))
-
-        if len(i_file_nevents) != 1:
-           KILL(das_name+' '+i_file+' '+str(i_file_nevents))
-
-        i_file_nevents = i_file_nevents[0]
-
-        if not is_int(i_file_nevents):
-           KILL(das_name+' '+i_file+' '+str(i_file_nevents))
+        n_tries = 0
+        while True:
+          try:
+            i_file_nevents = command_output_lines('dasgoclient --query "file='+str(i_file)+' | grep file.nevents"')
+            i_file_nevents = [_tmp.replace(' ', '') for _tmp in i_file_nevents]
+            i_file_nevents = [_tmp for _tmp in i_file_nevents if _tmp != '']
+            i_file_nevents = sorted(list(set(i_file_nevents)))
+            if len(i_file_nevents) != 1:
+               KILL(das_name+' '+i_file+' '+str(i_file_nevents))
+            i_file_nevents = i_file_nevents[0]
+            if not is_int(i_file_nevents):
+               KILL(das_name+' '+i_file+' '+str(i_file_nevents))
+            break
+          except:
+            if n_tries >= 3: raise
+            n_tries += 1
 
         i_file_nevents = int(i_file_nevents)
 
