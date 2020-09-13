@@ -17,7 +17,7 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
 
     dset_data = {'DAS': str(das_name), 'files': []}
 
-    dataset_files = command_output_lines('dasgoclient --query "file dataset='+str(das_name)+'"')
+    dataset_files = command_output_lines('dasgoclient --query "file dataset='+str(das_name)+' | grep file.name,file.nevents"')
     dataset_files = [_tmp for _tmp in dataset_files if _tmp != '']
     dataset_files = sorted(list(set(dataset_files)))
 
@@ -27,35 +27,23 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
     if max_files > 0:
        dataset_files = dataset_files[:max_files]
 
+    dataset_filesNevents = []
+    for _tmp in dataset_files:
+        _tmp_split = _tmp.split()
+        if len(_tmp_split) != 2:
+           KILL(das_name+' '+str(_tmp))
+        if not is_int(_tmp_split[1]):
+           KILL(das_name+' '+i_file+' '+str(_tmp_split[1]))
+        dataset_filesNevents += [[_tmp_split[0], _tmp_split[1]]]
+
     totEvents, breakLoop = 0, False
-
-    for i_file_idx, i_file in enumerate(dataset_files):
-
-        n_tries = 0
-        while True:
-          try:
-            i_file_nevents = command_output_lines('dasgoclient --query "file='+str(i_file)+' | grep file.nevents"')
-            i_file_nevents = [_tmp.replace(' ', '') for _tmp in i_file_nevents]
-            i_file_nevents = [_tmp for _tmp in i_file_nevents if _tmp != '']
-            i_file_nevents = sorted(list(set(i_file_nevents)))
-            if len(i_file_nevents) != 1:
-               KILL(das_name+' '+i_file+' '+str(i_file_nevents))
-            i_file_nevents = i_file_nevents[0]
-            if not is_int(i_file_nevents):
-               KILL(das_name+' '+i_file+' '+str(i_file_nevents))
-            break
-          except:
-            if n_tries >= 3: raise
-            n_tries += 1
-
-        i_file_nevents = int(i_file_nevents)
-
+    for i_file_idx, [i_file, i_file_nevents] in enumerate(dataset_filesNevents):
         totEvents += i_file_nevents
         if (max_events > 0) and (totEvents >= max_events):
            breakLoop = True
 
         if verbose:
-           print '  [ file', i_file_idx+1, '/', len(dataset_files), '] [ # events =', i_file_nevents, ']', i_file
+           print '  [ file', i_file_idx+1, '/', len(dataset_filesNevents), '] [ # events =', i_file_nevents, ']', i_file
 
         i_file_parents1 = []
         i_file_parents2 = []
