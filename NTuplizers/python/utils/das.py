@@ -34,7 +34,7 @@ def load_dataset_data(das_name, max_files=-1, max_events=-1, parentFiles_levels=
            KILL(das_name+' '+str(_tmp))
         if not is_int(_tmp_split[1]):
            KILL(das_name+' '+i_file+' '+str(_tmp_split[1]))
-        dataset_filesNevents += [[_tmp_split[0], _tmp_split[1]]]
+        dataset_filesNevents += [[_tmp_split[0], int(_tmp_split[1])]]
 
     totEvents, breakLoop = 0, False
     for i_file_idx, [i_file, i_file_nevents] in enumerate(dataset_filesNevents):
