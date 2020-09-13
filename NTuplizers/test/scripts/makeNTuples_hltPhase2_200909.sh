@@ -7,12 +7,17 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-NEVT=-1 #50000
+NEVT=-1
 
 ODIR=$1
 
 if [ -d ${ODIR} ]; then
-  echo "output directory already exists: ${ODIR}"
+  printf "%s\n" "output directory already exists: ${ODIR}"
+  exit 1
+fi
+
+if [ $(ls .tmp_*_cfg.py 2> /dev/null | wc -l) -gt 0 ]; then
+  printf "%s\n%s\n" "target configuration files already exist:" "$(ls .tmp_*_cfg.py)"
   exit 1
 fi
 
@@ -41,23 +46,19 @@ mkdir -p ${JDIR}
 for sample_key in ${!samplesMap[@]}; do
   sample_name=${samplesMap[${sample_key}]}
 
-  if [ ! -f ${JDIR}/${sample_key}.json ]; then
-    das_jsondump -v -m ${NEVT} -d ${sample_name} -o ${JDIR}/${sample_key}.json -p 0
-  fi
+  [ -f ${JDIR}/${sample_key}.json ] || (das_jsondump -v -m ${NEVT} -d ${sample_name} -o ${JDIR}/${sample_key}.json -p 0)
 
-  # lxplus: specify JobFlavour and AccountingGroup (CAF)
-  [[ ${HOSTNAME} != lxplus* ]] || opts="--JobFlavour longlunch --AccountingGroup group_u_CMS.CAF.PHYS"
+  # lxplus: specify JobFlavour and AccountingGroup
+  [[ ${HOSTNAME} != lxplus* ]] || opts="--JobFlavour longlunch --AccountingGroup group_u_CMS.CAF.PHYS --no-export-LD-LIBRARY-PATH"
 
   for reco_key in "${recoKeys[@]}"; do
-    htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=4 --cpus 4 --memory 8000 --runtime 10800 ${opts} \
-      -d ${JDIR}/${sample_key}.json -p 0 \
-      -o ${ODIR}/${reco_key}/${sample_key} \
-      -m ${NEVT} reco=${reco_key} globalTag=111X_mcRun4_realistic_T15_v2 trkdqm=1 pfdqm=2
-  done
-  unset reco_key
-  unset sample_name
-done
-unset sample_key
+    [ -f .tmp_${reco_key}_cfg.py ] || (python jmeTriggerNTuple_cfg.py dumpPython=.tmp_${reco_key}_cfg.py numThreads=1 reco=${reco_key} trkdqm=1 pfdqm=2 globalTag=111X_mcRun4_realistic_T15_v2)
 
-unset NEVT ODIR JDIR
-unset recoKeys samplesMap
+    htc_driver -c .tmp_${reco_key}_cfg.py --customize-cfg -m ${NEVT} -n 100 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
+      -d ${JDIR}/${sample_key}.json -p 0 -o ${ODIR}/${reco_key}/${sample_key}
+  done
+  unset reco_key sample_name
+done
+unset sample_key NEVT ODIR JDIR recoKeys samplesMap
+
+rm -f .tmp_*_cfg.py
