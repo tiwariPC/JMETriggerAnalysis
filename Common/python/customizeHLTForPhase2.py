@@ -152,6 +152,9 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
     return process
 
 def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=False, TRK='v06', useTICL=True, useMTD=False):
+    # reset schedule
+    process.setSchedule_(cms.Schedule())
+
     if useL1T:
        process = customise_hltPhase2_L1T(process)
 
@@ -192,10 +195,8 @@ def customise_hltPhase2_scheduleHLTJMERecoWithoutFilters(process):
 
     process.p = cms.Path(process.RawToDigi + process.reconstruction)
 
-    ## schedule
-    # FIXME: if the original schedule contains paths for L1T reco, the command below will remove them
-    # so this needs to be improved if one wants to be able to run (part of) the L1T reco on a separate path
-    process.setSchedule_(cms.Schedule(process.p))
+    # schedule
+    process.schedule_().append(process.p)
 
     return process
 
@@ -285,7 +286,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltPFPuppiMET
     )
 
-    ## Single-Jet triggers: modules
+    ## Single-Jet producers+filters
     _l1tSinglePFJet100 = cms.EDFilter('HLTLevel1PFJet',
       MaxEta = cms.double(5.0),
       MaxMass = cms.double(-1.0),
@@ -318,8 +319,8 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.hltSingleAK4PFCHSJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFCHSJetsCorrected', MinPt = 550.)
     process.hltSingleAK4PFPuppiJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFPuppiJetsCorrected', MinPt = 550.)
 
-    ## HT triggers: modules
-    _hltHTMHT = cms.EDProducer('HLTHtMhtProducer',
+    ## HT/MHT producers+filters
+    _hltHtMht = cms.EDProducer('HLTHtMhtProducer',
       excludePFMuons = cms.bool(False),
       jetsLabel = cms.InputTag(''),
       maxEtaJetHt = cms.double(2.4),
@@ -342,13 +343,26 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       saveTags = cms.bool(True)
     )
 
-    process.l1tPFPuppiHT = _hltHTMHT.clone(jetsLabel = 'ak4PFL1PuppiCorrected', maxEtaJetHt = 2.4, minPtJetHt = 30.)
-    process.hltPFPuppiHT = _hltHTMHT.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', maxEtaJetHt = 4.0, minPtJetHt = 30.)
+    _hltMHT100 = cms.EDFilter('HLTMhtFilter',
+      mhtLabels = cms.VInputTag(''),
+      minMht = cms.vdouble(100.0),
+      saveTags = cms.bool(True)
+    )
 
-    process.l1tPFPuppiHT440 = _hltHT100.clone(htLabels = ['l1tPFPuppiHT'], mhtLabels = ['l1tPFPuppiHT'], minHt = [440.])
-    process.hltPFPuppiHT1050 = _hltHT100.clone(htLabels = ['hltPFPuppiHT'], mhtLabels = ['hltPFPuppiHT'], minHt = [1050.])
+    # L1T-HT
+    process.l1tHtMhtPFPuppiJetPt30Eta2p4 = _hltHtMht.clone(jetsLabel = 'ak4PFL1PuppiCorrected', maxEtaJetHt = 2.4, minPtJetHt = 30., maxEtaJetMht = 2.4, minPtJetMht = 30.)
+    process.l1tPFPuppiHT440 = _hltHT100.clone(htLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], mhtLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], minHt = [440.])
 
-    ## MET triggers: modules
+    # HLT-HT
+    process.hltHtMhtPFPuppiJetPt30Eta4 = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', maxEtaJetHt = 4.0, minPtJetHt = 30., maxEtaJetMht = 4.0, minPtJetMht = 30.)
+    process.hltPFPuppiHT60 = _hltHT100.clone(htLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], mhtLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], minHt = [60.])
+    process.hltPFPuppiHT1050 = _hltHT100.clone(htLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], mhtLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], minHt = [1050.])
+
+    # HLT-MHT
+    process.hltHtMhtPFPuppiJetPt30Eta5 = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', maxEtaJetHt = 5.0, minPtJetHt = 30., maxEtaJetMht = 5.0, minPtJetMht = 30., usePt = False)
+    process.hltPFPuppiMHT120 = _hltMHT100.clone(mhtLabels = ['hltHtMhtPFPuppiJetPt30Eta5'], minMht = [120.])
+
+    ## MET producers+filters
     _hltPFMET200 = cms.EDFilter('HLT1PFMET',
       MaxEta = cms.double(-1.0),
       MaxMass = cms.double(-1.0),
@@ -368,26 +382,109 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.hltPFCHSMET250 = _hltPFMET200.clone(inputTag = 'hltPFCHSMET', MinPt = 250.)
     process.hltPFPuppiMET250 = _hltPFMET200.clone(inputTag = 'hltPFPuppiMET', MinPt = 250.)
 
-    ## trigger paths
-    process.MC_JME_v1 = cms.Path(process.HLTParticleFlowSequence + process.HLTJMESequence)
+    process.hltPFPuppiMET120 = _hltPFMET200.clone(inputTag = 'hltPFPuppiMET', MinPt = 120.)
 
-    process.L1T_AK4PFPuppiJet130_v1 = cms.Path(process.l1tSingleAK4PFPuppiJet130)
-    process.HLT_AK4PFJet550_v1 = cms.Path(process.l1tSingleAK4PFPuppiJet130 + process.HLTParticleFlowSequence + process.HLTAK4PFJetsReconstruction + process.hltSingleAK4PFJet550)
-    process.HLT_AK4PFCHSJet550_v1 = cms.Path(process.l1tSingleAK4PFPuppiJet130 + process.HLTParticleFlowSequence + process.HLTAK4PFCHSJetsReconstruction + process.hltSingleAK4PFCHSJet550)
-    process.HLT_AK4PFPuppiJet550_v1 = cms.Path(process.l1tSingleAK4PFPuppiJet130 + process.HLTParticleFlowSequence + process.HLTAK4PFPuppiJetsReconstruction + process.hltSingleAK4PFPuppiJet550)
+    ## Trigger Paths
+    process.MC_JME_v1 = cms.Path(
+        process.HLTParticleFlowSequence
+      + process.HLTJMESequence
+    )
 
-    process.L1T_PFPuppiHT440_v1 = cms.Path(process.l1tPFPuppiHT + process.l1tPFPuppiHT440)
-    process.HLT_PFPuppiHT1050_v1 = cms.Path(process.l1tPFPuppiHT + process.l1tPFPuppiHT440 + process.HLTParticleFlowSequence + process.HLTAK4PFPuppiJetsReconstruction + process.hltPFPuppiHT + process.hltPFPuppiHT1050)
+    process.L1T_AK4PFPuppiJet130_v1 = cms.Path(
+      process.l1tSingleAK4PFPuppiJet130
+    )
 
-    process.L1T_PFPuppiMET100_v1 = cms.Path(process.l1tPFPuppiMET100)
-    process.HLT_PFMET250_v1 = cms.Path(process.l1tPFPuppiMET100 + process.HLTParticleFlowSequence + process.hltPFMET + process.hltPFMET250)
-    process.HLT_PFCHSMET250_v1 = cms.Path(process.l1tPFPuppiMET100 + process.HLTParticleFlowSequence + process.HLTPFCHSMETReconstruction + process.hltPFCHSMET250)
-    process.HLT_PFPuppiMET250_v1 = cms.Path(process.l1tPFPuppiMET100 + process.HLTParticleFlowSequence + process.HLTPFPuppiMETReconstruction + process.hltPFPuppiMET250)
+    process.HLT_AK4PFJet550_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet130
+      + process.HLTParticleFlowSequence
+      + process.HLTAK4PFJetsReconstruction
+      + process.hltSingleAK4PFJet550
+    )
 
-    ## schedule
-    # FIXME: if the original schedule contains paths for L1T reco, the command below will remove them
-    # so this needs to be improved if one wants to be able to run (part of) the L1T reco on a separate path
-    process.setSchedule_(cms.Schedule(*[
+    process.HLT_AK4PFCHSJet550_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet130
+      + process.HLTParticleFlowSequence
+      + process.HLTAK4PFCHSJetsReconstruction
+      + process.hltSingleAK4PFCHSJet550
+    )
+
+    process.HLT_AK4PFPuppiJet550_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet130
+      + process.HLTParticleFlowSequence
+      + process.HLTAK4PFPuppiJetsReconstruction
+      + process.hltSingleAK4PFPuppiJet550
+    )
+
+    process.L1T_PFPuppiHT440_v1 = cms.Path(
+        process.l1tHtMhtPFPuppiJetPt30Eta2p4
+      + process.l1tPFPuppiHT440
+    )
+
+    process.HLT_PFPuppiHT1050_v1 = cms.Path(
+        process.l1tHtMhtPFPuppiJetPt30Eta2p4
+      + process.l1tPFPuppiHT440
+      + process.HLTParticleFlowSequence
+      + process.HLTAK4PFPuppiJetsReconstruction
+      + process.hltHtMhtPFPuppiJetPt30Eta4
+      + process.hltPFPuppiHT1050
+    )
+
+    process.L1T_PFPuppiMET100_v1 = cms.Path(
+      process.l1tPFPuppiMET100
+    )
+
+    process.HLT_PFMET250_v1 = cms.Path(
+        process.l1tPFPuppiMET100
+      + process.HLTParticleFlowSequence
+      + process.hltPFMET
+      + process.hltPFMET250
+    )
+
+    process.HLT_PFCHSMET250_v1 = cms.Path(
+        process.l1tPFPuppiMET100
+      + process.HLTParticleFlowSequence
+      + process.HLTPFCHSMETReconstruction
+      + process.hltPFCHSMET250
+    )
+
+    process.HLT_PFPuppiMET250_v1 = cms.Path(
+        process.l1tPFPuppiMET100
+      + process.HLTParticleFlowSequence
+      + process.HLTPFPuppiMETReconstruction
+      + process.hltPFPuppiMET250
+    )
+
+    process.HLT_PFPuppiMET120_v1 = cms.Path(
+        process.l1tPFPuppiMET100
+      + process.HLTParticleFlowSequence
+      + process.HLTPFPuppiMETReconstruction
+      + process.hltPFPuppiMET120
+    )
+
+    process.HLT_PFPuppiMET120_PFPuppiMHT120_v1 = cms.Path(
+        process.l1tPFPuppiMET100
+      + process.HLTParticleFlowSequence
+      + process.HLTPFPuppiMETReconstruction
+      + process.hltPFPuppiMET120
+      + process.HLTAK4PFPuppiJetsReconstruction
+      + process.hltHtMhtPFPuppiJetPt30Eta5
+      + process.hltPFPuppiMHT120
+    )
+
+    process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60_v1 = cms.Path(
+        process.l1tPFPuppiMET100
+      + process.HLTParticleFlowSequence
+      + process.HLTPFPuppiMETReconstruction
+      + process.hltPFPuppiMET120
+      + process.HLTAK4PFPuppiJetsReconstruction
+      + process.hltHtMhtPFPuppiJetPt30Eta5
+      + process.hltPFPuppiMHT120
+      + process.hltHtMhtPFPuppiJetPt30Eta4
+      + process.hltPFPuppiHT60
+    )
+
+    # schedule
+    process.schedule_().extend([
       process.MC_JME_v1,
 
       process.L1T_AK4PFPuppiJet130_v1,
@@ -403,10 +500,10 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       process.HLT_PFCHSMET250_v1,
       process.HLT_PFPuppiMET250_v1,
 
-#      process.HLT_PFPuppiMET120_v1,
-#      process.HLT_PFPuppiMET120_PFPuppiMHT120_v1,
-#      process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60_v1,
-    ]))
+      process.HLT_PFPuppiMET120_v1,
+      process.HLT_PFPuppiMET120_PFPuppiMHT120_v1,
+      process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60_v1,
+    ])
 
     return process
 
