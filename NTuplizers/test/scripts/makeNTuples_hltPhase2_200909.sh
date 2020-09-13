@@ -45,8 +45,11 @@ for sample_key in ${!samplesMap[@]}; do
     das_jsondump -v -m ${NEVT} -d ${sample_name} -o ${JDIR}/${sample_key}.json -p 0
   fi
 
+  # lxplus: specify JobFlavour and AccountingGroup (CAF)
+  [[ ${HOSTNAME} != lxplus* ]] || opts="--JobFlavour longlunch --AccountingGroup group_u_CMS.CAF.PHYS"
+
   for reco_key in "${recoKeys[@]}"; do
-    htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=4 --cpus 4 --memory 8000 --runtime 10800 --jobflavour longlunch \
+    htc_driver -c jmeTriggerNTuple_cfg.py -n 100 numThreads=4 --cpus 4 --memory 8000 --runtime 10800 ${opts} \
       -d ${JDIR}/${sample_key}.json -p 0 \
       -o ${ODIR}/${reco_key}/${sample_key} \
       -m ${NEVT} reco=${reco_key} globalTag=111X_mcRun4_realistic_T15_v2 trkdqm=1 pfdqm=2
