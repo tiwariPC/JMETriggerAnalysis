@@ -194,10 +194,7 @@ opts.register('skipEvents', 0,
               vpo.VarParsing.varType.int,
               'number of events to be skipped')
 
-opts.register('dumpPython', None,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.string,
-              'Path to python file with content of cms.Process')
+opts.parseArguments()
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
@@ -210,10 +207,6 @@ process.source.fileNames = opts.inputFiles
 
 # input EDM files [secondary]
 process.source.secondaryFileNames = opts.secondaryInputFiles
-
-# dump content of cms.Process to python file
-if opts.dumpPython is not None:
-   open(opts.dumpPython, 'w').write(process.dumpPython())
 """
             cfg_file.write(custom_str.format(os.path.basename(__file__), str(datetime.datetime.now())))
 
@@ -306,8 +299,14 @@ if opts.dumpPython is not None:
         i_njobs = int(math.ceil(float(i_inputFile_nevents) / opts.n_events)) if (opts.n_events > 0) else 1
         i_nevt_remainder = i_inputFile_nevents%opts.n_events if (opts.n_events > 0) else 0
 
-        for i_job in range(i_njobs):
+        # dump of python config
+        retcode = EXE('edmConfigDump '+out_cmsRun_cfg+' 2> '+OUTPUT_DIR+'/configDump.log > '+OUTPUT_DIR+'/configDump.py', suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
+        if retcode:
+           EXE('cat '+OUTPUT_DIR+'/configDump.log', verbose=opts.verbose, dry_run=opts.dry_run)
+           raise SystemExit(retcode)
+        del retcode
 
+        for i_job in range(i_njobs):
             # name of output sub-directory
             i_OUTPUT_DIR = OUTPUT_DIR+'/'+opts.jobdirname+outputname_postfix_format.format(jobCounter)
 
@@ -328,7 +327,7 @@ if opts.dumpPython is not None:
                breakLoop = True
 
             # cmsRun arguments (cfg-file + options)
-            cmsRun_opts = out_cmsRun_cfg
+            cmsRun_opts = os.path.relpath(out_cmsRun_cfg, i_OUTPUT_DIR)
             cmsRun_opts += ' \\\n maxEvents='+str(i_maxEvents)
             cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
             cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
@@ -337,20 +336,12 @@ if opts.dumpPython is not None:
             for _tmp in cmsRun_addopts:
                cmsRun_opts += ' \\\n '+str(_tmp)
 
-            ## dump of full python config
-            if jobCounter == 0:
-               retcode = EXE('python '+cmsRun_opts+' dumpPython='+OUTPUT_DIR+'/dumpPython.py &> '+OUTPUT_DIR+'/dumpPython.log', suspend=False, verbose=opts.verbose, dry_run=opts.dry_run)
-               if retcode:
-                  EXE('cat '+OUTPUT_DIR+'/dumpPython.log', verbose=opts.verbose, dry_run=opts.dry_run)
-                  raise SystemExit(retcode)
-               del retcode
-
             i_SHELL_COMMANDS  = [['set -e']]
             i_SHELL_COMMANDS += [['cd '+i_OUTPUT_DIR]]
-            i_SHELL_COMMANDS += [['if [ -f flag.done ]; then exit 0; fi;']]
-            i_SHELL_COMMANDS += [['cd '+os.environ['CMSSW_BASE']+'/src']]
+            i_SHELL_COMMANDS += [['[ ! -f flag.done ] || exit 0']]
+            i_SHELL_COMMANDS += [['pushd '+os.environ['CMSSW_BASE']+'/src &> /dev/null']]
             i_SHELL_COMMANDS += [['eval `scram runtime -sh`']]
-            i_SHELL_COMMANDS += [['cd - &> /dev/null']]
+            i_SHELL_COMMANDS += [['popd &> /dev/null']]
             i_SHELL_COMMANDS += [['cmsRun '+cmsRun_opts]]
             i_SHELL_COMMANDS += [['touch flag.done']]
 
@@ -361,7 +352,6 @@ if opts.dumpPython is not None:
 
             if not opts.dry_run:
                with open(EXEFILE_ABSPATH, 'w') as f_exefile:
-
                   f_exefile.write('#!/bin/bash\n')
 
                   # export explicitly the environment variable LD_LIBRARY_PATH
