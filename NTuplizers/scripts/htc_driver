@@ -32,34 +32,37 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
 
-    parser.add_argument('-j', '--jobdirname', dest='jobdirname', action='store', default='job', required=False,
+    parser.add_argument('-j', '--jobdirname', dest='jobdirname', action='store', default='job',
                         help='prefix of batch-job sub-directories (example: [JOBDIRNAME]_[counter]/)')
 
-    parser.add_argument('-f', '--max-files', dest='max_files', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-f', '--max-files', dest='max_files', action='store', type=int, default=-1,
                         help='maximum number of input files to be processed (if integer is negative, all files will be processed)')
 
-    parser.add_argument('-m', '--max-events', dest='max_events', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-m', '--max-events', dest='max_events', action='store', type=int, default=-1,
                         help='maximum number of total input events to be processed (if integer is negative, all events will be processed)')
 
-    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1,
                         help='maximum number of events per job')
 
-    parser.add_argument('-p', '--parentFiles-level', dest='parentFiles_level', action='store', type=int, default=2, required=False,
+    parser.add_argument('-p', '--parentFiles-level', dest='parentFiles_level', action='store', type=int, default=2,
                         help='level of parentFiles to be used as secondary input files (currently, anything other than 1 and 2 disables the usage of secondary input files)')
 
-    parser.add_argument('--cpus', dest='cpus', action='store', type=int, default=1, required=False,
+    parser.add_argument('--cpus', dest='cpus', action='store', type=int, default=1,
                         help='argument of HTCondor parameter "RequestCpus"')
 
-    parser.add_argument('--memory', dest='memory', action='store', type=int, default=2000, required=False,
+    parser.add_argument('--memory', dest='memory', action='store', type=int, default=2000,
                         help='argument of HTCondor parameter "RequestMemory"')
 
-    parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=10800, required=False,
+    parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=10800,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
-    parser.add_argument('--jobflavour', dest='jobflavour', action='store', default=None, required=False,
+    parser.add_argument('--JobFlavour', dest='JobFlavour', action='store', default=None,
                         help='argument of HTCondor parameter "+JobFlavour" (by default, the parameter is not specified)')
 
-    parser.add_argument('--batch-name', dest='batch_name', action='store', default=None, required=False,
+    parser.add_argument('--AccountingGroup', dest='AccountingGroup', action='store', default=None,
+                        help='argument of HTCondor parameter "+AccountingGroup" (by default, the parameter is not specified)')
+
+    parser.add_argument('--batch-name', dest='batch_name', action='store', default=None,
                         help='argument of HTCondor parameter "batch_name" (if not specified, basename of argument of "--output" is used)')
 
     parser.add_argument('--submit', dest='submit', action='store_true', default=False,
@@ -250,14 +253,24 @@ if opts.dumpPython is not None:
       '+RequestRuntime = '+str(opts.runtime),
     ]
 
-    if opts.jobflavour is not None:
-       jobflavour = opts.jobflavour
-       while jobflavour.startswith("'") or jobflavour.startswith('"'):
-         jobflavour = jobflavour[1:]
-       while jobflavour.endswith("'") or jobflavour.endswith('"'):
-         jobflavour = jobflavour[:-1]
+    if opts.JobFlavour is not None:
+       JobFlavour = opts.JobFlavour
+       while JobFlavour.startswith("'") or JobFlavour.startswith('"'):
+         JobFlavour = JobFlavour[1:]
+       while JobFlavour.endswith("'") or JobFlavour.endswith('"'):
+         JobFlavour = JobFlavour[:-1]
        SUBFILE_LINES += [
-         '+JobFlavour = "{:}"'.format(jobflavour)
+         '+JobFlavour = "{:}"'.format(JobFlavour)
+       ]
+
+    if opts.AccountingGroup is not None:
+       AccountingGroup = opts.AccountingGroup
+       while AccountingGroup.startswith("'") or AccountingGroup.startswith('"'):
+         AccountingGroup = AccountingGroup[1:]
+       while AccountingGroup.endswith("'") or AccountingGroup.endswith('"'):
+         AccountingGroup = AccountingGroup[:-1]
+       SUBFILE_LINES += [
+         '+AccountingGroup = "{:}"'.format(AccountingGroup)
        ]
 
     SUBFILE_LINES += [
