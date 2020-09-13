@@ -360,132 +360,132 @@ def customise_hltPhase2_JME(process):
       + process.hltPFSoftKillerMET
     )
 
-    ## Jets: Puppi AK4
-    process.hltPuppi = _puppi.clone(
+    ## Jets: PFPuppi AK4
+    process.hltPFPuppi = _puppi.clone(
       candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
     )
-    process.hltAK4PuppiJets = ak4PFJetsPuppi.clone(
+    process.hltAK4PFPuppiJets = ak4PFJetsPuppi.clone(
       src = _particleFlowCands,
       applyWeight = True,
-      srcWeights = 'hltPuppi',
+      srcWeights = 'hltPFPuppi',
 #     jetPtMin = 10.,
     )
-    process.hltAK4PuppiJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
+    process.hltAK4PFPuppiJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
       srcRho = cms.InputTag( 'fixedGridRhoFastjetAllTmp' ),
       algorithm = cms.string( 'AK4PFPuppi' ),
       level = cms.string( 'L1FastJet' )
     )
-    process.hltAK4PuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
+    process.hltAK4PFPuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK4PFPuppi' ),
       level = cms.string( 'L2Relative' )
     )
-    process.hltAK4PuppiJetCorrectorL3 = cms.EDProducer( 'LXXXCorrectorProducer',
+    process.hltAK4PFPuppiJetCorrectorL3 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK4PFPuppi' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK4PuppiJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
+    process.hltAK4PFPuppiJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK4PFPuppi' ),
       level = cms.string( 'L2L3Residual' )
     )
-    process.hltAK4PuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK4PuppiJetCorrectorL1', 'hltAK4PuppiJetCorrectorL2', 'hltAK4PuppiJetCorrectorL3', 'hltAK4PuppiJetCorrectorL2L3' )
+    process.hltAK4PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
+      correctors = cms.VInputTag( 'hltAK4PFPuppiJetCorrectorL1', 'hltAK4PFPuppiJetCorrectorL2', 'hltAK4PFPuppiJetCorrectorL3', 'hltAK4PFPuppiJetCorrectorL2L3' )
     )
-    process.hltAK4PuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
-      src = cms.InputTag( 'hltAK4PuppiJets' ),
-      correctors = cms.VInputTag( 'hltAK4PuppiJetCorrector' ),
+    process.hltAK4PFPuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
+      src = cms.InputTag( 'hltAK4PFPuppiJets' ),
+      correctors = cms.VInputTag( 'hltAK4PFPuppiJetCorrector' ),
     )
 
-    ## Jets: Puppi AK8
-    process.hltAK8PuppiJets = ak8PFJetsPuppi.clone(
+    ## Jets: PFPuppi AK8
+    process.hltAK8PFPuppiJets = ak8PFJetsPuppi.clone(
       src = _particleFlowCands,
       applyWeight = True,
-      srcWeights = 'hltPuppi',
+      srcWeights = 'hltPFPuppi',
 #     jetPtMin = 80.,
     )
-    process.hltAK8PuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
+    process.hltAK8PFPuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK8PFPuppi' ),
       level = cms.string( 'L2Relative' )
     )
-    process.hltAK8PuppiJetCorrectorL3 = cms.EDProducer( 'LXXXCorrectorProducer',
+    process.hltAK8PFPuppiJetCorrectorL3 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK8PFPuppi' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK8PuppiJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
+    process.hltAK8PFPuppiJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK8PFPuppi' ),
       level = cms.string( 'L2L3Residual' )
     )
-    process.hltAK8PuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK8PuppiJetCorrectorL2','hltAK8PuppiJetCorrectorL3','hltAK8PuppiJetCorrectorL2L3' )
+    process.hltAK8PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
+      correctors = cms.VInputTag( 'hltAK8PFPuppiJetCorrectorL2','hltAK8PFPuppiJetCorrectorL3','hltAK8PFPuppiJetCorrectorL2L3' )
     )
-    process.hltAK8PuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
-      src = cms.InputTag('hltAK8PuppiJets'),
-      correctors = cms.VInputTag('hltAK8PuppiJetCorrector'),
+    process.hltAK8PFPuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
+      src = cms.InputTag('hltAK8PFPuppiJets'),
+      correctors = cms.VInputTag('hltAK8PFPuppiJetCorrector'),
     )
 
-    ## MET: Puppi Raw
+    ## MET: PFPuppi Raw
 
-    # Puppi candidates for MET
-    process.hltPuppiNoLep = _puppiNoLep.clone(
+    # PFPuppi candidates for MET
+    process.hltPFPuppiNoLep = _puppiNoLep.clone(
       candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
     )
 
-    process.hltPuppiMETv0 = cms.EDProducer( 'PFMETProducer',
+    process.hltPFPuppiMETv0 = cms.EDProducer( 'PFMETProducer',
       src = cms.InputTag( _particleFlowCands ),
       applyWeight = cms.bool( True ),
-      srcWeights = cms.InputTag( 'hltPuppi' ),
+      srcWeights = cms.InputTag( 'hltPFPuppi' ),
       globalThreshold = cms.double( 0.0 ),
       calculateSignificance = cms.bool( False ),
     )
 
-    process.hltPuppiMET = cms.EDProducer( 'PFMETProducer',
+    process.hltPFPuppiMET = cms.EDProducer( 'PFMETProducer',
       src = cms.InputTag( _particleFlowCands ),
       applyWeight = cms.bool( True ),
-      srcWeights = cms.InputTag( 'hltPuppiNoLep' ),
+      srcWeights = cms.InputTag( 'hltPFPuppiNoLep' ),
       globalThreshold = cms.double( 0.0 ),
       calculateSignificance = cms.bool( False ),
     )
 
-    ## MET: Puppi Type-1
-    process.hltPuppiMETTypeOneCorrector = cms.EDProducer( 'PFJetMETcorrInputProducer',
-      src = cms.InputTag( 'hltAK4PuppiJets' ),
+    ## MET: PFPuppi Type-1
+    process.hltPFPuppiMETTypeOneCorrector = cms.EDProducer( 'PFJetMETcorrInputProducer',
+      src = cms.InputTag( 'hltAK4PFPuppiJets' ),
       type1JetPtThreshold = cms.double( 15.0 ),
       skipEMfractionThreshold = cms.double( 0.9 ),
       skipEM = cms.bool( True ),
-      jetCorrLabelRes = cms.InputTag( 'hltAK4PuppiJetCorrector' ),
-      offsetCorrLabel = cms.InputTag( 'hltAK4PuppiJetCorrectorL1' ),
+      jetCorrLabelRes = cms.InputTag( 'hltAK4PFPuppiJetCorrector' ),
+      offsetCorrLabel = cms.InputTag( 'hltAK4PFPuppiJetCorrectorL1' ),
       skipMuons = cms.bool( True ),
       skipMuonSelection = cms.string( 'isGlobalMuon | isStandAloneMuon' ),
       jetCorrEtaMax = cms.double( 9.9 ),
-      jetCorrLabel = cms.InputTag( 'hltAK4PuppiJetCorrector' )
+      jetCorrLabel = cms.InputTag( 'hltAK4PFPuppiJetCorrector' )
     )
-    process.hltPuppiMETTypeOne = cms.EDProducer( 'CorrectedPFMETProducer',
-      src = cms.InputTag( 'hltPuppiMET' ),
-      srcCorrections = cms.VInputTag( 'hltPuppiMETTypeOneCorrector:type1' )
+    process.hltPFPuppiMETTypeOne = cms.EDProducer( 'CorrectedPFMETProducer',
+      src = cms.InputTag( 'hltPFPuppiMET' ),
+      srcCorrections = cms.VInputTag( 'hltPFPuppiMETTypeOneCorrector:type1' )
     )
 
-    ## Sequence: Puppi Jets and MET
-    process.HLTPuppiJMEReconstruction = cms.Sequence(
-        process.hltPuppiNoLep
-      + process.hltPuppiMET
-      + process.hltPuppi
-      + process.hltPuppiMETv0
-      + process.hltAK4PuppiJets
-      + process.hltAK4PuppiJetCorrectorL1
-      + process.hltAK4PuppiJetCorrectorL2
-      + process.hltAK4PuppiJetCorrectorL3
-      + process.hltAK4PuppiJetCorrectorL2L3
-      + process.hltAK4PuppiJetCorrector
-      + process.hltAK4PuppiJetsCorrected
-      + process.hltPuppiMETTypeOneCorrector
-      + process.hltPuppiMETTypeOne
-      + process.hltAK8PuppiJets
-      + process.hltAK8PuppiJetCorrectorL2
-      + process.hltAK8PuppiJetCorrectorL3
-      + process.hltAK8PuppiJetCorrectorL2L3
-      + process.hltAK8PuppiJetCorrector
-      + process.hltAK8PuppiJetsCorrected
+    ## Sequence: PFPuppi Jets and MET
+    process.HLTPFPuppiJMEReconstruction = cms.Sequence(
+        process.hltPFPuppiNoLep
+      + process.hltPFPuppiMET
+      + process.hltPFPuppi
+      + process.hltPFPuppiMETv0
+      + process.hltAK4PFPuppiJets
+      + process.hltAK4PFPuppiJetCorrectorL1
+      + process.hltAK4PFPuppiJetCorrectorL2
+      + process.hltAK4PFPuppiJetCorrectorL3
+      + process.hltAK4PFPuppiJetCorrectorL2L3
+      + process.hltAK4PFPuppiJetCorrector
+      + process.hltAK4PFPuppiJetsCorrected
+      + process.hltPFPuppiMETTypeOneCorrector
+      + process.hltPFPuppiMETTypeOne
+      + process.hltAK8PFPuppiJets
+      + process.hltAK8PFPuppiJetCorrectorL2
+      + process.hltAK8PFPuppiJetCorrectorL3
+      + process.hltAK8PFPuppiJetCorrectorL2L3
+      + process.hltAK8PFPuppiJetCorrector
+      + process.hltAK8PFPuppiJetsCorrected
     )
 
     return process
