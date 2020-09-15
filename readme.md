@@ -10,7 +10,6 @@
 
 ### Setup
 
-List of commands to set up a local CMSSW area:
 ```shell
 scramv1 project CMSSW CMSSW_11_1_2_patch3
 cd CMSSW_11_1_2_patch3/src
