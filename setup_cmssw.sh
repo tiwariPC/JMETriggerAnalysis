@@ -15,8 +15,8 @@ eval `scramv1 runtime -sh`
 # updates to use l1t::PFJet with HLT plugins
 git cms-merge-topic missirol:devel_hltPhase2_l1tPFJet_1112pa3 -u
 
-# # workaround for PFSimParticle::trackerSurfaceMomentum
-# # ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
+# [optional] workaround for PFSimParticle::trackerSurfaceMomentum
+# ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
 git cms-addpkg FastSimulation/Event
 git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
 git fetch hatakeyamak
