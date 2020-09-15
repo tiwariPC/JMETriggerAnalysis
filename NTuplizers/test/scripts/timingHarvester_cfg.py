@@ -23,4 +23,4 @@ process.DQMFileSaverOutput = cms.EndPath( process.fastTimerServiceClient + proce
 import sys
 inputFiles = sys.argv[2:]
 print 'inputFiles =', inputFiles
-process.source.fileNames = inputFiles
+process.source.fileNames = ['file:'+_tmp for _tmp in inputFiles]
