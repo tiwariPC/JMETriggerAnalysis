@@ -61,7 +61,7 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
    - [**''skimmed tracks''**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_skimmedTracks.py#L3):
      an addon to the standard TRK sequence,
      to select a subset of tracks based on their compatibility
-     with the leading pixel vertices.
+     with the sumPt2-leading pixel vertices.
      If using one of the TRK customisation functions,
      apply the ''skimmed tracks'' customisation only after the TRK customisation function;
      this function can be applied after any of TRK customisation functions.
@@ -71,19 +71,16 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      following the approach used for PF@HLT in Run-2.
 
    - [**JME**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/hltPhase2_JME.py#L13):
-     customisations to build HLT-like Jets and MET collections;
-     currently, the JME function also includes the backbone of
-     the reconstruction sequence (largely taken from the `RECO` step),
-     incl. some HLT-like modifications to the ParticleFlow modules.
+     customisations to build HLT Jets and MET collections.
 
-   - [**Schedule and Paths**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/customizeHLTForPhase2.py):
-     wrapper functions that combine the customisations described above for individual objects (e.g. tracks, jets);
+   - [**Paths and Schedule**](https://github.com/missirol/JMETriggerAnalysis/blob/phase2/Common/python/customizeHLTForPhase2.py):
+     wrapper functions that combine the customisations described above for individual objects (e.g. tracks, PF, jets);
      see the source code for more details, and for the full set of available customisations.
 
  * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
    [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs).
 
- * **Example**: configuration file to run L1T+TRK(v06)+TICL+JME HLT-like reconstruction on RAW.
+ * **Example**: configuration file to run HLT reconstruction on RAW using TRK(v06)+TICL:
    ```shell
    cmsDriver.py step3 \
      --geometry Extended2026D49 --era Phase2C9 \
@@ -105,23 +102,6 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      --customise_commands 'process.prune()\n' \
      --python_filename hltPhase2_TRKv06_TICL_cfg.py
    ```
-
-----------
-
-### Configuration with JME trigger paths for testing
-
-A standalone configuration file including
-a set of Single-Jet and MET trigger paths
-is available for testing under
-[Common/python/configs/testTriggerPaths_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs/testTriggerPaths_cfg.py).
-It can be tested as follows:
-```
-cmsRun Common/python/configs/testTriggerPaths_cfg.py [reco=TRKv06_TICL] [maxEvents=1]
-```
-where the parts in parentheses denote some of the optional command-line arguments.
-The option `reco`, in particular, can be used to choose the inputs to the PF reconstruction (e.g. TRKv6+TICL);
-the keywords supported for `reco` can be checked by running
-`python Common/python/configs/testTriggerPaths_cfg.py reco=''`.
 
 ----------
 
@@ -152,11 +132,11 @@ can be found under
 
 ### Additional Notes
 
- * [HLT Phase-2 Twiki](https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2)
+ * [HLT Phase-2 TWiki](https://twiki.cern.ch/twiki/bin/viewauth/CMS/HighLevelTriggerPhase2)
 
  * DAS query for the latest Phase-2 MC samples (RAW):
    ```shell
-   dasgoclient --query="dataset dataset=/*/Phase2HLTTDRWinter20*/*RAW*"
+   dasgoclient --query="dataset dataset=/*/Phase2HLTTDR*ReRECO*111X*/*"
    ```
 
 ----------
