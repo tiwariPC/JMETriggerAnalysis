@@ -121,10 +121,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResultsCollections = cms.vstring(
     'MC_JME',
-    'L1T_AK4PFPuppiJet130',
-    'HLT_AK4PFJet550',
-    'HLT_AK4PFCHSJet550',
-    'HLT_AK4PFPuppiJet550',
+    'L1T_AK4PFPuppiJet130Eta2p4',
+    'HLT_AK4PFJet550Eta2p4',
+    'HLT_AK4PFCHSJet550Eta2p4',
+    'HLT_AK4PFPuppiJet550Eta2p4',
     'L1T_PFPuppiHT440',
     'HLT_PFPuppiHT1050',
     'L1T_PFPuppiMET100',
@@ -139,6 +139,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   fillCollectionConditions = cms.PSet(),
 
   doubles = cms.PSet(
+
     fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),
   ),
 

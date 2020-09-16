@@ -313,11 +313,11 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       triggerType = cms.int32(85),
     )
 
-    process.l1tSingleAK4PFPuppiJet130 = _l1tSinglePFJet100.clone(inputTag = 'ak4PFL1PuppiCorrected', MinPt = 130.)
+    process.l1tSingleAK4PFPuppiJet130Eta2p4 = _l1tSinglePFJet100.clone(inputTag = 'ak4PFL1PuppiCorrected', MinPt = 130., MaxEta = 2.4)
 
-    process.hltSingleAK4PFJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFJetsCorrected', MinPt = 550.)
-    process.hltSingleAK4PFCHSJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFCHSJetsCorrected', MinPt = 550.)
-    process.hltSingleAK4PFPuppiJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFPuppiJetsCorrected', MinPt = 550.)
+    process.hltSingleAK4PFJet550Eta2p4 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFJetsCorrected', MinPt = 550., MaxEta = 2.4)
+    process.hltSingleAK4PFCHSJet550Eta2p4 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFCHSJetsCorrected', MinPt = 550., MaxEta = 2.4)
+    process.hltSingleAK4PFPuppiJet550Eta2p4 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFPuppiJetsCorrected', MinPt = 550., MaxEta = 2.4)
 
     ## HT/MHT producers+filters
     _hltHtMht = cms.EDProducer('HLTHtMhtProducer',
@@ -350,13 +350,13 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     # L1T-HT
-    process.l1tHtMhtPFPuppiJetPt30Eta2p4 = _hltHtMht.clone(jetsLabel = 'ak4PFL1PuppiCorrected', maxEtaJetHt = 2.4, minPtJetHt = 30., maxEtaJetMht = 2.4, minPtJetMht = 30.)
+    process.l1tHtMhtPFPuppiJetPt30Eta2p4 = _hltHtMht.clone(jetsLabel = 'ak4PFL1PuppiCorrected', minPtJetHt = 30., maxEtaJetHt = 2.4, minPtJetMht = 30., maxEtaJetMht = 2.4)
     process.l1tPFPuppiHT440 = _hltHT100.clone(htLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], mhtLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], minHt = [440.])
 
     # HLT-HT
-    process.hltHtMhtPFPuppiJetPt30Eta4 = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', maxEtaJetHt = 4.0, minPtJetHt = 30., maxEtaJetMht = 4.0, minPtJetMht = 30.)
-    process.hltPFPuppiHT60 = _hltHT100.clone(htLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], mhtLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], minHt = [60.])
-    process.hltPFPuppiHT1050 = _hltHT100.clone(htLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], mhtLabels = ['hltHtMhtPFPuppiJetPt30Eta4'], minHt = [1050.])
+    process.hltHtMhtPFPuppiJetPt30Eta2p4 = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', minPtJetHt = 30., maxEtaJetHt = 2.4, minPtJetMht = 30., maxEtaJetMht = 2.4)
+    process.hltPFPuppiHT60 = _hltHT100.clone(htLabels = ['hltHtMhtPFPuppiJetPt30Eta2p4'], mhtLabels = ['hltHtMhtPFPuppiJetPt30Eta2p4'], minHt = [60.])
+    process.hltPFPuppiHT1050 = _hltHT100.clone(htLabels = ['hltHtMhtPFPuppiJetPt30Eta2p4'], mhtLabels = ['hltHtMhtPFPuppiJetPt30Eta2p4'], minHt = [1050.])
 
     # HLT-MHT
     process.hltHtMhtPFPuppiJetPt30Eta5 = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', maxEtaJetHt = 5.0, minPtJetHt = 30., maxEtaJetMht = 5.0, minPtJetMht = 30., usePt = False)
@@ -390,29 +390,29 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.HLTJMESequence
     )
 
-    process.L1T_AK4PFPuppiJet130_v1 = cms.Path(
-      process.l1tSingleAK4PFPuppiJet130
+    process.L1T_AK4PFPuppiJet130Eta2p4_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet130Eta2p4
     )
 
-    process.HLT_AK4PFJet550_v1 = cms.Path(
-        process.l1tSingleAK4PFPuppiJet130
+    process.HLT_AK4PFJet550Eta2p4_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet130Eta2p4
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFJetsReconstruction
-      + process.hltSingleAK4PFJet550
+      + process.hltSingleAK4PFJet550Eta2p4
     )
 
-    process.HLT_AK4PFCHSJet550_v1 = cms.Path(
-        process.l1tSingleAK4PFPuppiJet130
+    process.HLT_AK4PFCHSJet550Eta2p4_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet130Eta2p4
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFCHSJetsReconstruction
-      + process.hltSingleAK4PFCHSJet550
+      + process.hltSingleAK4PFCHSJet550Eta2p4
     )
 
-    process.HLT_AK4PFPuppiJet550_v1 = cms.Path(
-        process.l1tSingleAK4PFPuppiJet130
+    process.HLT_AK4PFPuppiJet550Eta2p4_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet130Eta2p4
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFPuppiJetsReconstruction
-      + process.hltSingleAK4PFPuppiJet550
+      + process.hltSingleAK4PFPuppiJet550Eta2p4
     )
 
     process.L1T_PFPuppiHT440_v1 = cms.Path(
@@ -425,12 +425,12 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.l1tPFPuppiHT440
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFPuppiJetsReconstruction
-      + process.hltHtMhtPFPuppiJetPt30Eta4
+      + process.hltHtMhtPFPuppiJetPt30Eta2p4
       + process.hltPFPuppiHT1050
     )
 
     process.L1T_PFPuppiMET100_v1 = cms.Path(
-      process.l1tPFPuppiMET100
+        process.l1tPFPuppiMET100
     )
 
     process.HLT_PFMET250_v1 = cms.Path(
@@ -479,7 +479,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.HLTAK4PFPuppiJetsReconstruction
       + process.hltHtMhtPFPuppiJetPt30Eta5
       + process.hltPFPuppiMHT120
-      + process.hltHtMhtPFPuppiJetPt30Eta4
+      + process.hltHtMhtPFPuppiJetPt30Eta2p4
       + process.hltPFPuppiHT60
     )
 
@@ -487,10 +487,10 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.schedule_().extend([
       process.MC_JME_v1,
 
-      process.L1T_AK4PFPuppiJet130_v1,
-      process.HLT_AK4PFJet550_v1,
-      process.HLT_AK4PFCHSJet550_v1,
-      process.HLT_AK4PFPuppiJet550_v1,
+      process.L1T_AK4PFPuppiJet130Eta2p4_v1,
+      process.HLT_AK4PFJet550Eta2p4_v1,
+      process.HLT_AK4PFCHSJet550Eta2p4_v1,
+      process.HLT_AK4PFPuppiJet550Eta2p4_v1,
 
       process.L1T_PFPuppiHT440_v1,
       process.HLT_PFPuppiHT1050_v1,
