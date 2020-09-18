@@ -39,6 +39,11 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
+opts.register('addTimingDQM', True,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'print results of FastTimerService, and produce corresponding DQM output file')
+
 opts.register('globalTag', None,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
@@ -194,6 +199,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFJetCollections = cms.PSet(
 
+#   l1tAK4CaloJets = cms.InputTag('ak4PFL1Calo'),
+#   l1tAK4PFJets = cms.InputTag('ak4PFL1PF'),
+#   l1tAK4PFPuppiJets = cms.InputTag('ak4PFL1Puppi'),
+
     hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
     hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
@@ -201,10 +210,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
     hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
     hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
-
-#   l1tAK4CaloJets = cms.InputTag('ak4PFL1Calo'),
-#   l1tAK4PFJets = cms.InputTag('ak4PFL1PF'),
-#   l1tAK4PFPuppiJets = cms.InputTag('ak4PFL1Puppi'),
   ),
 
   patJetCollections = cms.PSet(
@@ -311,6 +316,18 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 process.schedule.extend([process.analysisNTupleEndPath])
+
+# FastTimerService
+if opts.addTimingDQM:
+   from HLTrigger.Timer.FastTimer import customise_timer_service, customise_timer_service_print
+   process = customise_timer_service(process)
+   process = customise_timer_service_print(process)
+   process.FastTimerService.dqmTimeRange            = 20000.
+   process.FastTimerService.dqmTimeResolution       =    10.
+   process.FastTimerService.dqmPathTimeRange        = 10000.
+   process.FastTimerService.dqmPathTimeResolution   =     5.
+   process.FastTimerService.dqmModuleTimeRange      =  1000.
+   process.FastTimerService.dqmModuleTimeResolution =     1.
 
 # update process.GlobalTag.globaltag
 if opts.globalTag is not None:
