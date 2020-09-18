@@ -33,8 +33,8 @@ recoKeys=(
 #  HLT_TRKv00_TICL
 #  HLT_TRKv02
 #  HLT_TRKv02_TICL
-#  HLT_TRKv06
-  HLT_TRKv06_TICL
+  HLT_TRKv06
+#  HLT_TRKv06_TICL
 #  HLT_TRKv06_skimmedTracks
 #  HLT_TRKv06_TICL_skimmedTracks
 )
@@ -52,7 +52,7 @@ for sample_key in ${!samplesMap[@]}; do
   [[ ${HOSTNAME} != lxplus* ]] || opts="--JobFlavour longlunch --AccountingGroup group_u_CMS.CAF.PHYS --no-export-LD-LIBRARY-PATH"
 
   for reco_key in "${recoKeys[@]}"; do
-    [ -f .tmp_${reco_key}_cfg.py ] || (python jmeTriggerNTuple_cfg.py dumpPython=.tmp_${reco_key}_cfg.py numThreads=1 reco=${reco_key} trkdqm=1 pfdqm=2 globalTag=111X_mcRun4_realistic_T15_v2)
+    [ -f .tmp_${reco_key}_cfg.py ] || (python jmeTriggerNTuple_cfg.py dumpPython=.tmp_${reco_key}_cfg.py numThreads=1 reco=${reco_key} trkdqm=0 pfdqm=0 globalTag=111X_mcRun4_realistic_T15_v2)
 
     htc_driver -c .tmp_${reco_key}_cfg.py --customize-cfg -m ${NEVT} -n 100 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
       -d ${JDIR}/${sample_key}.json -p 0 -o ${ODIR}/${reco_key}/${sample_key}
