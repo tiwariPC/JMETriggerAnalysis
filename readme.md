@@ -96,8 +96,6 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      -n 10 \
      --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
      --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06_TICL \
-     --customise HLTrigger/Timer/FastTimer.customise_timer_service \
-     --customise HLTrigger/Timer/FastTimer.customise_timer_service_print \
      --customise_commands 'process.prune()\n' \
      --python_filename hltPhase2_TRKv06_TICL_cfg.py
    ```
