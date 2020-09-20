@@ -3,8 +3,11 @@ import ROOT
 import glob
 
 #input_files = 'output_hltPhase2_200909/HLT_TRKv06_TICL/Phase2HLTTDR_MinBias_14TeV_PU200/job_*/out.root'
+#output_file = 'metHistos_MB_PU200_hltWithTICL.root'
+
 input_files = 'output_hltPhase2_200909_woTICL/HLT_TRKv06/Phase2HLTTDR_MinBias_14TeV_PU200/job_*/out.root'
-output_file = 'metHistos_MB_PU200_hltWithTICL.root'
+output_file = 'metHistos_MB_PU200_hltWithoutTICL.root'
+
 ttree_key = 'JMETriggerNTuple/Events'
 
 tchain = ROOT.TChain(ttree_key)
@@ -15,6 +18,8 @@ for _tmp in input_files:
 metTypes = [
   'l1tPFMET_pt',
   'l1tPFPuppiMET_pt',
+  'hltPFMET_pt',
+  'hltPFCHSMET_pt',
   'hltPFPuppiMET_pt',
   'hltPFPuppiMETv0_pt',
   'offlinePFMET_Raw_pt',
@@ -30,7 +35,7 @@ for _tmp in metTypes:
 
 histos = {}
 for _tmp in metTypes:
-  histos[_tmp] = ROOT.TH1D(_tmp, _tmp, 50, 0, 500)
+  histos[_tmp] = ROOT.TH1D(_tmp, _tmp, 500, 0, 500)
   histos[_tmp].SetDirectory(0)
   histos[_tmp].Sumw2()
 
@@ -39,7 +44,7 @@ for _tmp in range(len(metTypes)):
     _name1 = metTypes[_tmp]
     _name2 = metTypes[_tmp2]
     _hname = _name1+'__'+_name2
-    histos[_hname] = ROOT.TH2D(_hname, _hname, 50, 0, 500, 50, 0, 500)
+    histos[_hname] = ROOT.TH2D(_hname, _hname, 500, 0, 500, 500, 0, 500)
     histos[_hname].SetDirectory(0)
     histos[_hname].Sumw2()
 
@@ -54,6 +59,8 @@ triggerCounts['l1tPFMET120 && offlinePFMET120_Raw'] = 0
 triggerCounts['l1tPFPuppiMET100'] = 0
 triggerCounts['l1tPFPuppiMET120'] = 0
 triggerCounts['l1tPFPuppiMET120 && offlinePFPuppiMET120_Raw'] = 0
+triggerCounts['hltPFMET120'] = 0
+triggerCounts['hltPFCHSMET120'] = 0
 triggerCounts['hltPFPuppiMET120'] = 0
 triggerCounts['hltPFPuppiMET120_v0'] = 0
 triggerCounts['offlinePFMET120_Raw'] = 0
@@ -63,6 +70,10 @@ triggerCounts['offlinePFPuppiMET120_Type1'] = 0
 numEvents = 0
 for evt in tchain:
     numEvents += 1
+
+    if not (numEvents % 10000):
+       print 'events processed:', numEvents
+
     for trigName in triggerCounts:
       if hasattr(evt, trigName) and (getattr(evt, trigName) == True):
         triggerCounts[trigName] += 1
@@ -79,6 +90,12 @@ for evt in tchain:
       triggerCounts['l1tPFPuppiMET120'] += 1
       if evt.offlinePFPuppiMET_Raw_pt[0] > 120.:
         triggerCounts['l1tPFPuppiMET120 && offlinePFPuppiMET120_Raw'] += 1
+
+    if evt.hltPFMET_pt[0] > 120.:
+      triggerCounts['hltPFMET120'] += 1
+
+    if evt.hltPFCHSMET_pt[0] > 120.:
+      triggerCounts['hltPFCHSMET120'] += 1
 
     if evt.hltPFPuppiMET_pt[0] > 120.:
       triggerCounts['hltPFPuppiMET120'] += 1
@@ -105,7 +122,10 @@ for evt in tchain:
         _hname = _name1+'__'+_name2
         histos[_hname].Fill(getattr(evt, _name1)[0], getattr(evt, _name2)[0])
 
-print numEvents
+print '-'*50
+print 'Events processed =', numEvents
+print '-'*50
+
 for trigName in sorted(triggerCounts.keys()):
   print '{:<60} {: >10d} {: >12.3f}'.format(trigName, triggerCounts[trigName], triggerCounts[trigName]/float(numEvents) * 2748. * 11246.)
 
