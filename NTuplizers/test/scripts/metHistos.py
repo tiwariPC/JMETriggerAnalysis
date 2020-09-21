@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-import ROOT
+import os
 import glob
+import ROOT
 
-#input_files = 'output_hltPhase2_200909/HLT_TRKv06_TICL/Phase2HLTTDR_MinBias_14TeV_PU200/job_*/out.root'
-#output_file = 'metHistos_MB_PU200_hltWithTICL.root'
+#input_files = os.environ['CMSSW_BASE']+'/src/NTupleAnalysis/JMETrigger/test/output_hltPhase2_200909_MB/ntuples/HLT_TRKv06/Phase2HLTTDR_MinBias_14TeV_PU200.root'
+#output_file = 'metHistos_MB_PU200_hltWithoutTICL.root'
 
-input_files = 'output_hltPhase2_200909_woTICL/HLT_TRKv06/Phase2HLTTDR_MinBias_14TeV_PU200/job_*/out.root'
-output_file = 'metHistos_MB_PU200_hltWithoutTICL.root'
+input_files = os.environ['CMSSW_BASE']+'/src/NTupleAnalysis/JMETrigger/test/output_hltPhase2_200909_MB/ntuples/HLT_TRKv06_TICL/Phase2HLTTDR_MinBias_14TeV_PU200.root'
+output_file = 'metHistos_MB_PU200_hltWithTICL.root'
 
 ttree_key = 'JMETriggerNTuple/Events'
 
