@@ -411,11 +411,14 @@ if opts.pfdqm > 0:
 
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerRecoPFCandidate_cfi import pfCandidateHistogrammerRecoPFCandidate
    from JMETriggerAnalysis.Common.pfCandidateHistogrammerPatPackedCandidate_cfi import pfCandidateHistogrammerPatPackedCandidate
+   from JMETriggerAnalysis.Common.leafCandidateHistogrammer_cfi import leafCandidateHistogrammer
 
    _candTags = [
      ('_offlineParticleFlow', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
      ('_particleFlowTmp', 'particleFlowTmp', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltPFPuppi', 'hltPFPuppi', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
+     ('_l1tParticleFlow', 'l1pfCandidates:PF', '', leafCandidateHistogrammer),
+     ('_l1tPFPuppi', 'l1pfCandidates:Puppi', '(pt > 0)', leafCandidateHistogrammer),
    ]
 
    if 'TICL' in opt_reco:
