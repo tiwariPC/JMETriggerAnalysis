@@ -113,6 +113,28 @@ else:
 #process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
 #process.schedule.extend([process.analysisCollectionsPath])
 
+# Bad PFMuon
+from RecoMET.METFilters.BadPFMuonFilter_cfi import BadPFMuonFilter
+process.OfflineBadPFMuonTagger = BadPFMuonFilter.clone(
+  PFCandidates = cms.InputTag('packedPFCandidates'),
+  muons = cms.InputTag('slimmedMuons'),
+  vtx = cms.InputTag('offlineSlimmedPrimaryVertices'),
+  taggingMode = False,
+)
+process.Offline_BadPFMuon = cms.Path(process.OfflineBadPFMuonTagger)
+process.schedule_().append(process.Offline_BadPFMuon)
+
+# Bad Charge Hadron
+from RecoMET.METFilters.BadChargedCandidateFilter_cfi import BadChargedCandidateFilter
+process.OfflineBadChargedCandidateTagger = BadChargedCandidateFilter.clone(
+  PFCandidates = cms.InputTag('packedPFCandidates'),
+  muons = cms.InputTag('slimmedMuons'),
+  vtx = cms.InputTag('offlineSlimmedPrimaryVertices'),
+  taggingMode = False,
+)
+process.Offline_BadChargedCandidate = cms.Path(process.OfflineBadChargedCandidateTagger)
+process.schedule_().append(process.Offline_BadChargedCandidate)
+
 ## JMETrigger NTuple
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
@@ -125,6 +147,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResultsFilterAND = cms.vstring(),
 
   TriggerResultsCollections = cms.vstring(
+    'Offline_BadPFMuon',
+    'Offline_BadChargedCandidate',
     'MC_JME',
     'L1T_AK4PFPuppiJet130Eta2p4',
     'HLT_AK4PFJet550Eta2p4',
@@ -162,6 +186,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFCandidateCollections = cms.PSet(
 
+#   hltSimPF = cms.InputTag('simPFProducer'),
+#   hltTiclPF = cms.InputTag('pfTICL'),
 #   hltParticleFlow = cms.InputTag('particleFlowTmp'),
 #   hltPFPuppi = cms.InputTag('hltPFPuppi'),
 #   hltPFPuppiNoLep = cms.InputTag('hltPFPuppiNoLep'),
