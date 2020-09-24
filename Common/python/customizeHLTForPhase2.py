@@ -40,6 +40,10 @@ def customise_hltPhase2_disableMTDReconstruction(process):
             process.__delattr__(_tmp2)
         process.__delattr__(_tmp1)
 
+    for _tmp in process.__dict__.keys():
+      if ('Vertices4D' in _tmp) or ('Sorting4D' in _tmp):
+        process.__delattr__(_tmp)
+
     # disable use of timing information in simPFProducer
     if hasattr(process, 'simPFProducer') and hasattr(process.simPFProducer, 'trackTimeValueMap'):
        del process.simPFProducer.trackTimeValueMap
