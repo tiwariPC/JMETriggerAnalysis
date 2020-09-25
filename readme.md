@@ -25,6 +25,12 @@ git remote add hatakeyamak https://github.com/hatakeyamak/cmssw.git
 git fetch hatakeyamak
 git diff 0cf67551731c80dc85130e4b8ec73c8f44d53cb0^ 0cf67551731c80dc85130e4b8ec73c8f44d53cb0 | git apply
 
+# selected manual backport of BadPFMuonDz MET-filter
+# https://github.com/cms-sw/cmssw/pull/30015
+git cms-addpkg RecoMET/METFilters
+git diff 442ae0775276f4388f8d51742ea915c1b91e1506 bb38311862c83068b2434f35850c9a17e29dd2f7 RecoMET/METFilters/python | git apply
+git checkout bb38311862c83068b2434f35850c9a17e29dd2f7 RecoMET/METFilters/plugins/BadParticleFilter.cc
+
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
 scram b
 ```
