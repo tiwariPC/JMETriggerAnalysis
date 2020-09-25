@@ -124,6 +124,17 @@ process.OfflineBadPFMuonTagger = BadPFMuonFilter.clone(
 process.Offline_BadPFMuon = cms.Path(process.OfflineBadPFMuonTagger)
 process.schedule_().append(process.Offline_BadPFMuon)
 
+# Bad PFMuon (Dz)
+from RecoMET.METFilters.BadPFMuonDzFilter_cfi import BadPFMuonDzFilter
+process.OfflineBadPFMuonDzTagger = BadPFMuonDzFilter.clone(
+  PFCandidates = cms.InputTag('packedPFCandidates'),
+  muons = cms.InputTag('slimmedMuons'),
+  vtx = cms.InputTag('offlineSlimmedPrimaryVertices'),
+  taggingMode = False,
+)
+process.Offline_BadPFMuonDz = cms.Path(process.OfflineBadPFMuonDzTagger)
+process.schedule_().append(process.Offline_BadPFMuonDz)
+
 # Bad Charge Hadron
 from RecoMET.METFilters.BadChargedCandidateFilter_cfi import BadChargedCandidateFilter
 process.OfflineBadChargedCandidateTagger = BadChargedCandidateFilter.clone(
@@ -148,6 +159,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TriggerResultsCollections = cms.vstring(
     'Offline_BadPFMuon',
+    'Offline_BadPFMuonDz',
     'Offline_BadChargedCandidate',
     'MC_JME',
     'L1T_AK4PFPuppiJet130Eta2p4',
