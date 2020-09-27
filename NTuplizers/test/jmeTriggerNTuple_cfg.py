@@ -179,6 +179,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   fillCollectionConditions = cms.PSet(),
 
+  HepMCProduct = cms.InputTag('generatorSmeared'),
+
+  PileupSummaryInfo = cms.InputTag('addPileupInfo'),
+
   doubles = cms.PSet(
 
     fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),

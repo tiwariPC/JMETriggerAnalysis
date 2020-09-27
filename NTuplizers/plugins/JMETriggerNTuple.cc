@@ -5,9 +5,11 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "FWCore/Common/interface/TriggerNames.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/ValueContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h"
@@ -51,14 +53,20 @@ protected:
   bool passesTriggerResults_OR(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&);
   bool passesTriggerResults_AND(const edm::TriggerResults&, const edm::Event&, const std::vector<std::string>&);
 
-  const std::string TTreeName_;
+  std::string const TTreeName_;
 
-  const std::vector<std::string> TriggerResultsFilterOR_;
-  const std::vector<std::string> TriggerResultsFilterAND_;
+  bool const consumeHepMCProduct_;
+  bool const consumePileupSummaryInfo_;
 
-  const std::vector<std::string> outputBranchesToBeDropped_;
+  std::vector<std::string> const TriggerResultsFilterOR_;
+  std::vector<std::string> const TriggerResultsFilterAND_;
+
+  std::vector<std::string> const outputBranchesToBeDropped_;
 
   std::unordered_map<std::string, std::string> stringCutObjectSelectors_map_;
+
+  edm::EDGetTokenT<edm::HepMCProduct> hepMCProductToken_;
+  edm::EDGetTokenT<edm::View<PileupSummaryInfo>> pileupInfoToken_;
 
   std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
   std::vector<ValueContainer<bool>> v_boolContainer_;
@@ -92,6 +100,12 @@ protected:
   unsigned int run_ = 0;
   unsigned int luminosityBlock_ = 0;
   unsigned long long event_ = 0;
+
+  float hepMCGenEvent_scale_ = -1.f;
+
+  int pileupInfo_BX0_numPUInteractions_ = -1;
+  float pileupInfo_BX0_numTrueInteractions_ = -1.f;
+  float pileupInfo_BX0_max_pT_hats_ = -1.f;
 
   class FillCollectionConditionsMap {
   public:
@@ -144,6 +158,8 @@ protected:
 
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     : TTreeName_(iConfig.getParameter<std::string>("TTreeName")),
+      consumeHepMCProduct_(iConfig.exists("HepMCProduct")),
+      consumePileupSummaryInfo_(iConfig.exists("PileupSummaryInfo")),
       TriggerResultsFilterOR_(iConfig.getParameter<std::vector<std::string>>("TriggerResultsFilterOR")),
       TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string>>("TriggerResultsFilterAND")),
       outputBranchesToBeDropped_(iConfig.getParameter<std::vector<std::string>>("outputBranchesToBeDropped")) {
@@ -174,6 +190,14 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     for (const auto& label : stringCutObjectSelectors_labels) {
       stringCutObjectSelectors_map_[label] = pset_stringCutObjectSelectors.getParameter<std::string>(label);
     }
+  }
+
+  if (consumeHepMCProduct_) {
+    hepMCProductToken_ = this->consumes<edm::HepMCProduct>(iConfig.getParameter<edm::InputTag>("HepMCProduct"));
+  }
+
+  if (consumePileupSummaryInfo_) {
+    pileupInfoToken_ = this->consumes<edm::View<PileupSummaryInfo>>(iConfig.getParameter<edm::InputTag>("PileupSummaryInfo"));
   }
 
   // bools
@@ -367,6 +391,12 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   this->addBranch("run", &run_);
   this->addBranch("luminosityBlock", &luminosityBlock_);
   this->addBranch("event", &event_);
+
+  this->addBranch("HepMCGenEvent_scale", &hepMCGenEvent_scale_);
+
+  this->addBranch("pileupInfo_BX0_numPUInteractions", &pileupInfo_BX0_numPUInteractions_);
+  this->addBranch("pileupInfo_BX0_numTrueInteractions", &pileupInfo_BX0_numTrueInteractions_);
+  this->addBranch("pileupInfo_BX0_max_pT_hats", &pileupInfo_BX0_max_pT_hats_);
 
   for (const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()) {
     this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
@@ -731,6 +761,34 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   run_ = iEvent.id().run();
   luminosityBlock_ = iEvent.id().luminosityBlock();
   event_ = iEvent.id().event();
+
+  // MC: HepMCProduct
+  if (consumeHepMCProduct_ and (not iEvent.isRealData())) {
+
+    auto const& hepMCProduct = iEvent.get(hepMCProductToken_);
+    auto const* hepMCGenEvent = hepMCProduct.GetEvent();
+
+    if (hepMCGenEvent) {
+      hepMCGenEvent_scale_ = hepMCGenEvent->event_scale();
+    }
+  }
+
+  // MC: PileupSummaryInfo (BX=0)
+  if (consumePileupSummaryInfo_ and (not iEvent.isRealData())) {
+
+    auto const& pileupInfoView = iEvent.get(pileupInfoToken_);
+    for(auto const& pileupInfo_i : pileupInfoView) {
+      if(pileupInfo_i.getBunchCrossing() == 0) {
+        pileupInfo_BX0_numTrueInteractions_ = pileupInfo_i.getTrueNumInteractions();
+        pileupInfo_BX0_numPUInteractions_ = pileupInfo_i.getPU_NumInteractions();
+
+        pileupInfo_BX0_max_pT_hats_ = -1.;
+        for (auto const i_pThat : pileupInfo_i.getPU_pT_hats()) {
+          pileupInfo_BX0_max_pT_hats_ = std::max(pileupInfo_BX0_max_pT_hats_, i_pThat);
+        }
+      }
+    }
+  }
 
   // fill TriggerResultsContainer
   edm::Handle<edm::TriggerResults> triggerResults_handle;
