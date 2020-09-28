@@ -29,27 +29,23 @@ recoKeys=(
 #  HLT_TRKv02
 #  HLT_TRKv02_TICL
   HLT_TRKv06
-  HLT_TRKv06_TICL
+#  HLT_TRKv06_TICL
 #  HLT_TRKv06_skimmedTracks
 #  HLT_TRKv06_TICL_skimmedTracks
 )
 
-JDIR=${1}_json
-
-mkdir -p ${JDIR}
-
-for sample_key in ${!samplesMap[@]}; do
-  sample_name=${samplesMap[${sample_key}]}
+for sampleKey in ${!samplesMap[@]}; do
+  sampleName=${samplesMap[${sampleKey}]}
 
   # lxplus: specify JobFlavour and AccountingGroup
   [[ ${HOSTNAME} != lxplus* ]] || opts="--JobFlavour longlunch --AccountingGroup group_u_CMS.CAF.PHYS --no-export-LD-LIBRARY-PATH"
 
-  for reco_key in "${recoKeys[@]}"; do
-    python jmeTriggerNTuple_cfg.py dumpPython=/tmp/${USER}/${reco_key}_cfg.py numThreads=1 reco=${reco_key} trkdqm=0 pfdqm=0 globalTag=111X_mcRun4_realistic_T15_v2
+  for recoKey in "${recoKeys[@]}"; do
+    python jmeTriggerNTuple_cfg.py dumpPython=/tmp/${USER}/${recoKey}_cfg.py numThreads=1 reco=${recoKey} trkdqm=0 pfdqm=0 globalTag=111X_mcRun4_realistic_T15_v2
 
-    htc_driver -c /tmp/${USER}/${reco_key}_cfg.py --customize-cfg -m ${NEVT} -n 100 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
-      -d ${sample_name} -p 0 -o ${ODIR}/${reco_key}/${sample_key}
+    htc_driver -c /tmp/${USER}/${recoKey}_cfg.py --customize-cfg -m ${NEVT} -n 200 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
+      -d ${sampleName} -p 0 -o ${ODIR}/${recoKey}/${sampleKey}
   done
-  unset reco_key sample_name
+  unset recoKey sampleName
 done
-unset sample_key NEVT ODIR JDIR recoKeys samplesMap
+unset sampleKey NEVT ODIR recoKeys samplesMap
