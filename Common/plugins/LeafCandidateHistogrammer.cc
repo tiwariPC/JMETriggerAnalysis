@@ -83,7 +83,8 @@ void LeafCandidateHistogrammer::analyze(const edm::Event &iEvent, const edm::Eve
 
 void LeafCandidateHistogrammer::fillDescriptions(edm::ConfigurationDescriptions &descriptions) {
   edm::ParameterSetDescription desc;
-  desc.add<edm::InputTag>("src", edm::InputTag("particleFlow"))->setComment("edm::InputTag of reco::LeafCandidate collection");
+  desc.add<edm::InputTag>("src", edm::InputTag("particleFlow"))
+      ->setComment("edm::InputTag of reco::LeafCandidate collection");
   desc.add<std::string>("cut", "")->setComment("string selector for reco::LeafCandidate collection");
   descriptions.add("leafCandidateHistogrammer", desc);
 }

@@ -150,37 +150,37 @@ void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event &iEvent, cons
       h_pfcand_vy_->Fill(pfc.vy());
       h_pfcand_vz_->Fill(pfc.vz());
 
-//std::cout << "PFCandidate: "
-//<< " pt=" << pfc.pt()
-//<< " eta=" << pfc.eta()
-//<< " phi=" << pfc.phi()
-//<< " mass=" << pfc.mass()
-//<< " pdgId=" << pfc.pdgId()
-//<< std::endl;
-//auto const* patPFCand = dynamic_cast<pat::PackedCandidate const*>(&pfc);
-//if(patPFCand){
-//std::cout << "             "
-//<< " fromPV=" << patPFCand->fromPV()
-//<< std::endl;
-//if(patPFCand->bestTrack()){
-//std::cout << " best-track: "
-//<< " pt=" << patPFCand->bestTrack()->pt()
-//<< " eta=" << patPFCand->bestTrack()->eta()
-//<< " phi=" << patPFCand->bestTrack()->phi()
-//<< std::endl;
-//}
-//}
-//else {
-//auto const* recoPFCand = dynamic_cast<reco::PFCandidate const*>(&pfc);
-//auto const trackRef = recoPFCand->trackRef();
-//if(trackRef.isNonnull()){
-//std::cout << "      track: "
-//<< " pt=" << trackRef->pt()
-//<< " eta=" << trackRef->eta()
-//<< " phi=" << trackRef->phi()
-//<< std::endl;
-//}
-//}
+      //std::cout << "PFCandidate: "
+      //<< " pt=" << pfc.pt()
+      //<< " eta=" << pfc.eta()
+      //<< " phi=" << pfc.phi()
+      //<< " mass=" << pfc.mass()
+      //<< " pdgId=" << pfc.pdgId()
+      //<< std::endl;
+      //auto const* patPFCand = dynamic_cast<pat::PackedCandidate const*>(&pfc);
+      //if(patPFCand){
+      //std::cout << "             "
+      //<< " fromPV=" << patPFCand->fromPV()
+      //<< std::endl;
+      //if(patPFCand->bestTrack()){
+      //std::cout << " best-track: "
+      //<< " pt=" << patPFCand->bestTrack()->pt()
+      //<< " eta=" << patPFCand->bestTrack()->eta()
+      //<< " phi=" << patPFCand->bestTrack()->phi()
+      //<< std::endl;
+      //}
+      //}
+      //else {
+      //auto const* recoPFCand = dynamic_cast<reco::PFCandidate const*>(&pfc);
+      //auto const trackRef = recoPFCand->trackRef();
+      //if(trackRef.isNonnull()){
+      //std::cout << "      track: "
+      //<< " pt=" << trackRef->pt()
+      //<< " eta=" << trackRef->eta()
+      //<< " phi=" << trackRef->phi()
+      //<< std::endl;
+      //}
+      //}
     }
 
     h_pfcand_mult_->Fill(pfcand_mult);
