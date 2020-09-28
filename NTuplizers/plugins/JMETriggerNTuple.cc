@@ -197,7 +197,8 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   }
 
   if (consumePileupSummaryInfo_) {
-    pileupInfoToken_ = this->consumes<edm::View<PileupSummaryInfo>>(iConfig.getParameter<edm::InputTag>("PileupSummaryInfo"));
+    pileupInfoToken_ =
+        this->consumes<edm::View<PileupSummaryInfo>>(iConfig.getParameter<edm::InputTag>("PileupSummaryInfo"));
   }
 
   // bools
@@ -764,7 +765,6 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   // MC: HepMCProduct
   if (consumeHepMCProduct_ and (not iEvent.isRealData())) {
-
     auto const& hepMCProduct = iEvent.get(hepMCProductToken_);
     auto const* hepMCGenEvent = hepMCProduct.GetEvent();
 
@@ -775,10 +775,9 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   // MC: PileupSummaryInfo (BX=0)
   if (consumePileupSummaryInfo_ and (not iEvent.isRealData())) {
-
     auto const& pileupInfoView = iEvent.get(pileupInfoToken_);
-    for(auto const& pileupInfo_i : pileupInfoView) {
-      if(pileupInfo_i.getBunchCrossing() == 0) {
+    for (auto const& pileupInfo_i : pileupInfoView) {
+      if (pileupInfo_i.getBunchCrossing() == 0) {
         pileupInfo_BX0_numTrueInteractions_ = pileupInfo_i.getTrueNumInteractions();
         pileupInfo_BX0_numPUInteractions_ = pileupInfo_i.getPU_NumInteractions();
 
