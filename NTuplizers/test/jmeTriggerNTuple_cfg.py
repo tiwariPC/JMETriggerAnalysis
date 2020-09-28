@@ -269,7 +269,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoCaloMETCollections = cms.PSet(
 
-    hltCaloMET = cms.InputTag('hltCaloMET'),
+#   hltCaloMET = cms.InputTag('hltCaloMET'),
 #   hltCaloMETClean = cms.InputTag('hltMetClean'),
   ),
 
@@ -355,6 +355,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'genMETCalo_InvisibleEtFraction',
   ),
 )
+
+if 'TICL' not in opts.reco:
+  process.iterTICLSequence = cms.Sequence(process.iterTICLTask)
+  process.globalreco += process.iterTICLSequence
+  process.JMETriggerNTuple.recoPFCandidateCollections.hltTiclPF = cms.InputTag('pfTICL::@currentProcess')
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 process.schedule.extend([process.analysisNTupleEndPath])

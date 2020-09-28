@@ -125,7 +125,7 @@ process = customise_hltPhase2_scheduleJMETriggers_TRKv06(process)
 
 # Customisation from command line
 
-process.prune()
+#process.prune()
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
