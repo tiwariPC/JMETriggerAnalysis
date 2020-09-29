@@ -12,6 +12,7 @@ if [ -z "${ROOT_INCLUDE_PATH}" ]; then
   exit 1
 fi
 
-find ${CLANGTIDY_INPUT_DIR} -regex '.*\.\(cpp\|hpp\|cu\|c\|cc\|h\)' -exec clang-tidy -fix-errors {} -- -x c++ -std=c++2a -I${ROOT_INCLUDE_PATH//:/ -I} \;
-
-unset -v CLANGTIDY_INPUT_DIR
+for file_i in $(ls ${CLANGTIDY_INPUT_DIR}/*/*/*.{h,hpp,cc,cpp,cu} 2> /dev/null); do
+  clang-tidy -fix-errors ${file_i} -- -x c++ -std=c++2a -I${ROOT_INCLUDE_PATH//:/ -I}
+done
+unset file_i CLANGTIDY_INPUT_DIR
