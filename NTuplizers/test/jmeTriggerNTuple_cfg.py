@@ -54,9 +54,9 @@ opts.register('reco', 'HLT_TRKv06_TICL',
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
 
-opts.register('trkdqm', False,
+opts.register('trkdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
+              vpo.VarParsing.varType.int,
               'added monitoring histograms for selected Tracks and Vertices')
 
 opts.register('pfdqm', 0,
@@ -88,30 +88,20 @@ if opt_reco.endswith('_skimmedTracks'):
    opt_reco = opt_reco[:-len('_skimmedTracks')]
    opt_skimTracks = True
 
-if   opt_reco == 'HLT_TRKv00':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv00_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg import cms, process
-elif opt_reco == 'HLT_TRKv02':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv02_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg import cms, process
-elif opt_reco == 'HLT_TRKv06':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv06_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
+if   opt_reco == 'HLT_TRKv00':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg        import cms, process
+elif opt_reco == 'HLT_TRKv00_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg   import cms, process
+elif opt_reco == 'HLT_TRKv02':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg        import cms, process
+elif opt_reco == 'HLT_TRKv02_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg   import cms, process
+elif opt_reco == 'HLT_TRKv06':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg        import cms, process
+elif opt_reco == 'HLT_TRKv06_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg   import cms, process
+elif opt_reco == 'HLT_TRKv07p2':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg      import cms, process
+elif opt_reco == 'HLT_TRKv07p2_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
 
 ###
 ### analysis sequence
 ###
-#process.analysisCollectionsSequence = cms.Sequence()
-#
-### Muons
-#process.load('JMETriggerAnalysis.NTuplizers.userMuons_cff')
-#process.analysisCollectionsSequence *= process.userMuonsSequence
-#
-### Electrons
-#process.load('JMETriggerAnalysis.NTuplizers.userElectrons_cff')
-#process.analysisCollectionsSequence *= process.userElectronsSequence
-#
-#process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
-#process.schedule.extend([process.analysisCollectionsPath])
 
 # Bad PFMuon
 from RecoMET.METFilters.BadPFMuonFilter_cfi import BadPFMuonFilter
@@ -229,7 +219,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoCaloJetCollections = cms.PSet(
 
-    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
+#   hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
 #   hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
   ),
 
@@ -245,20 +235,20 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 #   l1tAK4PFJets = cms.InputTag('ak4PFL1PF'),
 #   l1tAK4PFPuppiJets = cms.InputTag('ak4PFL1Puppi'),
 
-    hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
+#   hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
-    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
+#   hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
     hltAK4PFCHSJetsCorrected = cms.InputTag('hltAK4PFCHSJetsCorrected'),
-    hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
+#   hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
     hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
-    hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
+#   hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
   ),
 
   patJetCollections = cms.PSet(
 
     offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
     offlineAK4PFPuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
-    offlineAK8PFPuppiJetsCorrected = cms.InputTag('slimmedJetsAK8'),
+#   offlineAK8PFPuppiJetsCorrected = cms.InputTag('slimmedJetsAK8'),
   ),
 
   recoGenMETCollections = cms.PSet(
@@ -357,7 +347,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 )
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
-process.schedule.extend([process.analysisNTupleEndPath])
+process.schedule_().extend([process.analysisNTupleEndPath])
 
 # FastTimerService
 if opts.addTimingDQM:
@@ -406,11 +396,11 @@ if opts.lumis is not None:
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
 # Tracking Monitoring
-if opts.trkdqm:
+if opts.trkdqm > 0:
 
    if opt_reco in ['HLT_TRKv00', 'HLT_TRKv00_TICL', 'HLT_TRKv02', 'HLT_TRKv02_TICL']:
       process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
-      process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
+      process.schedule_().extend([process.reconstruction_pixelTrackingOnly_step])
 
    from JMETriggerAnalysis.Common.trackHistogrammer_cfi import trackHistogrammer
    process.TrackHistograms_hltPixelTracks = trackHistogrammer.clone(src = 'pixelTracks')
@@ -446,7 +436,7 @@ if opts.trkdqm:
 #  )
 
    process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
-   process.schedule.extend([process.trkMonitoringEndPath])
+   process.schedule_().extend([process.trkMonitoringEndPath])
 
 # ParticleFlow Monitoring
 if opts.pfdqm > 0:
@@ -508,7 +498,7 @@ if opts.pfdqm > 0:
          process.pfMonitoringSeq += getattr(process, _modName)
 
    process.pfMonitoringEndPath = cms.EndPath(process.pfMonitoringSeq)
-   process.schedule.extend([process.pfMonitoringEndPath])
+   process.schedule_().extend([process.pfMonitoringEndPath])
 
 # MessageLogger
 if opts.logs:
