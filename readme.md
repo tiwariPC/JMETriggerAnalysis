@@ -18,6 +18,9 @@ eval `scramv1 runtime -sh`
 # updates to use l1t::PFJet with HLT plugins
 git cms-merge-topic missirol:devel_hltPhase2_l1tPFJet_1112pa3 -u
 
+# updates to Puppi (required to run TRKvX, X>=7.2)
+git cms-merge-topic missirol:devel_hltPhase2_puppi_useRhoAsPUProxy_1112pa3 -u
+
 # [optional] workaround for PFSimParticle::trackerSurfaceMomentum
 # ref: hatakeyamak:FBaseSimEvent_ProtectAgainstMissingTrackerSurfaceMomentum
 git cms-addpkg FastSimulation/Event
