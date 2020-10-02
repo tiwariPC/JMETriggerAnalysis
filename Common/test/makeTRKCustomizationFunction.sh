@@ -67,14 +67,21 @@ cmsDriver.py step3 \
 
 edmConfigDump offline_cfg.py > offline_configDump.py
 
-edmConfigDump ${trkDump} > trk_configDump.py
+#edmConfigDump ${trkDump} > trk_configDump.py
+cp ${trkDump} trk_configDump.py
+
+# revert renaming
+for firstLet in {a..z}; do
+  sed -i "s|hltPhase2${firstLet^^}|${firstLet}|g" trk_configDump.py
+done
+unset -v firstLet
 
 diffCmd="edmDiffModulesOfSequence -r offline_configDump.py -t trk_configDump.py -s ${psetName} -d -e -p process. -k TrackProducer -i GlobalTag es_hardcode mix"
 
 cat <<@EOF > diff.py
 import FWCore.ParameterSet.Config as cms
 
-def customize_hltPhase2_TRKvX(process):
+def customise_hltPhase2_TRKvX(process):
 
     ###
     ### Modules (taken from configuration developed by TRK POG)
@@ -102,11 +109,5 @@ cat <<@EOF >> diff.py
 
     return process
 @EOF
-
-# revert renaming
-for firstLet in {a..z}; do
-  sed -i "s|hltPhase2${firstLet^^}|${firstLet}|g" diff.py
-done
-unset -v firstLet
 
 unset -v diffCmd trkDump psetName showHelpMsg

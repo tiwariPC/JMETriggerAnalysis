@@ -3,7 +3,6 @@
 Description:
  Script to show modules of a sequence that differ across two cmsRun configuration files
 """
-from __future__ import print_function
 import argparse
 import os
 import imp
@@ -55,16 +54,16 @@ if __name__ == '__main__':
                        help='verbosity of log messages')
 
    opts, opts_unknown = parser.parse_known_args()
-   ###
+   ### ----
 
    log_prx = os.path.basename(__file__)+' -- '
 
    process1 = None
    if (opts.reference is None):
       if opts.verbosity > 0:
-         print('-'*75)
-         print(log_prx+'path to reference configuration file not specified [-r]')
-         print('-'*75)
+         print '-'*75
+         print log_prx+'path to reference configuration file not specified [-r]'
+         print '-'*75
    elif not os.path.isfile(opts.reference):
       raise RuntimeError(log_prx+'invalid path to reference configuration file [-r]: '+opts.reference)
    else:
@@ -120,4 +119,4 @@ if __name__ == '__main__':
           # difference between two modules currently defined based on their dump
           _mod_diffs = (_mod1_dump != _mod2_dump)
        if _mod_diffs:
-          print(opts.prefix_output+_tmp+(not opts.name_only)*(' = '+_mod2_dump))
+          print opts.prefix_output+_tmp+(not opts.name_only)*(' = '+_mod2_dump)
