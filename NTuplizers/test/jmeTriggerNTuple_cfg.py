@@ -88,16 +88,40 @@ if opt_reco.endswith('_skimmedTracks'):
    opt_reco = opt_reco[:-len('_skimmedTracks')]
    opt_skimTracks = True
 
-if   opt_reco == 'HLT_TRKv00':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg        import cms, process
-elif opt_reco == 'HLT_TRKv00_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg   import cms, process
-elif opt_reco == 'HLT_TRKv02':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg        import cms, process
-elif opt_reco == 'HLT_TRKv02_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg   import cms, process
-elif opt_reco == 'HLT_TRKv06':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg        import cms, process
-elif opt_reco == 'HLT_TRKv06_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg   import cms, process
-elif opt_reco == 'HLT_TRKv07p2':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv07p2_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
+if opt_reco == 'HLT_TRKv00':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv00_TICL':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv02':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv02_TICL':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv06':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv06_TICL':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv06_TICL2':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
+  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
+
+elif opt_reco == 'HLT_TRKv07p2':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv07p2_TICL':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv07p2_TICL2':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
+  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
+
 else:
-   raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
+  raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
 
 ###
 ### analysis sequence
@@ -447,7 +471,7 @@ if opts.pfdqm > 0:
 
    _candTags = [
      ('_offlineParticleFlow', 'packedPFCandidates', '', pfCandidateHistogrammerPatPackedCandidate),
-     ('_particleFlowTmp', 'particleFlowTmp', '', pfCandidateHistogrammerRecoPFCandidate),
+     ('_hltParticleFlow', 'particleFlowTmp', '', pfCandidateHistogrammerRecoPFCandidate),
      ('_hltPFPuppi', 'hltPFPuppi', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
      ('_l1tParticleFlow', 'l1pfCandidates:PF', '', leafCandidateHistogrammer),
      ('_l1tPFPuppi', 'l1pfCandidates:Puppi', '(pt > 0)', leafCandidateHistogrammer),
