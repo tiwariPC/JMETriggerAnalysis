@@ -109,7 +109,7 @@ def customise_hltPhase2_TRKv06(process):
             'FPix5_neg+FPix6_neg+FPix7_neg+FPix8_neg'
         )
     )
-    
+
     process.pixelTracksHitDoublets = cms.EDProducer('HitPairEDProducer',
         clusterCheck = cms.InputTag(''),
         layerPairs = cms.vuint32(0, 1, 2),
@@ -121,7 +121,7 @@ def customise_hltPhase2_TRKv06(process):
         trackingRegions = cms.InputTag('pixelTracksTrackingRegions'),
         trackingRegionsSeedingLayers = cms.InputTag('')
     )
-    
+
     process.pixelTracksHitQuadruplets = cms.EDProducer('CAHitQuadrupletEDProducer',
         CAHardPtCut = cms.double(0.0),
         CAPhiCut = cms.double(0.2),
@@ -142,7 +142,6 @@ def customise_hltPhase2_TRKv06(process):
             value1 = cms.double(200.0),
             value2 = cms.double(50.0)
         ),
-        mightGet = cms.untracked.vstring('IntermediateHitDoublets_pixelTracksHitDoublets__RECO'),
         useBendingCorrection = cms.bool(True)
     )
     
@@ -170,10 +169,6 @@ def customise_hltPhase2_TRKv06(process):
         Filter = cms.InputTag('pixelTrackFilterByKinematics'),
         Fitter = cms.InputTag('pixelFitterByHelixProjections'),
         SeedingHitSets = cms.InputTag('pixelTracksHitQuadruplets'),
-        mightGet = cms.untracked.vstring(
-            '', 
-            'RegionsSeedingHitSets_pixelTracksHitQuadruplets__RECO'
-        ),
         passLabel = cms.string('pixelTracks')
     )
     
@@ -199,17 +194,7 @@ def customise_hltPhase2_TRKv06(process):
         ZSeparation = cms.double(0.05),
         beamSpot = cms.InputTag('offlineBeamSpot')
     )
-    
-    process.trimmedPixelVertices = cms.EDProducer('PixelVertexCollectionTrimmer',
-        PVcomparer = cms.PSet(
-            refToPSet_ = cms.string('pSetPvClusterComparerForIT')
-        ),
-        fractionSumPt2 = cms.double(0.3),
-        maxVtx = cms.uint32(100),
-        minSumPt2 = cms.double(0.0),
-        src = cms.InputTag('pixelVertices')
-    )
-    
+
     process.initialStepTrackingRegions = cms.EDProducer('GlobalTrackingRegionFromBeamSpotEDProducer',
         RegionPSet = cms.PSet(
             beamSpot = cms.InputTag('offlineBeamSpot'),
@@ -376,32 +361,7 @@ def customise_hltPhase2_TRKv06(process):
         hoInput = cms.InputTag('horeco'),
         missingHcalRescaleFactorForEcal = cms.double(0)
     )
-    
-    process.initialStepHitQuadruplets = cms.EDProducer('CAHitQuadrupletEDProducer',
-        CAHardPtCut = cms.double(0),
-        CAOnlyOneLastHitPerLayerFilter = cms.optional.bool,
-        CAPhiCut = cms.double(0.175),
-        CAThetaCut = cms.double(0.001),
-        SeedComparitorPSet = cms.PSet(
-            ComponentName = cms.string('LowPtClusterShapeSeedComparitor'),
-            clusterShapeCacheSrc = cms.InputTag('siPixelClusterShapeCache'),
-            clusterShapeHitFilter = cms.string('ClusterShapeHitFilter')
-        ),
-        doublets = cms.InputTag('initialStepHitDoublets'),
-        extraHitRPhitolerance = cms.double(0.032),
-        fitFastCircle = cms.bool(True),
-        fitFastCircleChi2Cut = cms.bool(True),
-        maxChi2 = cms.PSet(
-            enabled = cms.bool(True),
-            pt1 = cms.double(0.7),
-            pt2 = cms.double(2),
-            value1 = cms.double(200),
-            value2 = cms.double(50)
-        ),
-        mightGet = cms.untracked.vstring('IntermediateHitDoublets_initialStepHitDoublets__RECO'),
-        useBendingCorrection = cms.bool(True)
-    )
-    
+
     process.initialStepSeeds = cms.EDProducer('SeedCreatorFromRegionConsecutiveHitsTripletOnlyEDProducer',
         MinOneOverPtError = cms.double(1),
         OriginTransverseErrorMultiplier = cms.double(1),
@@ -417,7 +377,6 @@ def customise_hltPhase2_TRKv06(process):
         TTRHBuilder = cms.string('WithTrackAngle'),
         forceKinematicWithRegionDirection = cms.bool(False),
         magneticField = cms.string(''),
-        mightGet = cms.untracked.vstring('RegionsSeedingHitSets_initialStepHitQuadruplets__RECO'),
         propagator = cms.string('PropagatorWithMaterial'),
         seedingHitSets = cms.InputTag('initialStepHitQuadruplets')
     )
@@ -456,36 +415,9 @@ def customise_hltPhase2_TRKv06(process):
             value1 = cms.double(200),
             value2 = cms.double(50)
         ),
-        mightGet = cms.untracked.vstring(
-            'IntermediateHitDoublets_initialStepHitDoublets__RECO', 
-            'IntermediateHitDoublets_initialStepHitDoublets__RECO'
-        ),
         useBendingCorrection = cms.bool(True)
     )
-    
-    process.initialStepSeeds = cms.EDProducer('SeedCreatorFromRegionConsecutiveHitsTripletOnlyEDProducer',
-        MinOneOverPtError = cms.double(1),
-        OriginTransverseErrorMultiplier = cms.double(1),
-        SeedComparitorPSet = cms.PSet(
-            ClusterShapeCacheSrc = cms.InputTag('siPixelClusterShapeCache'),
-            ClusterShapeHitFilterName = cms.string('ClusterShapeHitFilter'),
-            ComponentName = cms.string('PixelClusterShapeSeedComparitor'),
-            FilterAtHelixStage = cms.bool(False),
-            FilterPixelHits = cms.bool(True),
-            FilterStripHits = cms.bool(False)
-        ),
-        SeedMomentumForBOFF = cms.double(5),
-        TTRHBuilder = cms.string('WithTrackAngle'),
-        forceKinematicWithRegionDirection = cms.bool(False),
-        magneticField = cms.string(''),
-        mightGet = cms.untracked.vstring(
-            '', 
-            'RegionsSeedingHitSets_initialStepHitQuadruplets__RECO'
-        ),
-        propagator = cms.string('PropagatorWithMaterial'),
-        seedingHitSets = cms.InputTag('initialStepHitQuadruplets')
-    )
-    
+
     process.initialStepTrajectoryFilter = cms.PSet(
         ComponentType = cms.string('CkfBaseTrajectoryFilter'),
         chargeSignificance = cms.double(-1.0),
@@ -628,6 +560,7 @@ def customise_hltPhase2_TRKv06(process):
         updator = cms.string('KFUpdator'),
         useSameTrajFilter = cms.bool(True)
     )
+
     process.initialStepTrackCandidates = cms.EDProducer('CkfTrackCandidateMaker',
         MeasurementTrackerEvent = cms.InputTag('MeasurementTrackerEvent'),
         NavigationSchool = cms.string('SimpleNavigationSchool'),
@@ -683,28 +616,7 @@ def customise_hltPhase2_TRKv06(process):
         updator = cms.string('KFUpdator'),
         useSameTrajFilter = cms.bool(False)
     )
-    process.highPtTripletStepHitTriplets = cms.EDProducer('CAHitTripletEDProducer',
-        CAHardPtCut = cms.double(0.5),
-        CAPhiCut = cms.double(0.06),
-        CAThetaCut = cms.double(0.003),
-        SeedComparitorPSet = cms.PSet(
-            ComponentName = cms.string('LowPtClusterShapeSeedComparitor'),
-            clusterShapeCacheSrc = cms.InputTag('siPixelClusterShapeCache'),
-            clusterShapeHitFilter = cms.string('ClusterShapeHitFilter')
-        ),
-        doublets = cms.InputTag('highPtTripletStepHitDoublets'),
-        extraHitRPhitolerance = cms.double(0.032),
-        maxChi2 = cms.PSet(
-            enabled = cms.bool(True),
-            pt1 = cms.double(0.8),
-            pt2 = cms.double(8),
-            value1 = cms.double(100),
-            value2 = cms.double(6)
-        ),
-        mightGet = cms.untracked.vstring('IntermediateHitDoublets_highPtTripletStepHitDoublets__RECO'),
-        useBendingCorrection = cms.bool(True)
-    )
-    
+
     process.highPtTripletStepSeeds = cms.EDProducer('SeedCreatorFromRegionConsecutiveHitsEDProducer',
         MinOneOverPtError = cms.double(1),
         OriginTransverseErrorMultiplier = cms.double(1),
@@ -715,7 +627,6 @@ def customise_hltPhase2_TRKv06(process):
         TTRHBuilder = cms.string('WithTrackAngle'),
         forceKinematicWithRegionDirection = cms.bool(False),
         magneticField = cms.string(''),
-        mightGet = cms.untracked.vstring('RegionsSeedingHitSets_highPtTripletStepHitTriplets__RECO'),
         propagator = cms.string('PropagatorWithMaterial'),
         seedingHitSets = cms.InputTag('highPtTripletStepHitTriplets')
     )
@@ -896,31 +807,9 @@ def customise_hltPhase2_TRKv06(process):
             value1 = cms.double(100),
             value2 = cms.double(6)
         ),
-        mightGet = cms.untracked.vstring(
-            'IntermediateHitDoublets_highPtTripletStepHitDoublets__RECO', 
-            'IntermediateHitDoublets_highPtTripletStepHitDoublets__RECO'
-        ),
         useBendingCorrection = cms.bool(True)
     )
-    
-    process.highPtTripletStepSeeds = cms.EDProducer('SeedCreatorFromRegionConsecutiveHitsEDProducer',
-        MinOneOverPtError = cms.double(1),
-        OriginTransverseErrorMultiplier = cms.double(1),
-        SeedComparitorPSet = cms.PSet(
-            ComponentName = cms.string('none')
-        ),
-        SeedMomentumForBOFF = cms.double(5),
-        TTRHBuilder = cms.string('WithTrackAngle'),
-        forceKinematicWithRegionDirection = cms.bool(False),
-        magneticField = cms.string(''),
-        mightGet = cms.untracked.vstring(
-            'RegionsSeedingHitSets_highPtTripletStepHitTriplets__RECO', 
-            'RegionsSeedingHitSets_highPtTripletStepHitTriplets__RECO'
-        ),
-        propagator = cms.string('PropagatorWithMaterial'),
-        seedingHitSets = cms.InputTag('highPtTripletStepHitTriplets')
-    )
-    
+
     process.highPtTripletStepTrackCandidates = cms.EDProducer('CkfTrackCandidateMaker',
         MeasurementTrackerEvent = cms.InputTag('MeasurementTrackerEvent'),
         NavigationSchool = cms.string('SimpleNavigationSchool'),
@@ -1382,7 +1271,6 @@ def customise_hltPhase2_TRKv06(process):
 
     process.pixelVerticesSequence = cms.Sequence(
         process.pixelVertices
-      + process.trimmedPixelVertices
     )
 
     process.initialStepPVSequence = cms.Sequence(
