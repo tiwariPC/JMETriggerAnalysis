@@ -534,8 +534,8 @@ def customise_hltPhase2_reconfigurePuppiForTRKv07p2(process):
          if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
             raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
          for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
-            mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 86. * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
-            mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.66
+            mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 80. * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+            mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.7
 
     return process
 
