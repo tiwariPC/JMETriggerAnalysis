@@ -17,7 +17,7 @@
   <use name="DataFormats/PatCandidates"/>
   <use name="HLTrigger/HLTcore"/>
   <use name="CondFormats/JetMETObjects"/>
-  <use name="RecoEgamma/EgammaTools"/>
+  <use name="CommonTools/Egamma"/>
   <use name="rootmath"/>
   <use name="root"/>
 </library>
