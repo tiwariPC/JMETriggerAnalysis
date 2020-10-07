@@ -9,7 +9,7 @@
 #include <DataFormats/PatCandidates/interface/Electron.h>
 #include <DataFormats/VertexReco/interface/Vertex.h>
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
-#include <RecoEgamma/EgammaTools/interface/EffectiveAreas.h>
+#include <CommonTools/Egamma/interface/EffectiveAreas.h>
 
 #include <string>
 #include <vector>
