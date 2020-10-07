@@ -57,7 +57,9 @@ def customise_hltPhase2_PF(process):
                 muonSrc = cms.InputTag("muons1stStep"),
                 source = cms.InputTag("pfTrack"),
                 useIterativeTracking = cms.bool(True),
-                veto = cms.InputTag("hgcalTrackCollection","TracksInHGCal")
+                veto = cms.InputTag("hgcalTrackCollection","TracksInHGCal"),
+                trackQuality = cms.string("highPurity"),
+                muonMaxDPtOPt = cms.double(1),
             ),
             cms.PSet(
                 BCtoPFCMap = cms.InputTag("particleFlowSuperClusterECAL","PFClusterAssociationEBEE"),
