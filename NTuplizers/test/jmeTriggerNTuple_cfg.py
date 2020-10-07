@@ -201,6 +201,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
     fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),
+    hltPixelTracksMultiplicity = cms.InputTag('hltPixelTracksMultiplicity'),
   ),
 
   recoVertexCollections = cms.PSet(

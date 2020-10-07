@@ -7,6 +7,7 @@ from JMETriggerAnalysis.Common.hltPhase2_TRKv06 import customise_hltPhase2_TRKv0
 from JMETriggerAnalysis.Common.hltPhase2_TRKv07p2 import customise_hltPhase2_TRKv07p2
 from JMETriggerAnalysis.Common.hltPhase2_PF import customise_hltPhase2_PF
 from JMETriggerAnalysis.Common.hltPhase2_JME import customise_hltPhase2_JME
+from JMETriggerAnalysis.Common.multiplicityValueProducerRecoTrackDouble_cfi import multiplicityValueProducerRecoTrackDouble as _multiplicityValueProducerRecoTrackDouble
 
 from HLTrigger.Configuration.common import producers_by_type
 
@@ -527,15 +528,23 @@ def customise_hltPhase2_reconfigurePuppiForTRKv06(process):
 
 # reconfiguration of Puppi for TRK-v07p2
 def customise_hltPhase2_reconfigurePuppiForTRKv07p2(process):
+    process.hltPixelTracksMultiplicity = _multiplicityValueProducerRecoTrackDouble.clone(src = 'pixelTracks')
+
     for mod_i in producers_by_type(process, 'PuppiProducer'):
-       mod_i.useRhoAsPUProxy = True
-       mod_i.rho = 'fixedGridRhoFastjetAllTmp'
-       for algo_idx in range(len(mod_i.algos)):
-         if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
-            raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
-         for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
-            mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 80. * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
-            mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.7
+      for seqName_i in process.sequences_():
+        seq_i = getattr(process, seqName_i)
+        if not seq_i.contains(process.pixelTracks):
+          seq_i._replaceIfHeldDirectly(mod_i, process.hltPixelTracksMultiplicity + mod_i)
+
+      mod_i.usePUProxyValue = True
+      mod_i.PUProxyValue = 'hltPixelTracksMultiplicity'
+      for algo_idx in range(len(mod_i.algos)):
+        if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
+          raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
+
+        for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
+          mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 58.7 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+          mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.0439
 
     return process
 
