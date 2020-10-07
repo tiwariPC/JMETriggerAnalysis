@@ -110,6 +110,16 @@ elif opt_reco == 'HLT_TRKv06_TICL2':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
   process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
 
+elif opt_reco == 'HLT_TRKv06p1':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv06p1_TICL':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv06p1_TICL2':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
+  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
+
 elif opt_reco == 'HLT_TRKv07p2':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg import cms, process
 
