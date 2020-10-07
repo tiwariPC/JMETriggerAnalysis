@@ -1123,8 +1123,8 @@ int JMETriggerNTuple::initValueContainers(std::vector<ValueContainer<VAL_TYPE>>&
 
     for (auto const& label : inputTagLabels) {
       auto const& inputTag(pset.getParameter<edm::InputTag>(label));
-      v_valContainers.emplace_back(
-          ValueContainer<VAL_TYPE>(label, inputTag.label(), this->consumes<VAL_TYPE>(inputTag), defaultValue));
+      ValueContainer<VAL_TYPE> tmp(label, inputTag.label(), this->consumes<VAL_TYPE>(inputTag), defaultValue);
+      v_valContainers.emplace_back(tmp);
     }
 
     return 0;
