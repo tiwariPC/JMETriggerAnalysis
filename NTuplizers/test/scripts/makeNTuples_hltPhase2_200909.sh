@@ -7,7 +7,7 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-NEVT=-1
+NEVT=500000
 
 ODIR=$1
 
@@ -29,7 +29,7 @@ recoKeys=(
 #  HLT_TRKv02
 #  HLT_TRKv02_TICL
   HLT_TRKv06
-#  HLT_TRKv06_TICL
+  HLT_TRKv06_TICL
 #  HLT_TRKv06_skimmedTracks
 #  HLT_TRKv06_TICL_skimmedTracks
 )

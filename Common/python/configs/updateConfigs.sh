@@ -7,6 +7,10 @@ opts=(
  TRKv02_TICL
  TRKv06
  TRKv06_TICL
+ TRKv06p1
+ TRKv06p1_TICL
+ TRKv07p2
+ TRKv07p2_TICL
 )
 
 for opt_i in "${opts[@]}"; do
