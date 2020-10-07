@@ -187,7 +187,7 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         fractionSumPt2 = cms.double(0.3),
         maxVtx = cms.uint32(5),
-        minSumPt2 = cms.double(20),
+        minSumPt2 = cms.double(0.),
         src = cms.InputTag("pixelVertices")
     )
 
