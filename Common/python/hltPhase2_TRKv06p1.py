@@ -10,15 +10,6 @@ def customise_hltPhase2_TRKv06p1(process):
         trackerGeometryLabel = cms.untracked.string('')
     )
 
-    process.trackAlgoPriorityOrderL1Initial = cms.ESProducer("TrackAlgoPriorityOrderESProducer",
-        ComponentName = cms.string('trackAlgoPriorityOrderL1Initial'),
-        algoOrder = cms.vstring(
-            'hltIter0', 
-            'initialStep'
-        ),
-        appendToDataLabel = cms.string('')
-    )
-
     process.seedFromProtoTracks = cms.PSet(
         ComponentName = cms.string('SeedFromConsecutiveHitsCreator'),
         MinOneOverPtError = cms.double(1.0),
