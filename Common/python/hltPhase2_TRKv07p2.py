@@ -10,15 +10,6 @@ def customise_hltPhase2_TRKv07p2(process):
         trackerGeometryLabel = cms.untracked.string('')
     )
 
-    process.trackAlgoPriorityOrderL1Initial = cms.ESProducer("TrackAlgoPriorityOrderESProducer",
-        ComponentName = cms.string('trackAlgoPriorityOrderL1Initial'),
-        algoOrder = cms.vstring(
-            'hltIter0', 
-            'initialStep'
-        ),
-        appendToDataLabel = cms.string('')
-    )
-
     process.seedFromProtoTracks = cms.PSet(
         ComponentName = cms.string('SeedFromConsecutiveHitsCreator'),
         MinOneOverPtError = cms.double(1.0),
@@ -95,13 +86,6 @@ def customise_hltPhase2_TRKv07p2(process):
     process.pixelFitterByHelixProjections = cms.EDProducer("PixelFitterByHelixProjectionsProducer",
         scaleErrorsForBPix1 = cms.bool(False),
         scaleFactor = cms.double(0.65)
-    )
-
-    process.pSetPvClusterComparerForITTrimming = cms.PSet(
-        track_chi2_max = cms.double(20.0),
-        track_prob_min = cms.double(-1.0),
-        track_pt_max = cms.double(40.0),
-        track_pt_min = cms.double(0.9)
     )
 
     process.pSetPvClusterComparerForIT = cms.PSet(
@@ -183,10 +167,10 @@ def customise_hltPhase2_TRKv07p2(process):
 
     process.trimmedPixelVertices = cms.EDProducer("PixelVertexCollectionTrimmer",
         PVcomparer = cms.PSet(
-            refToPSet_ = cms.string('pSetPvClusterComparerForITTrimming')
+            refToPSet_ = cms.string('pSetPvClusterComparerForIT')
         ),
-        fractionSumPt2 = cms.double(0.3),
-        maxVtx = cms.uint32(5),
+        fractionSumPt2 = cms.double(0.1),
+        maxVtx = cms.uint32(20),
         minSumPt2 = cms.double(0.),
         src = cms.InputTag("pixelVertices")
     )
