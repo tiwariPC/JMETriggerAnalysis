@@ -57,7 +57,12 @@ opts.register('reco', 'HLT_TRKv06_TICL',
 opts.register('trkdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
-              'added monitoring histograms for selected Tracks and Vertices')
+              'added monitoring histograms for selected Track collections')
+
+opts.register('pvdqm', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'added monitoring histograms for selected Vertex collections (partly, to separate output files)')
 
 opts.register('pfdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
@@ -445,10 +450,12 @@ if opts.trkdqm > 0:
 
    from JMETriggerAnalysis.Common.trackHistogrammer_cfi import trackHistogrammer
    process.TrackHistograms_hltPixelTracks = trackHistogrammer.clone(src = 'pixelTracks')
+   process.TrackHistograms_hltInitialStepTracks = trackHistogrammer.clone(src = 'initialStepTracks')
    process.TrackHistograms_hltGeneralTracks = trackHistogrammer.clone(src = 'generalTracks')
 
    process.trkMonitoringSeq = cms.Sequence(
        process.TrackHistograms_hltPixelTracks
+     + process.TrackHistograms_hltInitialStepTracks
      + process.TrackHistograms_hltGeneralTracks
    )
 
@@ -456,28 +463,143 @@ if opts.trkdqm > 0:
       process.TrackHistograms_hltGeneralTracksOriginal = trackHistogrammer.clone(src = 'generalTracksOriginal')
       process.trkMonitoringSeq += process.TrackHistograms_hltGeneralTracksOriginal
 
+   process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
+   process.schedule_().extend([process.trkMonitoringEndPath])
+
+# Vertexing monitoring
+if opts.pvdqm > 0:
+
    from JMETriggerAnalysis.Common.vertexHistogrammer_cfi import vertexHistogrammer
    process.VertexHistograms_hltPixelVertices = vertexHistogrammer.clone(src = 'pixelVertices')
+   process.VertexHistograms_hltTrimmedPixelVertices = vertexHistogrammer.clone(src = 'trimmedPixelVertices')
    process.VertexHistograms_hltPrimaryVertices = vertexHistogrammer.clone(src = 'offlinePrimaryVertices')
    process.VertexHistograms_offlinePrimaryVertices = vertexHistogrammer.clone(src = 'offlineSlimmedPrimaryVertices')
 
-   process.trkMonitoringSeq += cms.Sequence(
+   process.pvMonitoringSeq = cms.Sequence(
        process.VertexHistograms_hltPixelVertices
+     + process.VertexHistograms_hltTrimmedPixelVertices
      + process.VertexHistograms_hltPrimaryVertices
      + process.VertexHistograms_offlinePrimaryVertices
    )
 
-#  from Validation.RecoVertex.PrimaryVertexAnalyzer4PUSlimmed_cfi import vertexAnalysis, pixelVertexAnalysisPixelTrackingOnly
-#  process.vertexAnalysis = vertexAnalysis.clone(vertexRecoCollections = ['offlinePrimaryVertices'])
-#  process.pixelVertexAnalysis = pixelVertexAnalysisPixelTrackingOnly.clone(vertexRecoCollections = ['pixelVertices'])
-#
-#  process.trkMonitoringSeq += cms.Sequence(
-#      process.vertexAnalysis
-#    + process.pixelVertexAnalysis
-#  )
+   if opts.pvdqm > 1:
 
-   process.trkMonitoringEndPath = cms.EndPath(process.trkMonitoringSeq)
-   process.schedule_().extend([process.trkMonitoringEndPath])
+      if not hasattr(process, 'tpClusterProducer'):
+         from SimTracker.TrackerHitAssociation.tpClusterProducer_cfi import tpClusterProducer as _tpClusterProducer
+         process.tpClusterProducer = _tpClusterProducer.clone()
+
+      from SimTracker.TrackAssociatorProducers.quickTrackAssociatorByHits_cfi import quickTrackAssociatorByHits as _quickTrackAssociatorByHits
+      process.quickTrackAssociatorByHits = _quickTrackAssociatorByHits.clone()
+
+      from SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cfi import trackingParticleRecoTrackAsssociation as _trackingParticleRecoTrackAsssociation
+      process.trackingParticleRecoTrackAsssociation = _trackingParticleRecoTrackAsssociation.clone()
+
+      process.trackingParticlePixelTrackAssociation = cms.EDProducer('TrackAssociatorEDProducer',
+        associator = cms.InputTag('quickTrackAssociatorByHits'),
+        ignoremissingtrackcollection = cms.untracked.bool(False),
+        label_tp = cms.InputTag('mix', 'MergedTrackTruth'),
+        label_tr = cms.InputTag('pixelTracks')
+      )
+
+      process.trkTruthInfoSeq = cms.Sequence(
+          process.tpClusterProducer
+        + process.quickTrackAssociatorByHits
+        + process.trackingParticleRecoTrackAsssociation
+        + process.trackingParticlePixelTrackAssociation
+      )
+
+      process.trkTruthInfoPath = cms.Path(process.trkTruthInfoSeq)
+      process.schedule_().extend([process.trkTruthInfoPath])
+
+      if hasattr(process, 'pixelVertices') or hasattr(process, 'trimmedPixelVertices'):
+         process.pvAnalyzer1 = cms.EDAnalyzer('PrimaryVertexAnalyzer4PU',
+           info = cms.untracked.string(opts.reco),
+           f4D = cms.untracked.bool(False),
+           beamSpot = cms.InputTag('offlineBeamSpot'),
+           simG4 = cms.InputTag('g4SimHits'),
+           outputFile = cms.untracked.string('pv_hltPixelVertices.root'),
+           verbose = cms.untracked.bool(False),
+           veryverbose = cms.untracked.bool(False),
+           recoTrackProducer = cms.untracked.string('pixelTracks'),
+           minNDOF = cms.untracked.double(-1),
+           zmatch = cms.untracked.double(0.05),
+           autodump = cms.untracked.int32(0),
+           nDump = cms.untracked.int32(0),
+           nDumpTracks = cms.untracked.int32(0),
+           RECO = cms.untracked.bool(False),
+           track_timing = cms.untracked.bool(True),
+           TkFilterParameters = cms.PSet(
+             maxD0Error = cms.double(999.0),
+             maxD0Significance = cms.double(999.0),
+             maxDzError = cms.double(999.0),
+             maxEta = cms.double(4.0),
+             maxNormalizedChi2 = cms.double(999.0),
+             minPixelLayersWithHits = cms.int32(2),
+             minPt = cms.double(1.0),
+             minSiliconLayersWithHits = cms.int32(-1),
+             trackQuality = cms.string('any')
+           ),
+           trackingParticleCollection = cms.untracked.InputTag('mix', 'MergedTrackTruth'),
+           trackingVertexCollection = cms.untracked.InputTag('mix', 'MergedTrackTruth'),
+           trackAssociatorMap = cms.untracked.InputTag('trackingParticlePixelTrackAssociation'),
+           TrackTimesLabel = cms.untracked.InputTag('tofPID4DnoPID:t0safe'), # as opposed to 'tofPID:t0safe'
+           TrackTimeResosLabel = cms.untracked.InputTag('tofPID4DnoPID:sigmat0safe'),
+           vertexAssociator = cms.untracked.InputTag(''),
+           useVertexFilter = cms.untracked.bool(False),
+           compareCollections = cms.untracked.int32(0),
+           vertexRecoCollections = cms.VInputTag(),
+         )
+
+         for _tmp in ['pixelVertices', 'trimmedPixelVertices']:
+           if hasattr(process, _tmp):
+             process.pvAnalyzer1.vertexRecoCollections += [_tmp]
+
+         process.pvMonitoringSeq += process.pvAnalyzer1
+
+      if hasattr(process, 'offlinePrimaryVertices'):
+         process.pvAnalyzer2 = cms.EDAnalyzer('PrimaryVertexAnalyzer4PU',
+           info = cms.untracked.string(opts.reco),
+           f4D = cms.untracked.bool(False),
+           beamSpot = cms.InputTag('offlineBeamSpot'),
+           simG4 = cms.InputTag('g4SimHits'),
+           outputFile = cms.untracked.string('pv_hltPrimaryVertices.root'),
+           verbose = cms.untracked.bool(False),
+           veryverbose = cms.untracked.bool(False),
+           recoTrackProducer = cms.untracked.string('generalTracks'),
+           minNDOF = cms.untracked.double(4.0),
+           zmatch = cms.untracked.double(0.05),
+           autodump = cms.untracked.int32(0),
+           nDump = cms.untracked.int32(0),
+           nDumpTracks = cms.untracked.int32(0),
+           RECO = cms.untracked.bool(False),
+           track_timing = cms.untracked.bool(True),
+           TkFilterParameters = cms.PSet(
+             maxD0Error = cms.double(1.0),
+             maxD0Significance = cms.double(4.0),
+             maxDzError = cms.double(1.0),
+             maxEta = cms.double(4.0),
+             maxNormalizedChi2 = cms.double(10.0),
+             minPixelLayersWithHits = cms.int32(2),
+             minPt = cms.double(0.0),
+             minSiliconLayersWithHits = cms.int32(5),
+             trackQuality = cms.string('any')
+           ),
+           trackingParticleCollection = cms.untracked.InputTag('mix', 'MergedTrackTruth'),
+           trackingVertexCollection = cms.untracked.InputTag('mix', 'MergedTrackTruth'),
+           trackAssociatorMap = cms.untracked.InputTag('trackingParticleRecoTrackAsssociation'),
+           TrackTimesLabel = cms.untracked.InputTag('tofPID4DnoPID:t0safe'),  # as opposed to 'tofPID:t0safe'
+           TrackTimeResosLabel = cms.untracked.InputTag('tofPID4DnoPID:sigmat0safe'),
+           vertexAssociator = cms.untracked.InputTag(''),
+           useVertexFilter = cms.untracked.bool(False),
+           compareCollections = cms.untracked.int32(0),
+           vertexRecoCollections = cms.VInputTag(
+             'offlinePrimaryVertices',
+           ),
+         )
+         process.pvMonitoringSeq += process.pvAnalyzer2
+
+   process.pvMonitoringEndPath = cms.EndPath(process.pvMonitoringSeq)
+   process.schedule_().extend([process.pvMonitoringEndPath])
 
 # ParticleFlow Monitoring
 if opts.pfdqm > 0:
