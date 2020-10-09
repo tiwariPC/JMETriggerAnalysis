@@ -466,11 +466,13 @@ if opts.pvdqm > 0:
 
    from JMETriggerAnalysis.Common.vertexHistogrammer_cfi import vertexHistogrammer
    process.VertexHistograms_hltPixelVertices = vertexHistogrammer.clone(src = 'pixelVertices')
+   process.VertexHistograms_hltTrimmedPixelVertices = vertexHistogrammer.clone(src = 'trimmedPixelVertices')
    process.VertexHistograms_hltPrimaryVertices = vertexHistogrammer.clone(src = 'offlinePrimaryVertices')
    process.VertexHistograms_offlinePrimaryVertices = vertexHistogrammer.clone(src = 'offlineSlimmedPrimaryVertices')
 
    process.pvMonitoringSeq = cms.Sequence(
        process.VertexHistograms_hltPixelVertices
+     + process.VertexHistograms_hltTrimmedPixelVertices
      + process.VertexHistograms_hltPrimaryVertices
      + process.VertexHistograms_offlinePrimaryVertices
    )
