@@ -88,13 +88,6 @@ def customise_hltPhase2_TRKv07p2(process):
         scaleFactor = cms.double(0.65)
     )
 
-    process.pSetPvClusterComparerForIT = cms.PSet(
-        track_chi2_max = cms.double(20.0),
-        track_prob_min = cms.double(-1.0),
-        track_pt_max = cms.double(30.0),
-        track_pt_min = cms.double(1.0)
-    )
-
     process.pixelTracksTrackingRegions = cms.EDProducer("GlobalTrackingRegionFromBeamSpotEDProducer",
         RegionPSet = cms.PSet(
             beamSpot = cms.InputTag("offlineBeamSpot"),
@@ -148,6 +141,13 @@ def customise_hltPhase2_TRKv07p2(process):
         passLabel = cms.string('pixelTracks')
     )
 
+    process.pSetPvClusterComparerForIT = cms.PSet(
+        track_chi2_max = cms.double(20.0),
+        track_prob_min = cms.double(-1.0),
+        track_pt_max = cms.double(100.0),
+        track_pt_min = cms.double(1.0)
+    )
+
     process.pixelVertices = cms.EDProducer("PixelVertexProducer",
         Finder = cms.string('DivisiveVertexFinder'),
         Method2 = cms.bool(True),
@@ -170,8 +170,8 @@ def customise_hltPhase2_TRKv07p2(process):
             refToPSet_ = cms.string('pSetPvClusterComparerForIT')
         ),
         fractionSumPt2 = cms.double(0.1),
-        maxVtx = cms.uint32(20),
-        minSumPt2 = cms.double(0.),
+        maxVtx = cms.uint32(10),
+        minSumPt2 = cms.double(10.),
         src = cms.InputTag("pixelVertices")
     )
 
