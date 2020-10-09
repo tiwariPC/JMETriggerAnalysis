@@ -166,7 +166,7 @@ def customise_hltPhase2_TRKv06p1(process):
         Verbosity = cms.int32(0),
         WtAverage = cms.bool(True),
         ZOffset = cms.double(5.0),
-        ZSeparation = cms.double(0.005),
+        ZSeparation = cms.double(0.025),
         beamSpot = cms.InputTag("offlineBeamSpot")
     )
 

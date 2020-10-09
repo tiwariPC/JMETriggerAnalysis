@@ -445,10 +445,12 @@ if opts.trkdqm > 0:
 
    from JMETriggerAnalysis.Common.trackHistogrammer_cfi import trackHistogrammer
    process.TrackHistograms_hltPixelTracks = trackHistogrammer.clone(src = 'pixelTracks')
+   process.TrackHistograms_hltInitialStepTracks = trackHistogrammer.clone(src = 'initialStepTracks')
    process.TrackHistograms_hltGeneralTracks = trackHistogrammer.clone(src = 'generalTracks')
 
    process.trkMonitoringSeq = cms.Sequence(
        process.TrackHistograms_hltPixelTracks
+     + process.TrackHistograms_hltInitialStepTracks
      + process.TrackHistograms_hltGeneralTracks
    )
 
