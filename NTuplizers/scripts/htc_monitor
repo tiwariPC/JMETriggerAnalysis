@@ -187,7 +187,7 @@ if __name__ == '__main__':
     parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=None, required=False,
                         help='argument of HTCondor parameter "+RequestRuntime"')
 
-    parser.add_argument('-m', '--max-jobs', dest='max_jobs', action='store', type=int, default=5000,
+    parser.add_argument('-m', '--max-jobs', dest='max_jobs', action='store', type=int, default=-1,
                         help='maximum number of jobs that can submitted to the batch system')
 
     parser.add_argument('--repeat', dest='repeat', nargs='?', type=int, const=-1, default=None,
