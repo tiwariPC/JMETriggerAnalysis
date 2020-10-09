@@ -170,8 +170,8 @@ def customise_hltPhase2_TRKv07p2(process):
             refToPSet_ = cms.string('pSetPvClusterComparerForIT')
         ),
         fractionSumPt2 = cms.double(0.1),
-        maxVtx = cms.uint32(20),
-        minSumPt2 = cms.double(20.),
+        maxVtx = cms.uint32(10),
+        minSumPt2 = cms.double(10.),
         src = cms.InputTag("pixelVertices")
     )
 
