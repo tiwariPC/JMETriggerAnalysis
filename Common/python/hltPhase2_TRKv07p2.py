@@ -258,7 +258,7 @@ def customise_hltPhase2_TRKv07p2(process):
         originHalfLength = cms.double(0.3),
         originRadius = cms.double(0.1),
         useEventsWithNoVertex = cms.bool(True),
-        usePV = cms.bool(True),
+        usePV = cms.bool(False),
         useProtoTrackKinematics = cms.bool(False)
     )
 
@@ -420,7 +420,7 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         qualityCuts = cms.vdouble(-0.7, 0.1, 0.7),
         src = cms.InputTag("initialStepTracks"),
-        vertices = cms.InputTag("pixelVertices")
+        vertices = cms.InputTag("trimmedPixelVertices")
     )
 
     process.initialStepTrackSelectionHighPurity = cms.EDProducer("TrackCollectionFilterCloner",
@@ -586,7 +586,7 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         qualityCuts = cms.vdouble(-0.7, 0.1, 0.7),
         src = cms.InputTag("highPtTripletStepTracks"),
-        vertices = cms.InputTag("pixelVertices")
+        vertices = cms.InputTag("trimmedPixelVertices")
     )
 
     process.highPtTripletStepTrackSelectionHighPurity = cms.EDProducer("TrackCollectionFilterCloner",
