@@ -41,6 +41,9 @@ def monitor(options, log=''):
     if options.memory is not None:
        ADD_OPTIONS += ['-append "RequestMemory = '+str(options.memory)+'"']
 
+    if options.jobflavour is not None:
+       ADD_OPTIONS += ['-append \'+JobFlavour = "'+str(options.jobflavour)+'"\'']
+
     if len(ADD_OPTIONS) > 0:
        print ' > additional options to "'+BATCH_RESUB_EXE+'":', str(ADD_OPTIONS)
 
@@ -186,6 +189,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--runtime', dest='runtime', action='store', type=int, default=None, required=False,
                         help='argument of HTCondor parameter "+RequestRuntime"')
+
+    parser.add_argument('--jobflavour', dest='jobflavour', action='store', type=str, default=None, required=False,
+                        help='argument of HTCondor parameter "+JobFlavour"')
 
     parser.add_argument('-m', '--max-jobs', dest='max_jobs', action='store', type=int, default=-1,
                         help='maximum number of jobs that can submitted to the batch system')
