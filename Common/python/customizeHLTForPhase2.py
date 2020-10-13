@@ -530,7 +530,14 @@ def customise_hltPhase2_reconfigurePuppiForTRKv06(process):
 
 # retuning of Puppi parameters for TRK-v06p1
 def customise_hltPhase2_reconfigurePuppiForTRKv06p1(process):
-    process = customise_hltPhase2_reconfigurePuppiForTRKv06(process)
+    for mod_i in producers_by_type(process, 'PuppiProducer'):
+       for algo_idx in range(len(mod_i.algos)):
+         if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
+            raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
+         for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
+            mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 20.4 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+            mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 1.43
+
     return process
 
 # reconfiguration of Puppi for TRK-v07p2
