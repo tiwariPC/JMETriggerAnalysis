@@ -322,7 +322,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       triggerType = cms.int32(85),
     )
 
-    process.l1tSingleAK4PFPuppiJet130Eta2p4 = _l1tSinglePFJet100.clone(inputTag = 'ak4PFL1PuppiCorrected', MinPt = 130., MaxEta = 2.4)
+    process.l1tSingleAK4PFPuppiJet120Eta2p4 = _l1tSinglePFJet100.clone(inputTag = 'ak4PFL1PuppiCorrected', MinPt = 120., MaxEta = 2.4)
 
     process.hltSingleAK4PFJet550Eta2p4 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFJetsCorrected', MinPt = 550., MaxEta = 2.4)
     process.hltSingleAK4PFCHSJet550Eta2p4 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFCHSJetsCorrected', MinPt = 550., MaxEta = 2.4)
@@ -360,7 +360,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
     # L1T-HT
     process.l1tHtMhtPFPuppiJetPt30Eta2p4 = _hltHtMht.clone(jetsLabel = 'ak4PFL1PuppiCorrected', minPtJetHt = 30., maxEtaJetHt = 2.4, minPtJetMht = 30., maxEtaJetMht = 2.4)
-    process.l1tPFPuppiHT440 = _hltHT100.clone(htLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], mhtLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], minHt = [440.])
+    process.l1tPFPuppiHT365 = _hltHT100.clone(htLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], mhtLabels = ['l1tHtMhtPFPuppiJetPt30Eta2p4'], minHt = [365.])
 
     # HLT-HT
     process.hltHtMhtPFPuppiJetPt30Eta2p4 = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', minPtJetHt = 30., maxEtaJetHt = 2.4, minPtJetMht = 30., maxEtaJetMht = 2.4)
@@ -385,7 +385,8 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       triggerType = cms.int32(87),
     )
 
-    process.l1tPFPuppiMET100 = _hltPFMET200.clone(inputTag = 'l1PFMetPuppi', MinPt = 100.)
+    process.l1tPFPuppiMET105 = _hltPFMET200.clone(inputTag = 'l1PFMetPuppi', MinPt = 105.)
+    process.l1tPFPuppiMET135 = _hltPFMET200.clone(inputTag = 'l1PFMetPuppi', MinPt = 135.)
 
     process.hltPFMET250 = _hltPFMET200.clone(inputTag = 'hltPFMET', MinPt = 250.)
     process.hltPFCHSMET250 = _hltPFMET200.clone(inputTag = 'hltPFCHSMET', MinPt = 250.)
@@ -399,79 +400,83 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.HLTJMESequence
     )
 
-    process.L1T_AK4PFPuppiJet130Eta2p4_v1 = cms.Path(
-        process.l1tSingleAK4PFPuppiJet130Eta2p4
+    process.L1T_AK4PFPuppiJet120Eta2p4_v1 = cms.Path(
+        process.l1tSingleAK4PFPuppiJet120Eta2p4
     )
 
     process.HLT_AK4PFJet550Eta2p4_v1 = cms.Path(
-        process.l1tSingleAK4PFPuppiJet130Eta2p4
+        process.l1tSingleAK4PFPuppiJet120Eta2p4
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFJetsReconstruction
       + process.hltSingleAK4PFJet550Eta2p4
     )
 
     process.HLT_AK4PFCHSJet550Eta2p4_v1 = cms.Path(
-        process.l1tSingleAK4PFPuppiJet130Eta2p4
+        process.l1tSingleAK4PFPuppiJet120Eta2p4
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFCHSJetsReconstruction
       + process.hltSingleAK4PFCHSJet550Eta2p4
     )
 
     process.HLT_AK4PFPuppiJet550Eta2p4_v1 = cms.Path(
-        process.l1tSingleAK4PFPuppiJet130Eta2p4
+        process.l1tSingleAK4PFPuppiJet120Eta2p4
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFPuppiJetsReconstruction
       + process.hltSingleAK4PFPuppiJet550Eta2p4
     )
 
-    process.L1T_PFPuppiHT440_v1 = cms.Path(
+    process.L1T_PFPuppiHT365_v1 = cms.Path(
         process.l1tHtMhtPFPuppiJetPt30Eta2p4
-      + process.l1tPFPuppiHT440
+      + process.l1tPFPuppiHT365
     )
 
     process.HLT_PFPuppiHT1050_v1 = cms.Path(
         process.l1tHtMhtPFPuppiJetPt30Eta2p4
-      + process.l1tPFPuppiHT440
+      + process.l1tPFPuppiHT365
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFPuppiJetsReconstruction
       + process.hltHtMhtPFPuppiJetPt30Eta2p4
       + process.hltPFPuppiHT1050
     )
 
-    process.L1T_PFPuppiMET100_v1 = cms.Path(
-        process.l1tPFPuppiMET100
+    process.L1T_PFPuppiMET105_v1 = cms.Path(
+        process.l1tPFPuppiMET105
+    )
+
+    process.L1T_PFPuppiMET135_v1 = cms.Path(
+        process.l1tPFPuppiMET135
     )
 
     process.HLT_PFMET250_v1 = cms.Path(
-        process.l1tPFPuppiMET100
+        process.l1tPFPuppiMET105
       + process.HLTParticleFlowSequence
       + process.hltPFMET
       + process.hltPFMET250
     )
 
     process.HLT_PFCHSMET250_v1 = cms.Path(
-        process.l1tPFPuppiMET100
+        process.l1tPFPuppiMET105
       + process.HLTParticleFlowSequence
       + process.HLTPFCHSMETReconstruction
       + process.hltPFCHSMET250
     )
 
     process.HLT_PFPuppiMET250_v1 = cms.Path(
-        process.l1tPFPuppiMET100
+        process.l1tPFPuppiMET105
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET250
     )
 
     process.HLT_PFPuppiMET120_v1 = cms.Path(
-        process.l1tPFPuppiMET100
+        process.l1tPFPuppiMET105
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET120
     )
 
     process.HLT_PFPuppiMET120_PFPuppiMHT120_v1 = cms.Path(
-        process.l1tPFPuppiMET100
+        process.l1tPFPuppiMET105
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET120
@@ -481,7 +486,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60_v1 = cms.Path(
-        process.l1tPFPuppiMET100
+        process.l1tPFPuppiMET105
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET120
@@ -496,15 +501,16 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.schedule_().extend([
       process.MC_JME_v1,
 
-      process.L1T_AK4PFPuppiJet130Eta2p4_v1,
+      process.L1T_AK4PFPuppiJet120Eta2p4_v1,
       process.HLT_AK4PFJet550Eta2p4_v1,
       process.HLT_AK4PFCHSJet550Eta2p4_v1,
       process.HLT_AK4PFPuppiJet550Eta2p4_v1,
 
-      process.L1T_PFPuppiHT440_v1,
+      process.L1T_PFPuppiHT365_v1,
       process.HLT_PFPuppiHT1050_v1,
 
-      process.L1T_PFPuppiMET100_v1,
+      process.L1T_PFPuppiMET105_v1,
+      process.L1T_PFPuppiMET135_v1,
       process.HLT_PFMET250_v1,
       process.HLT_PFCHSMET250_v1,
       process.HLT_PFPuppiMET250_v1,
