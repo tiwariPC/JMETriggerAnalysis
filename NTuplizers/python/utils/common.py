@@ -17,6 +17,16 @@ def KILL(log):
 def WARNING(log):
     print '\n '+colored_text('@@@ WARNING', ['1','93'])+' -- '+log+'\n'
 
+def MKDIRP(dirpath, verbose=False, dry_run=False):
+    if verbose: print '\033[1m'+'>'+'\033[0m'+' os.mkdirs("'+dirpath+'")'
+    if dry_run: return
+    try:
+      os.makedirs(dirpath)
+    except OSError:
+      if not os.path.isdir(dirpath):
+        raise
+    return
+
 def EXE(cmd, suspend=True, verbose=False, dry_run=False):
     if verbose: print '\033[1m'+'>'+'\033[0m'+' '+cmd
     if dry_run: return
@@ -25,7 +35,7 @@ def EXE(cmd, suspend=True, verbose=False, dry_run=False):
     _exitcode = min(255, _exitcode)
 
     if _exitcode and suspend:
-       raise SystemExit(_exitcode)
+       raise RuntimeError(_exitcode)
 
     return _exitcode
 
