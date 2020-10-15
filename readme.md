@@ -11,15 +11,14 @@
 ### Setup
 
 ```shell
-scramv1 project CMSSW CMSSW_11_1_2_patch3
-cd CMSSW_11_1_2_patch3/src
+scramv1 project CMSSW CMSSW_11_1_4
+cd CMSSW_11_1_4/src
 eval `scramv1 runtime -sh`
 
-# updates to use l1t::PFJet with HLT plugins
-git cms-merge-topic missirol:devel_hltPhase2_l1tPFJet_1112pa3 -u
+git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
 
 # updates to Puppi (required only for TRK-vX, with X>=7.2)
-git cms-merge-topic missirol:devel_hltPhase2_puppi_usePUProxyValue_1112pa3 -u
+git cms-merge-topic missirol:devel_hltPhase2_puppi_usePUProxyValue_1114
 
 # [optional; required only for PF-Hadron calibrations]
 # workaround for PFSimParticle::trackerSurfaceMomentum
