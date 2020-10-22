@@ -39,7 +39,7 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
-opts.register('addTimingDQM', True,
+opts.register('addTimingDQM', False,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.bool,
               'print results of FastTimerService, and produce corresponding DQM output file')
