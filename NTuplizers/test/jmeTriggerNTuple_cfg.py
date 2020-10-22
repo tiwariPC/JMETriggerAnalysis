@@ -230,8 +230,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   doubles = cms.PSet(
 
-    offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
     fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),
+    offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
     hltPixelTracksMultiplicity = cms.InputTag('hltPixelTracksMultiplicity'),
     hltPixelVerticesMultiplicity = cms.InputTag('hltPixelVerticesMultiplicity'),
     hltPrimaryVerticesMultiplicity = cms.InputTag('hltPrimaryVerticesMultiplicity'),
@@ -433,49 +433,10 @@ if opts.addTimingDQM:
    process.FastTimerService.dqmModuleTimeRange      =  1000.
    process.FastTimerService.dqmModuleTimeResolution =     1.
 
-# ES modules for thresholds of L1T seeds
-if not hasattr(process, 'CondDB'):
-  process.load('CondCore.CondDB.CondDB_cfi')
-
-process.CondDB.connect = 'sqlite_file:/afs/cern.ch/user/t/tomei/public/L1TObjScaling.db'
-
-process.L1TScalingESSource = cms.ESSource('PoolDBESSource',
-  process.CondDB,
-  DumpStat = cms.untracked.bool(True),
-  toGet = cms.VPSet(
-    cms.PSet(
-      record = cms.string('L1TObjScalingRcd'),
-      tag = cms.string('L1TkMuonScaling'),
-      label = cms.untracked.string('L1TkMuonScaling'),
-    ),
-    cms.PSet(
-      record = cms.string('L1TObjScalingRcd'),
-      tag = cms.string('L1PFJetScaling'),
-      label = cms.untracked.string('L1PFJetScaling'),
-    ),
-    cms.PSet(
-      record = cms.string('L1TObjScalingRcd'),
-      tag = cms.string('L1TkElectronScaling'),
-      label = cms.untracked.string('L1TkEleScaling'),
-    ),
-    cms.PSet(
-      record = cms.string('L1TObjScalingRcd'),
-      tag = cms.string('L1PuppiMETScaling'),
-      label = cms.untracked.string('L1PuppiMETScaling'),
-    ),
-    cms.PSet(
-      record = cms.string('L1TObjScalingRcd'),
-      tag = cms.string('L1PFHTScaling'),
-      label = cms.untracked.string('L1PFHTScaling'),
-    ),
-  ),
-)
-
-process.es_prefer_l1tscaling = cms.ESPrefer('PoolDBESSource', 'L1TScalingESSource')
-
 # update process.GlobalTag.globaltag
 if opts.globalTag is not None:
-   process.GlobalTag.globaltag = opts.globalTag
+   from Configuration.AlCa.GlobalTag import GlobalTag
+   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
 
 # fix for AK4PF Phase-2 JECs
 process.GlobalTag.toGet.append(cms.PSet(
