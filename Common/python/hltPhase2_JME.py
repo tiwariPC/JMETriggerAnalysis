@@ -364,6 +364,7 @@ def customise_hltPhase2_JME(process):
     process.hltPFPuppi = _puppi.clone(
       candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
+      EtaMinUseDeltaZ = 4.0,
     )
     process.hltAK4PFPuppiJets = ak4PFJetsPuppi.clone(
       src = _particleFlowCands,
@@ -429,6 +430,7 @@ def customise_hltPhase2_JME(process):
     process.hltPFPuppiNoLep = _puppiNoLep.clone(
       candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
+      EtaMinUseDeltaZ = 4.0,
     )
 
     process.hltPFPuppiMETv0 = cms.EDProducer( 'PFMETProducer',
