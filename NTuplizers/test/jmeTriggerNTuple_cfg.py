@@ -272,8 +272,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   l1tPFJetCollections = cms.PSet(
 
-    l1tAK4CaloJetsCorrected = cms.InputTag('ak4PFL1CaloCorrected'),
-    l1tAK4PFJetsCorrected = cms.InputTag('ak4PFL1PFCorrected'),
+#   l1tAK4CaloJetsCorrected = cms.InputTag('ak4PFL1CaloCorrected'),
+#   l1tAK4PFJetsCorrected = cms.InputTag('ak4PFL1PFCorrected'),
     l1tAK4PFPuppiJetsCorrected = cms.InputTag('ak4PFL1PuppiCorrected'),
   ),
 
@@ -299,9 +299,9 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 #   l1tAK4PFPuppiJets = cms.InputTag('ak4PFL1Puppi'),
 
 #   hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
-    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
+#   hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
 #   hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
-    hltAK4PFCHSJetsCorrected = cms.InputTag('hltAK4PFCHSJetsCorrected'),
+#   hltAK4PFCHSJetsCorrected = cms.InputTag('hltAK4PFCHSJetsCorrected'),
 #   hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
     hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
 #   hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
@@ -309,7 +309,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   patJetCollections = cms.PSet(
 
-    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
+#   offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
     offlineAK4PFPuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
 #   offlineAK8PFPuppiJetsCorrected = cms.InputTag('slimmedJetsAK8'),
   ),
@@ -330,7 +330,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoCaloMETCollections = cms.PSet(
 
     hltCaloMET = cms.InputTag('hltCaloMET'),
-#   hltCaloMETClean = cms.InputTag('hltMetClean'),
   ),
 
   recoPFClusterMETCollections = cms.PSet(
@@ -375,10 +374,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     ak8GenJetsNoNu = cms.string('pt > 50'),
 
     # L1T AK4
-#   l1tAK4CaloJets = cms.string('pt > 20'),
-#   l1tAK4PFJets = cms.string('pt > 20'),
-#   l1tAK4PFPuppiJets = cms.string('pt > 20'),
-#   l1tSlwPFPuppiJets = cms.string('pt > 20'),
+    l1tAK4CaloJets = cms.string('pt > 20'),
+    l1tAK4PFJets = cms.string('pt > 20'),
+    l1tAK4PFPuppiJets = cms.string('pt > 20'),
+    l1tSlwPFPuppiJets = cms.string('pt > 20'),
 
     l1tAK4CaloJetsCorrected = cms.string('pt > 20'),
     l1tAK4PFJetsCorrected = cms.string('pt > 20'),
@@ -387,15 +386,15 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     # HLT AK4
     hltAK4CaloJets = cms.string('pt > 20'),
-#   hltAK4PFClusterJets = cms.string('pt > 20'),
+    hltAK4PFClusterJets = cms.string('pt > 20'),
     hltAK4PFJets = cms.string('pt > 20'),
     hltAK4PFJetsCorrected = cms.string('pt > 20'),
     hltAK4PFCHSJetsCorrected = cms.string('pt > 20'),
     hltAK4PFPuppiJetsCorrected = cms.string('pt > 20'),
 
     # HLT AK8
-#   hltAK8CaloJets = cms.string('pt > 80'),
-#   hltAK8PFClusterJets = cms.string('pt > 80'),
+    hltAK8CaloJets = cms.string('pt > 80'),
+    hltAK8PFClusterJets = cms.string('pt > 80'),
     hltAK8PFJetsCorrected = cms.string('pt > 80'),
     hltAK8PFCHSJetsCorrected = cms.string('pt > 80'),
     hltAK8PFPuppiJetsCorrected = cms.string('pt > 80'),
@@ -407,11 +406,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   outputBranchesToBeDropped = cms.vstring(
-
-    'offlinePrimaryVertices_tracksSize',
-
-#   'hltPFMET_ChargedEMEtFraction',
-#   'hltPFMETTypeOne_ChargedEMEtFraction',
 
     'genMETCalo_MuonEtFraction',
     'genMETCalo_InvisibleEtFraction',
