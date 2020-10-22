@@ -120,6 +120,7 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
         process.caloTowersRec
       + process.ecalClusters
 #     + process.egammaGlobalReco
+      + process.hcalGlobalRecoSequence
 
         # tracking
       + process.globalreco_tracking
