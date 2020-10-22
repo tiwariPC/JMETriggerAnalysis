@@ -15,7 +15,10 @@ scramv1 project CMSSW CMSSW_11_1_4
 cd CMSSW_11_1_4/src
 eval `scramv1 runtime -sh`
 
-git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
+git cms-merge-topic cms-l1t-offline:l1t-phase2-v3.1.9
+
+#git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
+git cms-merge-topic missirol:Phase2-L1T-HLT-Interface_devel
 
 # updates to Puppi (required only for TRK-vX, with X>=7.2)
 git cms-merge-topic missirol:devel_hltPhase2_puppi_usePUProxyValue_1114
@@ -40,7 +43,7 @@ git checkout bb38311862c83068b2434f35850c9a17e29dd2f7 RecoMET/METFilters/plugins
 git clone https://github.com/missirol/PVAnalysis.git usercode -o missirol -b phase2
 
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
-scram b
+scram b -j 10
 ```
 **Note**: when an update to this setup recipe is needed,
 update this part of the `readme`, plus the content of the script
