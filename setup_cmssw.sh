@@ -13,9 +13,7 @@ cd CMSSW_11_1_4/src
 eval `scramv1 runtime -sh`
 
 git cms-merge-topic cms-l1t-offline:l1t-phase2-v3.1.9
-
-#git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
-git cms-merge-topic missirol:Phase2-L1T-HLT-Interface_devel
+git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
 
 # updates to Puppi (required only for TRK-vX, with X>=7.2)
 git cms-merge-topic missirol:devel_hltPhase2_puppi_usePUProxyValue_1114
