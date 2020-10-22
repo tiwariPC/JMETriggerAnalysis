@@ -23,6 +23,7 @@
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFClusterJetCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/PATJetCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoGenMETCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/RecoMETCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoCaloMETCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFClusterMETCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/RecoPFMETCollectionContainer.h"
@@ -88,6 +89,7 @@ protected:
   std::vector<RecoPFClusterJetCollectionContainer> v_recoPFClusterJetCollectionContainer_;
   std::vector<PATJetCollectionContainer> v_patJetCollectionContainer_;
   std::vector<RecoGenMETCollectionContainer> v_recoGenMETCollectionContainer_;
+  std::vector<RecoMETCollectionContainer> v_recoMETCollectionContainer_;
   std::vector<RecoCaloMETCollectionContainer> v_recoCaloMETCollectionContainer_;
   std::vector<RecoPFClusterMETCollectionContainer> v_recoPFClusterMETCollectionContainer_;
   std::vector<RecoPFMETCollectionContainer> v_recoPFMETCollectionContainer_;
@@ -327,6 +329,13 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
                                                                        "recoGenMETCollections",
                                                                        "reco::GenMETCollection",
                                                                        stringCutObjectSelectors_map_);
+
+  // reco::METCollection
+  initCollectionContainer<RecoMETCollectionContainer, reco::MET>(iConfig,
+                                                                 v_recoMETCollectionContainer_,
+                                                                 "recoMETCollections",
+                                                                 "reco::METCollection",
+                                                                 stringCutObjectSelectors_map_);
 
   // reco::CaloMETCollection
   initCollectionContainer<RecoCaloMETCollectionContainer, reco::CaloMET>(iConfig,
@@ -653,6 +662,12 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(recoCaloMETCollectionContainer_i.name() + "_sumEt", &recoCaloMETCollectionContainer_i.vec_sumEt());
   }
 
+  for (auto& recoMETCollectionContainer_i : v_recoMETCollectionContainer_) {
+    this->addBranch(recoMETCollectionContainer_i.name() + "_pt", &recoMETCollectionContainer_i.vec_pt());
+    this->addBranch(recoMETCollectionContainer_i.name() + "_phi", &recoMETCollectionContainer_i.vec_phi());
+    this->addBranch(recoMETCollectionContainer_i.name() + "_sumEt", &recoMETCollectionContainer_i.vec_sumEt());
+  }
+
   for (auto& recoPFClusterMETCollectionContainer_i : v_recoPFClusterMETCollectionContainer_) {
     this->addBranch(recoPFClusterMETCollectionContainer_i.name() + "_pt",
                     &recoPFClusterMETCollectionContainer_i.vec_pt());
@@ -894,6 +909,10 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     this->fillCollectionContainer<RecoGenMETCollectionContainer, reco::GenMET>(
         iEvent, v_recoGenMETCollectionContainer_, fillCollectionConditionMap_);
   }
+
+  // reco::METCollection
+  this->fillCollectionContainer<RecoMETCollectionContainer, reco::MET>(
+      iEvent, v_recoMETCollectionContainer_, fillCollectionConditionMap_);
 
   // reco::CaloMETCollection
   this->fillCollectionContainer<RecoCaloMETCollectionContainer, reco::CaloMET>(

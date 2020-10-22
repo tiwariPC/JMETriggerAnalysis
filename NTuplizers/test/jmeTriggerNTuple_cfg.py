@@ -176,6 +176,21 @@ process.Offline_BadChargedCandidate = cms.Path(process.OfflineBadChargedCandidat
 process.schedule_().append(process.Offline_BadChargedCandidate)
 
 ## JMETrigger NTuple
+from JMETriggerAnalysis.Common.multiplicityValueProducerRecoVertexDouble_cfi import multiplicityValueProducerRecoVertexDouble as _multiplicityValueProducerRecoVertexDouble
+
+process.hltPixelVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'pixelVertices')
+process.hltPrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlinePrimaryVertices')
+process.offlinePrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlineSlimmedPrimaryVertices')
+
+process.jmeTriggerNTupleInputsSeq = cms.Sequence(
+    process.hltPixelVerticesMultiplicity
+  + process.hltPrimaryVerticesMultiplicity
+  + process.offlinePrimaryVerticesMultiplicity
+)
+
+process.jmeTriggerNTupleInputsPath = cms.Path(process.jmeTriggerNTupleInputsSeq)
+process.schedule_().append(process.jmeTriggerNTupleInputsPath)
+
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   TTreeName = cms.string('Events'),
@@ -191,13 +206,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'Offline_BadPFMuonDz',
     'Offline_BadChargedCandidate',
     'MC_JME',
-    'L1T_AK4PFPuppiJet130Eta2p4',
-    'HLT_AK4PFJet550Eta2p4',
-    'HLT_AK4PFCHSJet550Eta2p4',
-    'HLT_AK4PFPuppiJet550Eta2p4',
-    'L1T_PFPuppiHT440',
+    'L1T_SinglePFPuppiJet200off',
+    'HLT_AK4PFJet550',
+    'HLT_AK4PFCHSJet550',
+    'HLT_AK4PFPuppiJet550',
+    'L1T_PFPuppiHT450off',
     'HLT_PFPuppiHT1050',
-    'L1T_PFPuppiMET100',
+    'L1T_PFPuppiMET200off',
+    'L1T_PFPuppiMET245off',
     'HLT_PFMET250',
     'HLT_PFCHSMET250',
     'HLT_PFPuppiMET250',
@@ -217,13 +233,16 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
     fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),
     hltPixelTracksMultiplicity = cms.InputTag('hltPixelTracksMultiplicity'),
+    hltPixelVerticesMultiplicity = cms.InputTag('hltPixelVerticesMultiplicity'),
+    hltPrimaryVerticesMultiplicity = cms.InputTag('hltPrimaryVerticesMultiplicity'),
+    offlinePrimaryVerticesMultiplicity = cms.InputTag('offlinePrimaryVerticesMultiplicity'),
   ),
 
   recoVertexCollections = cms.PSet(
 
-    hltPixelVertices = cms.InputTag('pixelVertices'),
-    hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'),
-    offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
+#   hltPixelVertices = cms.InputTag('pixelVertices'),
+#   hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'),
+#   offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
   ),
 
   l1tPFCandidateCollections = cms.PSet(
@@ -262,6 +281,9 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
 #   hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
 #   hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
+
+#   l1tSlwPFPuppiJets = cms.InputTag('l1tSlwPFPuppiJets', 'UncalibratedPhase1L1TJetFromPfCandidates'),
+    l1tSlwPFPuppiJetsCorrected = cms.InputTag('l1tSlwPFPuppiJetsCorrected', 'Phase1L1TJetFromPfCandidates'),
   ),
 
   recoPFClusterJetCollections = cms.PSet(
@@ -296,6 +318,13 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     genMETCalo = cms.InputTag('genMetCalo::HLT'),
     genMETTrue = cms.InputTag('genMetTrue::HLT'),
+  ),
+
+  recoMETCollections = cms.PSet(
+
+    l1tPFPuppiHT = cms.InputTag('l1tPFPuppiHT'),
+    hltPFPuppiHT = cms.InputTag('hltPFPuppiHT'),
+    hltPFPuppiMHT = cms.InputTag('hltPFPuppiMHT'),
   ),
 
   recoCaloMETCollections = cms.PSet(
@@ -349,10 +378,12 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 #   l1tAK4CaloJets = cms.string('pt > 20'),
 #   l1tAK4PFJets = cms.string('pt > 20'),
 #   l1tAK4PFPuppiJets = cms.string('pt > 20'),
+#   l1tSlwPFPuppiJets = cms.string('pt > 20'),
 
     l1tAK4CaloJetsCorrected = cms.string('pt > 20'),
     l1tAK4PFJetsCorrected = cms.string('pt > 20'),
     l1tAK4PFPuppiJetsCorrected = cms.string('pt > 20'),
+    l1tSlwPFPuppiJetsCorrected = cms.string('pt > 20'),
 
     # HLT AK4
     hltAK4CaloJets = cms.string('pt > 20'),
