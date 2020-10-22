@@ -15,11 +15,16 @@ scramv1 project CMSSW CMSSW_11_1_4
 cd CMSSW_11_1_4/src
 eval `scramv1 runtime -sh`
 
+# L1T
 git cms-merge-topic cms-l1t-offline:l1t-phase2-v3.1.9
 
+# HLT: interface for L1T seeds
 git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
 
-# updates to Puppi (required only for TRK-vX, with X>=7.2)
+# HGCal
+git cms-merge-topic rovere:TICLv2_11_1_X
+
+# JME: updates to Puppi (required only for TRK-vX, with X>=7.2)
 git cms-merge-topic missirol:devel_hltPhase2_puppi_usePUProxyValue_1114
 
 # [optional; required only for PF-Hadron calibrations]
