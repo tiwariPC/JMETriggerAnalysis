@@ -159,6 +159,92 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
 
     return process
 
+def customise_hltPhase2_common(process):
+    # ES modules for thresholds of L1T seeds
+    if not hasattr(process, 'CondDB'):
+      process.load('CondCore.CondDB.CondDB_cfi')
+
+    process.CondDB.connect = 'sqlite_file:/afs/cern.ch/user/t/tomei/public/L1TObjScaling.db'
+
+    process.L1TScalingESSource = cms.ESSource('PoolDBESSource',
+      process.CondDB,
+      DumpStat = cms.untracked.bool(True),
+      toGet = cms.VPSet(
+        cms.PSet(
+          record = cms.string('L1TObjScalingRcd'),
+          tag = cms.string('L1TkMuonScaling'),
+          label = cms.untracked.string('L1TkMuonScaling'),
+        ),
+        cms.PSet(
+          record = cms.string('L1TObjScalingRcd'),
+          tag = cms.string('L1TkElectronScaling'),
+          label = cms.untracked.string('L1TkEleScaling'),
+        ),
+        cms.PSet(
+          record = cms.string('L1TObjScalingRcd'),
+          tag = cms.string('L1PFPhase1JetScaling'),
+          label = cms.untracked.string('L1PFPhase1JetScaling'),
+        ),
+        cms.PSet(
+          record = cms.string('L1TObjScalingRcd'),
+          tag = cms.string('L1PFPhase1HTScaling'),
+          label = cms.untracked.string('L1PFPhase1HTScaling'),
+        ),
+        cms.PSet(
+          record = cms.string('L1TObjScalingRcd'),
+          tag = cms.string('L1PFPhase1HT090Scaling'),
+          label = cms.untracked.string('L1PFPhase1HT090Scaling'),
+        ),
+        cms.PSet(
+          record = cms.string('L1TObjScalingRcd'),
+          tag = cms.string('L1PuppiMETScaling'),
+          label = cms.untracked.string('L1PuppiMETScaling'),
+        ),
+        cms.PSet(
+          record = cms.string('L1TObjScalingRcd'),
+          tag = cms.string('L1PuppiMET090Scaling'),
+          label = cms.untracked.string('L1PuppiMET090Scaling'),
+        ),
+      ),
+    )
+
+    process.es_prefer_l1tscaling = cms.ESPrefer('PoolDBESSource', 'L1TScalingESSource')
+
+    # prevent access to inputs from RECO step (if available),
+    # except for Offline objects to be used saved in the NTuple,
+    # or used for validation purposes
+    process.source.dropDescendantsOfDroppedBranches = cms.untracked.bool(False)
+
+    process.source.inputCommands = cms.untracked.vstring([
+      'keep *_*_*_*',
+      'drop *_*_*_RECO',
+
+      # L1T
+      'keep *_l1pfCandidates_Puppi_RECO',
+      'keep *_ak4PFL1Calo__RECO',
+      'keep *_ak4PFL1CaloCorrected__RECO',
+      'keep *_ak4PFL1PF__RECO',
+      'keep *_ak4PFL1PFCorrected__RECO',
+      'keep *_ak4PFL1Puppi__RECO',
+      'keep *_ak4PFL1PuppiCorrected__RECO',
+      'keep *_l1PFMetCalo__RECO',
+      'keep *_l1PFMetPF__RECO',
+      'keep *_l1PFMetPuppi__RECO',
+
+      # Offline
+      'keep *_fixedGridRhoFastjetAll__RECO',
+      'keep *_offlineSlimmedPrimaryVertices__RECO',
+      'keep *_packedPFCandidates__RECO',
+      'keep *_slimmedMuons__RECO',
+      'keep *_slimmedJets__RECO',
+      'keep *_slimmedJetsPuppi__RECO',
+      'keep *_slimmedJetsAK8__RECO',
+      'keep *_slimmedMETs__RECO',
+      'keep *_slimmedMETsPuppi__RECO',
+    ])
+
+    return process
+
 def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=True, TRK='v06', useTICL=True, useMTD=False):
     # reset schedule
     process.setSchedule_(cms.Schedule())
@@ -184,6 +270,8 @@ def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=True, TR
 
     if useTICL:
        process = customise_hltPhase2_enableTICLInHGCalReconstruction(process)
+
+    process = customise_hltPhase2_common(process)
 
     return process
 
@@ -299,7 +387,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     ## Single-Jet producers+filters
     process.l1tSinglePFPuppiJet200off = cms.EDFilter('L1JetFilter',
       inputTag = cms.InputTag('l1tSlwPFPuppiJetsCorrected', 'Phase1L1TJetFromPfCandidates'),
-      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PFJetScaling'),
+      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PFPhase1JetScaling'),
       MinPt = cms.double(200.),
       MinEta = cms.double(-5.),
       MaxEta = cms.double(5.),
@@ -334,7 +422,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
     process.l1tPFPuppiHT450off = cms.EDFilter('L1EnergySumFilter',
       inputTag = cms.InputTag('l1tPFPuppiHT'),
-      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PFHTScaling'),
+      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PFPhase1HT090Scaling'),
       TypeOfSum = cms.string('HT'),
       MinPt = cms.double(450.),
     )
@@ -379,7 +467,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     ## MET producers+filters
     process.l1tPFPuppiMET200off = cms.EDFilter('L1PFEnergySumFilter',
       inputTag = cms.InputTag('l1PFMetPuppi'),
-      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PuppiMETScaling'),
+      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PuppiMET090Scaling'),
       TypeOfSum = cms.string('MET'),
       MinPt = cms.double(200.),
     )
