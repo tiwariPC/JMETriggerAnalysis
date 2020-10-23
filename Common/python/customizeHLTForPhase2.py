@@ -67,22 +67,9 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
     #  nevertheless, this modification is applied, in order to make sure _particleFlowCands is consistently used)
     process.fixedGridRhoFastjetAll.pfCandidatesTag = 'particleFlowTmp'
 
-    # redefine process.hgcalLocalReco sequence
-    # to disable unnecessary producers in HGCal local reconstruction
-    process.hgcalLocalRecoSequence = cms.Sequence(
-        process.HGCalUncalibRecHit
-      + process.HGCalRecHit
-      + process.hgcalLayerClusters
-      + process.hgcalMultiClusters
-      + process.particleFlowRecHitHGC
-      + process.particleFlowClusterHGCal
-      + process.particleFlowClusterHGCalFromMultiCl
-    )
-
     process.calolocalreco = cms.Sequence(
         process.ecalLocalRecoSequence
       + process.hcalLocalRecoSequence
-      + process.hgcalLocalRecoSequence
     )
 
     process.localreco = cms.Sequence(
@@ -125,6 +112,7 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
         # tracking
       + process.globalreco_tracking
       + process.standalonemuontracking # needs to be included for early muons of PF
+      + process.hgcalLocalRecoSequence
 
         # timing
       + process.fastTimingGlobalReco # necessary for MTD inputs to PF
