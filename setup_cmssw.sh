@@ -21,7 +21,7 @@ git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
 # HGCal
 git cms-merge-topic rovere:TICLv2_11_1_X
 cp -r ${CMSSW_DATA_PATH}/data-RecoHGCal-TICL/V00-01-00/RecoHGCal/TICL/data/ ${CMSSW_BASE}/src/RecoHGCal/TICL
-cp /afs/cern.ch/work/m/missirol/public/phase2/HGCal/frozen_graph.pb ${CMSSW_BASE}/src/RecoHGCal/TICL/data/tf_models/energy_id_v0.pb
+wget https://github.com/rovere/RecoHGCal-TICL/raw/9d2c6f72c86233fa5573e93d5535b32e90c835ee/tf_models/energy_id_v0.pb -O ${CMSSW_BASE}/src/RecoHGCal/TICL/data/tf_models/energy_id_v0.pb
 
 # JME: updates to Puppi (required only for TRK-vX, with X>=7.2)
 git cms-merge-topic missirol:devel_hltPhase2_puppi_usePUProxyValue_1114
