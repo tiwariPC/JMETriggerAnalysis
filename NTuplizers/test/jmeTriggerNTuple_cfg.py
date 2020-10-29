@@ -178,9 +178,9 @@ process.schedule_().append(process.Offline_BadChargedCandidate)
 ## JMETrigger NTuple
 from JMETriggerAnalysis.Common.multiplicityValueProducerRecoVertexDouble_cfi import multiplicityValueProducerRecoVertexDouble as _multiplicityValueProducerRecoVertexDouble
 
-process.hltPixelVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'pixelVertices')
-process.hltPrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlinePrimaryVertices')
-process.offlinePrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlineSlimmedPrimaryVertices')
+process.hltPixelVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'pixelVertices', defaultValue = -1.)
+process.hltPrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlinePrimaryVertices', defaultValue = -1.)
+process.offlinePrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlineSlimmedPrimaryVertices', defaultValue = -1.)
 
 process.jmeTriggerNTupleInputsSeq = cms.Sequence(
     process.hltPixelVerticesMultiplicity
@@ -777,6 +777,10 @@ if opt_skimTracks:
      'hltTrimmedPixelVertices_chi2',
      'hltTrimmedPixelVertices_ndof',
    ]
+
+#process.schedule_().remove(process.MC_JME)
+#process.schedule_().remove(process.jmeTriggerNTupleInputsPath)
+#process.schedule_().remove(process.analysisNTupleEndPath)
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
