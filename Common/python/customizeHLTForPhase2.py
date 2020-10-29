@@ -546,6 +546,10 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.HLT_PFCHSMET250 = cms.Path(
         process.l1tPFPuppiMET200off
       + process.HLTParticleFlowSequence
+      + process.particleFlowPtrs
+      + process.goodOfflinePrimaryVertices
+      + process.pfPileUpJME
+      + process.pfNoPileUpJME
       + process.HLTPFCHSMETReconstruction
       + process.hltPFCHSMET250
     )
@@ -637,7 +641,7 @@ def customise_hltPhase2_reconfigurePuppiForTRKv06p1(process):
 
 # reconfiguration of Puppi for TRK-v07p2
 def customise_hltPhase2_reconfigurePuppiForTRKv07p2(process):
-    process.hltPixelTracksMultiplicity = _multiplicityValueProducerRecoTrackDouble.clone(src = 'pixelTracks')
+    process.hltPixelTracksMultiplicity = _multiplicityValueProducerRecoTrackDouble.clone(src = 'pixelTracks', defaultValue = -1.)
 
     for mod_i in producers_by_type(process, 'PuppiProducer'):
       for seqName_i in process.sequences_():
