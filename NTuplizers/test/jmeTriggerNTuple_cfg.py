@@ -420,6 +420,7 @@ if opts.addTimingDQM:
    from HLTrigger.Timer.FastTimer import customise_timer_service, customise_timer_service_print
    process = customise_timer_service(process)
    process = customise_timer_service_print(process)
+   import os
    process.dqmOutput.fileName = os.path.splitext(opts.output)[0]+'_DQM.root'
    process.FastTimerService.dqmTimeRange            = 20000.
    process.FastTimerService.dqmTimeResolution       =    10.
