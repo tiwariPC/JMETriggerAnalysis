@@ -420,6 +420,7 @@ if opts.addTimingDQM:
    from HLTrigger.Timer.FastTimer import customise_timer_service, customise_timer_service_print
    process = customise_timer_service(process)
    process = customise_timer_service_print(process)
+   process.dqmOutput.fileName = os.path.splitext(opts.output)[0]+'_DQM.root'
    process.FastTimerService.dqmTimeRange            = 20000.
    process.FastTimerService.dqmTimeResolution       =    10.
    process.FastTimerService.dqmPathTimeRange        = 10000.
@@ -744,7 +745,7 @@ elif opts.inputFiles:
    process.source.secondaryFileNames = []
 else:
    process.source.fileNames = [
-     '/store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/FEVT/PU200_castor_111X_mcRun4_realistic_T15_v1-v1/100000/DA18C0FC-1189-D64B-B3B6-44F3F96F1840.root',
+     '/store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root',
    ]
    process.source.secondaryFileNames = []
 
