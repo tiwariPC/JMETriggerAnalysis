@@ -21,34 +21,42 @@ public:
 protected:
   void produce(edm::Event&, const edm::EventSetup&) override;
 
-  const edm::EDGetTokenT<edm::View<INP_TYPE>> src_token_;
+  edm::EDGetTokenT<edm::View<INP_TYPE>> const src_token_;
   StringCutObjectSelector<INP_TYPE, true> const strObjSelector_;
+  OUT_TYPE const defaultValue_;
 };
 
 template <class INP_TYPE, class OUT_TYPE>
 MultiplicityValueProducer<INP_TYPE, OUT_TYPE>::MultiplicityValueProducer(const edm::ParameterSet& iConfig)
   : src_token_(consumes<edm::View<INP_TYPE>>(iConfig.getParameter<edm::InputTag>("src")))
-  , strObjSelector_(StringCutObjectSelector<INP_TYPE, true>(iConfig.getParameter<std::string>("cut"))) {
+  , strObjSelector_(StringCutObjectSelector<INP_TYPE, true>(iConfig.getParameter<std::string>("cut")))
+  , defaultValue_(iConfig.getParameter<OUT_TYPE>("defaultValue")) {
 
   produces<OUT_TYPE>();
 }
 
 template <class INP_TYPE, class OUT_TYPE>
 void MultiplicityValueProducer<INP_TYPE, OUT_TYPE>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  auto const& objs(iEvent.get(src_token_));
+  auto const& objHandle(iEvent.getHandle(src_token_));
 
-  LogDebug("Input") << "size of input collection: " << objs.size();
+  if(objHandle.isValid()){
 
-  OUT_TYPE objMult(0);
-  for (auto const& obj : objs) {
-    if (strObjSelector_(obj)) {
-      ++objMult;
+    LogDebug("Input") << "size of input collection: " << objHandle->size();
+
+    OUT_TYPE objMult(0);
+    for (auto const& obj : *objHandle) {
+      if (strObjSelector_(obj)) {
+        ++objMult;
+      }
     }
+
+    LogDebug("Output") << "size of selected input objects: " << objMult;
+
+    iEvent.put(std::make_unique<OUT_TYPE>(objMult));
   }
-
-  LogDebug("Output") << "size of selected input objects: " << objMult;
-
-  iEvent.put(std::make_unique<double>(objMult));
+  else {
+    iEvent.put(std::make_unique<OUT_TYPE>(defaultValue_));
+  }
 }
 
 template <class INP_TYPE, class OUT_TYPE>
@@ -56,5 +64,6 @@ void MultiplicityValueProducer<INP_TYPE, OUT_TYPE>::fillDescriptions(edm::Config
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("src")->setComment("input collection");
   desc.add<std::string>("cut", "")->setComment("string for StringCutObjectSelector");
+  desc.add<OUT_TYPE>("defaultValue")->setComment("default output value (used when input collection is unavailable)");
   descriptions.add(defaultModuleLabel<MultiplicityValueProducer<INP_TYPE, OUT_TYPE>>(), desc);
 }
