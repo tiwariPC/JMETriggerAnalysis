@@ -44,14 +44,14 @@ opts.register('globalTag', None,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
 
-opts.register('reco', 'HLT_TRKv06_TICL',
+opts.register('reco', 'HLT_TRKv06p1_TICL',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
 
-opts.register('trkdqm', False,
+opts.register('trkdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
+              vpo.VarParsing.varType.int,
               'added monitoring histograms for selected Tracks and Vertices')
 
 opts.register('pfdqm', 0,
@@ -75,22 +75,21 @@ opts.parseArguments()
 ### base configuration file
 ###
 
-# flag: skim original collection of generalTracks (only tracks associated to first N pixel vertices)
-opt_skimTracks = False
-
-opt_reco = opts.reco
-if opt_reco.endswith('_skimmedTracks'):
-   opt_reco = opt_reco[:-len('_skimmedTracks')]
-   opt_skimTracks = True
-
-if   opt_reco == 'HLT_TRKv00':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv00_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg import cms, process
-elif opt_reco == 'HLT_TRKv02':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv02_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg import cms, process
-elif opt_reco == 'HLT_TRKv06':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg      import cms, process
-elif opt_reco == 'HLT_TRKv06_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
+if   opts.reco == 'HLT_TRKv00':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg      import cms, process
+elif opts.reco == 'HLT_TRKv00_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg import cms, process
+elif opts.reco == 'HLT_TRKv02':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg      import cms, process
+elif opts.reco == 'HLT_TRKv02_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg import cms, process
+elif opts.reco == 'HLT_TRKv06':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg      import cms, process
+elif opts.reco == 'HLT_TRKv06_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
+elif opts.reco == 'HLT_TRKv06p1':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_cfg      import cms, process
+elif opts.reco == 'HLT_TRKv06p1_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
+elif opts.reco == 'HLT_TRKv07p2':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg      import cms, process
+elif opts.reco == 'HLT_TRKv07p2_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
 else:
-   raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
+   raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
+
+# use only the cms.Path with the full HLT reconstruction (no specific trigger paths)
+process.setSchedule_(cms.Schedule(process.MC_JME))
 
 ###
 ### Jet Response Analyzer (JRA) NTuple
@@ -103,15 +102,10 @@ for algorithm in [
 ]:
   addAlgorithm(process, algorithm, Defaults)
 
-###process.analysisCollectionsPath = cms.Path(process.analysisCollectionsSequence)
-###process.schedule.extend([process.analysisCollectionsPath])
-
-###process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
-###process.schedule.extend([process.analysisNTupleEndPath])
-
 # update process.GlobalTag.globaltag
 if opts.globalTag is not None:
-   process.GlobalTag.globaltag = opts.globalTag
+   from Configuration.AlCa.GlobalTag import GlobalTag
+   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
@@ -131,13 +125,13 @@ if opts.lumis is not None:
    import FWCore.PythonUtilities.LumiList as LumiList
    process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
 
-# create TFileService to be accessed by JMETriggerNTuple plugin
+# create TFileService to be accessed by JRA-NTuple plugin
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
 # Tracking Monitoring
-if opts.trkdqm:
+if opts.trkdqm > 0:
 
-   if opt_reco in ['HLT_TRKv00', 'HLT_TRKv00_TICL', 'HLT_TRKv02', 'HLT_TRKv02_TICL']:
+   if opts.reco in ['HLT_TRKv00', 'HLT_TRKv00_TICL', 'HLT_TRKv02', 'HLT_TRKv02_TICL']:
       process.reconstruction_pixelTrackingOnly_step = cms.Path(process.reconstruction_pixelTrackingOnly)
       process.schedule.extend([process.reconstruction_pixelTrackingOnly_step])
 
@@ -149,10 +143,6 @@ if opts.trkdqm:
        process.TrackHistograms_hltPixelTracks
      + process.TrackHistograms_hltGeneralTracks
    )
-
-   if opt_skimTracks:
-      process.TrackHistograms_hltGeneralTracksOriginal = trackHistogrammer.clone(src = 'generalTracksOriginal')
-      process.trkMonitoringSeq += process.TrackHistograms_hltGeneralTracksOriginal
 
    from JMETriggerAnalysis.Common.vertexHistogrammer_cfi import vertexHistogrammer
    process.VertexHistograms_hltPixelVertices = vertexHistogrammer.clone(src = 'pixelVertices')
@@ -180,7 +170,7 @@ if opts.pfdqm > 0:
      ('_hltPuppi', 'hltPuppi', '(pt > 0)', pfCandidateHistogrammerRecoPFCandidate),
    ]
 
-   if 'TICL' in opt_reco:
+   if 'TICL' in opts.reco:
       _candTags += [
         ('_pfTICL', 'pfTICL', '', pfCandidateHistogrammerRecoPFCandidate),
       ]
@@ -238,7 +228,6 @@ if opts.logs:
      ),
      # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
      debugModules = cms.untracked.vstring(
-       'JMETriggerNTuple',
      ),
      categories = cms.untracked.vstring(
        'FwkReport',
@@ -272,43 +261,13 @@ if opts.logs:
      ),
    )
 
-   if opt_skimTracks:
-      process.MessageLogger.debugModules += [
-        'hltTrimmedPixelVertices',
-        'generalTracks',
-      ]
-
 # input EDM files
 process.source.secondaryFileNames = []
 if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
    process.source.fileNames = [
-     '/store/mc/Phase2HLTTDRWinter20DIGI/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/PU200_castor_110X_mcRun4_realistic_v3-v2/10000/02C1FCCC-315F-404C-ABF7-A65154C46C28.root',
-   ]
-
-# skimming of tracks
-if opt_skimTracks:
-
-   from JMETriggerAnalysis.Common.hltPhase2_skimmedTracks import customize_hltPhase2_skimmedTracks
-   process = customize_hltPhase2_skimmedTracks(process)
-
-   # add PV collections to JMETriggerNTuple
-   process.JMETriggerNTuple.recoVertexCollections = cms.PSet(
-     hltPixelVertices = cms.InputTag('pixelVertices'),
-     hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
-     hltPrimaryVertices = cms.InputTag('offlinePrimaryVertices'),
-     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
-   )
-
-   process.JMETriggerNTuple.outputBranchesToBeDropped += [
-     'hltPixelVertices_isFake',
-     'hltPixelVertices_chi2',
-     'hltPixelVertices_ndof',
-
-     'hltTrimmedPixelVertices_isFake',
-     'hltTrimmedPixelVertices_chi2',
-     'hltTrimmedPixelVertices_ndof',
+     '/store/mc/Phase2HLTTDRWinter20DIGI/QCD_Pt-15to7000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/FlatPU0To200_castor_110X_mcRun4_realistic_v3_ext1-v1/270000/CBFAF568-D485-0F4D-A49A-C60FA0A300F0.root',
    ]
 
 # dump content of cms.Process to python file
@@ -320,7 +279,7 @@ if opts.verbosity > 0:
    print '--- hltJRA_mcRun4_cfg.py ---'
    print ''
    print 'option: output =', opts.output
-   print 'option: reco =', opts.reco, '(skimTracks = '+str(opt_skimTracks)+')'
+   print 'option: reco =', opts.reco
    print 'option: trkdqm =', opts.trkdqm
    print 'option: pfdqm =', opts.pfdqm
    print 'option: dumpPython =', opts.dumpPython
