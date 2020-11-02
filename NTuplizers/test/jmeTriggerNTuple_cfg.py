@@ -19,7 +19,7 @@ opts.register('numThreads', 1,
               vpo.VarParsing.varType.int,
               'number of threads')
 
-opts.register('numStreams', 1,
+opts.register('numStreams', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
               'number of streams')
@@ -415,6 +415,17 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 process.schedule_().extend([process.analysisNTupleEndPath])
 
+#process.schedule_().remove(process.MC_JME)
+#process.schedule_().remove(process.jmeTriggerNTupleInputsPath)
+#process.schedule_().remove(process.analysisNTupleEndPath)
+#
+#process.setSchedule_(cms.Schedule(
+#  process.l1tReconstructionPath,
+#  process.HLT_AK4PFPuppiJet550,
+#  process.HLT_PFPuppiHT1050,
+#  process.HLT_PFPuppiMET250,
+#))
+
 # FastTimerService
 if opts.addTimingDQM:
    from HLTrigger.Timer.FastTimer import customise_timer_service, customise_timer_service_print
@@ -449,7 +460,7 @@ process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
 # multi-threading settings
 process.options.numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1)
-process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 1)
+process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 0)
 #if hasattr(process, 'DQMStore'):
 #   process.DQMStore.enableMultiThread = (process.options.numberOfThreads > 1)
 
@@ -777,10 +788,6 @@ if opt_skimTracks:
      'hltTrimmedPixelVertices_chi2',
      'hltTrimmedPixelVertices_ndof',
    ]
-
-#process.schedule_().remove(process.MC_JME)
-#process.schedule_().remove(process.jmeTriggerNTupleInputsPath)
-#process.schedule_().remove(process.analysisNTupleEndPath)
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
