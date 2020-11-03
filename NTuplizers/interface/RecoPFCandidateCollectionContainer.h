@@ -22,6 +22,8 @@ public:
   std::vector<float>& vec_eta() { return eta_; }
   std::vector<float>& vec_phi() { return phi_; }
   std::vector<float>& vec_mass() { return mass_; }
+  std::vector<float>& vec_rawEcalEnergy() { return rawEcalEnergy_; }
+  std::vector<float>& vec_rawHcalEnergy() { return rawHcalEnergy_; }
   std::vector<float>& vec_vx() { return vx_; }
   std::vector<float>& vec_vy() { return vy_; }
   std::vector<float>& vec_vz() { return vz_; }
@@ -32,6 +34,8 @@ protected:
   std::vector<float> eta_;
   std::vector<float> phi_;
   std::vector<float> mass_;
+  std::vector<float> rawEcalEnergy_;
+  std::vector<float> rawHcalEnergy_;
   std::vector<float> vx_;
   std::vector<float> vy_;
   std::vector<float> vz_;
