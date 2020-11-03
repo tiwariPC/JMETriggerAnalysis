@@ -49,7 +49,7 @@ opts.register('globalTag', None,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
 
-opts.register('reco', 'HLT_TRKv06_TICL',
+opts.register('reco', 'HLT_TRKv06p1_TICL',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
@@ -252,8 +252,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFCandidateCollections = cms.PSet(
 
-#   hltSimPF = cms.InputTag('simPFProducer'),
-#   hltTiclPF = cms.InputTag('pfTICL'),
+#   hltPFSim = cms.InputTag('simPFProducer'),
+#   hltPFTICL = cms.InputTag('pfTICL'),
 #   hltParticleFlow = cms.InputTag('particleFlowTmp'),
 #   hltPFPuppi = cms.InputTag('hltPFPuppi'),
 #   hltPFPuppiNoLep = cms.InputTag('hltPFPuppiNoLep'),
