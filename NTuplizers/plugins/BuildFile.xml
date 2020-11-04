@@ -12,6 +12,9 @@
   <use name="DataFormats/Common"/>
   <use name="SimDataFormats/GeneratorProducts"/>
   <use name="SimDataFormats/PileupSummaryInfo"/>
+  <use name="DataFormats/CLHEP"/>
+  <use name="DataFormats/ParticleFlowCandidate"/>
+  <use name="DataFormats/ParticleFlowReco"/>
   <use name="rootmath"/>
   <use name="root"/>
 </library>

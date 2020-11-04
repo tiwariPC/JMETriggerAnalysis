@@ -128,13 +128,18 @@ class PFHadHLT : public edm::EDAnalyzer {
       int charge_;
       float true_, p_, ecal_, hcal_, eta_, phi_, ho_;
       float gen_E_, gen_pt_, gen_eta_, gen_phi_;
-      std::vector <float> pfcsID;
-      std::vector <float> Eecal_;
-      std::vector <float> Ehcal_;
-      std::vector <float> dr_;
-      //float TagPion_Pt, TagPion_Eta, TagPion_Phi, TagPion_E, TagPion_Charge;
-      //float ProbePion_Pt, ProbePion_Eta, ProbePion_Phi, ProbePion_E, ProbePion_Charge;
-      //float deltaR_pion;
+      std::vector <float> true_energy;
+      std::vector <float> true_eta;
+      std::vector <float> true_phi;
+      std::vector <float> true_dr;
+      std::vector <bool>  true_isCharged;
+      std::vector <float> pfc_ecal;
+      std::vector <float> pfc_hcal;
+      std::vector <float> pfc_eta;
+      std::vector <float> pfc_phi;
+      std::vector <float> pfc_charge;
+      std::vector <float> pfc_id;
+      std::vector <float> trackRef_p;
 
       bool isCharged;
 };

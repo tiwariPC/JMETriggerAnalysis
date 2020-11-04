@@ -2,33 +2,19 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("PFHadCalib")
 
-process.load("FWCore.MessageService.MessageLogger_cfi")
-process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
+from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import *
 
-#process.load("PFHadHLT.hlt83X_JME_PFHadCal")
-
-#from PFHCalib.PFHadHLT.dump_hlt_SinglePion import *
-#from PFHCalib.PFHadHLT.step3_TrackingV2_11_0_0 import *
-from JMETriggerAnalysis.NTuplizers.hltPhase2_TRKv06_cfg import *
-#from JMETriggerAnalysis.NTuplizers.tmp import *
-#from PFHCalib.PFHadHLT.hltPhase2_TRKv02_cfg import *
-
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.source = cms.Source("PoolSource",
  # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
-      'root://cms-xrd-global.cern.ch//store/mc/Phase2HLTTDRWinter20DIGI/MultiPion_PT0to200/GEN-SIM-DIGI-RAW/NoPU_110X_mcRun4_realistic_v3-v2/250000/71269CFE-FE69-2445-A303-8920BEEA1B72.root'
+      '/store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/MultiPion_PT0to200/GEN-SIM-DIGI-RAW-MINIAOD/NoPU_111X_mcRun4_realistic_T15_v1-v1/250000/5749D223-89ED-C448-AB1A-555597E20D98.root',
     )
 )
 
 process.pfhadhlt = cms.EDAnalyzer('PFHadHLT',
-    #src = cms.InputTag("prunedGenParticles"),
-    #maxEventsToPrint = cms.untracked.int32(1)
-		   #genEvnTag = cms.InputTag("generator"),
 		   genParTag        = cms.InputTag("genParticles"),
-                   #HLTPFCandidates  = cms.InputTag("particleFlowTmpBarrel"),
                    HLTPFCandidates  = cms.InputTag("particleFlowTmp"),
                    PFSimParticles   = cms.InputTag("particleFlowSimParticle"),
 
@@ -53,14 +39,35 @@ process.printGenParticleList = cms.EDAnalyzer("ParticleListDrawer",
   src = cms.InputTag("genParticles")
 )
 
+process.particleFlowSimParticle = cms.EDProducer("PFSimParticleProducer",
+    Fitter = cms.string('KFFittingSmoother'),
+    MCTruthMatchingInfo = cms.untracked.bool(False),
+    ParticleFilter = cms.PSet(
+        EMin = cms.double(0),
+        chargedPtMin = cms.double(0),
+        etaMax = cms.double(5.3),
+        invisibleParticles = cms.vint32(),
+        protonEMin = cms.double(5000.0),
+        rMax = cms.double(129.0),
+        zMax = cms.double(317.0)
+    ),
+    Propagator = cms.string('PropagatorWithMaterial'),
+    RecTracks = cms.InputTag("trackerDrivenElectronSeeds"),
+    TTRHBuilder = cms.string('WithTrackAngle'),
+    ecalRecHitsEB = cms.InputTag("caloRecHits","EcalRecHitsEB"),
+    ecalRecHitsEE = cms.InputTag("caloRecHits","EcalRecHitsEE"),
+    fastSimProducer = cms.untracked.InputTag("fastSimProducer","EcalHitsEB"),
+    process_Particles = cms.untracked.bool(True),
+    process_RecTracks = cms.untracked.bool(False),
+    sim = cms.InputTag("g4SimHits"),
+    verbose = cms.untracked.bool(False)
+)
 
-#process.reconstruction += process.simPFProducer
-process.reconstruction += process.particleFlowSimParticle
+process.HLTJMESequence += process.particleFlowSimParticle
 
-#process.p = cms.Path(process.pfhadhlt)
-
-#process.AOutput = cms.EndPath( process.hltPreAOutput + process.pfhadhlt + process.printGenParticleList)
-#process.AOutput = cms.EndPath( process.hltPreAOutput + process.pfhadhlt)
-#process.AOutput = cms.EndPath( process.printGenParticleList)
 process.AOutput = cms.EndPath( process.pfhadhlt )
-process.schedule.extend([process.AOutput])
+process.setSchedule_(cms.Schedule(process.MC_JME, process.AOutput))
+
+process.options.numberOfThreads=cms.untracked.uint32(4)
+process.options.numberOfStreams=cms.untracked.uint32(0)
+
