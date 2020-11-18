@@ -222,35 +222,35 @@ PFHadHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 			const PFCandidate::ElementsInBlocks& theElements = pfc.elementsInBlocks();
 
-			if( theElements.empty() ) continue;
+			//if( theElements.empty() ) continue;
 
-			const reco::PFBlockRef blockRef = theElements[0].first;
-			PFBlock::LinkData linkData =  blockRef->linkData();
-			const edm::OwnVector<reco::PFBlockElement>& elements = blockRef->elements();
+			//const reco::PFBlockRef blockRef = theElements[0].first;
+			//PFBlock::LinkData linkData =  blockRef->linkData();
+			//const edm::OwnVector<reco::PFBlockElement>& elements = blockRef->elements();
 
-			unsigned int nTracks = 0;
-			unsigned iTrack = 999999;
+			//unsigned int nTracks = 0;
+			//unsigned iTrack = 999999;
 
-			for(unsigned iEle=0; iEle<elements.size(); iEle++) {
-				PFBlockElement::Type type = elements[iEle].type();
-				switch( type )
-				{
-					case PFBlockElement::TRACK:
-						iTrack = iEle;
-						nTracks++;
-						break;
-					default:
-						continue;
-				}
-			}
+			//for(unsigned iEle=0; iEle<elements.size(); iEle++) {
+			//	PFBlockElement::Type type = elements[iEle].type();
+			//	switch( type )
+			//	{
+			//		case PFBlockElement::TRACK:
+			//			iTrack = iEle;
+			//			nTracks++;
+			//			break;
+			//		default:
+			//			continue;
+			//	}
+			//}
 
-			if ( nTracks != 1 ) continue;
+			//if ( nTracks != 1 ) continue;
 			nCh[4]++;
 
-			const reco::PFBlockElementTrack& et = dynamic_cast<const reco::PFBlockElementTrack &>( elements[iTrack] );
-			double p = et.trackRef()->p();  
-			double pt = et.trackRef()->pt(); 
-			double eta = et.trackRef()->eta();
+			//const reco::PFBlockElementTrack& et = dynamic_cast<const reco::PFBlockElementTrack &>( elements[iTrack] );
+			double p = pfc.trackRef()->p();
+			double pt = pfc.trackRef()->pt();
+			double eta = pfc.trackRef()->eta();
 
 			if ( p < pMin_ || pt < ptMin_ ) continue;
 			nCh[5]++;
@@ -261,8 +261,8 @@ PFHadHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			unsigned int tidN = 0;
 			unsigned int pxbN = 0;
 			unsigned int pxdN = 0;
-			const reco::HitPattern& hp = et.trackRef()->hitPattern();
-			switch ( et.trackRef()->algo() ) {
+			const reco::HitPattern& hp = pfc.trackRef()->hitPattern();
+			switch ( pfc.trackRef()->algo() ) {
 				case TrackBase::hltIter0:
 				case TrackBase::hltIter1:
 					//case TrackBase::hltIter2:

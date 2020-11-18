@@ -15,7 +15,7 @@ process.source = cms.Source("PoolSource",
 
 process.pfhadhlt = cms.EDAnalyzer('PFHadHLT',
 		   genParTag        = cms.InputTag("genParticles"),
-                   HLTPFCandidates  = cms.InputTag("particleFlowTmp"),
+                   HLTPFCandidates  = cms.InputTag("pfTICL"),
                    PFSimParticles   = cms.InputTag("particleFlowSimParticle"),
 
                    ptMin = cms.double(0.01),                     # Minimum pt
