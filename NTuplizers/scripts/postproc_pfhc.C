@@ -58,7 +58,7 @@ void postproc_pfhc::Loop(const char* file2)
    Long64_t nbytes = 0, nb = 0;
 
    TFile *file;
-   file = new TFile(file2, "RECREATE");
+   file = new TFile(file2, "recreate");
    file->cd();
    TH1F *dR = new TH1F ("dR", "dR", 200, 0, 20);
    TH1F *reso_eh_barrel = new TH1F ("reso_eh_barrel", "reso_eh_barrel", 200, -1.5, 1.5);
