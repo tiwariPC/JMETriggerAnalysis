@@ -14,16 +14,6 @@ def customise_hltPhase2_PF(process):
     process.particleFlowBlock = cms.EDProducer("PFBlockProducer",
         debug = cms.untracked.bool(False),
         elementImporters = cms.VPSet(
-#            cms.PSet(
-#                gsfsAreSecondary = cms.bool(False),
-#                importerName = cms.string('GSFTrackImporter'),
-#                source = cms.InputTag("pfTrackElec"),
-#                superClustersArePF = cms.bool(True)
-#            ),
-#            cms.PSet(
-#                importerName = cms.string('ConvBremTrackImporter'),
-#                source = cms.InputTag("pfTrackElec")
-#            ),
             cms.PSet(
                 importerName = cms.string('SuperClusterImporter'),
                 maximumHoverE = cms.double(0.5),
@@ -34,23 +24,9 @@ def customise_hltPhase2_PF(process):
                 source_towers = cms.InputTag("towerMaker"),
                 superClustersArePF = cms.bool(True)
             ),
-#            cms.PSet(
-#                importerName = cms.string('ConversionTrackImporter'),
-#                source = cms.InputTag("pfConversions")
-#            ),
-#            cms.PSet(
-#                importerName = cms.string('NuclearInteractionTrackImporter'),
-#                source = cms.InputTag("pfDisplacedTrackerVertex")
-#            ),
             cms.PSet(
-                DPtOverPtCuts_byTrackAlgo = cms.vdouble(
-                    10.0, 10.0, 10.0, 10.0, 10.0,
-                    5.0
-                ),
-                NHitCuts_byTrackAlgo = cms.vuint32(
-                    3, 3, 3, 3, 3,
-                    3
-                ),
+                DPtOverPtCuts_byTrackAlgo = cms.vdouble(10.0, 10.0, 10.0, 10.0, 10.0, 5.0),
+                NHitCuts_byTrackAlgo = cms.vuint32(3, 3, 3, 3, 3, 3),
                 cleanBadConvertedBrems = cms.bool(True),
                 importerName = cms.string('GeneralTracksImporterWithVeto'),
                 maxDPtOPt = cms.double(1.0),
@@ -146,34 +122,8 @@ def customise_hltPhase2_PF(process):
                 useKDTree = cms.bool(False)
             ),
             cms.PSet(
-                linkType = cms.string('GSF:ECAL'),
-                linkerName = cms.string('GSFAndECALLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('TRACK:GSF'),
-                linkerName = cms.string('TrackAndGSFLinker'),
-                useConvertedBrems = cms.bool(True),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('GSF:BREM'),
-                linkerName = cms.string('GSFAndBREMLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('GSF:GSF'),
-                linkerName = cms.string('GSFAndGSFLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
                 linkType = cms.string('ECAL:BREM'),
                 linkerName = cms.string('ECALAndBREMLinker'),
-                useKDTree = cms.bool(False)
-            ),
-            cms.PSet(
-                linkType = cms.string('GSF:HCAL'),
-                linkerName = cms.string('GSFAndHCALLinker'),
                 useKDTree = cms.bool(False)
             ),
             cms.PSet(
