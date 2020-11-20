@@ -1,53 +1,94 @@
-// -*- C++ -*-
-//
-// Package:    PFHCalib/PFHadHLT
-// Class:      PFHadHLT
-//
-/**\class PFHadHLT PFHadHLT.cc PFHadCalib/PFHadHLT/plugins/PFHadHLT.cc
-Description: [one line class summary]
-Implementation:
-[Notes on implementation]
-*/
-//
-// Original Author:  Dr. Lee Sehwook
-//         Created:  Thu, 26 Mar 2015 07:49:04 GMT
-//
-//
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 
-// system include files
-#include <memory>
-
-// user include files
-
-#include "JMETriggerAnalysis/NTuplizers/plugins/PFHadHLT.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
+#include "DataFormats/ParticleFlowReco/interface/PFSimParticle.h"
+#include "DataFormats/ParticleFlowReco/interface/PFSimParticleFwd.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlockElementTrack.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
-#include "FWCore/Framework/interface/ESHandle.h"
+#include <TFile.h>
+#include <TTree.h>
 
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "FWCore/Utilities/interface/Exception.h"
-#include "FWCore/Framework/interface/EventSetup.h"
-#include "DataFormats/Math/interface/deltaR.h"
-#include "TLorentzVector.h"
+class PFHadCalibNTuple : public edm::EDAnalyzer {
+  typedef std::vector<reco::GenParticle> GenParticleCollection;
+  typedef std::vector<reco::PFSimParticle> PFSimParticleCollection;
+  typedef std::vector<reco::PFCandidate> HltParticleFlow;
 
-//
-// constants, enums and typedefs
-//
+public:
+  explicit PFHadCalibNTuple(const edm::ParameterSet &);
+  ~PFHadCalibNTuple() override;
 
-//
-// static data member definitions
-//
+  static void fillDescriptions(edm::ConfigurationDescriptions &descriptions);
 
-using namespace std;
-using namespace edm;
-using namespace reco;
+private:
+  void beginJob() override { Book_trees(); }
+  void analyze(const edm::Event &, const edm::EventSetup &) override;
 
-//
-// constructors and destructor
-//
-PFHadHLT::PFHadHLT(const edm::ParameterSet& iConfig) {
+  edm::EDGetTokenT<reco::PFCandidateCollection> hltpfcandTag;
+  edm::EDGetTokenT<reco::PFSimParticleCollection> PFSimParticlesTag;
+  edm::EDGetTokenT<reco::GenParticleCollection> genParInfoTag;
+
+  void Book_trees();
+  void Reset_variables();
+
+  /// Min pt for charged hadrons
+  double ptMin_;
+
+  /// Min p for charged hadrons
+  double pMin_;
+
+  /// Min hcal raw energy for charged hadrons
+  double hcalMin_;
+
+  /// Max ecal raw energy to define a MIP
+  double ecalMax_;
+
+  /// Min number of pixel hits for charged hadrons
+  int nPixMin_;
+
+  /// Min number of track hits for charged hadrons
+  std::vector<int> nHitMin_;
+  std::vector<double> nEtaMin_;
+
+  // Number of tracks after cuts
+  std::vector<unsigned int> nCh;
+  std::vector<unsigned int> nEv;
+
+  std::string outputfile_;
+  TFile *tf1;
+  TTree *s;
+
+  int charge_;
+  float true_, p_, ecal_, hcal_, eta_, phi_, ho_;
+  float gen_E_, gen_pt_, gen_eta_, gen_phi_;
+  std::vector<float> true_energy;
+  std::vector<float> true_eta;
+  std::vector<float> true_phi;
+  std::vector<float> true_dr;
+  std::vector<bool> true_isCharged;
+  std::vector<float> pfc_ecal;
+  std::vector<float> pfc_hcal;
+  std::vector<float> pfc_eta;
+  std::vector<float> pfc_phi;
+  std::vector<float> pfc_charge;
+  std::vector<float> pfc_id;
+  std::vector<float> trackRef_p;
+
+  bool isCharged;
+};
+
+PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig) {
   nCh = std::vector<unsigned int>(10, static_cast<unsigned int>(0));
   nEv = std::vector<unsigned int>(3, static_cast<unsigned int>(0));
 
@@ -85,9 +126,7 @@ PFHadHLT::PFHadHLT(const edm::ParameterSet& iConfig) {
   s = new TTree("s", " PFCalibration");
 }
 
-PFHadHLT::~PFHadHLT() {
-  // do anything here that needs to be done at desctruction time
-  // (e.g. close files, deallocate resources etc.)
+PFHadCalibNTuple::~PFHadCalibNTuple() {
 
   std::cout << "Total number of events .............. " << nEv[0] << std::endl;
   std::cout << "Number of isolated pions " << nEv[1] << std::endl;
@@ -108,24 +147,16 @@ PFHadHLT::~PFHadHLT() {
   tf1->Close();
 }
 
-//
-// member functions
-//
-
-// ------------ method called for each event  ------------
-void PFHadHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  //using namespace edm;
+void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   Reset_variables();
 
-  edm::Handle<GenParticleCollection> genParticles;
+  edm::Handle<reco::GenParticleCollection> genParticles;
   iEvent.getByToken(genParInfoTag, genParticles); /* get genParticle information */
 
-  Handle<HltParticleFlow> hltpf;
-  //iEvent.getByLabel(hltpfcandTag, hltpf);
+  edm::Handle<HltParticleFlow> hltpf;
   iEvent.getByToken(hltpfcandTag, hltpf);
 
-  Handle<PFSimParticleCollection> trueParticles;
-  //bool isSimu = iEvent.getByLabel(PFSimParticlesTag, trueParticles);
+  edm::Handle<reco::PFSimParticleCollection> trueParticles;
   bool isSimu = iEvent.getByToken(PFSimParticlesTag, trueParticles);
 
   nEv[0]++;
@@ -217,7 +248,7 @@ void PFHadHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) 
         continue;
       nCh[3]++;
 
-      const PFCandidate::ElementsInBlocks& theElements = pfc.elementsInBlocks();
+      const reco::PFCandidate::ElementsInBlocks& theElements = pfc.elementsInBlocks();
 
       //if( theElements.empty() ) continue;
 
@@ -261,10 +292,10 @@ void PFHadHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) 
       unsigned int pxdN = 0;
       const reco::HitPattern& hp = pfc.trackRef()->hitPattern();
       switch (pfc.trackRef()->algo()) {
-        case TrackBase::hltIter0:
-        case TrackBase::hltIter1:
-          //case TrackBase::hltIter2:
-        case TrackBase::highPtTripletStep:
+        case reco::TrackBase::hltIter0:
+        case reco::TrackBase::hltIter1:
+        case reco::TrackBase::hltIter2:
+        case reco::TrackBase::highPtTripletStep:
           tobN += hp.numberOfValidStripTOBHits();
           tecN += hp.numberOfValidStripTECHits();
           tibN += hp.numberOfValidStripTIBHits();
@@ -272,9 +303,9 @@ void PFHadHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) 
           pxbN += hp.numberOfValidPixelBarrelHits();
           pxdN += hp.numberOfValidPixelEndcapHits();
           break;
-        case TrackBase::hltIter3:
-        case TrackBase::hltIter4:
-        case TrackBase::hltIterX:
+        case reco::TrackBase::hltIter3:
+        case reco::TrackBase::hltIter4:
+        case reco::TrackBase::hltIterX:
         default:
           break;
       }
@@ -317,55 +348,14 @@ void PFHadHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) 
   }  // isSimu
 }
 
-// ------------ method called once each job just before starting event loop  ------------
-void PFHadHLT::beginJob() { Book_trees(); }
-
-// ------------ method called once each job just after ending the event loop  ------------
-void PFHadHLT::endJob() {}
-
-// ------------ method called when starting to processes a run  ------------
-/*
-	 void 
-	 PFHadHLT::beginRun(edm::Run const&, edm::EventSetup const&)
-	 {
-	 }
-	 */
-
-// ------------ method called when ending the processing of a run  ------------
-/*
-	 void 
-	 PFHadHLT::endRun(edm::Run const&, edm::EventSetup const&)
-	 {
-	 }
-	 */
-
-// ------------ method called when starting to processes a luminosity block  ------------
-/*
-	 void 
-	 PFHadHLT::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-	 {
-	 }
-	 */
-
-// ------------ method called when ending the processing of a luminosity block  ------------
-/*
-	 void 
-	 PFHadHLT::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-	 {
-	 }
-	 */
-
-// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void PFHadHLT::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  //The following says we do not know what parameters are allowed so do no validation
-  // Please change this to state exactly what you do use, even if it is no parameters
+void PFHadCalibNTuple::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
 
 /// Booking trees
-void PFHadHLT::Book_trees() {
+void PFHadCalibNTuple::Book_trees() {
   s->Branch("true_energy", &true_energy);
   s->Branch("true_eta", &true_eta);
   s->Branch("true_phi", &true_phi);
@@ -381,7 +371,7 @@ void PFHadHLT::Book_trees() {
 }
 
 /// Reset variables
-void PFHadHLT::Reset_variables() {
+void PFHadCalibNTuple::Reset_variables() {
   true_energy.clear();
   true_eta.clear();
   true_phi.clear();
@@ -396,5 +386,4 @@ void PFHadHLT::Reset_variables() {
   trackRef_p.clear();
 }
 
-//define this as a plug-in
-DEFINE_FWK_MODULE(PFHadHLT);
+DEFINE_FWK_MODULE(PFHadCalibNTuple);
