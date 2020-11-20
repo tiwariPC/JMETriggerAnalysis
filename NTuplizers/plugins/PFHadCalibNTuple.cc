@@ -30,11 +30,15 @@ public:
 private:
   void analyze(const edm::Event &, const edm::EventSetup &) override;
 
+  std::string const moduleLabel_;
+
+  /// name of TTree
+  std::string const ttreeName_;
+
+  /// Input EDM collections
   edm::EDGetTokenT<reco::GenParticleCollection> const genPartsToken_;
   edm::EDGetTokenT<reco::PFSimParticleCollection> const pfSimPartsToken_;
   edm::EDGetTokenT<reco::PFCandidateCollection> const recoPFCandsToken_;
-
-  TTree* ttree_ = nullptr;
 
   /// Min pt for charged hadrons
   double const ptMin_;
@@ -58,12 +62,11 @@ private:
   /// use PFBlockElements to find tracks associated to PFChargedHadron
   bool const usePFBlockElements_;
 
-  /// name of TTree
-  std::string const ttreeName_;
-
   /// Number of tracks after cuts
   std::vector<uint> nCh;
   std::vector<uint> nEv;
+
+  TTree* ttree_ = nullptr;
 
   std::vector<float> true_energy_;
   std::vector<float> true_eta_;
@@ -82,7 +85,9 @@ private:
 };
 
 PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
-  : genPartsToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles")))
+  : moduleLabel_(iConfig.getParameter<std::string>("@module_label"))
+  , ttreeName_(iConfig.getParameter<std::string>("TTreeName"))
+  , genPartsToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles")))
   , pfSimPartsToken_(consumes<reco::PFSimParticleCollection>(iConfig.getParameter<edm::InputTag>("pfSimParticles")))
   , recoPFCandsToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("recoPFCandidates")))
   , ptMin_(iConfig.getParameter<double>("ptMin"))
@@ -93,7 +98,6 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
   , nTrackerHitsMin_(iConfig.getParameter<std::vector<uint>>("nTrackerHitsMin"))
   , nTrackerHitsMinEtaMax_(iConfig.getParameter<std::vector<double>>("nTrackerHitsMinEtaMax"))
   , usePFBlockElements_(iConfig.getParameter<bool>("usePFBlockElements"))
-  , ttreeName_(iConfig.getParameter<std::string>("TTreeName"))
 {
   nCh = std::vector<uint>(10, 0);
   nEv = std::vector<uint>(3, 0);
@@ -128,6 +132,9 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
 
 PFHadCalibNTuple::~PFHadCalibNTuple() {
 
+  edm::LogPrint("") << "----------------------------------------------------------";
+  edm::LogPrint("") << moduleLabel_;
+  edm::LogPrint("") << "----------------------------------------------------------";
   edm::LogPrint("") << "Total number of events: " << nEv[0];
   edm::LogPrint("") << "Number of isolated pions: " << nEv[1];
   edm::LogPrint("") << "Number of true particles within dR = 0.01 of an isolated pion: " << nEv[2];
@@ -224,37 +231,34 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       if ((ecalRaw + hcalRaw) < hcalMin_) continue;
       nCh[3]++;
 
+      auto nTracks = 0u;
+      auto trackRef = pfc.trackRef();
+
       auto const& theElements = pfc.elementsInBlocks();
 
-      //if( theElements.empty() ) continue;
+      if(theElements.empty()){
+        if(not usePFBlockElements_) nTracks = 1; //!! hack for pfTICL
+      }
+      else {
+        auto const& elements = theElements[0].first->elements();
+        for(unsigned iEle=0; iEle<elements.size(); ++iEle) {
+          switch(elements[iEle].type()) {
+            case reco::PFBlockElement::TRACK:
+              trackRef = dynamic_cast<reco::PFBlockElementTrack const&>(elements[iEle]).trackRef();
+              ++nTracks;
+              break;
+            default:
+              continue;
+          }
+        }
+      }
 
-      //const reco::PFBlockRef blockRef = theElements[0].first;
-      //PFBlock::LinkData linkData =  blockRef->linkData();
-      //const edm::OwnVector<reco::PFBlockElement>& elements = blockRef->elements();
-
-      //uint nTracks = 0;
-      //uint iTrack = 999999;
-
-      //for(unsigned iEle=0; iEle<elements.size(); iEle++) {
-      //	PFBlockElement::Type type = elements[iEle].type();
-      //	switch( type )
-      //	{
-      //		case PFBlockElement::TRACK:
-      //			iTrack = iEle;
-      //			nTracks++;
-      //			break;
-      //		default:
-      //			continue;
-      //	}
-      //}
-
-      //if ( nTracks != 1 ) continue;
+      if (nTracks != 1) continue;
       nCh[4]++;
 
-      //const reco::PFBlockElementTrack& et = dynamic_cast<const reco::PFBlockElementTrack &>( elements[iTrack] );
-      auto const p = pfc.trackRef()->p();
-      auto const pt = pfc.trackRef()->pt();
-      auto const eta = pfc.trackRef()->eta();
+      auto const p = trackRef->p();
+      auto const pt = trackRef->pt();
+      auto const eta = trackRef->eta();
 
       if (p < pMin_ || pt < ptMin_) continue;
       nCh[5]++;
@@ -265,8 +269,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       uint tidN = 0;
       uint pxbN = 0;
       uint pxdN = 0;
-      auto const& hp = pfc.trackRef()->hitPattern();
-      switch (pfc.trackRef()->algo()) {
+      auto const& hp = trackRef->hitPattern();
+      switch (trackRef->algo()) {
         case reco::TrackBase::hltIter0:
         case reco::TrackBase::hltIter1:
         case reco::TrackBase::hltIter2:

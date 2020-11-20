@@ -51,25 +51,25 @@ process.particleFlowSimParticle = cms.EDProducer('PFSimParticleProducer',
 )
 
 process.pfHadCalibNTuplePFBarrel = cms.EDAnalyzer('PFHadCalibNTuple',
-  genParTag = cms.InputTag('genParticles'),
-  HLTPFCandidates = cms.InputTag('particleFlowTmpBarrel'),
-  PFSimParticles = cms.InputTag('particleFlowSimParticle'),
+  TTreeName = cms.string('Candidates'),
+
+  genParticles = cms.InputTag('genParticles'),
+  pfSimParticles = cms.InputTag('particleFlowSimParticle'),
+  recoPFCandidates = cms.InputTag('particleFlowTmpBarrel'),
 
   ptMin = cms.double(0.01), # Minimum pt
   pMin = cms.double(0.01),  # Minimum p
   hcalMin = cms.double(0.0),  # Minimum hcal energy
   ecalMax = cms.double(1e12), # Maximum ecal energy
   nPixelHitsMin = cms.uint32(2), # Nb of pixel hits for pion
-  nTrackerHitsMin = cms.uint32(8, 8, 8, 8), # Nb of track hits for pion
+  nTrackerHitsMin = cms.vuint32(8, 8, 8, 8), # Nb of track hits for pion
   nTrackerHitsMinEtaMax = cms.vdouble(1.4, 1.6, 2.0, 2.5), #  eta ranges
 
   usePFBlockElements = cms.bool(True),
-
-  TTreeName = cms.string('Candidates'),
 )
 
 process.pfHadCalibNTuplePFTICL = process.pfHadCalibNTuplePFBarrel.clone(
-  HLTPFCandidates = 'pfTICL',
+  recoPFCandidates = 'pfTICL',
   usePFBlockElements = False,
 )
 
