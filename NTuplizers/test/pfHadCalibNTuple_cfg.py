@@ -55,16 +55,15 @@ process.pfHadCalibNTuplePFBarrel = cms.EDAnalyzer('PFHadCalibNTuple',
   HLTPFCandidates = cms.InputTag('particleFlowTmpBarrel'),
   PFSimParticles = cms.InputTag('particleFlowSimParticle'),
 
-  usePFBlockElements = cms.bool(True),
-
   ptMin = cms.double(0.01), # Minimum pt
   pMin = cms.double(0.01),  # Minimum p
-  nPixMin = cms.int32(2), # Nb of pixel hits for pion
-  nHitMin = cms.vint32(8, 8, 8, 8),          # Nb of track hits for pion
-  nEtaMin = cms.vdouble(1.4, 1.6, 2.0, 2.5), #  in these eta ranges
-
   hcalMin = cms.double(0.0),  # Minimum hcal energy
   ecalMax = cms.double(1e12), # Maximum ecal energy
+  nPixelHitsMin = cms.uint32(2), # Nb of pixel hits for pion
+  nTrackerHitsMin = cms.uint32(8, 8, 8, 8), # Nb of track hits for pion
+  nTrackerHitsMinEtaMax = cms.vdouble(1.4, 1.6, 2.0, 2.5), #  eta ranges
+
+  usePFBlockElements = cms.bool(True),
 
   TTreeName = cms.string('Candidates'),
 )
