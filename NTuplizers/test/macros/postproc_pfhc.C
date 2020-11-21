@@ -14,12 +14,12 @@ float deltaR2(float eta1, float eta2, float phi1, float phi2) {
 
 int main(int argc, char *argv[])
 {
-  
   if(argc > 1)
-    { 
-      postproc_pfhc t(argv[1], argv[2]);
-      t.Loop(argv[2]);
-    }
+  { 
+    postproc_pfhc t(argv[1], argv[2]);
+    t.Loop(argv[2]);
+  }
+
   return 0;
 }
 
@@ -67,7 +67,7 @@ void postproc_pfhc::Loop(const char* file2)
    TH1F *reso_h_endcap = new TH1F ("reso_h_endcap", "reso_h_endcap", 200, -1.5, 1.5);
 
    Float_t true_, ecal_, hcal_, eta_, phi_, p_;
-   TTree *s = new TTree("s", "selected pfc");
+   TTree *s = new TTree("Candidates", "Candidates");
    s->Branch("true",&true_,"true/F");
    s->Branch("ecal",&ecal_,"ecal/F");
    s->Branch("hcal",&hcal_,"hcal/F");
@@ -79,8 +79,8 @@ void postproc_pfhc::Loop(const char* file2)
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
-      nb = fChain->GetEntry(jentry);   nbytes += nb;
-      // if (Cut(ientry) < 0) continue;
+      nb = fChain->GetEntry(jentry);
+      nbytes += nb;
 
       for(int j = 0; j < true_energy->size(); j++){
          double Dr = 99.;

@@ -71,7 +71,7 @@ public:
 
 #ifdef postproc_pfhc_cxx
 postproc_pfhc::postproc_pfhc(const char *file1, const char *file2) {
-  TChain *chain = new TChain("s");
+  TChain *chain = new TChain("Candidates");
   ifstream file;
   file.open(file1, ifstream::in);
   char filename[2000];
