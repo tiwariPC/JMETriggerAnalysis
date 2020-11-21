@@ -349,7 +349,7 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     pfc_trackRef_phi_.emplace_back(track_phi);
     pfc_trackRef_nValidPixelHits_.emplace_back(track_nValidPixelHits);
     pfc_trackRef_nValidTrackerHits_.emplace_back(track_nValidTrackerHits);
-  }  // end of pion (pi-) loop
+  }
 
   ttree_->Fill();
 }
