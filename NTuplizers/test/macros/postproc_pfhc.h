@@ -153,7 +153,7 @@ void postproc_pfhc::Init(TTree *tree) {
   fChain->SetBranchAddress("pfc_phi", &pfc_phi, &b_pfc_phi);
   fChain->SetBranchAddress("pfc_charge", &pfc_charge, &b_pfc_charge);
   fChain->SetBranchAddress("pfc_id", &pfc_id, &b_pfc_id);
-  fChain->SetBranchAddress("trackRef_p", &trackRef_p, &b_trackRef_p);
+  fChain->SetBranchAddress("pfc_trackRef_p", &trackRef_p, &b_trackRef_p);
 
   Notify();
 }
