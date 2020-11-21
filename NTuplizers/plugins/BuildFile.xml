@@ -1,15 +1,19 @@
 <library name="JMETriggerAnalysisNTuplizersPlugins" file="*.cc">
   <flags EDM_PLUGIN="1"/>
   <use name="JMETriggerAnalysis/NTuplizers"/>
-  <use name="FWCore/Framework"/>
-  <use name="FWCore/ParameterSet"/>
-  <use name="FWCore/MessageLogger"/>
-  <use name="FWCore/Utilities"/>
-  <use name="FWCore/ServiceRegistry"/>
   <use name="FWCore/Common"/>
+  <use name="FWCore/Framework"/>
+  <use name="FWCore/MessageLogger"/>
+  <use name="FWCore/ParameterSet"/>
+  <use name="FWCore/ServiceRegistry"/>
+  <use name="FWCore/Utilities"/>
   <use name="CommonTools/UtilAlgos"/>
   <use name="CommonTools/Utils"/>
   <use name="DataFormats/Common"/>
+  <use name="DataFormats/HepMCCandidate"/>
+  <use name="DataFormats/Math"/>
+  <use name="DataFormats/ParticleFlowCandidate"/>
+  <use name="DataFormats/ParticleFlowReco"/>
   <use name="SimDataFormats/GeneratorProducts"/>
   <use name="SimDataFormats/PileupSummaryInfo"/>
   <use name="rootmath"/>
