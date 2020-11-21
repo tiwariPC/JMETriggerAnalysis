@@ -102,11 +102,10 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
       minTrackerHits_(iConfig.getParameter<std::vector<uint>>("minTrackerHits")),
       maxEtaForMinTrkHitsCuts_(iConfig.getParameter<std::vector<double>>("maxEtaForMinTrkHitsCuts")),
       usePFBlockElements_(iConfig.getParameter<bool>("usePFBlockElements")) {
-
   assert(minPixelHits_.size() == minTrackerHits_.size());
   assert(minPixelHits_.size() == maxEtaForMinTrkHitsCuts_.size());
-  for(uint idx=0; 1+idx<maxEtaForMinTrkHitsCuts_.size(); ++idx){
-    assert(maxEtaForMinTrkHitsCuts_[idx] < maxEtaForMinTrkHitsCuts_[idx+1]);
+  for (uint idx = 0; 1 + idx < maxEtaForMinTrkHitsCuts_.size(); ++idx) {
+    assert(maxEtaForMinTrkHitsCuts_[idx] < maxEtaForMinTrkHitsCuts_[idx + 1]);
   }
 
   globalCounter_ = std::vector<uint>(13, 0);
@@ -156,7 +155,8 @@ PFHadCalibNTuple::~PFHadCalibNTuple() {
   edm::LogPrint("") << "Number of PF Charged Hadrons: " << globalCounter_[5];
   edm::LogPrint("") << " - with pt > " << minPt_ << " GeV: " << globalCounter_[6];
   edm::LogPrint("") << " - with E_ECAL+E_HCAL > " << minCaloEnergy_ << " GeV: " << globalCounter_[7];
-  if(usePFBlockElements_) edm::LogPrint("") << " - with only 1 track in the block: " << globalCounter_[8];
+  if (usePFBlockElements_)
+    edm::LogPrint("") << " - with only 1 track in the block: " << globalCounter_[8];
   edm::LogPrint("") << " - with track-p > " << minTrackP_ << " GeV: " << globalCounter_[9];
   edm::LogPrint("") << " - with min nb of pixel hits: " << globalCounter_[10];
   edm::LogPrint("") << " - with min nb of pixel+strip hits: " << globalCounter_[11];
@@ -178,11 +178,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     auto const& genp_i = genParts.at(genpIdx_i);
 
     LogTrace("") << " genParticle[" << genpIdx_i << "]:"
-     << " pt=" << genp_i.pt()
-     << " eta=" << genp_i.eta()
-     << " phi=" << genp_i.phi()
-     << " pdgId=" << genp_i.pdgId()
-     << " status=" << genp_i.status();
+                 << " pt=" << genp_i.pt() << " eta=" << genp_i.eta() << " phi=" << genp_i.phi()
+                 << " pdgId=" << genp_i.pdgId() << " status=" << genp_i.status();
 
     // Gen and true particle selection
     if (genp_i.status() == 1 and genp_i.pdgId() == -211) {
@@ -201,12 +198,14 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
         for (auto const& ptc : pfSimParts) {
           // only consider negatively charged particles
-          if (ptc.charge() >= 0) continue;
+          if (ptc.charge() >= 0)
+            continue;
 
           // require true particle within deltaR = 0.01 of the gen particle
           auto const& gen = ptc.trajectoryPoint(reco::PFTrajectoryPoint::ClosestApproach);
           auto const dR = reco::deltaR(genp_i.eta(), genp_i.phi(), gen.momentum().Eta(), gen.momentum().Phi());
-          if (dR > 0.01) continue;
+          if (dR > 0.01)
+            continue;
           ++globalCounter_[2];
 
           // check for a reconstructed track *in the event*
@@ -219,7 +218,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
           }
 
           auto const& tpatecal = ptc.extrapolatedPoint(reco::PFTrajectoryPoint::ECALEntrance);
-          if (not tpatecal.isValid()) continue;
+          if (not tpatecal.isValid())
+            continue;
 
           auto const eta = tpatecal.positionREP().Eta();
           auto const phi = tpatecal.positionREP().Phi();
@@ -227,7 +227,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
           auto const true_dr = reco::deltaR(gen.momentum().Eta(), gen.momentum().Phi(), eta, phi);
 
           // extrapolated track within 0.1 of the true particle
-          if (true_dr > 0.1) continue;
+          if (true_dr > 0.1)
+            continue;
           ++globalCounter_[3];
 
           true_energy_.emplace_back(trueE);
@@ -246,15 +247,18 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   for (auto const& pfc : recoPFCands) {
     ++globalCounter_[4];
 
-    if (pfc.particleId() != 1) continue;
+    if (pfc.particleId() != 1)
+      continue;
     ++globalCounter_[5];
 
-    if (pfc.pt() < minPt_) continue;
+    if (pfc.pt() < minPt_)
+      continue;
     ++globalCounter_[6];
 
     auto const ecalRaw = pfc.rawEcalEnergy();
     auto const hcalRaw = pfc.rawHcalEnergy();
-    if ((ecalRaw + hcalRaw) < minCaloEnergy_) continue;
+    if ((ecalRaw + hcalRaw) < minCaloEnergy_)
+      continue;
     ++globalCounter_[7];
 
     auto nTracks = 0u;
@@ -271,7 +275,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       }
     }
 
-    if (nTracks != 1) continue;
+    if (nTracks != 1)
+      continue;
     ++globalCounter_[8];
 
     auto trackRef = pfc.trackRef();
@@ -281,7 +286,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     auto const track_eta = trackRef->eta();
     auto const track_phi = trackRef->phi();
 
-    if (track_p < minTrackP_) continue;
+    if (track_p < minTrackP_)
+      continue;
     ++globalCounter_[9];
 
     auto const& hp = trackRef->hitPattern();
@@ -309,7 +315,7 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     auto hasMinPixelHits = false;
     auto hasMinTrackerHits = false;
     for (uint ieta = 0; ieta < maxEtaForMinTrkHitsCuts_.size(); ++ieta) {
-      auto const etaMin = ieta ? maxEtaForMinTrkHitsCuts_[ieta-1] : 0.;
+      auto const etaMin = ieta ? maxEtaForMinTrkHitsCuts_[ieta - 1] : 0.;
       auto const etaMax = maxEtaForMinTrkHitsCuts_[ieta];
 
       if (std::abs(track_eta) >= etaMin and std::abs(track_eta) < etaMax) {
@@ -319,13 +325,16 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       }
     }
 
-    if (not hasMinPixelHits) continue;
+    if (not hasMinPixelHits)
+      continue;
     ++globalCounter_[10];
 
-    if (not hasMinTrackerHits) continue;
+    if (not hasMinTrackerHits)
+      continue;
     ++globalCounter_[11];
 
-    if (ecalRaw > maxECalEnergy_) continue;
+    if (ecalRaw > maxECalEnergy_)
+      continue;
     ++globalCounter_[12];
 
     pfc_ecal_.emplace_back(ecalRaw);
