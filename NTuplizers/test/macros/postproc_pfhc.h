@@ -33,28 +33,28 @@ public:
   vector<float> *true_eta;
   vector<float> *true_phi;
   vector<float> *true_dr;
-  vector<bool> *true_isCharged;
+  vector<int> *true_charge;
   vector<float> *pfc_ecal;
   vector<float> *pfc_hcal;
   vector<float> *pfc_eta;
   vector<float> *pfc_phi;
-  vector<float> *pfc_charge;
+  vector<int> *pfc_charge;
   vector<float> *pfc_id;
-  vector<float> *trackRef_p;
+  vector<float> *pfc_trackRef_p;
 
   // List of branches
   TBranch *b_true_energy;     //!
   TBranch *b_true_eta;        //!
   TBranch *b_true_phi;        //!
   TBranch *b_true_dr;         //!
-  TBranch *b_true_isCharged;  //!
+  TBranch *b_true_charge;     //!
   TBranch *b_pfc_ecal;        //!
   TBranch *b_pfc_hcal;        //!
   TBranch *b_pfc_eta;         //!
   TBranch *b_pfc_phi;         //!
   TBranch *b_pfc_charge;      //!
   TBranch *b_pfc_id;          //!
-  TBranch *b_trackRef_p;      //!
+  TBranch *b_pfc_trackRef_p;  //!
 
   postproc_pfhc(const char *file1, const char *file2);
   virtual ~postproc_pfhc();
@@ -126,14 +126,14 @@ void postproc_pfhc::Init(TTree *tree) {
   true_eta = 0;
   true_phi = 0;
   true_dr = 0;
-  true_isCharged = 0;
+  true_charge = 0;
   pfc_ecal = 0;
   pfc_hcal = 0;
   pfc_eta = 0;
   pfc_phi = 0;
   pfc_charge = 0;
   pfc_id = 0;
-  trackRef_p = 0;
+  pfc_trackRef_p = 0;
 
   // Set branch addresses and branch pointers
   if (!tree)
@@ -146,14 +146,14 @@ void postproc_pfhc::Init(TTree *tree) {
   fChain->SetBranchAddress("true_eta", &true_eta, &b_true_eta);
   fChain->SetBranchAddress("true_phi", &true_phi, &b_true_phi);
   fChain->SetBranchAddress("true_dr", &true_dr, &b_true_dr);
-  fChain->SetBranchAddress("true_isCharged", &true_isCharged, &b_true_isCharged);
+  fChain->SetBranchAddress("true_charge", &true_charge, &b_true_charge);
   fChain->SetBranchAddress("pfc_ecal", &pfc_ecal, &b_pfc_ecal);
   fChain->SetBranchAddress("pfc_hcal", &pfc_hcal, &b_pfc_hcal);
   fChain->SetBranchAddress("pfc_eta", &pfc_eta, &b_pfc_eta);
   fChain->SetBranchAddress("pfc_phi", &pfc_phi, &b_pfc_phi);
   fChain->SetBranchAddress("pfc_charge", &pfc_charge, &b_pfc_charge);
   fChain->SetBranchAddress("pfc_id", &pfc_id, &b_pfc_id);
-  fChain->SetBranchAddress("pfc_trackRef_p", &trackRef_p, &b_trackRef_p);
+  fChain->SetBranchAddress("pfc_trackRef_p", &pfc_trackRef_p, &b_pfc_trackRef_p);
 
   Notify();
 }

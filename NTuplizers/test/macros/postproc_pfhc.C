@@ -85,7 +85,7 @@ void postproc_pfhc::Loop(const char* file2)
       for(int j = 0; j < true_energy->size(); j++){
          double Dr = 99.;
          //neutron
-         if(!(true_isCharged->at(j))){
+         if(true_charge->at(j) == 0){
             eta_ = true_eta->at(j);
             phi_ = true_phi->at(j);
             true_ = true_energy->at(j);

@@ -71,12 +71,12 @@ private:
   std::vector<float> true_eta_;
   std::vector<float> true_phi_;
   std::vector<float> true_dr_;
-  std::vector<bool> true_isCharged_;
+  std::vector<int> true_charge_;
   std::vector<float> pfc_ecal_;
   std::vector<float> pfc_hcal_;
   std::vector<float> pfc_eta_;
   std::vector<float> pfc_phi_;
-  std::vector<float> pfc_charge_;
+  std::vector<int> pfc_charge_;
   std::vector<float> pfc_id_;
   std::vector<float> pfc_trackRef_p_;
   std::vector<float> pfc_trackRef_pt_;
@@ -128,7 +128,7 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
   ttree_->Branch("true_eta", &true_eta_);
   ttree_->Branch("true_phi", &true_phi_);
   ttree_->Branch("true_dr", &true_dr_);
-  ttree_->Branch("true_isCharged", &true_isCharged_);
+  ttree_->Branch("true_charge", &true_charge_);
   ttree_->Branch("pfc_ecal", &pfc_ecal_);
   ttree_->Branch("pfc_hcal", &pfc_hcal_);
   ttree_->Branch("pfc_eta", &pfc_eta_);
@@ -208,15 +208,6 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
             continue;
           ++globalCounter_[2];
 
-          // check for a reconstructed track *in the event*
-          auto isCharged = false;
-          for (auto const& pfc : recoPFCands) {
-            if (pfc.particleId() < 4) {
-              isCharged = true;
-              break;
-            }
-          }
-
           auto const& tpatecal = ptc.extrapolatedPoint(reco::PFTrajectoryPoint::ECALEntrance);
           if (not tpatecal.isValid())
             continue;
@@ -235,7 +226,7 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
           true_eta_.emplace_back(eta);
           true_phi_.emplace_back(phi);
           true_dr_.emplace_back(true_dr);
-          true_isCharged_.emplace_back(isCharged);
+          true_charge_.emplace_back(ptc.charge());
         }
       }
     }
@@ -359,7 +350,7 @@ void PFHadCalibNTuple::reset_variables() {
   true_eta_.clear();
   true_phi_.clear();
   true_dr_.clear();
-  true_isCharged_.clear();
+  true_charge_.clear();
   pfc_ecal_.clear();
   pfc_hcal_.clear();
   pfc_eta_.clear();
