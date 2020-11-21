@@ -148,9 +148,9 @@ PFHadCalibNTuple::~PFHadCalibNTuple() {
   edm::LogPrint("") << moduleLabel_;
   edm::LogPrint("") << "----------------------------------------------------------";
   edm::LogPrint("") << "Total number of events: " << globalCounter_[0];
-  edm::LogPrint("") << "Number of isolated pions: " << globalCounter_[1];
-  edm::LogPrint("") << "Number of true particles within dR = 0.01 of an isolated pion: " << globalCounter_[2];
-  edm::LogPrint("") << "Number of true particles with track matching: " << globalCounter_[3];
+  edm::LogPrint("") << "Number of GEN isolated pions: " << globalCounter_[1];
+  edm::LogPrint("") << "Number of pfSIM particles within dR = 0.01 of an isolated GEN pion: " << globalCounter_[2];
+  edm::LogPrint("") << "Number of pfSIM particles with valid extrapolation point to ECAL surface: " << globalCounter_[3];
   edm::LogPrint("") << "Number of PF candidates: " << globalCounter_[4];
   edm::LogPrint("") << "Number of PF Charged Hadrons: " << globalCounter_[5];
   edm::LogPrint("") << " - with pt > " << minPt_ << " GeV: " << globalCounter_[6];
@@ -217,9 +217,6 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
           auto const trueE = std::sqrt(tpatecal.momentum().Vect().Mag2());
           auto const true_dr = reco::deltaR(gen.momentum().Eta(), gen.momentum().Phi(), eta, phi);
 
-          // extrapolated track within 0.1 of the true particle
-          if (true_dr > 0.1)
-            continue;
           ++globalCounter_[3];
 
           true_energy_.emplace_back(trueE);
