@@ -29,41 +29,41 @@ public:
 private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
+  // name of module
   std::string const moduleLabel_;
 
-  /// name of TTree
+  // name of TTree
   std::string const ttreeName_;
 
-  /// Input EDM collections
+  // input EDM collections
   edm::EDGetTokenT<reco::GenParticleCollection> const genPartsToken_;
   edm::EDGetTokenT<reco::PFSimParticleCollection> const pfSimPartsToken_;
   edm::EDGetTokenT<reco::PFCandidateCollection> const recoPFCandsToken_;
 
-  /// Min pt for charged hadrons
-  double const ptMin_;
+  // min pt for charged hadrons
+  double const minPt_;
 
-  /// Min p for charged hadrons
-  double const pMin_;
+  // min track-p for charged hadrons
+  double const minTrackP_;
 
-  /// Min hcal raw energy for charged hadrons
-  double const hcalMin_;
+  // min ecal+hcal raw energy for charged hadrons
+  double const minCaloEnergy_;
 
-  /// Max ecal raw energy to define a MIP
-  double const ecalMax_;
+  // max ecal raw energy to define a MIP
+  double const maxECalEnergy_;
 
-  /// Min number of pixel hits for charged hadrons
-  uint const nPixelHitsMin_;
+  // min number of pixel hits for charged hadrons
+  uint const minPixelHits_;
 
-  /// Min number of tracker hits for charged hadrons
-  std::vector<uint> const nTrackerHitsMin_;
-  std::vector<double> const nTrackerHitsMinEtaMax_;
+  // min number of tracker hits for charged hadrons
+  std::vector<uint> const minTrackerHits_;
+  std::vector<double> const maxEtaForMinTrackerHitsCut_;
 
-  /// use PFBlockElements to find tracks associated to PFChargedHadron
+  // use PFBlockElements to count tracks associated to reco::PFCandidate
   bool const usePFBlockElements_;
 
-  /// Number of tracks after cuts
-  std::vector<uint> nCh;
-  std::vector<uint> nEv;
+  // Number of tracks after cuts
+  std::vector<uint> globalCounter_;
 
   TTree* ttree_ = nullptr;
 
@@ -89,16 +89,15 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
       genPartsToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"))),
       pfSimPartsToken_(consumes<reco::PFSimParticleCollection>(iConfig.getParameter<edm::InputTag>("pfSimParticles"))),
       recoPFCandsToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("recoPFCandidates"))),
-      ptMin_(iConfig.getParameter<double>("ptMin")),
-      pMin_(iConfig.getParameter<double>("pMin")),
-      hcalMin_(iConfig.getParameter<double>("hcalMin")),
-      ecalMax_(iConfig.getParameter<double>("ecalMax")),
-      nPixelHitsMin_(iConfig.getParameter<uint>("nPixelHitsMin")),
-      nTrackerHitsMin_(iConfig.getParameter<std::vector<uint>>("nTrackerHitsMin")),
-      nTrackerHitsMinEtaMax_(iConfig.getParameter<std::vector<double>>("nTrackerHitsMinEtaMax")),
+      minPt_(iConfig.getParameter<double>("minPt")),
+      minTrackP_(iConfig.getParameter<double>("minTrackP")),
+      minCaloEnergy_(iConfig.getParameter<double>("minCaloEnergy")),
+      maxECalEnergy_(iConfig.getParameter<double>("maxECalEnergy")),
+      minPixelHits_(iConfig.getParameter<uint>("minPixelHits")),
+      minTrackerHits_(iConfig.getParameter<std::vector<uint>>("minTrackerHits")),
+      maxEtaForMinTrackerHitsCut_(iConfig.getParameter<std::vector<double>>("maxEtaForMinTrackerHitsCut")),
       usePFBlockElements_(iConfig.getParameter<bool>("usePFBlockElements")) {
-  nCh = std::vector<uint>(10, 0);
-  nEv = std::vector<uint>(3, 0);
+  globalCounter_ = std::vector<uint>(13, 0);
 
   usesResource(TFileService::kSharedResource);
 
@@ -132,18 +131,19 @@ PFHadCalibNTuple::~PFHadCalibNTuple() {
   edm::LogPrint("") << "----------------------------------------------------------";
   edm::LogPrint("") << moduleLabel_;
   edm::LogPrint("") << "----------------------------------------------------------";
-  edm::LogPrint("") << "Total number of events: " << nEv[0];
-  edm::LogPrint("") << "Number of isolated pions: " << nEv[1];
-  edm::LogPrint("") << "Number of true particles within dR = 0.01 of an isolated pion: " << nEv[2];
-  edm::LogPrint("") << "Number of true particles with track matching: " << nCh[7];
-  edm::LogPrint("") << "Number of PF candidates: " << nCh[0];
-  edm::LogPrint("") << "Number of PF Charged Hadrons: " << nCh[1];
-  edm::LogPrint("") << " - With pt > " << ptMin_ << " GeV: " << nCh[2];
-  edm::LogPrint("") << " - With E_HCAL > " << hcalMin_ << " GeV: " << nCh[3];
-  edm::LogPrint("") << " - With only 1 track in the block: " << nCh[4];
-  edm::LogPrint("") << " - With p > " << pMin_ << " GeV: " << nCh[5];
-  edm::LogPrint("") << " - With at least " << nPixelHitsMin_ << " pixel hits: " << nCh[6];
-  edm::LogPrint("") << " - With E_ECAL < " << ecalMax_ << " GeV: " << nCh[8];
+  edm::LogPrint("") << "Total number of events: " << globalCounter_[0];
+  edm::LogPrint("") << "Number of isolated pions: " << globalCounter_[1];
+  edm::LogPrint("") << "Number of true particles within dR = 0.01 of an isolated pion: " << globalCounter_[2];
+  edm::LogPrint("") << "Number of true particles with track matching: " << globalCounter_[3];
+  edm::LogPrint("") << "Number of PF candidates: " << globalCounter_[4];
+  edm::LogPrint("") << "Number of PF Charged Hadrons: " << globalCounter_[5];
+  edm::LogPrint("") << " - With pt > " << minPt_ << " GeV: " << globalCounter_[6];
+  edm::LogPrint("") << " - With E_ECAL+E_HCAL > " << minCaloEnergy_ << " GeV: " << globalCounter_[7];
+  edm::LogPrint("") << " - With only 1 track in the block: " << globalCounter_[8];
+  edm::LogPrint("") << " - With p > " << minTrackP_ << " GeV: " << globalCounter_[9];
+  edm::LogPrint("") << " - With at least " << minPixelHits_ << " pixel hits: " << globalCounter_[10];
+//  edm::LogPrint("") << " - With at least [N] tracker hits " << globalCounter_[11];
+  edm::LogPrint("") << " - With E_ECAL < " << maxECalEnergy_ << " GeV: " << globalCounter_[12];
 }
 
 void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -153,7 +153,7 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   reset_variables();
 
-  nEv[0]++;
+  globalCounter_[0]++;
 
   for (uint genpIdx_i = 0; genpIdx_i < genParts.size(); ++genpIdx_i) {
     auto const& genp_i = genParts.at(genpIdx_i);
@@ -170,7 +170,7 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       }
 
       if (mindR > 1.) {  // Pion isolation
-        nEv[1]++;
+        globalCounter_[1]++;
 
         for (auto const& ptc : pfSimParts) {
           // Only consider negatively charged particles
@@ -180,9 +180,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
           // There should be true particle within deltaR = 0.01 of the gen particle
           auto const& gen = ptc.trajectoryPoint(reco::PFTrajectoryPoint::ClosestApproach);
           auto const dR = reco::deltaR(genp_i.eta(), genp_i.phi(), gen.momentum().Eta(), gen.momentum().Phi());
-          if (dR > 0.01)
-            continue;
-          nEv[2]++;
+          if (dR > 0.01) continue;
+          globalCounter_[2]++;
 
           // Check if there is a reconstructed track *in the event*
           auto isCharged = false;
@@ -203,10 +202,9 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
           auto const trueE = std::sqrt(tpatecal.momentum().Vect().Mag2());
           auto const true_dr = reco::deltaR(gen.momentum().Eta(), gen.momentum().Phi(), eta, phi);
 
-          // The extrapolated track should be within 0.1 of the true particle
-          if (true_dr > 0.1)
-            continue;
-          nCh[7]++;
+          // extrapolated track within 0.1 of the true particle
+          if (true_dr > 0.1) continue;
+          globalCounter_[3]++;
 
           true_energy_.emplace_back(trueE);
           true_eta_.emplace_back(eta);
@@ -220,55 +218,44 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   // Reco pion(pi-) selection
   for (auto const& pfc : recoPFCands) {
-    nCh[0]++;
+    globalCounter_[4]++;
 
-    if (pfc.particleId() != 1)
-      continue;
-    nCh[1]++;
+    if (pfc.particleId() != 1) continue;
+    globalCounter_[5]++;
 
-    if (pfc.pt() < ptMin_)
-      continue;
-    nCh[2]++;
+    if (pfc.pt() < minPt_) continue;
+    globalCounter_[6]++;
 
     auto const ecalRaw = pfc.rawEcalEnergy();
     auto const hcalRaw = pfc.rawHcalEnergy();
-    if ((ecalRaw + hcalRaw) < hcalMin_)
-      continue;
-    nCh[3]++;
+    if ((ecalRaw + hcalRaw) < minCaloEnergy_) continue;
+    globalCounter_[7]++;
 
     auto nTracks = 0u;
-    auto trackRef = pfc.trackRef();
-
     auto const& theElements = pfc.elementsInBlocks();
-
     if (theElements.empty()) {
       if (not usePFBlockElements_)
-        nTracks = 1;  //!! hack for pfTICL
+        nTracks = 1;  //!! hack for pfTICL (ref: https://github.com/cms-sw/cmssw/pull/32202)
     } else {
       auto const& elements = theElements[0].first->elements();
       for (unsigned iEle = 0; iEle < elements.size(); ++iEle) {
-        switch (elements[iEle].type()) {
-          case reco::PFBlockElement::TRACK:
-            trackRef = dynamic_cast<reco::PFBlockElementTrack const&>(elements[iEle]).trackRef();
-            ++nTracks;
-            break;
-          default:
-            continue;
+        if (elements[iEle].type() == reco::PFBlockElement::TRACK) {
+          ++nTracks;
         }
       }
     }
 
-    if (nTracks != 1)
-      continue;
-    nCh[4]++;
+    if (nTracks != 1) continue;
+    globalCounter_[8]++;
 
-    auto const p = trackRef->p();
-    auto const pt = trackRef->pt();
-    auto const eta = trackRef->eta();
+    auto trackRef = pfc.trackRef();
 
-    if (p < pMin_ || pt < ptMin_)
-      continue;
-    nCh[5]++;
+    auto const track_p = trackRef->p();
+    auto const track_pt = trackRef->pt();
+    auto const track_eta = trackRef->eta();
+
+    if (track_p < minTrackP_ || track_pt < minPt_) continue;
+    globalCounter_[9]++;
 
     uint tobN = 0;
     uint tecN = 0;
@@ -298,24 +285,24 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     auto const inner = pxbN + pxdN;
     auto const outer = tibN + tobN + tidN + tecN;
 
-    if (inner < nPixelHitsMin_)
-      continue;
-    nCh[6]++;
+    if (inner < minPixelHits_) continue;
+    globalCounter_[10]++;
 
-    //!!      auto hasMinHits = false;
-    //!!      for (uint ieta = 0; ieta < nTrackerHitsMinEtaMax_.size(); ++ieta) {
-    //!!        auto const etaMin = ieta ? nTrackerHitsMinEtaMax_[ieta-1] : 0.;
-    //!!        auto const etaMax = nTrackerHitsMinEtaMax_[ieta];
-    //!!
-    //!!        if (std::abs(eta) >= etaMin and std::abs(eta) < etaMax) {
-    //!!          hasMinHits = (inner + outer) > nTrackerHitsMin_[ieta]);
-    //!!          break;
-    //!!        }
-    //!!      }
+//!!    auto hasMinHits = false;
+//!!    for (uint ieta = 0; ieta < maxEtaForMinTrackerHitsCut_.size(); ++ieta) {
+//!!      auto const etaMin = ieta ? maxEtaForMinTrackerHitsCut_[ieta-1] : 0.;
+//!!      auto const etaMax = maxEtaForMinTrackerHitsCut_[ieta];
+//!!
+//!!      if (std::abs(eta) >= etaMin and std::abs(eta) < etaMax) {
+//!!        hasMinHits = (inner + outer) > minTrackerHits_[ieta]);
+//!!        break;
+//!!      }
+//!!    }
+//!!    if (not hasMinHits) continue;
+    globalCounter_[11]++;
 
-    if (ecalRaw > ecalMax_)
-      continue;
-    nCh[8]++;
+    if (ecalRaw > maxECalEnergy_) continue;
+    globalCounter_[12]++;
 
     pfc_ecal_.emplace_back(ecalRaw);
     pfc_hcal_.emplace_back(hcalRaw);
@@ -323,7 +310,7 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     pfc_phi_.emplace_back(pfc.phi());
     pfc_charge_.emplace_back(pfc.charge());
     pfc_id_.emplace_back(pfc.particleId());
-    trackRef_p_.emplace_back(p);
+    trackRef_p_.emplace_back(track_p);
   }  // end of pion (pi-) loop
 
   ttree_->Fill();

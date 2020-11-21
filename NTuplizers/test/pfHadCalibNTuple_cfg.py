@@ -57,13 +57,13 @@ process.pfHadCalibNTuplePFBarrel = cms.EDAnalyzer('PFHadCalibNTuple',
   pfSimParticles = cms.InputTag('particleFlowSimParticle'),
   recoPFCandidates = cms.InputTag('particleFlowTmpBarrel'),
 
-  ptMin = cms.double(0.01), # Minimum pt
-  pMin = cms.double(0.01),  # Minimum p
-  hcalMin = cms.double(0.0),  # Minimum hcal energy
-  ecalMax = cms.double(1e12), # Maximum ecal energy
-  nPixelHitsMin = cms.uint32(2), # Nb of pixel hits for pion
-  nTrackerHitsMin = cms.vuint32(8, 8, 8, 8), # Nb of track hits for pion
-  nTrackerHitsMinEtaMax = cms.vdouble(1.4, 1.6, 2.0, 2.5), #  eta ranges
+  minPt = cms.double(0.01), # min pt
+  minTrackP = cms.double(0.01),  # min track momentum
+  minCaloEnergy = cms.double(0.0),  # min ecal+hcal energy
+  maxECalEnergy = cms.double(1e12), # max ecal energy
+  minPixelHits = cms.uint32(2), # min nb of pixel hits
+  minTrackerHits = cms.vuint32(8, 8, 8, 8), # min nb of tracker hits (per eta range)
+  maxEtaForMinTrackerHitsCut = cms.vdouble(1.4, 1.6, 2.0, 2.5),
 
   usePFBlockElements = cms.bool(True),
 )
