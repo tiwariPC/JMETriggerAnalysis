@@ -16,6 +16,8 @@
 #include "DataFormats/ParticleFlowReco/interface/PFBlockElementTrack.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
+#include <cassert>
+
 #include <TFile.h>
 #include <TTree.h>
 
@@ -52,12 +54,10 @@ private:
   // max ecal raw energy to define a MIP
   double const maxECalEnergy_;
 
-  // min number of pixel hits for charged hadrons
-  uint const minPixelHits_;
-
-  // min number of tracker hits for charged hadrons
+  // min number of pixel and pixel+strip hits for charged hadrons
+  std::vector<uint> const minPixelHits_;
   std::vector<uint> const minTrackerHits_;
-  std::vector<double> const maxEtaForMinTrackerHitsCut_;
+  std::vector<double> const maxEtaForMinTrkHitsCuts_;
 
   // use PFBlockElements to count tracks associated to reco::PFCandidate
   bool const usePFBlockElements_;
@@ -78,7 +78,12 @@ private:
   std::vector<float> pfc_phi_;
   std::vector<float> pfc_charge_;
   std::vector<float> pfc_id_;
-  std::vector<float> trackRef_p_;
+  std::vector<float> pfc_trackRef_p_;
+  std::vector<float> pfc_trackRef_pt_;
+  std::vector<float> pfc_trackRef_eta_;
+  std::vector<float> pfc_trackRef_phi_;
+  std::vector<uint> pfc_trackRef_nValidPixelHits_;
+  std::vector<uint> pfc_trackRef_nValidTrackerHits_;
 
   void reset_variables();
 };
@@ -93,10 +98,17 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
       minTrackP_(iConfig.getParameter<double>("minTrackP")),
       minCaloEnergy_(iConfig.getParameter<double>("minCaloEnergy")),
       maxECalEnergy_(iConfig.getParameter<double>("maxECalEnergy")),
-      minPixelHits_(iConfig.getParameter<uint>("minPixelHits")),
+      minPixelHits_(iConfig.getParameter<std::vector<uint>>("minPixelHits")),
       minTrackerHits_(iConfig.getParameter<std::vector<uint>>("minTrackerHits")),
-      maxEtaForMinTrackerHitsCut_(iConfig.getParameter<std::vector<double>>("maxEtaForMinTrackerHitsCut")),
+      maxEtaForMinTrkHitsCuts_(iConfig.getParameter<std::vector<double>>("maxEtaForMinTrkHitsCuts")),
       usePFBlockElements_(iConfig.getParameter<bool>("usePFBlockElements")) {
+
+  assert(minPixelHits_.size() == minTrackerHits_.size());
+  assert(minPixelHits_.size() == maxEtaForMinTrkHitsCuts_.size());
+  for(uint idx=0; 1+idx<maxEtaForMinTrkHitsCuts_.size(); ++idx){
+    assert(maxEtaForMinTrkHitsCuts_[idx] < maxEtaForMinTrkHitsCuts_[idx+1]);
+  }
+
   globalCounter_ = std::vector<uint>(13, 0);
 
   usesResource(TFileService::kSharedResource);
@@ -124,7 +136,12 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
   ttree_->Branch("pfc_phi", &pfc_phi_);
   ttree_->Branch("pfc_charge", &pfc_charge_);
   ttree_->Branch("pfc_id", &pfc_id_);
-  ttree_->Branch("trackRef_p", &trackRef_p_);
+  ttree_->Branch("pfc_trackRef_p", &pfc_trackRef_p_);
+  ttree_->Branch("pfc_trackRef_pt", &pfc_trackRef_pt_);
+  ttree_->Branch("pfc_trackRef_eta", &pfc_trackRef_eta_);
+  ttree_->Branch("pfc_trackRef_phi", &pfc_trackRef_phi_);
+  ttree_->Branch("pfc_trackRef_nValidPixelHits", &pfc_trackRef_nValidPixelHits_);
+  ttree_->Branch("pfc_trackRef_nValidTrackerHits", &pfc_trackRef_nValidTrackerHits_);
 }
 
 PFHadCalibNTuple::~PFHadCalibNTuple() {
@@ -137,13 +154,13 @@ PFHadCalibNTuple::~PFHadCalibNTuple() {
   edm::LogPrint("") << "Number of true particles with track matching: " << globalCounter_[3];
   edm::LogPrint("") << "Number of PF candidates: " << globalCounter_[4];
   edm::LogPrint("") << "Number of PF Charged Hadrons: " << globalCounter_[5];
-  edm::LogPrint("") << " - With pt > " << minPt_ << " GeV: " << globalCounter_[6];
-  edm::LogPrint("") << " - With E_ECAL+E_HCAL > " << minCaloEnergy_ << " GeV: " << globalCounter_[7];
-  edm::LogPrint("") << " - With only 1 track in the block: " << globalCounter_[8];
-  edm::LogPrint("") << " - With p > " << minTrackP_ << " GeV: " << globalCounter_[9];
-  edm::LogPrint("") << " - With at least " << minPixelHits_ << " pixel hits: " << globalCounter_[10];
-//  edm::LogPrint("") << " - With at least [N] tracker hits " << globalCounter_[11];
-  edm::LogPrint("") << " - With E_ECAL < " << maxECalEnergy_ << " GeV: " << globalCounter_[12];
+  edm::LogPrint("") << " - with pt > " << minPt_ << " GeV: " << globalCounter_[6];
+  edm::LogPrint("") << " - with E_ECAL+E_HCAL > " << minCaloEnergy_ << " GeV: " << globalCounter_[7];
+  if(usePFBlockElements_) edm::LogPrint("") << " - with only 1 track in the block: " << globalCounter_[8];
+  edm::LogPrint("") << " - with track-p > " << minTrackP_ << " GeV: " << globalCounter_[9];
+  edm::LogPrint("") << " - with min nb of pixel hits: " << globalCounter_[10];
+  edm::LogPrint("") << " - with min nb of pixel+strip hits: " << globalCounter_[11];
+  edm::LogPrint("") << " - with E_ECAL < " << maxECalEnergy_ << " GeV: " << globalCounter_[12];
 }
 
 void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -153,10 +170,20 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
   reset_variables();
 
-  globalCounter_[0]++;
+  ++globalCounter_[0];
+
+  LogTrace("") << "----------------------------------------------------------";
 
   for (uint genpIdx_i = 0; genpIdx_i < genParts.size(); ++genpIdx_i) {
     auto const& genp_i = genParts.at(genpIdx_i);
+
+    LogTrace("") << " genParticle[" << genpIdx_i << "]:"
+     << " pt=" << genp_i.pt()
+     << " eta=" << genp_i.eta()
+     << " phi=" << genp_i.phi()
+     << " pdgId=" << genp_i.pdgId()
+     << " status=" << genp_i.status();
+
     // Gen and true particle selection
     if (genp_i.status() == 1 and genp_i.pdgId() == -211) {
       auto mindR = 999999.f;
@@ -170,20 +197,19 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       }
 
       if (mindR > 1.) {  // Pion isolation
-        globalCounter_[1]++;
+        ++globalCounter_[1];
 
         for (auto const& ptc : pfSimParts) {
-          // Only consider negatively charged particles
-          if (ptc.charge() >= 0)
-            continue;
+          // only consider negatively charged particles
+          if (ptc.charge() >= 0) continue;
 
-          // There should be true particle within deltaR = 0.01 of the gen particle
+          // require true particle within deltaR = 0.01 of the gen particle
           auto const& gen = ptc.trajectoryPoint(reco::PFTrajectoryPoint::ClosestApproach);
           auto const dR = reco::deltaR(genp_i.eta(), genp_i.phi(), gen.momentum().Eta(), gen.momentum().Phi());
           if (dR > 0.01) continue;
-          globalCounter_[2]++;
+          ++globalCounter_[2];
 
-          // Check if there is a reconstructed track *in the event*
+          // check for a reconstructed track *in the event*
           auto isCharged = false;
           for (auto const& pfc : recoPFCands) {
             if (pfc.particleId() < 4) {
@@ -192,10 +218,8 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
             }
           }
 
-          reco::PFTrajectoryPoint::LayerType ecalEntrance = reco::PFTrajectoryPoint::ECALEntrance;
-          const reco::PFTrajectoryPoint& tpatecal = ptc.extrapolatedPoint(ecalEntrance);
-          if (not tpatecal.isValid())
-            continue;
+          auto const& tpatecal = ptc.extrapolatedPoint(reco::PFTrajectoryPoint::ECALEntrance);
+          if (not tpatecal.isValid()) continue;
 
           auto const eta = tpatecal.positionREP().Eta();
           auto const phi = tpatecal.positionREP().Phi();
@@ -204,32 +228,34 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
           // extrapolated track within 0.1 of the true particle
           if (true_dr > 0.1) continue;
-          globalCounter_[3]++;
+          ++globalCounter_[3];
 
           true_energy_.emplace_back(trueE);
           true_eta_.emplace_back(eta);
           true_phi_.emplace_back(phi);
           true_dr_.emplace_back(true_dr);
           true_isCharged_.emplace_back(isCharged);
-        }  // end of true particle loop
-      }    // isolation > 1
-    }      // stable gen particle pdgid = -211
-  }        // end of all gen particles loop
+        }
+      }
+    }
+  }
+
+  LogTrace("") << "----------------------------------------------------------";
 
   // Reco pion(pi-) selection
   for (auto const& pfc : recoPFCands) {
-    globalCounter_[4]++;
+    ++globalCounter_[4];
 
     if (pfc.particleId() != 1) continue;
-    globalCounter_[5]++;
+    ++globalCounter_[5];
 
     if (pfc.pt() < minPt_) continue;
-    globalCounter_[6]++;
+    ++globalCounter_[6];
 
     auto const ecalRaw = pfc.rawEcalEnergy();
     auto const hcalRaw = pfc.rawHcalEnergy();
     if ((ecalRaw + hcalRaw) < minCaloEnergy_) continue;
-    globalCounter_[7]++;
+    ++globalCounter_[7];
 
     auto nTracks = 0u;
     auto const& theElements = pfc.elementsInBlocks();
@@ -246,63 +272,61 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     }
 
     if (nTracks != 1) continue;
-    globalCounter_[8]++;
+    ++globalCounter_[8];
 
     auto trackRef = pfc.trackRef();
 
     auto const track_p = trackRef->p();
     auto const track_pt = trackRef->pt();
     auto const track_eta = trackRef->eta();
+    auto const track_phi = trackRef->phi();
 
-    if (track_p < minTrackP_ || track_pt < minPt_) continue;
-    globalCounter_[9]++;
+    if (track_p < minTrackP_) continue;
+    ++globalCounter_[9];
 
-    uint tobN = 0;
-    uint tecN = 0;
-    uint tibN = 0;
-    uint tidN = 0;
-    uint pxbN = 0;
-    uint pxdN = 0;
     auto const& hp = trackRef->hitPattern();
-    switch (trackRef->algo()) {
-      case reco::TrackBase::hltIter0:
-      case reco::TrackBase::hltIter1:
-      case reco::TrackBase::hltIter2:
-      case reco::TrackBase::highPtTripletStep:
-        tobN += hp.numberOfValidStripTOBHits();
-        tecN += hp.numberOfValidStripTECHits();
-        tibN += hp.numberOfValidStripTIBHits();
-        tidN += hp.numberOfValidStripTIDHits();
-        pxbN += hp.numberOfValidPixelBarrelHits();
-        pxdN += hp.numberOfValidPixelEndcapHits();
+    uint const track_nValidPixelHits = hp.numberOfValidPixelHits();
+    uint const track_nValidTrackerHits = trackRef->numberOfValidHits();
+
+    LogTrace("") << "----------------------------------------------------------";
+    LogTrace("") << moduleLabel_ << " trackRef:";
+    LogTrace("") << "     pt=" << trackRef->pt();
+    LogTrace("") << "     eta=" << trackRef->eta();
+    LogTrace("") << "     phi=" << trackRef->phi();
+    LogTrace("") << "     algo=" << trackRef->algo();
+    LogTrace("") << "     numberOfValidStripTOBHits=" << hp.numberOfValidStripTOBHits();
+    LogTrace("") << "     numberOfValidStripTECHits=" << hp.numberOfValidStripTECHits();
+    LogTrace("") << "     numberOfValidStripTIBHits=" << hp.numberOfValidStripTIBHits();
+    LogTrace("") << "     numberOfValidStripTIDHits=" << hp.numberOfValidStripTIDHits();
+    LogTrace("") << "     numberOfValidPixelBarrelHits=" << hp.numberOfValidPixelBarrelHits();
+    LogTrace("") << "     numberOfValidPixelEndcapHits=" << hp.numberOfValidPixelEndcapHits();
+    LogTrace("") << "     numberOfValidPixelHits=" << hp.numberOfValidPixelHits();
+    LogTrace("") << "     numberOfValidStripHits=" << hp.numberOfValidStripHits();
+    LogTrace("") << "     numberOfValidHits=" << trackRef->numberOfValidHits();
+    LogTrace("") << "     numberOfLostHits=" << trackRef->numberOfLostHits();
+    LogTrace("") << "----------------------------------------------------------";
+
+    auto hasMinPixelHits = false;
+    auto hasMinTrackerHits = false;
+    for (uint ieta = 0; ieta < maxEtaForMinTrkHitsCuts_.size(); ++ieta) {
+      auto const etaMin = ieta ? maxEtaForMinTrkHitsCuts_[ieta-1] : 0.;
+      auto const etaMax = maxEtaForMinTrkHitsCuts_[ieta];
+
+      if (std::abs(track_eta) >= etaMin and std::abs(track_eta) < etaMax) {
+        hasMinPixelHits = track_nValidPixelHits >= minPixelHits_[ieta];
+        hasMinTrackerHits = track_nValidTrackerHits >= minTrackerHits_[ieta];
         break;
-      case reco::TrackBase::hltIter3:
-      case reco::TrackBase::hltIter4:
-      case reco::TrackBase::hltIterX:
-      default:
-        break;
+      }
     }
-    auto const inner = pxbN + pxdN;
-    auto const outer = tibN + tobN + tidN + tecN;
 
-    if (inner < minPixelHits_) continue;
-    globalCounter_[10]++;
+    if (not hasMinPixelHits) continue;
+    ++globalCounter_[10];
 
-//!!    auto hasMinHits = false;
-//!!    for (uint ieta = 0; ieta < maxEtaForMinTrackerHitsCut_.size(); ++ieta) {
-//!!      auto const etaMin = ieta ? maxEtaForMinTrackerHitsCut_[ieta-1] : 0.;
-//!!      auto const etaMax = maxEtaForMinTrackerHitsCut_[ieta];
-//!!
-//!!      if (std::abs(eta) >= etaMin and std::abs(eta) < etaMax) {
-//!!        hasMinHits = (inner + outer) > minTrackerHits_[ieta]);
-//!!        break;
-//!!      }
-//!!    }
-//!!    if (not hasMinHits) continue;
-    globalCounter_[11]++;
+    if (not hasMinTrackerHits) continue;
+    ++globalCounter_[11];
 
     if (ecalRaw > maxECalEnergy_) continue;
-    globalCounter_[12]++;
+    ++globalCounter_[12];
 
     pfc_ecal_.emplace_back(ecalRaw);
     pfc_hcal_.emplace_back(hcalRaw);
@@ -310,7 +334,12 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     pfc_phi_.emplace_back(pfc.phi());
     pfc_charge_.emplace_back(pfc.charge());
     pfc_id_.emplace_back(pfc.particleId());
-    trackRef_p_.emplace_back(track_p);
+    pfc_trackRef_p_.emplace_back(track_p);
+    pfc_trackRef_pt_.emplace_back(track_pt);
+    pfc_trackRef_eta_.emplace_back(track_eta);
+    pfc_trackRef_phi_.emplace_back(track_phi);
+    pfc_trackRef_nValidPixelHits_.emplace_back(track_nValidPixelHits);
+    pfc_trackRef_nValidTrackerHits_.emplace_back(track_nValidTrackerHits);
   }  // end of pion (pi-) loop
 
   ttree_->Fill();
@@ -328,7 +357,12 @@ void PFHadCalibNTuple::reset_variables() {
   pfc_phi_.clear();
   pfc_charge_.clear();
   pfc_id_.clear();
-  trackRef_p_.clear();
+  pfc_trackRef_p_.clear();
+  pfc_trackRef_pt_.clear();
+  pfc_trackRef_eta_.clear();
+  pfc_trackRef_phi_.clear();
+  pfc_trackRef_nValidPixelHits_.clear();
+  pfc_trackRef_nValidTrackerHits_.clear();
 }
 
 void PFHadCalibNTuple::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
