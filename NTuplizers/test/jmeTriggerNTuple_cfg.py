@@ -125,6 +125,16 @@ elif opt_reco == 'HLT_TRKv06p1_TICL2':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
   process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
 
+elif opt_reco == 'HLT_TRKv06p3':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p3_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv06p3_TICL':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p3_TICL_cfg import cms, process
+
+elif opt_reco == 'HLT_TRKv06p3_TICL2':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p3_TICL_cfg import cms, process
+  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
+
 elif opt_reco == 'HLT_TRKv07p2':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg import cms, process
 
@@ -176,14 +186,28 @@ process.Offline_BadChargedCandidate = cms.Path(process.OfflineBadChargedCandidat
 process.schedule_().append(process.Offline_BadChargedCandidate)
 
 ## JMETrigger NTuple
-from JMETriggerAnalysis.Common.multiplicityValueProducerRecoVertexDouble_cfi import multiplicityValueProducerRecoVertexDouble as _multiplicityValueProducerRecoVertexDouble
+from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
+ import multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble as _nSiPixelClusters
+from JMETriggerAnalysis.Common.multiplicityValueProducerRecoTrackDouble_cfi import multiplicityValueProducerRecoTrackDouble as _nTracks
+from JMETriggerAnalysis.Common.multiplicityValueProducerRecoVertexDouble_cfi import multiplicityValueProducerRecoVertexDouble as _nVertices
 
-process.hltPixelVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'pixelVertices', defaultValue = -1.)
-process.hltPrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlinePrimaryVertices', defaultValue = -1.)
-process.offlinePrimaryVerticesMultiplicity = _multiplicityValueProducerRecoVertexDouble.clone(src = 'offlineSlimmedPrimaryVertices', defaultValue = -1.)
+process.hltPixelClustersMultiplicity = _nSiPixelClusters.clone(src = 'siPixelClusters', defaultValue = -1.)
+
+if not hasattr(process, 'hltPixelTracksMultiplicity'):
+  process.hltPixelTracksMultiplicity = _nTracks.clone(src = 'pixelTracks', defaultValue = -1.)
+process.hltPixelTracksCleanerMultiplicity = _nTracks.clone(src = 'pixelTracksCleaner', defaultValue = -1.)
+process.hltPixelTracksMergerMultiplicity = _nTracks.clone(src = 'pixelTracksMerger', defaultValue = -1.)
+
+process.hltPixelVerticesMultiplicity = _nVertices.clone(src = 'pixelVertices', defaultValue = -1.)
+process.hltPrimaryVerticesMultiplicity = _nVertices.clone(src = 'offlinePrimaryVertices', defaultValue = -1.)
+process.offlinePrimaryVerticesMultiplicity = _nVertices.clone(src = 'offlineSlimmedPrimaryVertices', defaultValue = -1.)
 
 process.jmeTriggerNTupleInputsSeq = cms.Sequence(
-    process.hltPixelVerticesMultiplicity
+    process.hltPixelClustersMultiplicity
+  + process.hltPixelTracksMultiplicity
+  + process.hltPixelTracksCleanerMultiplicity
+  + process.hltPixelTracksMergerMultiplicity
+  + process.hltPixelVerticesMultiplicity
   + process.hltPrimaryVerticesMultiplicity
   + process.offlinePrimaryVerticesMultiplicity
 )
@@ -232,7 +256,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),
     offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
+    hltPixelClustersMultiplicity = cms.InputTag('hltPixelClustersMultiplicity'),
     hltPixelTracksMultiplicity = cms.InputTag('hltPixelTracksMultiplicity'),
+    hltPixelTracksCleanerMultiplicity = cms.InputTag('hltPixelTracksCleanerMultiplicity'),
+    hltPixelTracksMergerMultiplicity = cms.InputTag('hltPixelTracksMergerMultiplicity'),
     hltPixelVerticesMultiplicity = cms.InputTag('hltPixelVerticesMultiplicity'),
     hltPrimaryVerticesMultiplicity = cms.InputTag('hltPrimaryVerticesMultiplicity'),
     offlinePrimaryVerticesMultiplicity = cms.InputTag('offlinePrimaryVerticesMultiplicity'),
@@ -459,10 +486,8 @@ process.maxEvents.input = opts.maxEvents
 process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
 # multi-threading settings
-process.options.numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1)
-process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 0)
-#if hasattr(process, 'DQMStore'):
-#   process.DQMStore.enableMultiThread = (process.options.numberOfThreads > 1)
+process.options.numberOfThreads = max(opts.numThreads, 1)
+process.options.numberOfStreams = max(opts.numStreams, 0)
 
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
