@@ -1,6 +1,6 @@
 #!/bin/bash
 
-opts=(
+recos=(
  TRKv00
  TRKv00_TICL
  TRKv02
@@ -9,11 +9,13 @@ opts=(
  TRKv06_TICL
  TRKv06p1
  TRKv06p1_TICL
+ TRKv06p3
+ TRKv06p3_TICL
  TRKv07p2
  TRKv07p2_TICL
 )
 
-for opt_i in "${opts[@]}"; do
+for reco_i in "${recos[@]}"; do
   cmsDriver.py step3 \
     --geometry Extended2026D49 --era Phase2C9 \
     --conditions 111X_mcRun4_realistic_T15_v2 \
@@ -21,15 +23,15 @@ for opt_i in "${opts[@]}"; do
     --step RAW2DIGI,RECO \
     --eventcontent RECO \
     --datatier RECO \
-    --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/FEVT/PU200_castor_111X_mcRun4_realistic_T15_v1-v1/100000/DA18C0FC-1189-D64B-B3B6-44F3F96F1840.root \
+    --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root \
     --mc \
     --nThreads 4 \
     --nStreams 4 \
     --no_exec \
     -n 10 \
     --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
-    --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_${opt_i} \
+    --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_${reco_i} \
     --customise_commands 'process.prune()\n' \
-    --python_filename hltPhase2_${opt_i}_cfg.py
+    --python_filename hltPhase2_${reco_i}_cfg.py
 done
-unset opt_i opts
+unset reco_i recos

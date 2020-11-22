@@ -5,6 +5,7 @@ from JMETriggerAnalysis.Common.hltPhase2_TRKv00 import customise_hltPhase2_TRKv0
 from JMETriggerAnalysis.Common.hltPhase2_TRKv02 import customise_hltPhase2_TRKv02
 from JMETriggerAnalysis.Common.hltPhase2_TRKv06 import customise_hltPhase2_TRKv06
 from JMETriggerAnalysis.Common.hltPhase2_TRKv06p1 import customise_hltPhase2_TRKv06p1
+from JMETriggerAnalysis.Common.hltPhase2_TRKv06p3 import customise_hltPhase2_TRKv06p3
 from JMETriggerAnalysis.Common.hltPhase2_TRKv07p2 import customise_hltPhase2_TRKv07p2
 from JMETriggerAnalysis.Common.hltPhase2_PF import customise_hltPhase2_PF
 from JMETriggerAnalysis.Common.hltPhase2_JME import customise_hltPhase2_JME
@@ -208,6 +209,7 @@ def customise_hltPhase2_common(process):
       'drop *_*_*_RECO',
 
       # L1T
+      'keep *_L1TkPrimaryVertex__RECO',
       'keep *_l1pfCandidates_Puppi_RECO',
       'keep *_ak4PFL1Calo__RECO',
       'keep *_ak4PFL1CaloCorrected__RECO',
@@ -233,7 +235,7 @@ def customise_hltPhase2_common(process):
 
     return process
 
-def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=True, TRK='v06', useTICL=True, useMTD=False):
+def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=True, TRK='v06p1', useTICL=True, useMTD=False):
     # reset schedule
     process.setSchedule_(cms.Schedule())
 
@@ -245,6 +247,7 @@ def customise_hltPhase2_redefineReconstructionSequences(process, useL1T=True, TR
       'v02'  : customise_hltPhase2_TRKv02,
       'v06'  : customise_hltPhase2_TRKv06,
       'v06p1': customise_hltPhase2_TRKv06p1,
+      'v06p3': customise_hltPhase2_TRKv06p3,
       'v07p2': customise_hltPhase2_TRKv07p2,
     }
     process = _trkCustomFuncDict[TRK](process)
@@ -639,6 +642,18 @@ def customise_hltPhase2_reconfigurePuppiForTRKv06p1(process):
 
     return process
 
+# retuning of Puppi parameters for TRK-v06p3
+def customise_hltPhase2_reconfigurePuppiForTRKv06p3(process):
+#!!    for mod_i in producers_by_type(process, 'PuppiProducer'):
+#!!       for algo_idx in range(len(mod_i.algos)):
+#!!         if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
+#!!            raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
+#!!         for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
+#!!            mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 20.4 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+#!!            mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 1.43
+
+    return process
+
 # reconfiguration of Puppi for TRK-v07p2
 def customise_hltPhase2_reconfigurePuppiForTRKv07p2(process):
     process.hltPixelTracksMultiplicity = _multiplicityValueProducerRecoTrackDouble.clone(src = 'pixelTracks', defaultValue = -1.)
@@ -705,6 +720,18 @@ def customise_hltPhase2_scheduleHLTJMERecoWithoutFilters_TRKv06p1_TICL(process):
     process = customise_hltPhase2_reconfigurePuppiForTRKv06p1(process)
     return process
 
+def customise_hltPhase2_scheduleHLTJMERecoWithoutFilters_TRKv06p3(process):
+    process = customise_hltPhase2_redefineReconstructionSequences(process, TRK='v06p3', useTICL=False)
+    process = customise_hltPhase2_scheduleHLTJMERecoWithoutFilters(process)
+    process = customise_hltPhase2_reconfigurePuppiForTRKv06p3(process)
+    return process
+
+def customise_hltPhase2_scheduleHLTJMERecoWithoutFilters_TRKv06p3_TICL(process):
+    process = customise_hltPhase2_redefineReconstructionSequences(process, TRK='v06p3', useTICL=True)
+    process = customise_hltPhase2_scheduleHLTJMERecoWithoutFilters(process)
+    process = customise_hltPhase2_reconfigurePuppiForTRKv06p3(process)
+    return process
+
 def customise_hltPhase2_scheduleHLTJMERecoWithoutFilters_TRKv07p2(process):
     process = customise_hltPhase2_redefineReconstructionSequences(process, TRK='v07p2', useTICL=False)
     process = customise_hltPhase2_scheduleHLTJMERecoWithoutFilters(process)
@@ -759,6 +786,18 @@ def customise_hltPhase2_scheduleJMETriggers_TRKv06p1_TICL(process):
     process = customise_hltPhase2_redefineReconstructionSequences(process, TRK='v06p1', useTICL=True)
     process = customise_hltPhase2_scheduleJMETriggers(process)
     process = customise_hltPhase2_reconfigurePuppiForTRKv06p1(process)
+    return process
+
+def customise_hltPhase2_scheduleJMETriggers_TRKv06p3(process):
+    process = customise_hltPhase2_redefineReconstructionSequences(process, TRK='v06p3', useTICL=False)
+    process = customise_hltPhase2_scheduleJMETriggers(process)
+    process = customise_hltPhase2_reconfigurePuppiForTRKv06p3(process)
+    return process
+
+def customise_hltPhase2_scheduleJMETriggers_TRKv06p3_TICL(process):
+    process = customise_hltPhase2_redefineReconstructionSequences(process, TRK='v06p3', useTICL=True)
+    process = customise_hltPhase2_scheduleJMETriggers(process)
+    process = customise_hltPhase2_reconfigurePuppiForTRKv06p3(process)
     return process
 
 def customise_hltPhase2_scheduleJMETriggers_TRKv07p2(process):

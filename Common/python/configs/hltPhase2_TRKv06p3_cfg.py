@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v2 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv00_TICL --customise_commands process.prune()\n --python_filename hltPhase2_TRKv00_TICL_cfg.py
+# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v2 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06p3 --customise_commands process.prune()\n --python_filename hltPhase2_TRKv06p3_cfg.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
@@ -116,10 +116,10 @@ from Configuration.DataProcessing.Utils import addMonitoring
 process = addMonitoring(process)
 
 # Automatic addition of the customisation function from JMETriggerAnalysis.Common.customizeHLTForPhase2
-from JMETriggerAnalysis.Common.customizeHLTForPhase2 import customise_hltPhase2_scheduleJMETriggers_TRKv00_TICL 
+from JMETriggerAnalysis.Common.customizeHLTForPhase2 import customise_hltPhase2_scheduleJMETriggers_TRKv06p3 
 
-#call to customisation function customise_hltPhase2_scheduleJMETriggers_TRKv00_TICL imported from JMETriggerAnalysis.Common.customizeHLTForPhase2
-process = customise_hltPhase2_scheduleJMETriggers_TRKv00_TICL(process)
+#call to customisation function customise_hltPhase2_scheduleJMETriggers_TRKv06p3 imported from JMETriggerAnalysis.Common.customizeHLTForPhase2
+process = customise_hltPhase2_scheduleJMETriggers_TRKv06p3(process)
 
 # End of customisation functions
 
