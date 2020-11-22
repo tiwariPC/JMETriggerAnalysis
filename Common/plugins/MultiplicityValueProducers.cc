@@ -4,7 +4,8 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
-typedef MultiplicityValueProducerFromNestedCollection<SiPixelClusterCollectionNew, double> SiPixelClusterMultiplicityValueProducer;
+typedef MultiplicityValueProducerFromNestedCollection<SiPixelClusterCollectionNew, double>
+    SiPixelClusterMultiplicityValueProducer;
 DEFINE_FWK_MODULE(SiPixelClusterMultiplicityValueProducer);
 
 typedef MultiplicityValueProducer<reco::Track, double> TrackMultiplicityValueProducer;

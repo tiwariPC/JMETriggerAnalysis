@@ -28,10 +28,9 @@ protected:
 
 template <class INP_TYPE, class OUT_TYPE>
 MultiplicityValueProducer<INP_TYPE, OUT_TYPE>::MultiplicityValueProducer(edm::ParameterSet const& iConfig)
-  : src_token_(consumes<edm::View<INP_TYPE>>(iConfig.getParameter<edm::InputTag>("src")))
-  , strObjSelector_(StringCutObjectSelector<INP_TYPE, true>(iConfig.getParameter<std::string>("cut")))
-  , defaultValue_(iConfig.getParameter<OUT_TYPE>("defaultValue")) {
-
+    : src_token_(consumes<edm::View<INP_TYPE>>(iConfig.getParameter<edm::InputTag>("src"))),
+      strObjSelector_(StringCutObjectSelector<INP_TYPE, true>(iConfig.getParameter<std::string>("cut"))),
+      defaultValue_(iConfig.getParameter<OUT_TYPE>("defaultValue")) {
   produces<OUT_TYPE>();
 }
 
@@ -39,8 +38,7 @@ template <class INP_TYPE, class OUT_TYPE>
 void MultiplicityValueProducer<INP_TYPE, OUT_TYPE>::produce(edm::Event& iEvent, edm::EventSetup const& iSetup) {
   auto const& objHandle(iEvent.getHandle(src_token_));
 
-  if(objHandle.isValid()){
-
+  if (objHandle.isValid()) {
     LogDebug("Input") << "size of input collection: " << objHandle->size();
 
     OUT_TYPE objMult(0);
@@ -53,8 +51,7 @@ void MultiplicityValueProducer<INP_TYPE, OUT_TYPE>::produce(edm::Event& iEvent, 
     LogDebug("Output") << "size of selected input objects: " << objMult;
 
     iEvent.put(std::make_unique<OUT_TYPE>(objMult));
-  }
-  else {
+  } else {
     iEvent.put(std::make_unique<OUT_TYPE>(defaultValue_));
   }
 }
@@ -84,19 +81,19 @@ protected:
 };
 
 template <class INP_TYPE, class OUT_TYPE>
-MultiplicityValueProducerFromNestedCollection<INP_TYPE, OUT_TYPE>::MultiplicityValueProducerFromNestedCollection(edm::ParameterSet const& iConfig)
-  : src_token_(consumes<INP_TYPE>(iConfig.getParameter<edm::InputTag>("src")))
-  , defaultValue_(iConfig.getParameter<OUT_TYPE>("defaultValue")) {
-
+MultiplicityValueProducerFromNestedCollection<INP_TYPE, OUT_TYPE>::MultiplicityValueProducerFromNestedCollection(
+    edm::ParameterSet const& iConfig)
+    : src_token_(consumes<INP_TYPE>(iConfig.getParameter<edm::InputTag>("src"))),
+      defaultValue_(iConfig.getParameter<OUT_TYPE>("defaultValue")) {
   produces<OUT_TYPE>();
 }
 
 template <class INP_TYPE, class OUT_TYPE>
-void MultiplicityValueProducerFromNestedCollection<INP_TYPE, OUT_TYPE>::produce(edm::Event& iEvent, edm::EventSetup const& iSetup) {
+void MultiplicityValueProducerFromNestedCollection<INP_TYPE, OUT_TYPE>::produce(edm::Event& iEvent,
+                                                                                edm::EventSetup const& iSetup) {
   auto const& objHandle(iEvent.getHandle(src_token_));
 
-  if(objHandle.isValid()){
-
+  if (objHandle.isValid()) {
     LogDebug("Input") << "size of input collection: " << objHandle->size();
 
     OUT_TYPE objMult(0);
@@ -107,14 +104,14 @@ void MultiplicityValueProducerFromNestedCollection<INP_TYPE, OUT_TYPE>::produce(
     LogDebug("Output") << "size of output objects: " << objMult;
 
     iEvent.put(std::make_unique<OUT_TYPE>(objMult));
-  }
-  else {
+  } else {
     iEvent.put(std::make_unique<OUT_TYPE>(defaultValue_));
   }
 }
 
 template <class INP_TYPE, class OUT_TYPE>
-void MultiplicityValueProducerFromNestedCollection<INP_TYPE, OUT_TYPE>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void MultiplicityValueProducerFromNestedCollection<INP_TYPE, OUT_TYPE>::fillDescriptions(
+    edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("src")->setComment("input collection");
   desc.add<OUT_TYPE>("defaultValue")->setComment("default output value (used when input collection is unavailable)");

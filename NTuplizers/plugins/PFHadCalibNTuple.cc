@@ -150,7 +150,8 @@ PFHadCalibNTuple::~PFHadCalibNTuple() {
   edm::LogPrint("") << "Total number of events: " << globalCounter_[0];
   edm::LogPrint("") << "Number of GEN isolated pions: " << globalCounter_[1];
   edm::LogPrint("") << "Number of pfSIM particles within dR = 0.01 of an isolated GEN pion: " << globalCounter_[2];
-  edm::LogPrint("") << "Number of pfSIM particles with valid extrapolation point to ECAL surface: " << globalCounter_[3];
+  edm::LogPrint("") << "Number of pfSIM particles with valid extrapolation point to ECAL surface: "
+                    << globalCounter_[3];
   edm::LogPrint("") << "Number of PF candidates: " << globalCounter_[4];
   edm::LogPrint("") << "Number of PF Charged Hadrons: " << globalCounter_[5];
   edm::LogPrint("") << " - with pt > " << minPt_ << " GeV: " << globalCounter_[6];
