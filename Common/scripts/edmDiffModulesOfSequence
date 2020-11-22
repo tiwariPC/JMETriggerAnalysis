@@ -33,7 +33,7 @@ if __name__ == '__main__':
                        help='include dependencies not included in the sequence of the target configuration file')
 
    parser.add_argument('-e', '--include-es', dest='include_es', action='store_true', default=False,
-                       help='include ES modules (ESPrefer, ESSource, ESProducer)')
+                       help='include ES modules (ESPrefer, ESSource, ESProducer) and Services')
 
    parser.add_argument('-n', '--name-only', dest='name_only', action='store_true', default=False,
                        help='show only name of modules')
@@ -92,7 +92,7 @@ if __name__ == '__main__':
    if opts.include_dependencies:
       listOfModuleNames += depModuleNames[:]
    if opts.include_es:
-      for _tmp_set in [process2.es_prefers_(), process2.es_sources_(), process2.es_producers_()]:
+      for _tmp_set in [process2.es_prefers_(), process2.es_sources_(), process2.es_producers_(), process2.services_()]:
           for _tmp in _tmp_set:
               if (_tmp not in listOfModuleNames) and (_tmp not in orderedListOfModuleNames):
                  listOfModuleNames += [_tmp]

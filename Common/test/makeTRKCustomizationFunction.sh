@@ -51,15 +51,15 @@ cd tmp
 
 cmsDriver.py step3 \
   --geometry Extended2026D49 --era Phase2C9 \
-  --conditions auto:phase2_realistic_T15 \
+  --conditions 111X_mcRun4_realistic_T15_v2 \
   --processName RECO2 \
   --step RAW2DIGI,RECO \
   --eventcontent RECO \
   --datatier RECO \
-  --filein /store/mc/Phase2HLTTDRWinter20DIGI/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/GEN-SIM-DIGI-RAW/PU200_castor_110X_mcRun4_realistic_v3-v2/10000/05BFAD3E-3F91-1843-ABA2-2040324C7567.root \
+  --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root \
   --mc \
-  --nThreads 4 \
-  --nStreams 4 \
+  --nThreads 1 \
+  --nStreams 0 \
   --no_exec \
   -n 10 \
   --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
