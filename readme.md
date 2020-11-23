@@ -21,6 +21,9 @@ git cms-merge-topic cms-l1t-offline:l1t-phase2-v3.1.9
 # HLT: interface for L1T seeds
 git cms-merge-topic trtomei:Phase2-L1T-HLT-Interface
 
+# TRK
+git cms-merge-topic AdrianoDee:patatrack_hlt_phase2
+
 # HGCal
 git cms-merge-topic rovere:TICLv2_11_1_X
 cp -r ${CMSSW_DATA_PATH}/data-RecoHGCal-TICL/V00-01-00/RecoHGCal/TICL/data/ ${CMSSW_BASE}/src/RecoHGCal/TICL
