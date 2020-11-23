@@ -69,8 +69,8 @@ if __name__ == '__main__':
     parser.add_argument('--submit', dest='submit', action='store_true', default=False,
                         help='submit job(s) on the batch system')
 
-    parser.add_argument('--no-export-LD-LIBRARY-PATH', dest='no_export_LD_LIBRARY_PATH', action='store_true', default=False,
-                        help='do not export explicitly the environment variable "LD_LIBRARY_PATH" in the batch-job executable')
+    parser.add_argument('--export-LD-LIBRARY-PATH', dest='export_LD_LIBRARY_PATH', action='store_true', default=False,
+                        help='export explicitly the environment variable "LD_LIBRARY_PATH" in the batch-job executable')
 
     parser.add_argument('--dry-run', dest='dry_run', action='store_true', default=False,
                         help='enable dry-run mode')
@@ -338,7 +338,7 @@ process.source.secondaryFileNames = opts.secondaryInputFiles
                   f_exefile.write('#!/bin/bash\n')
 
                   # export explicitly the environment variable LD_LIBRARY_PATH
-                  if not opts.no_export_LD_LIBRARY_PATH:
+                  if opts.export_LD_LIBRARY_PATH:
                      if 'LD_LIBRARY_PATH' in os.environ:
                         f_exefile.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
 
