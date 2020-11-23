@@ -27,7 +27,7 @@ cp -r ${CMSSW_DATA_PATH}/data-RecoHGCal-TICL/V00-01-00/RecoHGCal/TICL/data/ ${CM
 wget https://github.com/rovere/RecoHGCal-TICL/raw/9d2c6f72c86233fa5573e93d5535b32e90c835ee/tf_models/energy_id_v0.pb -O ${CMSSW_BASE}/src/RecoHGCal/TICL/data/tf_models/energy_id_v0.pb
 sed -i 's|hwPt2()|hwPtUnconstrained()|g' L1Trigger/L1TNtuples/src/L1AnalysisPhaseII.cc
 
-# JME: updates to Puppi (required only for TRK-vX, with X>=7.2)
+# JME: updates to Puppi
 git cms-merge-topic missirol:devel_hltPhase2_puppi_usePUProxyValue_1114
 
 # [optional; required only for PF-Hadron calibrations]
