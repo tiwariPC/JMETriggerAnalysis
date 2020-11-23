@@ -19,7 +19,7 @@ opts.register('numThreads', 1,
               vpo.VarParsing.varType.int,
               'number of threads')
 
-opts.register('numStreams', 1,
+opts.register('numStreams', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
               'number of streams')
@@ -75,12 +75,12 @@ opts.parseArguments()
 ### base configuration file
 ###
 
-if   opts.reco == 'HLT_TRKv00':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg      import cms, process
-elif opts.reco == 'HLT_TRKv00_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg import cms, process
-elif opts.reco == 'HLT_TRKv02':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg      import cms, process
-elif opts.reco == 'HLT_TRKv02_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg import cms, process
-elif opts.reco == 'HLT_TRKv06':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg      import cms, process
-elif opts.reco == 'HLT_TRKv06_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
+if   opts.reco == 'HLT_TRKv00':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_cfg        import cms, process
+elif opts.reco == 'HLT_TRKv00_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv00_TICL_cfg   import cms, process
+elif opts.reco == 'HLT_TRKv02':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_cfg        import cms, process
+elif opts.reco == 'HLT_TRKv02_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv02_TICL_cfg   import cms, process
+elif opts.reco == 'HLT_TRKv06':        from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_cfg        import cms, process
+elif opts.reco == 'HLT_TRKv06_TICL':   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg   import cms, process
 elif opts.reco == 'HLT_TRKv06p1':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_cfg      import cms, process
 elif opts.reco == 'HLT_TRKv06p1_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
 elif opts.reco == 'HLT_TRKv07p2':      from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg      import cms, process
@@ -101,6 +101,9 @@ for algorithm in [
   'ak8puppiHLT',
 ]:
   addAlgorithm(process, algorithm, Defaults)
+  getattr(process, algorithm).srcRho = 'fixedGridRhoFastjetAllTmp'
+  getattr(process, algorithm).srcRhoHLT = ''
+  getattr(process, algorithm).srcRhos = ''
 
 # update process.GlobalTag.globaltag
 if opts.globalTag is not None:
@@ -114,8 +117,8 @@ process.maxEvents.input = opts.maxEvents
 process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
 # multi-threading settings
-process.options.numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1)
-process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 1)
+process.options.numberOfThreads = max(opts.numThreads, 1)
+process.options.numberOfStreams = max(opts.numStreams, 0)
 
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
