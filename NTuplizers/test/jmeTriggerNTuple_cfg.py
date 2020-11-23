@@ -194,12 +194,13 @@ from JMETriggerAnalysis.Common.multiplicityValueProducerRecoTrackDouble_cfi impo
 from JMETriggerAnalysis.Common.multiplicityValueProducerRecoVertexDouble_cfi import multiplicityValueProducerRecoVertexDouble as _nVertices
 
 process.hltPixelClustersMultiplicity = _nSiPixelClusters.clone(src = 'siPixelClusters', defaultValue = -1.)
-process.hltOuterTrackerClustersMultiplicity = _nSiOuterTrackerClusters.clone(src = 'siPhase2Clusters', defaultValue = -1.)
+if not hasattr(process, 'hltOuterTrackerClustersMultiplicity'):
+  process.hltOuterTrackerClustersMultiplicity = _nSiOuterTrackerClusters.clone(src = 'siPhase2Clusters', defaultValue = -1.)
 
-if not hasattr(process, 'hltPixelTracksMultiplicity'):
-  process.hltPixelTracksMultiplicity = _nTracks.clone(src = 'pixelTracks', defaultValue = -1.)
+process.hltPixelTracksMultiplicity = _nTracks.clone(src = 'pixelTracks', defaultValue = -1.)
 process.hltPixelTracksCleanerMultiplicity = _nTracks.clone(src = 'pixelTracksCleaner', defaultValue = -1.)
 process.hltPixelTracksMergerMultiplicity = _nTracks.clone(src = 'pixelTracksMerger', defaultValue = -1.)
+process.hltTracksMultiplicity = _nTracks.clone(src = 'generalTracks', defaultValue = -1.)
 
 process.hltPixelVerticesMultiplicity = _nVertices.clone(src = 'pixelVertices', defaultValue = -1.)
 process.hltPrimaryVerticesMultiplicity = _nVertices.clone(src = 'offlinePrimaryVertices', defaultValue = -1.)
@@ -211,6 +212,7 @@ process.jmeTriggerNTupleInputsSeq = cms.Sequence(
   + process.hltPixelTracksMultiplicity
   + process.hltPixelTracksCleanerMultiplicity
   + process.hltPixelTracksMergerMultiplicity
+  + process.hltTracksMultiplicity
   + process.hltPixelVerticesMultiplicity
   + process.hltPrimaryVerticesMultiplicity
   + process.offlinePrimaryVerticesMultiplicity
@@ -265,6 +267,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPixelTracksMultiplicity = cms.InputTag('hltPixelTracksMultiplicity'),
     hltPixelTracksCleanerMultiplicity = cms.InputTag('hltPixelTracksCleanerMultiplicity'),
     hltPixelTracksMergerMultiplicity = cms.InputTag('hltPixelTracksMergerMultiplicity'),
+    hltTracksMultiplicity = cms.InputTag('hltTracksMultiplicity'),
     hltPixelVerticesMultiplicity = cms.InputTag('hltPixelVerticesMultiplicity'),
     hltPrimaryVerticesMultiplicity = cms.InputTag('hltPrimaryVerticesMultiplicity'),
     offlinePrimaryVerticesMultiplicity = cms.InputTag('offlinePrimaryVerticesMultiplicity'),
