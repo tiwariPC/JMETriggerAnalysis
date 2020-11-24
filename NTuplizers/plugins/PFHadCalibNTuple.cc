@@ -42,11 +42,23 @@ private:
   edm::EDGetTokenT<reco::PFSimParticleCollection> const pfSimPartsToken_;
   edm::EDGetTokenT<reco::PFCandidateCollection> const recoPFCandsToken_;
 
+  // status code of selected GEN particles
+  int const genParticleStatus_;
+
+  // PDG-ID of selected GEN particles
+  int const genParticlePdgId_;
+
+  // min-DeltaR of isolated GEN particles from other GEN particles
+  double const genParticleIsoMinDeltaR_;
+
   // min pt for charged hadrons
   double const minPt_;
 
   // min track-p for charged hadrons
   double const minTrackP_;
+
+  // min track-pT for charged hadrons
+  double const minTrackPt_;
 
   // min ecal+hcal raw energy for charged hadrons
   double const minCaloEnergy_;
@@ -94,8 +106,12 @@ PFHadCalibNTuple::PFHadCalibNTuple(const edm::ParameterSet& iConfig)
       genPartsToken_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticles"))),
       pfSimPartsToken_(consumes<reco::PFSimParticleCollection>(iConfig.getParameter<edm::InputTag>("pfSimParticles"))),
       recoPFCandsToken_(consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("recoPFCandidates"))),
+      genParticleStatus_(iConfig.getParameter<int>("genParticleStatus")),
+      genParticlePdgId_(iConfig.getParameter<int>("genParticlePdgId")),
+      genParticleIsoMinDeltaR_(iConfig.getParameter<double>("genParticleIsoMinDeltaR")),
       minPt_(iConfig.getParameter<double>("minPt")),
       minTrackP_(iConfig.getParameter<double>("minTrackP")),
+      minTrackPt_(iConfig.getParameter<double>("minTrackPt")),
       minCaloEnergy_(iConfig.getParameter<double>("minCaloEnergy")),
       maxECalEnergy_(iConfig.getParameter<double>("maxECalEnergy")),
       minPixelHits_(iConfig.getParameter<std::vector<uint>>("minPixelHits")),
@@ -158,7 +174,7 @@ PFHadCalibNTuple::~PFHadCalibNTuple() {
   edm::LogPrint("") << " - with E_ECAL+E_HCAL > " << minCaloEnergy_ << " GeV: " << globalCounter_[7];
   if (usePFBlockElements_)
     edm::LogPrint("") << " - with only 1 track in the block: " << globalCounter_[8];
-  edm::LogPrint("") << " - with track-p > " << minTrackP_ << " GeV: " << globalCounter_[9];
+  edm::LogPrint("") << " - with track-p > " << minTrackP_ << " GeV and track-pT > " << minTrackPt_ << " GeV: " << globalCounter_[9];
   edm::LogPrint("") << " - with min nb of pixel hits: " << globalCounter_[10];
   edm::LogPrint("") << " - with min nb of pixel+strip hits: " << globalCounter_[11];
   edm::LogPrint("") << " - with E_ECAL < " << maxECalEnergy_ << " GeV: " << globalCounter_[12];
@@ -182,19 +198,20 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
                  << " pt=" << genp_i.pt() << " eta=" << genp_i.eta() << " phi=" << genp_i.phi()
                  << " pdgId=" << genp_i.pdgId() << " status=" << genp_i.status();
 
-    // Gen and true particle selection
-    if (genp_i.status() == 1 and genp_i.pdgId() == -211) {
+    // GEN and true(simPF) particle selection
+    if (genp_i.status() == genParticleStatus_ and genp_i.pdgId() == genParticlePdgId_) {
       auto mindR = 999999.f;
       for (uint genpIdx_j = 0; genpIdx_j != genpIdx_i and genpIdx_j < genParts.size(); ++genpIdx_j) {
         auto const& genp_j = genParts.at(genpIdx_j);
-        if (genp_j.status() == 1) {
+        if (genp_j.status() == genParticleStatus_) {
           auto const dR = reco::deltaR(genp_i.eta(), genp_i.phi(), genp_j.eta(), genp_j.phi());
           if (dR < mindR)
             mindR = dR;
         }
       }
 
-      if (mindR > 1.) {  // Pion isolation
+      // Isolated GEN particle
+      if (mindR > genParticleIsoMinDeltaR_) {
         ++globalCounter_[1];
 
         for (auto const& ptc : pfSimParts) {
@@ -275,7 +292,7 @@ void PFHadCalibNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     auto const track_eta = trackRef->eta();
     auto const track_phi = trackRef->phi();
 
-    if (track_p < minTrackP_)
+    if (track_p < minTrackP_ or track_pt < minTrackPt_)
       continue;
     ++globalCounter_[9];
 

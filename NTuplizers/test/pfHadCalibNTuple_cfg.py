@@ -57,8 +57,13 @@ process.pfHadCalibNTuplePFBarrel = cms.EDAnalyzer('PFHadCalibNTuple',
   pfSimParticles = cms.InputTag('particleFlowSimParticle'),
   recoPFCandidates = cms.InputTag('particleFlowTmpBarrel'),
 
+  genParticleStatus = cms.int32(1), # status code of selected GEN particles
+  genParticlePdgId = cms.int32(-211), # pdgID of selected GEN particles
+  genParticleIsoMinDeltaR = cms.double(1.0), # min deltaR between "isolated" GEN particles and other GEN particles
+
   minPt = cms.double(0.01), # min pt
   minTrackP = cms.double(0.01),  # min track momentum
+  minTrackPt = cms.double(0.01),  # min track transverse momentum
   minCaloEnergy = cms.double(0.0),  # min ecal+hcal energy
   maxECalEnergy = cms.double(1e12), # max ecal energy
 
