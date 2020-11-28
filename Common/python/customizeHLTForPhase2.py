@@ -315,12 +315,16 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     ## sequence: AK4 Jets, PFCHS
-    process.HLTAK4PFCHSJetsReconstruction = cms.Sequence(
-        process.particleFlowPtrs
+    process.HLTParticleFlowCHSSequence = cms.Sequence(
+        process.HLTParticleFlowSequence
+      + process.particleFlowPtrs
       + process.goodOfflinePrimaryVertices
       + process.pfPileUpJME
       + process.pfNoPileUpJME
-      + process.hltAK4PFCHSJets
+    )
+
+    process.HLTAK4PFCHSJetsReconstruction = cms.Sequence(
+        process.hltAK4PFCHSJets
       + process.hltAK4PFCHSJetCorrectorL1
       + process.hltAK4PFCHSJetCorrectorL2
       + process.hltAK4PFCHSJetCorrectorL3
@@ -331,11 +335,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
 #    ## sequence: AK8 Jets, PFCHS
 #    process.HLTAK8PFCHSJetsReconstruction = cms.Sequence(
-#        process.particleFlowPtrs
-#      + process.goodOfflinePrimaryVertices
-#      + process.pfPileUpJME
-#      + process.pfNoPileUpJME
-#      + process.hltAK8PFCHSJets
+#        process.hltAK8PFCHSJets
 #      + process.hltAK8PFCHSJetCorrectorL1
 #      + process.hltAK8PFCHSJetCorrectorL2
 #      + process.hltAK8PFCHSJetCorrectorL3
@@ -506,7 +506,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
     process.HLT_AK4PFCHSJet550 = cms.Path(
         process.l1tSinglePFPuppiJet200off
-      + process.HLTParticleFlowSequence
+      + process.HLTParticleFlowCHSSequence
       + process.HLTAK4PFCHSJetsReconstruction
       + process.hltSingleAK4PFCHSJet550
     )
@@ -549,11 +549,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
     process.HLT_PFCHSMET250 = cms.Path(
         process.l1tPFPuppiMET200off
-      + process.HLTParticleFlowSequence
-      + process.particleFlowPtrs
-      + process.goodOfflinePrimaryVertices
-      + process.pfPileUpJME
-      + process.pfNoPileUpJME
+      + process.HLTParticleFlowCHSSequence
       + process.HLTPFCHSMETReconstruction
       + process.hltPFCHSMET250
     )
