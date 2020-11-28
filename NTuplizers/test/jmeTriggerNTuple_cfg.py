@@ -54,6 +54,11 @@ opts.register('reco', 'HLT_TRKv06p1_TICL',
               vpo.VarParsing.varType.string,
               'keyword defining reconstruction methods for JME inputs')
 
+opts.register('onlyTriggerResultsInNTuple', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'store only the trigger-results booleans in the output NTuple')
+
 opts.register('trkdqm', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
@@ -460,6 +465,28 @@ process.schedule_().extend([process.analysisNTupleEndPath])
 #  process.HLT_PFPuppiHT1050,
 #  process.HLT_PFPuppiMET250,
 #))
+
+# JMETriggerNTuple: save only TriggerResults
+if opts.onlyTriggerResultsInNTuple:
+   # reset input collections
+   process.JMETriggerNTuple.doubles = cms.PSet()
+   process.JMETriggerNTuple.recoVertexCollections = cms.PSet()
+   process.JMETriggerNTuple.l1tPFCandidateCollections = cms.PSet()
+   process.JMETriggerNTuple.recoPFCandidateCollections = cms.PSet()
+   process.JMETriggerNTuple.patPackedCandidateCollections = cms.PSet()
+   process.JMETriggerNTuple.recoGenJetCollections = cms.PSet()
+   process.JMETriggerNTuple.l1tPFJetCollections = cms.PSet()
+   process.JMETriggerNTuple.recoCaloJetCollections = cms.PSet()
+   process.JMETriggerNTuple.recoPFClusterJetCollections = cms.PSet()
+   process.JMETriggerNTuple.recoPFJetCollections = cms.PSet()
+   process.JMETriggerNTuple.patJetCollections = cms.PSet()
+   process.JMETriggerNTuple.recoGenMETCollections = cms.PSet()
+   process.JMETriggerNTuple.recoCaloMETCollections = cms.PSet()
+   process.JMETriggerNTuple.recoPFClusterMETCollections = cms.PSet()
+   process.JMETriggerNTuple.recoPFMETCollections = cms.PSet()
+   process.JMETriggerNTuple.patMETCollections = cms.PSet()
+   process.JMETriggerNTuple.patMuonCollections = cms.PSet()
+   process.JMETriggerNTuple.patElectronCollections = cms.PSet()
 
 # FastTimerService
 if opts.addTimingDQM:
