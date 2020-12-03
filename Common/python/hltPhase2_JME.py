@@ -390,7 +390,12 @@ def customise_hltPhase2_JME(process):
       level = cms.string( 'L2L3Residual' )
     )
     process.hltAK4PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK4PFPuppiJetCorrectorL1', 'hltAK4PFPuppiJetCorrectorL2', 'hltAK4PFPuppiJetCorrectorL3', 'hltAK4PFPuppiJetCorrectorL2L3' )
+      correctors = cms.VInputTag(
+        'hltAK4PFPuppiJetCorrectorL1',
+        'hltAK4PFPuppiJetCorrectorL2',
+        'hltAK4PFPuppiJetCorrectorL3',
+        'hltAK4PFPuppiJetCorrectorL2L3',
+      )
     )
     process.hltAK4PFPuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
       src = cms.InputTag( 'hltAK4PFPuppiJets' ),
@@ -403,6 +408,11 @@ def customise_hltPhase2_JME(process):
       applyWeight = True,
       srcWeights = 'hltPFPuppi',
 #     jetPtMin = 80.,
+    )
+    process.hltAK8PFPuppiJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
+      srcRho = cms.InputTag( 'fixedGridRhoFastjetAllTmp' ),
+      algorithm = cms.string( 'AK8PFPuppi' ),
+      level = cms.string( 'L1FastJet' )
     )
     process.hltAK8PFPuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
       algorithm = cms.string( 'AK8PFPuppi' ),
@@ -417,7 +427,12 @@ def customise_hltPhase2_JME(process):
       level = cms.string( 'L2L3Residual' )
     )
     process.hltAK8PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK8PFPuppiJetCorrectorL2','hltAK8PFPuppiJetCorrectorL3','hltAK8PFPuppiJetCorrectorL2L3' )
+      correctors = cms.VInputTag(
+        'hltAK8PFPuppiJetCorrectorL1',
+        'hltAK8PFPuppiJetCorrectorL2',
+        'hltAK8PFPuppiJetCorrectorL3',
+        'hltAK8PFPuppiJetCorrectorL2L3',
+      ),
     )
     process.hltAK8PFPuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
       src = cms.InputTag('hltAK8PFPuppiJets'),
@@ -483,6 +498,7 @@ def customise_hltPhase2_JME(process):
       + process.hltPFPuppiMETTypeOneCorrector
       + process.hltPFPuppiMETTypeOne
       + process.hltAK8PFPuppiJets
+      + process.hltAK8PFPuppiJetCorrectorL1
       + process.hltAK8PFPuppiJetCorrectorL2
       + process.hltAK8PFPuppiJetCorrectorL3
       + process.hltAK8PFPuppiJetCorrectorL2L3
