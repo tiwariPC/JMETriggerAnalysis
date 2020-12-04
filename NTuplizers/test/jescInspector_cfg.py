@@ -106,9 +106,8 @@ process.GlobalTag.toGet.append(cms.PSet(
 ))
 
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
-CondDBJECFile = _CondDB.clone(connect = cms.string( 'sqlite:Phase2HLTTDR_V0_MC.db' ) )
-process.esSourceJESC = cms.ESSource('PoolDBESSource',
-  CondDBJECFile,
+process.jescESSource = cms.ESSource('PoolDBESSource',
+  _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/Phase2HLTTDR_V0_MC/Phase2HLTTDR_V0_MC.db'),
   toGet = cms.VPSet(
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
@@ -122,8 +121,7 @@ process.esSourceJESC = cms.ESSource('PoolDBESSource',
     ),
   ),
 )
-# Add an ESPrefer to override JEC that might be available from the global tag
-process.es_prefer_esSourceJESC = cms.ESPrefer('PoolDBESSource', 'esSourceJESC')
+process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
 
 ###
 ### JESC analyzers
