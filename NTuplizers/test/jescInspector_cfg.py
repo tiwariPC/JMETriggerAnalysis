@@ -14,16 +14,6 @@ opts.register('dumpPython', None,
               vpo.VarParsing.varType.string,
               'path to python file with content of cms.Process')
 
-opts.register('numThreads', 1,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.int,
-              'number of threads')
-
-opts.register('numStreams', 0,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.int,
-              'number of streams')
-
 opts.register('lumis', None,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
@@ -116,14 +106,19 @@ process.GlobalTag.toGet.append(cms.PSet(
 ))
 
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
-CondDBJECFile = _CondDB.clone(connect = cms.string( 'sqlite:Phase2HLTTDR_V1_MC.db' ) )
+CondDBJECFile = _CondDB.clone(connect = cms.string( 'sqlite:Phase2HLTTDR_V0_MC.db' ) )
 process.esSourceJESC = cms.ESSource('PoolDBESSource',
   CondDBJECFile,
   toGet = cms.VPSet(
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V1_MC_AK4PFPuppiHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V0_MC_AK4PFPuppiHLT'),
       label = cms.untracked.string('AK4PFPuppiHLT')
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V0_MC_AK8PFPuppiHLT'),
+      label = cms.untracked.string('AK8PFPuppiHLT')
     ),
   ),
 )
@@ -138,6 +133,7 @@ process.hltJESCAnalysisSeq = cms.Sequence()
 
 for [rawJetsMod, jetCorrMod, jecAlgo] in [
   ['hltAK4PFPuppiJets', 'hltAK4PFPuppiJetCorrector', 'AK4PFPuppiHLT'],
+  ['hltAK8PFPuppiJets', 'hltAK8PFPuppiJetCorrector', 'AK8PFPuppiHLT'],
 ]:
   if hasattr(process, rawJetsMod+'JESCAnalyzer'):
     raise RuntimeError('module "'+rawJetsMod+'JESCAnalyzer" already exists')
@@ -178,8 +174,8 @@ process.maxEvents.input = opts.maxEvents
 process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
 # multi-threading settings
-process.options.numberOfThreads = max(opts.numThreads, 1)
-process.options.numberOfStreams = max(opts.numStreams, 0)
+process.options.numberOfThreads = 1
+process.options.numberOfStreams = 0
 
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
