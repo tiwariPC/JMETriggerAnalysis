@@ -43,7 +43,6 @@ CorrectedJetAnalyzer<T>::CorrectedJetAnalyzer(edm::ParameterSet const& iConfig)
   , useRho_(iConfig.getParameter<bool>("useRho"))
   , rhoToken_(useRho_ ? consumes<double>(iConfig.getParameter<edm::InputTag>("rho")) : edm::EDGetTokenT<double>())
   , verbose_(iConfig.getParameter<bool>("verbose")) {
-  assert(jetCorrectorTokens_.size() == textFilesInPath_.size() or jetCorrectorTokens_.size() == 0 or textFilesInPath_.size() == 0);
   factorizedJetCorrectors_.clear();
   factorizedJetCorrectors_.reserve(textFilesInPath_.size());
   for(auto const& foo : textFilesInPath_){
