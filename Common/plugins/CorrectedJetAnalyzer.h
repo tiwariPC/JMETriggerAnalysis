@@ -25,6 +25,7 @@ public:
   void analyze(edm::Event const&, edm::EventSetup const&) override;
 
 protected:
+  edm::InputTag const srcInputTag_;
   edm::EDGetTokenT<edm::View<T>> const srcToken_;
   std::vector<edm::EDGetTokenT<reco::JetCorrector>> const jetCorrectorTokens_;
   std::vector<edm::FileInPath> const textFilesInPath_;
@@ -37,7 +38,8 @@ protected:
 
 template <class T>
 CorrectedJetAnalyzer<T>::CorrectedJetAnalyzer(edm::ParameterSet const& iConfig)
-  : srcToken_(consumes<edm::View<T>>(iConfig.getParameter<edm::InputTag>("src")))
+  : srcInputTag_(iConfig.getParameter<edm::InputTag>("src"))
+  , srcToken_(consumes<edm::View<T>>(srcInputTag_))
   , jetCorrectorTokens_(edm::vector_transform(iConfig.getParameter<std::vector<edm::InputTag>>("correctors"), [this](edm::InputTag const& foo) { return consumes<reco::JetCorrector>(foo); }))
   , textFilesInPath_(edm::vector_transform(iConfig.getParameter<std::vector<std::string>>("textFiles"), [this](std::string const& foo) { return edm::FileInPath(foo); }))
   , useRho_(iConfig.getParameter<bool>("useRho"))
@@ -68,7 +70,7 @@ void CorrectedJetAnalyzer<T>::analyze(edm::Event const& iEvent, edm::EventSetup 
     edm::RefToBase<reco::Jet> jetRef(edm::Ref<edm::View<T>>(jets, idx));
     T correctedJet = jets->at(idx); // copy original jet
     if (verbose_) {
-      edm::LogPrint("") << "Jet #" << idx;
+      edm::LogPrint("") << "[" << srcInputTag_.encode() << "] Jet #" << idx;
       edm::LogPrint("") << "  - Original: pt=" << referenceJet->pt() << " eta=" << referenceJet->eta();
     }
 
