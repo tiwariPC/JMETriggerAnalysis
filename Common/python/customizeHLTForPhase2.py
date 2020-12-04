@@ -328,7 +328,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltAK4PFCHSJetCorrectorL1
       + process.hltAK4PFCHSJetCorrectorL2
       + process.hltAK4PFCHSJetCorrectorL3
-      + process.hltAK4PFCHSJetCorrectorL2L3
       + process.hltAK4PFCHSJetCorrector
       + process.hltAK4PFCHSJetsCorrected
     )
@@ -339,7 +338,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 #      + process.hltAK8PFCHSJetCorrectorL1
 #      + process.hltAK8PFCHSJetCorrectorL2
 #      + process.hltAK8PFCHSJetCorrectorL3
-#      + process.hltAK8PFCHSJetCorrectorL2L3
 #      + process.hltAK8PFCHSJetCorrector
 #      + process.hltAK8PFCHSJetsCorrected
 #    )
@@ -352,7 +350,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltAK4PFPuppiJetCorrectorL1
       + process.hltAK4PFPuppiJetCorrectorL2
       + process.hltAK4PFPuppiJetCorrectorL3
-      + process.hltAK4PFPuppiJetCorrectorL2L3
       + process.hltAK4PFPuppiJetCorrector
       + process.hltAK4PFPuppiJetsCorrected
     )
@@ -364,7 +361,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 #      + process.hltAK8PFPuppiJets
 #      + process.hltAK8PFPuppiJetCorrectorL2
 #      + process.hltAK8PFPuppiJetCorrectorL3
-#      + process.hltAK8PFPuppiJetCorrectorL2L3
 #      + process.hltAK8PFPuppiJetCorrector
 #      + process.hltAK8PFPuppiJetsCorrected
 #    )

@@ -116,12 +116,12 @@ def customise_hltPhase2_JME(process):
       algorithm = cms.string( 'AK4PF' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK4PFJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK4PF' ),
-      level = cms.string( 'L2L3Residual' )
-    )
     process.hltAK4PFJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK4PFJetCorrectorL1', 'hltAK4PFJetCorrectorL2', 'hltAK4PFJetCorrectorL3', 'hltAK4PFJetCorrectorL2L3' )
+      correctors = cms.VInputTag(
+        'hltAK4PFJetCorrectorL1',
+        'hltAK4PFJetCorrectorL2',
+        'hltAK4PFJetCorrectorL3',
+      )
     )
     process.hltAK4PFJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
       src = cms.InputTag( 'hltAK4PFJets' ),
@@ -134,7 +134,6 @@ def customise_hltPhase2_JME(process):
       + process.hltAK4PFJetCorrectorL1
       + process.hltAK4PFJetCorrectorL2
       + process.hltAK4PFJetCorrectorL3
-      + process.hltAK4PFJetCorrectorL2L3
       + process.hltAK4PFJetCorrector
       + process.hltAK4PFJetsCorrected
     )
@@ -157,12 +156,12 @@ def customise_hltPhase2_JME(process):
       algorithm = cms.string( 'AK8PF' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK8PFJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK8PF' ),
-      level = cms.string( 'L2L3Residual' )
-    )
     process.hltAK8PFJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK8PFJetCorrectorL1', 'hltAK8PFJetCorrectorL2', 'hltAK8PFJetCorrectorL3', 'hltAK8PFJetCorrectorL2L3' )
+      correctors = cms.VInputTag(
+        'hltAK8PFJetCorrectorL1',
+        'hltAK8PFJetCorrectorL2',
+        'hltAK8PFJetCorrectorL3',
+      )
     )
     process.hltAK8PFJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
       src = cms.InputTag( 'hltAK8PFJets' ),
@@ -175,7 +174,6 @@ def customise_hltPhase2_JME(process):
       + process.hltAK8PFJetCorrectorL1
       + process.hltAK8PFJetCorrectorL2
       + process.hltAK8PFJetCorrectorL3
-      + process.hltAK8PFJetCorrectorL2L3
       + process.hltAK8PFJetCorrector
       + process.hltAK8PFJetsCorrected
     )
@@ -198,12 +196,12 @@ def customise_hltPhase2_JME(process):
       algorithm = cms.string( 'AK4PFchs' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK4PFCHSJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK4PFchs' ),
-      level = cms.string( 'L2L3Residual' )
-    )
     process.hltAK4PFCHSJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK4PFCHSJetCorrectorL1', 'hltAK4PFCHSJetCorrectorL2', 'hltAK4PFCHSJetCorrectorL3', 'hltAK4PFCHSJetCorrectorL2L3' )
+      correctors = cms.VInputTag(
+        'hltAK4PFCHSJetCorrectorL1',
+        'hltAK4PFCHSJetCorrectorL2',
+        'hltAK4PFCHSJetCorrectorL3',
+      )
     )
     process.hltAK4PFCHSJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
       src = cms.InputTag( 'hltAK4PFCHSJets' ),
@@ -228,12 +226,12 @@ def customise_hltPhase2_JME(process):
       algorithm = cms.string( 'AK8PFchs' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK8PFCHSJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK8PFchs' ),
-      level = cms.string( 'L2L3Residual' )
-    )
     process.hltAK8PFCHSJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltAK8PFCHSJetCorrectorL1', 'hltAK8PFCHSJetCorrectorL2', 'hltAK8PFCHSJetCorrectorL3', 'hltAK8PFCHSJetCorrectorL2L3' )
+      correctors = cms.VInputTag(
+        'hltAK8PFCHSJetCorrectorL1',
+        'hltAK8PFCHSJetCorrectorL2',
+        'hltAK8PFCHSJetCorrectorL3',
+      )
     )
     process.hltAK8PFCHSJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
       src = cms.InputTag( 'hltAK8PFCHSJets' ),
@@ -254,14 +252,12 @@ def customise_hltPhase2_JME(process):
       + process.hltAK4PFCHSJetCorrectorL1
       + process.hltAK4PFCHSJetCorrectorL2
       + process.hltAK4PFCHSJetCorrectorL3
-      + process.hltAK4PFCHSJetCorrectorL2L3
       + process.hltAK4PFCHSJetCorrector
       + process.hltAK4PFCHSJetsCorrected
       + process.hltAK8PFCHSJets
       + process.hltAK8PFCHSJetCorrectorL1
       + process.hltAK8PFCHSJetCorrectorL2
       + process.hltAK8PFCHSJetCorrectorL3
-      + process.hltAK8PFCHSJetCorrectorL2L3
       + process.hltAK8PFCHSJetCorrector
       + process.hltAK8PFCHSJetsCorrected
     )
@@ -290,12 +286,8 @@ def customise_hltPhase2_JME(process):
       algorithm = cms.string( _jescLabelForPFMETTypeOne ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltPFMETJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( _jescLabelForPFMETTypeOne ),
-      level = cms.string( 'L2L3Residual' )
-    )
     process.hltPFMETJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
-      correctors = cms.VInputTag( 'hltPFMETJetCorrectorL1','hltPFMETJetCorrectorL2','hltPFMETJetCorrectorL3','hltPFMETJetCorrectorL2L3' )
+      correctors = cms.VInputTag( 'hltPFMETJetCorrectorL1','hltPFMETJetCorrectorL2','hltPFMETJetCorrectorL3' )
     )
     process.hltPFMETTypeOneCorrector = cms.EDProducer( 'PFJetMETcorrInputProducer',
       src = cms.InputTag( _jetsForPFMETTypeOne ),
@@ -320,7 +312,6 @@ def customise_hltPhase2_JME(process):
       + process.hltPFMETJetCorrectorL1
       + process.hltPFMETJetCorrectorL2
       + process.hltPFMETJetCorrectorL3
-      + process.hltPFMETJetCorrectorL2L3
       + process.hltPFMETJetCorrector
       + process.hltPFMETTypeOneCorrector
       + process.hltPFMETTypeOne
@@ -385,16 +376,11 @@ def customise_hltPhase2_JME(process):
       algorithm = cms.string( 'AK4PFPuppi' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK4PFPuppiJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK4PFPuppi' ),
-      level = cms.string( 'L2L3Residual' )
-    )
     process.hltAK4PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
       correctors = cms.VInputTag(
         'hltAK4PFPuppiJetCorrectorL1',
         'hltAK4PFPuppiJetCorrectorL2',
         'hltAK4PFPuppiJetCorrectorL3',
-        'hltAK4PFPuppiJetCorrectorL2L3',
       )
     )
     process.hltAK4PFPuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
@@ -422,16 +408,11 @@ def customise_hltPhase2_JME(process):
       algorithm = cms.string( 'AK8PFPuppi' ),
       level = cms.string( 'L3Absolute' )
     )
-    process.hltAK8PFPuppiJetCorrectorL2L3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK8PFPuppi' ),
-      level = cms.string( 'L2L3Residual' )
-    )
     process.hltAK8PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
       correctors = cms.VInputTag(
         'hltAK8PFPuppiJetCorrectorL1',
         'hltAK8PFPuppiJetCorrectorL2',
         'hltAK8PFPuppiJetCorrectorL3',
-        'hltAK8PFPuppiJetCorrectorL2L3',
       ),
     )
     process.hltAK8PFPuppiJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
@@ -492,7 +473,6 @@ def customise_hltPhase2_JME(process):
       + process.hltAK4PFPuppiJetCorrectorL1
       + process.hltAK4PFPuppiJetCorrectorL2
       + process.hltAK4PFPuppiJetCorrectorL3
-      + process.hltAK4PFPuppiJetCorrectorL2L3
       + process.hltAK4PFPuppiJetCorrector
       + process.hltAK4PFPuppiJetsCorrected
       + process.hltPFPuppiMETTypeOneCorrector
@@ -501,7 +481,6 @@ def customise_hltPhase2_JME(process):
       + process.hltAK8PFPuppiJetCorrectorL1
       + process.hltAK8PFPuppiJetCorrectorL2
       + process.hltAK8PFPuppiJetCorrectorL3
-      + process.hltAK8PFPuppiJetCorrectorL2L3
       + process.hltAK8PFPuppiJetCorrector
       + process.hltAK8PFPuppiJetsCorrected
     )
