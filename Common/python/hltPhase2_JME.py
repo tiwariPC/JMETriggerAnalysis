@@ -365,15 +365,15 @@ def customise_hltPhase2_JME(process):
     )
     process.hltAK4PFPuppiJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
       srcRho = cms.InputTag( 'fixedGridRhoFastjetAllTmp' ),
-      algorithm = cms.string( 'AK4PFPuppi' ),
+      algorithm = cms.string( 'AK4PFPuppiHLT' ),
       level = cms.string( 'L1FastJet' )
     )
     process.hltAK4PFPuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK4PFPuppi' ),
+      algorithm = cms.string( 'AK4PFPuppiHLT' ),
       level = cms.string( 'L2Relative' )
     )
     process.hltAK4PFPuppiJetCorrectorL3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK4PFPuppi' ),
+      algorithm = cms.string( 'AK4PFPuppiHLT' ),
       level = cms.string( 'L3Absolute' )
     )
     process.hltAK4PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
@@ -397,15 +397,15 @@ def customise_hltPhase2_JME(process):
     )
     process.hltAK8PFPuppiJetCorrectorL1 = cms.EDProducer( 'L1FastjetCorrectorProducer',
       srcRho = cms.InputTag( 'fixedGridRhoFastjetAllTmp' ),
-      algorithm = cms.string( 'AK8PFPuppi' ),
+      algorithm = cms.string( 'AK8PFPuppiHLT' ),
       level = cms.string( 'L1FastJet' )
     )
     process.hltAK8PFPuppiJetCorrectorL2 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK8PFPuppi' ),
+      algorithm = cms.string( 'AK8PFPuppiHLT' ),
       level = cms.string( 'L2Relative' )
     )
     process.hltAK8PFPuppiJetCorrectorL3 = cms.EDProducer( 'LXXXCorrectorProducer',
-      algorithm = cms.string( 'AK8PFPuppi' ),
+      algorithm = cms.string( 'AK8PFPuppiHLT' ),
       level = cms.string( 'L3Absolute' )
     )
     process.hltAK8PFPuppiJetCorrector = cms.EDProducer( 'ChainedJetCorrectorProducer',
