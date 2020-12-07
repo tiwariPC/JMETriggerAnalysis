@@ -107,16 +107,16 @@ process.GlobalTag.toGet.append(cms.PSet(
 
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 process.jescESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/Phase2HLTTDR_V0_MC/Phase2HLTTDR_V0_MC.db'),
+  _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/Phase2HLTTDR_V4_MC/Phase2HLTTDR_V4_MC.db'),
   toGet = cms.VPSet(
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V0_MC_AK4PFPuppiHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V4_MC_AK4PFPuppiHLT'),
       label = cms.untracked.string('AK4PFPuppiHLT')
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V0_MC_AK8PFPuppiHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V4_MC_AK8PFPuppiHLT'),
       label = cms.untracked.string('AK8PFPuppiHLT')
     ),
   ),
