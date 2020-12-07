@@ -7,7 +7,7 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-NEVT=500000
+NEVT=-1
 
 ODIR=$1
 
@@ -19,6 +19,7 @@ fi
 declare -A samplesMap
 samplesMap["Phase2HLTTDR_QCD_PtFlat15to7000_14TeV_NoPU"]="/QCD_Pt-15to7000_TuneCP5_Flat_14TeV-pythia8/Phase2HLTTDRWinter20DIGI-NoPU_castor_110X_mcRun4_realistic_v3_ext1-v1/GEN-SIM-DIGI-RAW"
 samplesMap["Phase2HLTTDR_QCD_PtFlat15to7000_14TeV_PU"]="/QCD_Pt-15to7000_TuneCP5_Flat_14TeV-pythia8/Phase2HLTTDRWinter20DIGI-FlatPU0To200_castor_110X_mcRun4_realistic_v3_ext1-v1/GEN-SIM-DIGI-RAW"
+#samplesMap["Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200"]="/QCD_Pt-15to3000_TuneCP5_Flat_14TeV-pythia8/Phase2HLTTDRSummer20ReRECOMiniAOD-PU200_castor_111X_mcRun4_realistic_T15_v1-v1/FEVT"
 
 recoKeys=(
 #  HLT_TRKv00
