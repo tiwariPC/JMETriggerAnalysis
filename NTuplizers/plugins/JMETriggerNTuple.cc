@@ -108,6 +108,16 @@ protected:
   int pileupInfo_BX0_numPUInteractions_ = -1;
   float pileupInfo_BX0_numTrueInteractions_ = -1.f;
   float pileupInfo_BX0_max_pT_hats_ = -1.f;
+  uint pileupInfo_BX0_n_pThat0000to0020_ = 0;
+  uint pileupInfo_BX0_n_pThat0020to0030_ = 0;
+  uint pileupInfo_BX0_n_pThat0030to0050_ = 0;
+  uint pileupInfo_BX0_n_pThat0050to0080_ = 0;
+  uint pileupInfo_BX0_n_pThat0080to0120_ = 0;
+  uint pileupInfo_BX0_n_pThat0120to0170_ = 0;
+  uint pileupInfo_BX0_n_pThat0170to0300_ = 0;
+  uint pileupInfo_BX0_n_pThat0300to0470_ = 0;
+  uint pileupInfo_BX0_n_pThat0470to0600_ = 0;
+  uint pileupInfo_BX0_n_pThat0600toINFY_ = 0;
 
   class FillCollectionConditionsMap {
   public:
@@ -407,6 +417,17 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   this->addBranch("pileupInfo_BX0_numPUInteractions", &pileupInfo_BX0_numPUInteractions_);
   this->addBranch("pileupInfo_BX0_numTrueInteractions", &pileupInfo_BX0_numTrueInteractions_);
   this->addBranch("pileupInfo_BX0_max_pT_hats", &pileupInfo_BX0_max_pT_hats_);
+
+  this->addBranch("pileupInfo_BX0_n_pThat0000to0020", &pileupInfo_BX0_n_pThat0000to0020_);
+  this->addBranch("pileupInfo_BX0_n_pThat0020to0030", &pileupInfo_BX0_n_pThat0020to0030_);
+  this->addBranch("pileupInfo_BX0_n_pThat0030to0050", &pileupInfo_BX0_n_pThat0030to0050_);
+  this->addBranch("pileupInfo_BX0_n_pThat0050to0080", &pileupInfo_BX0_n_pThat0050to0080_);
+  this->addBranch("pileupInfo_BX0_n_pThat0080to0120", &pileupInfo_BX0_n_pThat0080to0120_);
+  this->addBranch("pileupInfo_BX0_n_pThat0120to0170", &pileupInfo_BX0_n_pThat0120to0170_);
+  this->addBranch("pileupInfo_BX0_n_pThat0170to0300", &pileupInfo_BX0_n_pThat0170to0300_);
+  this->addBranch("pileupInfo_BX0_n_pThat0300to0470", &pileupInfo_BX0_n_pThat0300to0470_);
+  this->addBranch("pileupInfo_BX0_n_pThat0470to0600", &pileupInfo_BX0_n_pThat0470to0600_);
+  this->addBranch("pileupInfo_BX0_n_pThat0600toINFY", &pileupInfo_BX0_n_pThat0600toINFY_);
 
   for (const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()) {
     this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
@@ -793,6 +814,17 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   }
 
   // MC: PileupSummaryInfo (BX=0)
+  pileupInfo_BX0_n_pThat0000to0020_ = 0;
+  pileupInfo_BX0_n_pThat0020to0030_ = 0;
+  pileupInfo_BX0_n_pThat0030to0050_ = 0;
+  pileupInfo_BX0_n_pThat0050to0080_ = 0;
+  pileupInfo_BX0_n_pThat0080to0120_ = 0;
+  pileupInfo_BX0_n_pThat0120to0170_ = 0;
+  pileupInfo_BX0_n_pThat0170to0300_ = 0;
+  pileupInfo_BX0_n_pThat0300to0470_ = 0;
+  pileupInfo_BX0_n_pThat0470to0600_ = 0;
+  pileupInfo_BX0_n_pThat0600toINFY_ = 0;
+
   if (consumePileupSummaryInfo_ and (not iEvent.isRealData())) {
     auto const& pileupInfoView = iEvent.get(pileupInfoToken_);
     for (auto const& pileupInfo_i : pileupInfoView) {
@@ -803,6 +835,17 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         pileupInfo_BX0_max_pT_hats_ = -1.;
         for (auto const i_pThat : pileupInfo_i.getPU_pT_hats()) {
           pileupInfo_BX0_max_pT_hats_ = std::max(pileupInfo_BX0_max_pT_hats_, i_pThat);
+
+          if(0. <= i_pThat and i_pThat <  20.) ++pileupInfo_BX0_n_pThat0000to0020_;
+          else if(20. <= i_pThat and i_pThat <  30.) ++pileupInfo_BX0_n_pThat0020to0030_;
+          else if(30. <= i_pThat and i_pThat <  50.) ++pileupInfo_BX0_n_pThat0030to0050_;
+          else if(50. <= i_pThat and i_pThat <  80.) ++pileupInfo_BX0_n_pThat0050to0080_;
+          else if(80. <= i_pThat and i_pThat < 120.) ++pileupInfo_BX0_n_pThat0080to0120_;
+          else if(120. <= i_pThat and i_pThat < 170.) ++pileupInfo_BX0_n_pThat0120to0170_;
+          else if(170. <= i_pThat and i_pThat < 300.) ++pileupInfo_BX0_n_pThat0170to0300_;
+          else if(300. <= i_pThat and i_pThat < 470.) ++pileupInfo_BX0_n_pThat0300to0470_;
+          else if(470. <= i_pThat and i_pThat < 600.) ++pileupInfo_BX0_n_pThat0470to0600_;
+          else if(600. <= i_pThat) ++pileupInfo_BX0_n_pThat0600toINFY_;
         }
       }
     }

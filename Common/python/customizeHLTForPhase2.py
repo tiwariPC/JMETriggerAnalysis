@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
+
 from JMETriggerAnalysis.Common.hltPhase2_L1T import customise_hltPhase2_L1T
 from JMETriggerAnalysis.Common.hltPhase2_TRKv00 import customise_hltPhase2_TRKv00
 from JMETriggerAnalysis.Common.hltPhase2_TRKv02 import customise_hltPhase2_TRKv02
@@ -9,8 +11,8 @@ from JMETriggerAnalysis.Common.hltPhase2_TRKv06p3 import customise_hltPhase2_TRK
 from JMETriggerAnalysis.Common.hltPhase2_TRKv07p2 import customise_hltPhase2_TRKv07p2
 from JMETriggerAnalysis.Common.hltPhase2_PF import customise_hltPhase2_PF
 from JMETriggerAnalysis.Common.hltPhase2_JME import customise_hltPhase2_JME
-from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorPhase2TrackerCluster1DDouble_cfi\
- import multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorPhase2TrackerCluster1DDouble as _nSiOuterTrackerClusters
+from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
+ import multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble as _nSiPixelClusters
 
 from HLTrigger.Configuration.common import producers_by_type
 
@@ -150,14 +152,9 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
     return process
 
 def customise_hltPhase2_common(process):
-    # ES modules for thresholds of L1T seeds
-    if not hasattr(process, 'CondDB'):
-      process.load('CondCore.CondDB.CondDB_cfi')
-
-    process.CondDB.connect = 'sqlite_file:/afs/cern.ch/user/t/tomei/public/L1TObjScaling.db'
-
-    process.L1TScalingESSource = cms.ESSource('PoolDBESSource',
-      process.CondDB,
+    # ES modules for offline-to-online scaling of L1T thresholds
+    process.l1tScalingESSource = cms.ESSource('PoolDBESSource',
+      _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/user/t/tomei/public/L1TObjScaling.db'),
       DumpStat = cms.untracked.bool(True),
       toGet = cms.VPSet(
         cms.PSet(
@@ -197,8 +194,25 @@ def customise_hltPhase2_common(process):
         ),
       ),
     )
+    process.l1tScalingESPrefer = cms.ESPrefer('PoolDBESSource', 'l1tScalingESSource')
 
-    process.es_prefer_l1tscaling = cms.ESPrefer('PoolDBESSource', 'L1TScalingESSource')
+    # ES modules for Jet Energy Scale Corrections
+    process.jescESSource = cms.ESSource('PoolDBESSource',
+      _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/Phase2HLTTDR_V5_MC/Phase2HLTTDR_V5_MC.db'),
+      toGet = cms.VPSet(
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK4PFPuppiHLT'),
+          label = cms.untracked.string('AK4PFPuppiHLT')
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK8PFPuppiHLT'),
+          label = cms.untracked.string('AK8PFPuppiHLT')
+        ),
+      ),
+    )
+    process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
 
     # prevent access to inputs from RECO step (if available),
     # except for Offline objects to be used saved in the NTuple,
@@ -229,7 +243,7 @@ def customise_hltPhase2_common(process):
       'keep *_slimmedMuons__RECO',
       'keep *_slimmedJets__RECO',
       'keep *_slimmedJetsPuppi__RECO',
-      'keep *_slimmedJetsAK8__RECO',
+      'keep *_slimmedJetsAK8*_*_RECO',
       'keep *_slimmedMETs__RECO',
       'keep *_slimmedMETsPuppi__RECO',
     ])
@@ -328,7 +342,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltAK4PFCHSJetCorrectorL1
       + process.hltAK4PFCHSJetCorrectorL2
       + process.hltAK4PFCHSJetCorrectorL3
-      + process.hltAK4PFCHSJetCorrectorL2L3
       + process.hltAK4PFCHSJetCorrector
       + process.hltAK4PFCHSJetsCorrected
     )
@@ -339,7 +352,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 #      + process.hltAK8PFCHSJetCorrectorL1
 #      + process.hltAK8PFCHSJetCorrectorL2
 #      + process.hltAK8PFCHSJetCorrectorL3
-#      + process.hltAK8PFCHSJetCorrectorL2L3
 #      + process.hltAK8PFCHSJetCorrector
 #      + process.hltAK8PFCHSJetsCorrected
 #    )
@@ -352,7 +364,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltAK4PFPuppiJetCorrectorL1
       + process.hltAK4PFPuppiJetCorrectorL2
       + process.hltAK4PFPuppiJetCorrectorL3
-      + process.hltAK4PFPuppiJetCorrectorL2L3
       + process.hltAK4PFPuppiJetCorrector
       + process.hltAK4PFPuppiJetsCorrected
     )
@@ -364,7 +375,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 #      + process.hltAK8PFPuppiJets
 #      + process.hltAK8PFPuppiJetCorrectorL2
 #      + process.hltAK8PFPuppiJetCorrectorL3
-#      + process.hltAK8PFPuppiJetCorrectorL2L3
 #      + process.hltAK8PFPuppiJetCorrector
 #      + process.hltAK8PFPuppiJetsCorrected
 #    )
@@ -379,7 +389,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     ## Single-Jet producers+filters
     process.l1tSinglePFPuppiJet200off = cms.EDFilter('L1JetFilter',
       inputTag = cms.InputTag('l1tSlwPFPuppiJetsCorrected', 'Phase1L1TJetFromPfCandidates'),
-      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PFPhase1JetScaling'),
+      esScalingTag = cms.ESInputTag('l1tScalingESSource', 'L1PFPhase1JetScaling'),
       MinPt = cms.double(200.),
       MinEta = cms.double(-5.),
       MaxEta = cms.double(5.),
@@ -414,7 +424,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
     process.l1tPFPuppiHT450off = cms.EDFilter('L1EnergySumFilter',
       inputTag = cms.InputTag('l1tPFPuppiHT'),
-      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PFPhase1HT090Scaling'),
+      esScalingTag = cms.ESInputTag('l1tScalingESSource', 'L1PFPhase1HT090Scaling'),
       TypeOfSum = cms.string('HT'),
       MinPt = cms.double(450.),
     )
@@ -449,7 +459,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       saveTags = cms.bool(True)
     )
 
-    process.hltPFPuppiHT = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', minPtJetHt = 30., maxEtaJetHt = 5.0, minPtJetMht = 30., maxEtaJetMht = 5.0)
+    process.hltPFPuppiHT = _hltHtMht.clone(jetsLabel = 'hltAK4PFPuppiJetsCorrected', minPtJetHt = 30., maxEtaJetHt = 2.4, minPtJetMht = 30., maxEtaJetMht = 2.4)
     process.hltPFPuppiHT60 = _hltHT100.clone(htLabels = ['hltPFPuppiHT'], mhtLabels = ['hltPFPuppiHT'], minHt = [60.])
     process.hltPFPuppiHT1050 = _hltHT100.clone(htLabels = ['hltPFPuppiHT'], mhtLabels = ['hltPFPuppiHT'], minHt = [1050.])
 
@@ -459,7 +469,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     ## MET producers+filters
     process.l1tPFPuppiMET200off = cms.EDFilter('L1PFEnergySumFilter',
       inputTag = cms.InputTag('l1PFMetPuppi'),
-      esScalingTag = cms.ESInputTag('L1TScalingESSource', 'L1PuppiMET090Scaling'),
+      esScalingTag = cms.ESInputTag('l1tScalingESSource', 'L1PuppiMET090Scaling'),
       TypeOfSum = cms.string('MET'),
       MinPt = cms.double(200.),
     )
@@ -616,23 +626,23 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     return process
 
 def customise_hltPhase2_reconfigurePuppi(process):
-    process.hltOuterTrackerClustersMultiplicity = _nSiOuterTrackerClusters.clone(src = 'siPhase2Clusters', defaultValue = -1.)
+    process.hltPixelClustersMultiplicity = _nSiPixelClusters.clone(src = 'siPixelClusters', defaultValue = -1.)
 
     for mod_i in producers_by_type(process, 'PuppiProducer'):
       for seqName_i in process.sequences_():
         seq_i = getattr(process, seqName_i)
         if not seq_i.contains(process.pixelTracks):
-          seq_i._replaceIfHeldDirectly(mod_i, process.hltOuterTrackerClustersMultiplicity + mod_i)
+          seq_i._replaceIfHeldDirectly(mod_i, process.hltPixelClustersMultiplicity + mod_i)
 
       mod_i.usePUProxyValue = True
-      mod_i.PUProxyValue = 'hltOuterTrackerClustersMultiplicity'
+      mod_i.PUProxyValue = 'hltPixelClustersMultiplicity'
       for algo_idx in range(len(mod_i.algos)):
         if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
           raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
 
         for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
-          mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 4. * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
-          mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.00057
+          mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 20.7 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+          mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.000634
 
     return process
 
