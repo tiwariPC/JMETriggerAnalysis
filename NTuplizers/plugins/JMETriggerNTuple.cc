@@ -9,6 +9,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/TriggerResultsContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/ValueContainer.h"
@@ -57,6 +58,7 @@ protected:
   std::string const TTreeName_;
 
   bool const consumeHepMCProduct_;
+  bool const consumeGenEventInfoProduct_;
   bool const consumePileupSummaryInfo_;
 
   std::vector<std::string> const TriggerResultsFilterOR_;
@@ -67,6 +69,7 @@ protected:
   std::unordered_map<std::string, std::string> stringCutObjectSelectors_map_;
 
   edm::EDGetTokenT<edm::HepMCProduct> hepMCProductToken_;
+  edm::EDGetTokenT<GenEventInfoProduct> genEventInfoProductToken_;
   edm::EDGetTokenT<edm::View<PileupSummaryInfo>> pileupInfoToken_;
 
   std::unique_ptr<TriggerResultsContainer> triggerResultsContainer_ptr_;
@@ -104,20 +107,21 @@ protected:
   unsigned long long event_ = 0;
 
   float hepMCGenEvent_scale_ = -1.f;
+  float genEventInfo_qScale_ = -1.f;
 
   int pileupInfo_BX0_numPUInteractions_ = -1;
   float pileupInfo_BX0_numTrueInteractions_ = -1.f;
   float pileupInfo_BX0_max_pT_hats_ = -1.f;
-  uint pileupInfo_BX0_n_pThat0000to0020_ = 0;
-  uint pileupInfo_BX0_n_pThat0020to0030_ = 0;
-  uint pileupInfo_BX0_n_pThat0030to0050_ = 0;
-  uint pileupInfo_BX0_n_pThat0050to0080_ = 0;
-  uint pileupInfo_BX0_n_pThat0080to0120_ = 0;
-  uint pileupInfo_BX0_n_pThat0120to0170_ = 0;
-  uint pileupInfo_BX0_n_pThat0170to0300_ = 0;
-  uint pileupInfo_BX0_n_pThat0300to0470_ = 0;
-  uint pileupInfo_BX0_n_pThat0470to0600_ = 0;
-  uint pileupInfo_BX0_n_pThat0600toINFY_ = 0;
+  uint pileupInfo_BX0_n_pThat000to020_ = 0;
+  uint pileupInfo_BX0_n_pThat020to030_ = 0;
+  uint pileupInfo_BX0_n_pThat030to050_ = 0;
+  uint pileupInfo_BX0_n_pThat050to080_ = 0;
+  uint pileupInfo_BX0_n_pThat080to120_ = 0;
+  uint pileupInfo_BX0_n_pThat120to170_ = 0;
+  uint pileupInfo_BX0_n_pThat170to300_ = 0;
+  uint pileupInfo_BX0_n_pThat300to470_ = 0;
+  uint pileupInfo_BX0_n_pThat470to600_ = 0;
+  uint pileupInfo_BX0_n_pThat600toInf_ = 0;
 
   class FillCollectionConditionsMap {
   public:
@@ -171,6 +175,7 @@ protected:
 JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     : TTreeName_(iConfig.getParameter<std::string>("TTreeName")),
       consumeHepMCProduct_(iConfig.exists("HepMCProduct")),
+      consumeGenEventInfoProduct_(iConfig.exists("GenEventInfoProduct")),
       consumePileupSummaryInfo_(iConfig.exists("PileupSummaryInfo")),
       TriggerResultsFilterOR_(iConfig.getParameter<std::vector<std::string>>("TriggerResultsFilterOR")),
       TriggerResultsFilterAND_(iConfig.getParameter<std::vector<std::string>>("TriggerResultsFilterAND")),
@@ -206,6 +211,10 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
 
   if (consumeHepMCProduct_) {
     hepMCProductToken_ = this->consumes<edm::HepMCProduct>(iConfig.getParameter<edm::InputTag>("HepMCProduct"));
+  }
+
+  if (consumeGenEventInfoProduct_) {
+    genEventInfoProductToken_ = this->consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("GenEventInfoProduct"));
   }
 
   if (consumePileupSummaryInfo_) {
@@ -413,21 +422,22 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   this->addBranch("event", &event_);
 
   this->addBranch("HepMCGenEvent_scale", &hepMCGenEvent_scale_);
+  this->addBranch("GenEventInfo_qScale", &genEventInfo_qScale_);
 
   this->addBranch("pileupInfo_BX0_numPUInteractions", &pileupInfo_BX0_numPUInteractions_);
   this->addBranch("pileupInfo_BX0_numTrueInteractions", &pileupInfo_BX0_numTrueInteractions_);
   this->addBranch("pileupInfo_BX0_max_pT_hats", &pileupInfo_BX0_max_pT_hats_);
 
-  this->addBranch("pileupInfo_BX0_n_pThat0000to0020", &pileupInfo_BX0_n_pThat0000to0020_);
-  this->addBranch("pileupInfo_BX0_n_pThat0020to0030", &pileupInfo_BX0_n_pThat0020to0030_);
-  this->addBranch("pileupInfo_BX0_n_pThat0030to0050", &pileupInfo_BX0_n_pThat0030to0050_);
-  this->addBranch("pileupInfo_BX0_n_pThat0050to0080", &pileupInfo_BX0_n_pThat0050to0080_);
-  this->addBranch("pileupInfo_BX0_n_pThat0080to0120", &pileupInfo_BX0_n_pThat0080to0120_);
-  this->addBranch("pileupInfo_BX0_n_pThat0120to0170", &pileupInfo_BX0_n_pThat0120to0170_);
-  this->addBranch("pileupInfo_BX0_n_pThat0170to0300", &pileupInfo_BX0_n_pThat0170to0300_);
-  this->addBranch("pileupInfo_BX0_n_pThat0300to0470", &pileupInfo_BX0_n_pThat0300to0470_);
-  this->addBranch("pileupInfo_BX0_n_pThat0470to0600", &pileupInfo_BX0_n_pThat0470to0600_);
-  this->addBranch("pileupInfo_BX0_n_pThat0600toINFY", &pileupInfo_BX0_n_pThat0600toINFY_);
+  this->addBranch("pileupInfo_BX0_n_pThat000to020", &pileupInfo_BX0_n_pThat000to020_);
+  this->addBranch("pileupInfo_BX0_n_pThat020to030", &pileupInfo_BX0_n_pThat020to030_);
+  this->addBranch("pileupInfo_BX0_n_pThat030to050", &pileupInfo_BX0_n_pThat030to050_);
+  this->addBranch("pileupInfo_BX0_n_pThat050to080", &pileupInfo_BX0_n_pThat050to080_);
+  this->addBranch("pileupInfo_BX0_n_pThat080to120", &pileupInfo_BX0_n_pThat080to120_);
+  this->addBranch("pileupInfo_BX0_n_pThat120to170", &pileupInfo_BX0_n_pThat120to170_);
+  this->addBranch("pileupInfo_BX0_n_pThat170to300", &pileupInfo_BX0_n_pThat170to300_);
+  this->addBranch("pileupInfo_BX0_n_pThat300to470", &pileupInfo_BX0_n_pThat300to470_);
+  this->addBranch("pileupInfo_BX0_n_pThat470to600", &pileupInfo_BX0_n_pThat470to600_);
+  this->addBranch("pileupInfo_BX0_n_pThat600toInf", &pileupInfo_BX0_n_pThat600toInf_);
 
   for (const auto& triggerEntry_i : triggerResultsContainer_ptr_->entries()) {
     this->addBranch(triggerEntry_i.name, const_cast<bool*>(&triggerEntry_i.accept));
@@ -804,6 +814,7 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   event_ = iEvent.id().event();
 
   // MC: HepMCProduct
+  hepMCGenEvent_scale_ = -1.f;
   if (consumeHepMCProduct_ and (not iEvent.isRealData())) {
     auto const& hepMCProduct = iEvent.get(hepMCProductToken_);
     auto const* hepMCGenEvent = hepMCProduct.GetEvent();
@@ -813,17 +824,26 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     }
   }
 
+  // MC: GenEventInfoProduct
+  genEventInfo_qScale_ = -1.f;
+  if (consumeGenEventInfoProduct_ and (not iEvent.isRealData())) {
+    auto const& genEventInfo = iEvent.get(genEventInfoProductToken_);
+    genEventInfo_qScale_ = genEventInfo.qScale();
+  }
+
   // MC: PileupSummaryInfo (BX=0)
-  pileupInfo_BX0_n_pThat0000to0020_ = 0;
-  pileupInfo_BX0_n_pThat0020to0030_ = 0;
-  pileupInfo_BX0_n_pThat0030to0050_ = 0;
-  pileupInfo_BX0_n_pThat0050to0080_ = 0;
-  pileupInfo_BX0_n_pThat0080to0120_ = 0;
-  pileupInfo_BX0_n_pThat0120to0170_ = 0;
-  pileupInfo_BX0_n_pThat0170to0300_ = 0;
-  pileupInfo_BX0_n_pThat0300to0470_ = 0;
-  pileupInfo_BX0_n_pThat0470to0600_ = 0;
-  pileupInfo_BX0_n_pThat0600toINFY_ = 0;
+  pileupInfo_BX0_max_pT_hats_ = -1.f;
+
+  pileupInfo_BX0_n_pThat000to020_ = 0;
+  pileupInfo_BX0_n_pThat020to030_ = 0;
+  pileupInfo_BX0_n_pThat030to050_ = 0;
+  pileupInfo_BX0_n_pThat050to080_ = 0;
+  pileupInfo_BX0_n_pThat080to120_ = 0;
+  pileupInfo_BX0_n_pThat120to170_ = 0;
+  pileupInfo_BX0_n_pThat170to300_ = 0;
+  pileupInfo_BX0_n_pThat300to470_ = 0;
+  pileupInfo_BX0_n_pThat470to600_ = 0;
+  pileupInfo_BX0_n_pThat600toInf_ = 0;
 
   if (consumePileupSummaryInfo_ and (not iEvent.isRealData())) {
     auto const& pileupInfoView = iEvent.get(pileupInfoToken_);
@@ -832,20 +852,20 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         pileupInfo_BX0_numTrueInteractions_ = pileupInfo_i.getTrueNumInteractions();
         pileupInfo_BX0_numPUInteractions_ = pileupInfo_i.getPU_NumInteractions();
 
-        pileupInfo_BX0_max_pT_hats_ = -1.;
-        for (auto const i_pThat : pileupInfo_i.getPU_pT_hats()) {
-          pileupInfo_BX0_max_pT_hats_ = std::max(pileupInfo_BX0_max_pT_hats_, i_pThat);
+        pileupInfo_BX0_max_pT_hats_ = *std::max_element(pileupInfo_i.getPU_pT_hats().begin(), pileupInfo_i.getPU_pT_hats().end());
 
-          if(0. <= i_pThat and i_pThat <  20.) ++pileupInfo_BX0_n_pThat0000to0020_;
-          else if(20. <= i_pThat and i_pThat <  30.) ++pileupInfo_BX0_n_pThat0020to0030_;
-          else if(30. <= i_pThat and i_pThat <  50.) ++pileupInfo_BX0_n_pThat0030to0050_;
-          else if(50. <= i_pThat and i_pThat <  80.) ++pileupInfo_BX0_n_pThat0050to0080_;
-          else if(80. <= i_pThat and i_pThat < 120.) ++pileupInfo_BX0_n_pThat0080to0120_;
-          else if(120. <= i_pThat and i_pThat < 170.) ++pileupInfo_BX0_n_pThat0120to0170_;
-          else if(170. <= i_pThat and i_pThat < 300.) ++pileupInfo_BX0_n_pThat0170to0300_;
-          else if(300. <= i_pThat and i_pThat < 470.) ++pileupInfo_BX0_n_pThat0300to0470_;
-          else if(470. <= i_pThat and i_pThat < 600.) ++pileupInfo_BX0_n_pThat0470to0600_;
-          else if(600. <= i_pThat) ++pileupInfo_BX0_n_pThat0600toINFY_;
+        for (uint idx=0; idx<=pileupInfo_i.getPU_pT_hats().size(); ++idx) {
+          auto const i_pThat = (idx == pileupInfo_i.getPU_pT_hats().size()) ? genEventInfo_qScale_ : pileupInfo_i.getPU_pT_hats().at(idx);
+          if(0. <= i_pThat and i_pThat < 20.) ++pileupInfo_BX0_n_pThat000to020_;
+          else if(20. <= i_pThat and i_pThat < 30.) ++pileupInfo_BX0_n_pThat020to030_;
+          else if(30. <= i_pThat and i_pThat < 50.) ++pileupInfo_BX0_n_pThat030to050_;
+          else if(50. <= i_pThat and i_pThat < 80.) ++pileupInfo_BX0_n_pThat050to080_;
+          else if(80. <= i_pThat and i_pThat < 120.) ++pileupInfo_BX0_n_pThat080to120_;
+          else if(120. <= i_pThat and i_pThat < 170.) ++pileupInfo_BX0_n_pThat120to170_;
+          else if(170. <= i_pThat and i_pThat < 300.) ++pileupInfo_BX0_n_pThat170to300_;
+          else if(300. <= i_pThat and i_pThat < 470.) ++pileupInfo_BX0_n_pThat300to470_;
+          else if(470. <= i_pThat and i_pThat < 600.) ++pileupInfo_BX0_n_pThat470to600_;
+          else if(600. <= i_pThat) ++pileupInfo_BX0_n_pThat600toInf_;
         }
       }
     }

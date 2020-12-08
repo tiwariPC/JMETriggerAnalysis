@@ -52,6 +52,10 @@ git checkout bb38311862c83068b2434f35850c9a17e29dd2f7 RecoMET/METFilters/plugins
 # analyzer for primary vertices (courtesy of W. Erdmann)
 git clone https://github.com/missirol/PVAnalysis.git usercode -o missirol -b phase2
 
+# [optional; required only for JME-Trigger NTuple]
+mkdir -p HLTrigger
+git clone https://github.com/veelken/mcStitching.git HLTrigger/mcStitching
+
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b phase2
 scram b -j 10
 ```

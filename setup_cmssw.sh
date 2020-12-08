@@ -45,6 +45,10 @@ git cms-addpkg RecoMET/METFilters
 git diff 442ae0775276f4388f8d51742ea915c1b91e1506 bb38311862c83068b2434f35850c9a17e29dd2f7 RecoMET/METFilters/python | git apply
 git checkout bb38311862c83068b2434f35850c9a17e29dd2f7 RecoMET/METFilters/plugins/BadParticleFilter.cc
 
+# [optional; required only for JME-Trigger NTuple]
+mkdir -p HLTrigger
+git clone https://github.com/veelken/mcStitching.git HLTrigger/mcStitching
+
 # [optional; required only for JME-Trigger NTuple workflow with 'pvdqm > 1']
 # analyzer for primary vertices (courtesy of W. Erdmann)
 git clone https://github.com/missirol/PVAnalysis.git usercode -o missirol -b phase2

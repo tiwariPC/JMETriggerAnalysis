@@ -211,6 +211,11 @@ process.hltPixelVerticesMultiplicity = _nVertices.clone(src = 'pixelVertices', d
 process.hltPrimaryVerticesMultiplicity = _nVertices.clone(src = 'offlinePrimaryVertices', defaultValue = -1.)
 process.offlinePrimaryVerticesMultiplicity = _nVertices.clone(src = 'offlineSlimmedPrimaryVertices', defaultValue = -1.)
 
+from JMETriggerAnalysis.NTuplizers.qcdWeightProducer import qcdWeightProducer
+
+process.qcdWeightPU140 = qcdWeightProducer(BXFrequency = 30. * 1e6, PU = 140.)
+process.qcdWeightPU200 = qcdWeightProducer(BXFrequency = 30. * 1e6, PU = 200.)
+
 process.jmeTriggerNTupleInputsSeq = cms.Sequence(
     process.hltPixelClustersMultiplicity
   + process.hltOuterTrackerClustersMultiplicity
@@ -221,6 +226,8 @@ process.jmeTriggerNTupleInputsSeq = cms.Sequence(
   + process.hltPixelVerticesMultiplicity
   + process.hltPrimaryVerticesMultiplicity
   + process.offlinePrimaryVerticesMultiplicity
+  + process.qcdWeightPU140
+  + process.qcdWeightPU200
 )
 
 process.jmeTriggerNTupleInputsPath = cms.Path(process.jmeTriggerNTupleInputsSeq)
@@ -260,10 +267,13 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   fillCollectionConditions = cms.PSet(),
 
   HepMCProduct = cms.InputTag('generatorSmeared'),
-
+  GenEventInfoProduct = cms.InputTag('generator'),
   PileupSummaryInfo = cms.InputTag('addPileupInfo'),
 
   doubles = cms.PSet(
+
+    qcdWeightPU140 = cms.InputTag('qcdWeightPU140'),
+    qcdWeightPU200 = cms.InputTag('qcdWeightPU200'),
 
     fixedGridRhoFastjetAllTmp = cms.InputTag('fixedGridRhoFastjetAllTmp'),
     offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
