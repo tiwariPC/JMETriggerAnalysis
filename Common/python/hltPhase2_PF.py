@@ -155,25 +155,4 @@ def customise_hltPhase2_PF(process):
         verbose = cms.untracked.bool(False)
     )
 
-    # remove PFElectron-related modules not needed for HLT-PF
-    del process.particleFlowTmpPtrs
-
-    _modulesToKeep = ['pfTrack']
-    for _tmp1 in [
-      'gedElectronPFIsolationDepositsTask',
-      'gedGsfElectronTaskTmp',
-      'particleFlowEGammaFinalTask',
-      'particleFlowEGammaFullTask',
-      'particleFlowTrackWithDisplacedVertexTask',
-      'pfGsfElectronMVASelectionTask',
-      'pfParticleSelectionTask',
-    ]:
-      if hasattr(process, _tmp1):
-        for _tmp2 in getattr(process, _tmp1).moduleNames():
-          if _tmp2 in _modulesToKeep: continue
-          if hasattr(process, _tmp2):
-            process.__delattr__(_tmp2)
-        process.__delattr__(_tmp1)
-    del _modulesToKeep
-
     return process
