@@ -291,7 +291,7 @@ def customise_hltPhase2_JME(process):
     )
     process.hltPFMETTypeOneCorrector = cms.EDProducer( 'PFJetMETcorrInputProducer',
       src = cms.InputTag( _jetsForPFMETTypeOne ),
-      type1JetPtThreshold = cms.double( 15.0 ),
+      type1JetPtThreshold = cms.double( 30. ),
       skipEMfractionThreshold = cms.double( 0.9 ),
       skipEM = cms.bool( True ),
       jetCorrLabelRes = cms.InputTag( 'hltPFMETJetCorrector' ),
@@ -448,7 +448,7 @@ def customise_hltPhase2_JME(process):
     ## MET: PFPuppi Type-1
     process.hltPFPuppiMETTypeOneCorrector = cms.EDProducer( 'PFJetMETcorrInputProducer',
       src = cms.InputTag( 'hltAK4PFPuppiJets' ),
-      type1JetPtThreshold = cms.double( 15.0 ),
+      type1JetPtThreshold = cms.double( 30. ),
       skipEMfractionThreshold = cms.double( 0.9 ),
       skipEM = cms.bool( True ),
       jetCorrLabelRes = cms.InputTag( 'hltAK4PFPuppiJetCorrector' ),
