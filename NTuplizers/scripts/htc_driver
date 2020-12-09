@@ -33,6 +33,9 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
 
+    parser.add_argument('--cmsRun-output-dir', dest='cmsRun_output_dir', action='store', default=None,
+                        help='directory to host output of cmsRun job (if not specified, same as --output)')
+
     parser.add_argument('-j', '--jobdirname', dest='jobdirname', action='store', default='job',
                         help='prefix of batch-job sub-directories (example: [JOBDIRNAME]_[counter]/)')
 
@@ -176,6 +179,9 @@ if __name__ == '__main__':
     MKDIRP(OUTPUT_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
     EXE('cp '+voms_proxy_path+' '+OUTPUT_DIR+'/X509_USER_PROXY', verbose=opts.verbose, dry_run=opts.dry_run)
 
+    if opts.cmsRun_output_dir is not None:
+      MKDIRP(opts.cmsRun_output_dir, verbose=opts.verbose, dry_run=opts.dry_run)
+
     ### copy cmsRun-cfg into output directory
     out_cmsRun_cfg = os.path.abspath(OUTPUT_DIR+'/cfg.py')
     EXE('cp '+opts.cmsRun_cfg+' '+out_cmsRun_cfg, verbose=opts.verbose, dry_run=opts.dry_run)
@@ -186,7 +192,6 @@ if __name__ == '__main__':
 ###
 ### customization added by {:} [time-stamp: {:}]
 ###
-
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
 
@@ -194,6 +199,11 @@ opts.register('skipEvents', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
               'number of events to be skipped')
+
+opts.register('output', 'out.root',
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'path to output file of TFileService')
 
 opts.parseArguments()
 
@@ -208,6 +218,9 @@ process.source.fileNames = opts.inputFiles
 
 # input EDM files [secondary]
 process.source.secondaryFileNames = opts.secondaryInputFiles
+
+# output [TFileService]
+process.TFileService.fileName = opts.output
 """
             cfg_file.write(custom_str.format(os.path.basename(__file__), str(datetime.datetime.now())))
 
@@ -348,17 +361,27 @@ process.source.secondaryFileNames = opts.secondaryInputFiles
                   cmsRun_opts += ' \\\n skipEvents='+str(opts.n_events*i_job)
                   cmsRun_opts += ' \\\n inputFiles='+str(i_inputFile)
                   if i_secondaryInputFiles:
-                     cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
+                    cmsRun_opts += ' \\\n secondaryInputFiles='+str(','.join(i_secondaryInputFiles))
+
+                  CMSRUN_OUTPUT_DIR = opts.cmsRun_output_dir
+                  if CMSRUN_OUTPUT_DIR is None:
+                    CMSRUN_OUTPUT_DIR = '.'
+                  elif os.path.isabs(CMSRUN_OUTPUT_DIR):
+                    while CMSRUN_OUTPUT_DIR.endswith('/') and len(CMSRUN_OUTPUT_DIR) > 1:
+                      CMSRUN_OUTPUT_DIR = CMSRUN_OUTPUT_DIR[:-1]
+                  else:
+                    CMSRUN_OUTPUT_DIR = os.path.relpath(os.path.abspath(CMSRUN_OUTPUT_DIR), i_OUTPUT_DIR)
+                  cmsRun_opts += ' \\\n output='+CMSRUN_OUTPUT_DIR+'/out'+outputname_postfix_format.format(jobCounter)+'.root'
+
                   for _tmp in cmsRun_addopts:
-                     cmsRun_opts += ' \\\n '+str(_tmp)
+                    cmsRun_opts += ' \\\n '+str(_tmp)
 
                   i_SHELL_COMMANDS = [
                    ['set -e'],
+                   ['cd '+os.environ['CMSSW_BASE']+'/src'],
+                   ['eval `scram runtime -sh`'],
                    ['cd '+i_OUTPUT_DIR],
                    ['[ ! -f flag.done ] || exit 0'],
-                   ['pushd '+os.environ['CMSSW_BASE']+'/src &> /dev/null'],
-                   ['eval `scram runtime -sh`'],
-                   ['popd &> /dev/null'],
                    ['cmsRun '+cmsRun_opts],
                    ['touch flag.done'],
                   ]
