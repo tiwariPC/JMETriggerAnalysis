@@ -852,7 +852,8 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         pileupInfo_BX0_numTrueInteractions_ = pileupInfo_i.getTrueNumInteractions();
         pileupInfo_BX0_numPUInteractions_ = pileupInfo_i.getPU_NumInteractions();
 
-        pileupInfo_BX0_max_pT_hats_ = *std::max_element(pileupInfo_i.getPU_pT_hats().begin(), pileupInfo_i.getPU_pT_hats().end());
+        if(not pileupInfo_i.getPU_pT_hats().empty())
+          pileupInfo_BX0_max_pT_hats_ = *std::max_element(pileupInfo_i.getPU_pT_hats().begin(), pileupInfo_i.getPU_pT_hats().end());
 
         for (uint idx=0; idx<=pileupInfo_i.getPU_pT_hats().size(); ++idx) {
           auto const i_pThat = (idx == pileupInfo_i.getPU_pT_hats().size()) ? genEventInfo_qScale_ : pileupInfo_i.getPU_pT_hats().at(idx);
