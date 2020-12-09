@@ -100,8 +100,6 @@ for recoKey in "${recoKeys[@]}"; do
 
     htc_driver -c /tmp/${USER}/${recoKey}_cfg.py --customize-cfg -m ${numEvents} -n 250 --cpus 1 --memory 2000 --runtime 10800 ${opts} \
       -d ${sampleName} -p 0 -o ${ODIR}/${recoKey}/${sampleKey} --cmsRun-output-dir ${ODIR_cmsRun}/${recoKey}/${sampleKey}
-
-    break #!!
   done
   unset sampleKey numEvents sampleName
 
