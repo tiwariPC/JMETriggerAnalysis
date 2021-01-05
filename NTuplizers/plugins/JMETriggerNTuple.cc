@@ -270,7 +270,7 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
                                                                                  "reco::PFCandidateCollection",
                                                                                  stringCutObjectSelectors_map_);
   for (auto& cc_i : v_recoPFCandidateCollectionContainer_) {
-    cc_i.orderByHighestPt(true);
+    cc_i.orderByHighestPt(false);
   }
 
   // pat::PackedCandidateCollection
