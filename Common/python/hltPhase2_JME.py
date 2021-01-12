@@ -1,14 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
-from CommonTools.PileupAlgos.Puppi_cff import puppi as _puppi
-from CommonTools.PileupAlgos.Puppi_cff import puppiNoLep as _puppiNoLep
+from CommonTools.PileupAlgos.Puppi_cff import puppi as _puppi, puppiCentral as _puppiCentral, puppiForward as _puppiForward, puppiNoLep as _puppiNoLep
 from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets, ak4PFJetsCHS, ak4PFJetsPuppi
 from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJets, ak8PFJetsCHS, ak8PFJetsPuppi
 from RecoMET.METProducers.PFClusterMET_cfi import pfClusterMet
 
 def customise_hltPhase2_JME(process):
-
     ### Guidelines to browse the code below:
     ###  - jet (MET) collections are indicated by comments starting with "## Jets: " ("## MET:")
     ###  - sequences are indicated by comments starting with "## Sequence: "
@@ -355,8 +353,14 @@ def customise_hltPhase2_JME(process):
     process.hltPFPuppi = _puppi.clone(
       candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
-#     EtaMinUseDeltaZ = 4.0,
+#      PtMaxCharged = 20.,
+#      EtaMinUseDeltaZ = 4.0,
+#      PtMaxNeutralsStartSlope = 20.,
+#      NumOfPUVtxsForCharged = 2,
+#      puppiDiagnostics = False,
     )
+#    process.hltPFPuppi.algos[0].etaMin[0] = -0.01
+
     process.hltAK4PFPuppiJets = ak4PFJetsPuppi.clone(
       src = _particleFlowCands,
       applyWeight = True,
@@ -426,8 +430,13 @@ def customise_hltPhase2_JME(process):
     process.hltPFPuppiNoLep = _puppiNoLep.clone(
       candName = _particleFlowCands,
       vertexName = _primaryVerticesGood,
-#     EtaMinUseDeltaZ = 4.0,
+#      PtMaxCharged = 20.,
+#      EtaMinUseDeltaZ = 4.0,
+#      PtMaxNeutralsStartSlope = 20.,
+#      NumOfPUVtxsForCharged = 2,
+#      puppiDiagnostics = False,
     )
+#    process.hltPFPuppiNoLep.algos[0].etaMin[0] = -0.01
 
     process.hltPFPuppiMETv0 = cms.EDProducer( 'PFMETProducer',
       src = cms.InputTag( _particleFlowCands ),

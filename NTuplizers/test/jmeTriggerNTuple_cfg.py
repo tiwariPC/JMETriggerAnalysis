@@ -156,39 +156,9 @@ else:
 ###
 ### analysis sequence
 ###
-
-# Bad PFMuon
-from RecoMET.METFilters.BadPFMuonFilter_cfi import BadPFMuonFilter
-process.OfflineBadPFMuonTagger = BadPFMuonFilter.clone(
-  PFCandidates = cms.InputTag('packedPFCandidates'),
-  muons = cms.InputTag('slimmedMuons'),
-  vtx = cms.InputTag('offlineSlimmedPrimaryVertices'),
-  taggingMode = False,
-)
-process.Offline_BadPFMuon = cms.Path(process.OfflineBadPFMuonTagger)
-process.schedule_().append(process.Offline_BadPFMuon)
-
-# Bad PFMuon (Dz)
-from RecoMET.METFilters.BadPFMuonDzFilter_cfi import BadPFMuonDzFilter
-process.OfflineBadPFMuonDzTagger = BadPFMuonDzFilter.clone(
-  PFCandidates = cms.InputTag('packedPFCandidates'),
-  muons = cms.InputTag('slimmedMuons'),
-  vtx = cms.InputTag('offlineSlimmedPrimaryVertices'),
-  taggingMode = False,
-)
-process.Offline_BadPFMuonDz = cms.Path(process.OfflineBadPFMuonDzTagger)
-process.schedule_().append(process.Offline_BadPFMuonDz)
-
-# Bad Charge Hadron
-from RecoMET.METFilters.BadChargedCandidateFilter_cfi import BadChargedCandidateFilter
-process.OfflineBadChargedCandidateTagger = BadChargedCandidateFilter.clone(
-  PFCandidates = cms.InputTag('packedPFCandidates'),
-  muons = cms.InputTag('slimmedMuons'),
-  vtx = cms.InputTag('offlineSlimmedPrimaryVertices'),
-  taggingMode = False,
-)
-process.Offline_BadChargedCandidate = cms.Path(process.OfflineBadChargedCandidateTagger)
-process.schedule_().append(process.Offline_BadChargedCandidate)
+#process.setSchedule_(cms.Schedule(
+#  process.MC_JME
+#))
 
 ## JMETrigger NTuple
 from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
@@ -212,7 +182,6 @@ process.hltPrimaryVerticesMultiplicity = _nVertices.clone(src = 'offlinePrimaryV
 process.offlinePrimaryVerticesMultiplicity = _nVertices.clone(src = 'offlineSlimmedPrimaryVertices', defaultValue = -1.)
 
 from JMETriggerAnalysis.NTuplizers.qcdWeightProducer import qcdWeightProducer
-
 process.qcdWeightPU140 = qcdWeightProducer(BXFrequency = 30. * 1e6, PU = 140.)
 process.qcdWeightPU200 = qcdWeightProducer(BXFrequency = 30. * 1e6, PU = 200.)
 
@@ -244,9 +213,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResultsFilterAND = cms.vstring(),
 
   TriggerResultsCollections = cms.vstring(
-    'Offline_BadPFMuon',
-    'Offline_BadPFMuonDz',
-    'Offline_BadChargedCandidate',
     'MC_JME',
     'L1T_SinglePFPuppiJet200off',
     'HLT_AK4PFJet550',
@@ -288,6 +254,14 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlinePrimaryVerticesMultiplicity = cms.InputTag('offlinePrimaryVerticesMultiplicity'),
   ),
 
+  vdoubles = cms.PSet(
+
+#    hltPFPuppi_PuppiRawAlphas = cms.InputTag('hltPFPuppi:PuppiRawAlphas'),
+#    hltPFPuppi_PuppiAlphas = cms.InputTag('hltPFPuppi:PuppiAlphas'),
+#    hltPFPuppi_PuppiAlphasMed = cms.InputTag('hltPFPuppi:PuppiAlphasMed'),
+#    hltPFPuppi_PuppiAlphasRms = cms.InputTag('hltPFPuppi:PuppiAlphasRms'),
+  ),
+
   recoVertexCollections = cms.PSet(
 
 #   hltPixelVertices = cms.InputTag('pixelVertices'),
@@ -302,11 +276,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFCandidateCollections = cms.PSet(
 
-#   hltPFSim = cms.InputTag('simPFProducer'),
-#   hltPFTICL = cms.InputTag('pfTICL'),
-#   hltParticleFlow = cms.InputTag('particleFlowTmp'),
-#   hltPFPuppi = cms.InputTag('hltPFPuppi'),
-#   hltPFPuppiNoLep = cms.InputTag('hltPFPuppiNoLep'),
+#    hltPFSim = cms.InputTag('simPFProducer'),
+#    hltPFTICL = cms.InputTag('pfTICL'),
+#    hltParticleFlow = cms.InputTag('particleFlowTmp'),
+#    hltPFPuppi = cms.InputTag('hltPFPuppi'),
+#    hltPFPuppiNoLep = cms.InputTag('hltPFPuppiNoLep'),
   ),
 
   patPackedCandidateCollections = cms.PSet(
@@ -344,24 +318,24 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFJetCollections = cms.PSet(
 
-#   l1tAK4CaloJets = cms.InputTag('ak4PFL1Calo'),
-#   l1tAK4PFJets = cms.InputTag('ak4PFL1PF'),
-#   l1tAK4PFPuppiJets = cms.InputTag('ak4PFL1Puppi'),
+#    l1tAK4CaloJets = cms.InputTag('ak4PFL1Calo'),
+#    l1tAK4PFJets = cms.InputTag('ak4PFL1PF'),
+#    l1tAK4PFPuppiJets = cms.InputTag('ak4PFL1Puppi'),
 
-#   hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
-#   hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
-#   hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
-#   hltAK4PFCHSJetsCorrected = cms.InputTag('hltAK4PFCHSJetsCorrected'),
-#   hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
-#   hltAK4PFPuppiJets = cms.InputTag('hltAK4PFPuppiJets'),
+#    hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
+#    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
+#    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
+#    hltAK4PFCHSJetsCorrected = cms.InputTag('hltAK4PFCHSJetsCorrected'),
+#    hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
+#    hltAK4PFPuppiJets = cms.InputTag('hltAK4PFPuppiJets'),
     hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
-#   hltAK8PFPuppiJets = cms.InputTag('hltAK8PFPuppiJets'),
+#    hltAK8PFPuppiJets = cms.InputTag('hltAK8PFPuppiJets'),
     hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
   ),
 
   patJetCollections = cms.PSet(
 
-#   offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
+#    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
     offlineAK4PFPuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
     offlineAK8PFPuppiJetsCorrected = cms.InputTag('slimmedJetsAK8'),
   ),

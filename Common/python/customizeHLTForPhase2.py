@@ -173,50 +173,6 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
     return process
 
 def customise_hltPhase2_common(process):
-    # ES modules for offline-to-online scaling of L1T thresholds
-    process.l1tScalingESSource = cms.ESSource('PoolDBESSource',
-      _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/user/t/tomei/public/L1TObjScaling.db'),
-      DumpStat = cms.untracked.bool(True),
-      toGet = cms.VPSet(
-        cms.PSet(
-          record = cms.string('L1TObjScalingRcd'),
-          tag = cms.string('L1TkMuonScaling'),
-          label = cms.untracked.string('L1TkMuonScaling'),
-        ),
-        cms.PSet(
-          record = cms.string('L1TObjScalingRcd'),
-          tag = cms.string('L1TkElectronScaling'),
-          label = cms.untracked.string('L1TkEleScaling'),
-        ),
-        cms.PSet(
-          record = cms.string('L1TObjScalingRcd'),
-          tag = cms.string('L1PFPhase1JetScaling'),
-          label = cms.untracked.string('L1PFPhase1JetScaling'),
-        ),
-        cms.PSet(
-          record = cms.string('L1TObjScalingRcd'),
-          tag = cms.string('L1PFPhase1HTScaling'),
-          label = cms.untracked.string('L1PFPhase1HTScaling'),
-        ),
-        cms.PSet(
-          record = cms.string('L1TObjScalingRcd'),
-          tag = cms.string('L1PFPhase1HT090Scaling'),
-          label = cms.untracked.string('L1PFPhase1HT090Scaling'),
-        ),
-        cms.PSet(
-          record = cms.string('L1TObjScalingRcd'),
-          tag = cms.string('L1PuppiMETScaling'),
-          label = cms.untracked.string('L1PuppiMETScaling'),
-        ),
-        cms.PSet(
-          record = cms.string('L1TObjScalingRcd'),
-          tag = cms.string('L1PuppiMET090Scaling'),
-          label = cms.untracked.string('L1PuppiMET090Scaling'),
-        ),
-      ),
-    )
-    process.l1tScalingESPrefer = cms.ESPrefer('PoolDBESSource', 'l1tScalingESSource')
-
     # ES modules for Jet Energy Scale Corrections
     process.jescESSource = cms.ESSource('PoolDBESSource',
       _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/Phase2HLTTDR_V5_MC/Phase2HLTTDR_V5_MC.db'),
@@ -408,9 +364,13 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     ## Single-Jet producers+filters
-    process.l1tSinglePFPuppiJet200off = cms.EDFilter('L1JetFilter',
+    process.l1tSinglePFPuppiJet200off = cms.EDFilter('L1TJetFilter',
       inputTag = cms.InputTag('l1tSlwPFPuppiJetsCorrected', 'Phase1L1TJetFromPfCandidates'),
-      esScalingTag = cms.ESInputTag('l1tScalingESSource', 'L1PFPhase1JetScaling'),
+      Scalings = cms.PSet(
+        barrel = cms.vdouble(11.1254, 1.40627, 0),
+        overlap = cms.vdouble(24.8375, 1.4152, 0),
+        endcap = cms.vdouble(42.4039, 1.33052, 0),
+      ),
       MinPt = cms.double(200.),
       MinEta = cms.double(-5.),
       MaxEta = cms.double(5.),
@@ -443,9 +403,11 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       maxEtaJetHt = cms.double(2.4),
     )
 
-    process.l1tPFPuppiHT450off = cms.EDFilter('L1EnergySumFilter',
+    process.l1tPFPuppiHT450off = cms.EDFilter('L1TEnergySumFilter',
       inputTag = cms.InputTag('l1tPFPuppiHT'),
-      esScalingTag = cms.ESInputTag('l1tScalingESSource', 'L1PFPhase1HT090Scaling'),
+      Scalings = cms.PSet(
+        theScalings = cms.vdouble(50.0182, 1.0961, 0), # PFPhase1HT090OfflineEtCut
+      ),
       TypeOfSum = cms.string('HT'),
       MinPt = cms.double(450.),
     )
@@ -488,9 +450,11 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.hltPFPuppiMHT120 = _hltMHT100.clone(mhtLabels = ['hltPFPuppiMHT'], minMht = [120.])
 
     ## MET producers+filters
-    process.l1tPFPuppiMET200off = cms.EDFilter('L1PFEnergySumFilter',
+    process.l1tPFPuppiMET200off = cms.EDFilter('L1TPFEnergySumFilter',
       inputTag = cms.InputTag('l1PFMetPuppi'),
-      esScalingTag = cms.ESInputTag('l1tScalingESSource', 'L1PuppiMET090Scaling'),
+      Scalings = cms.PSet(
+        theScalings = cms.vdouble(54.2859, 1.39739, 0), # PuppiMET090OfflineEtCut
+      ),
       TypeOfSum = cms.string('MET'),
       MinPt = cms.double(200.),
     )
