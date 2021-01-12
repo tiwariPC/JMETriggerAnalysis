@@ -156,9 +156,9 @@ else:
 ###
 ### analysis sequence
 ###
-#process.setSchedule_(cms.Schedule(
-#  process.MC_JME
-#))
+process.setSchedule_(cms.Schedule(
+  process.MC_JME
+))
 
 ## JMETrigger NTuple
 from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
@@ -256,10 +256,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   vdoubles = cms.PSet(
 
-#    hltPFPuppi_PuppiRawAlphas = cms.InputTag('hltPFPuppi:PuppiRawAlphas'),
-#    hltPFPuppi_PuppiAlphas = cms.InputTag('hltPFPuppi:PuppiAlphas'),
-#    hltPFPuppi_PuppiAlphasMed = cms.InputTag('hltPFPuppi:PuppiAlphasMed'),
-#    hltPFPuppi_PuppiAlphasRms = cms.InputTag('hltPFPuppi:PuppiAlphasRms'),
+    hltPFPuppi_PuppiRawAlphas = cms.InputTag('hltPFPuppi:PuppiRawAlphas'),
+    hltPFPuppi_PuppiAlphas = cms.InputTag('hltPFPuppi:PuppiAlphas'),
+    hltPFPuppi_PuppiAlphasMed = cms.InputTag('hltPFPuppi:PuppiAlphasMed'),
+    hltPFPuppi_PuppiAlphasRms = cms.InputTag('hltPFPuppi:PuppiAlphasRms'),
   ),
 
   recoVertexCollections = cms.PSet(
@@ -277,9 +277,9 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoPFCandidateCollections = cms.PSet(
 
 #    hltPFSim = cms.InputTag('simPFProducer'),
-#    hltPFTICL = cms.InputTag('pfTICL'),
+    hltPFTICL = cms.InputTag('pfTICL'),
 #    hltParticleFlow = cms.InputTag('particleFlowTmp'),
-#    hltPFPuppi = cms.InputTag('hltPFPuppi'),
+    hltPFPuppi = cms.InputTag('hltPFPuppi'),
 #    hltPFPuppiNoLep = cms.InputTag('hltPFPuppiNoLep'),
   ),
 

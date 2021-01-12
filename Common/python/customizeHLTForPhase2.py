@@ -630,17 +630,20 @@ def customise_hltPhase2_reconfigurePuppi(process, TICL):
           mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.000634
 
       if TICL:
-        mod_i.algos[0].etaMin = [-1., 1.5, 2.5, 2.8, 3.2]
+        mod_i.algos[0].etaMin = [-0.01, 1.5, 2.5, 2.8, 3.2]
         mod_i.algos[0].etaMax = [1.5, 2.5, 2.8, 3.2, 3.5]
-        mod_i.algos[0].ptMin = mod_i.algos[0].ptMin[0] + 4*mod_i.algos[0].ptMin[1]
-        mod_i.algos[0].MinNeutralPt = mod_i.algos[0].MinNeutralPt[0] + 4*mod_i.algos[0].MinNeutralPt[1]
-        mod_i.algos[0].MinNeutralPtSlope = mod_i.algos[0].MinNeutralPtSlope[0] + 4*mod_i.algos[0].MinNeutralPtSlope[1]
-        mod_i.algos[0].RMSEtaSF = mod_i.algos[0].RMSEtaSF[0] + 4*mod_i.algos[0].RMSEtaSF[1]
-        mod_i.algos[0].MedEtaSF = mod_i.algos[0].MedEtaSF[0] + 4*mod_i.algos[0].MedEtaSF[1]
+        mod_i.algos[0].ptMin = [mod_i.algos[0].ptMin[0]] + 4*[mod_i.algos[0].ptMin[1]]
+        mod_i.algos[0].MinNeutralPt = [mod_i.algos[0].MinNeutralPt[0]] + 4*[mod_i.algos[0].MinNeutralPt[1]]
+        mod_i.algos[0].MinNeutralPtSlope = [mod_i.algos[0].MinNeutralPtSlope[0]] + 4*[mod_i.algos[0].MinNeutralPtSlope[1]]
+        mod_i.algos[0].PtMaxNeutrals = [mod_i.algos[0].PtMaxNeutrals[0]] + 4*[mod_i.algos[0].PtMaxNeutrals[1]]#!!
+        mod_i.algos[0].PtMaxNeutralsStartSlope = [mod_i.algos[0].PtMaxNeutralsStartSlope[0]] + 4*[mod_i.algos[0].PtMaxNeutralsStartSlope[1]]#!!
+        mod_i.algos[0].RMSEtaSF = [mod_i.algos[0].RMSEtaSF[0]] + 4*[mod_i.algos[0].RMSEtaSF[1]]
+        mod_i.algos[0].MedEtaSF = [mod_i.algos[0].MedEtaSF[0]] + 4*[mod_i.algos[0].MedEtaSF[1]]
 
         mod_i.algos[0].MinNeutralPt[1] += 1.
         mod_i.algos[0].MinNeutralPt[3] += 1.
-        mod_i.algos[0].MinNeutralPtSlope[3] *= 1.3
+        mod_i.algos[0].MinNeutralPtSlope[3] *= 4.
+        mod_i.algos[0].PtMaxNeutrals[3] = -1.
 
     return process
 

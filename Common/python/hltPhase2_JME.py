@@ -355,11 +355,13 @@ def customise_hltPhase2_JME(process):
       vertexName = _primaryVerticesGood,
       PtMaxCharged = 20.,
       EtaMinUseDeltaZ = 4.0,
-      PtMaxNeutralsStartSlope = 20.,
+#!!      PtMaxNeutralsStartSlope = 20.,
       NumOfPUVtxsForCharged = 2,
-      puppiDiagnostics = False,
+      puppiDiagnostics = True,
     )
     process.hltPFPuppi.algos[0].etaMin[0] = -0.01
+    process.hltPFPuppi.algos[0].PtMaxNeutralsStartSlope = [20., 20.]#!!
+    process.hltPFPuppi.algos[1].PtMaxNeutralsStartSlope = [20.]#!!
 
     process.hltAK4PFPuppiJets = ak4PFJetsPuppi.clone(
       src = _particleFlowCands,
@@ -432,11 +434,13 @@ def customise_hltPhase2_JME(process):
       vertexName = _primaryVerticesGood,
       PtMaxCharged = 20.,
       EtaMinUseDeltaZ = 4.0,
-      PtMaxNeutralsStartSlope = 20.,
+#!!      PtMaxNeutralsStartSlope = 20.,
       NumOfPUVtxsForCharged = 2,
       puppiDiagnostics = False,
     )
     process.hltPFPuppiNoLep.algos[0].etaMin[0] = -0.01
+    process.hltPFPuppiNoLep.algos[0].PtMaxNeutralsStartSlope = [20., 20.]#!!
+    process.hltPFPuppiNoLep.algos[1].PtMaxNeutralsStartSlope = [20.]#!!
 
     process.hltPFPuppiMETv0 = cms.EDProducer( 'PFMETProducer',
       src = cms.InputTag( _particleFlowCands ),
