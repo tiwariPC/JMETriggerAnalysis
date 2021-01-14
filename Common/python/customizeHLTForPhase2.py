@@ -173,23 +173,30 @@ def customise_hltPhase2_redefineReconstructionSequencesCommon(process):
     return process
 
 def customise_hltPhase2_common(process):
-    # ES modules for Jet Energy Scale Corrections
-    process.jescESSource = cms.ESSource('PoolDBESSource',
-      _CondDB.clone(connect = 'sqlite_file:/afs/cern.ch/work/m/missirol/public/phase2/JESC/Phase2HLTTDR_V5_MC/Phase2HLTTDR_V5_MC.db'),
-      toGet = cms.VPSet(
-        cms.PSet(
-          record = cms.string('JetCorrectionsRecord'),
-          tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK4PFPuppiHLT'),
-          label = cms.untracked.string('AK4PFPuppiHLT')
-        ),
-        cms.PSet(
-          record = cms.string('JetCorrectionsRecord'),
-          tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK8PFPuppiHLT'),
-          label = cms.untracked.string('AK8PFPuppiHLT')
-        ),
-      ),
-    )
-    process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
+
+    if not hasattr(process, 'GlobalTag'):
+      raise RuntimeError('process.GlobalTag not found')
+
+    # fix for AK4PF Phase-2 JECs
+    process.GlobalTag.toGet.append(cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_AK4PF'),
+      label = cms.untracked.string('AK4PF'),
+    ))
+
+    process.GlobalTag.toGet.append(cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK4PFPuppiHLT'),
+      label = cms.untracked.string('AK4PFPuppiHLT'),
+      connect = cms.string('frontier://FrontierPrep/CMS_CONDITIONS'),
+    ))
+
+    process.GlobalTag.toGet.append(cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK8PFPuppiHLT'),
+      label = cms.untracked.string('AK8PFPuppiHLT'),
+      connect = cms.string('frontier://FrontierPrep/CMS_CONDITIONS'),
+    ))
 
     # prevent access to inputs from RECO step (if available),
     # except for Offline objects to be used saved in the NTuple,

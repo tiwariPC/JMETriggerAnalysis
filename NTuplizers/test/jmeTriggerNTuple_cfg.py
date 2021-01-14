@@ -44,10 +44,10 @@ opts.register('addTimingDQM', False,
               vpo.VarParsing.varType.bool,
               'print results of FastTimerService, and produce corresponding DQM output file')
 
-opts.register('globalTag', None,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.string,
-              'argument of process.GlobalTag.globaltag')
+#opts.register('globalTag', None,
+#              vpo.VarParsing.multiplicity.singleton,
+#              vpo.VarParsing.varType.string,
+#              'argument of process.GlobalTag.globaltag')
 
 opts.register('reco', 'HLT_TRKv06p1_TICL',
               vpo.VarParsing.multiplicity.singleton,
@@ -488,17 +488,11 @@ if opts.addTimingDQM:
    process.FastTimerService.dqmModuleTimeRange      =  1000.
    process.FastTimerService.dqmModuleTimeResolution =     1.
 
-# update process.GlobalTag.globaltag
-if opts.globalTag is not None:
-   from Configuration.AlCa.GlobalTag import GlobalTag
-   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
-
-# fix for AK4PF Phase-2 JECs
-process.GlobalTag.toGet.append(cms.PSet(
-  record = cms.string('JetCorrectionsRecord'),
-  tag = cms.string('JetCorrectorParametersCollection_PhaseIIFall17_V5b_MC_AK4PF'),
-  label = cms.untracked.string('AK4PF'),
-))
+## update process.GlobalTag.globaltag
+#if opts.globalTag is not None:
+#   raise RuntimeError('command-line argument "globalTag='+opts.globalTag+'" will overwrite process.GlobalTag (previous customizations of it will be lost)')
+#   from Configuration.AlCa.GlobalTag import GlobalTag
+#   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
