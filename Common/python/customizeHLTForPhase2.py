@@ -188,14 +188,14 @@ def customise_hltPhase2_common(process):
       record = cms.string('JetCorrectionsRecord'),
       tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK4PFPuppiHLT'),
       label = cms.untracked.string('AK4PFPuppiHLT'),
-      connect = cms.string('frontier://FrontierPrep/CMS_CONDITIONS'),
+      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS'),
     ))
 
     process.GlobalTag.toGet.append(cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
       tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK8PFPuppiHLT'),
       label = cms.untracked.string('AK8PFPuppiHLT'),
-      connect = cms.string('frontier://FrontierPrep/CMS_CONDITIONS'),
+      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS'),
     ))
 
     # prevent access to inputs from RECO step (if available),
