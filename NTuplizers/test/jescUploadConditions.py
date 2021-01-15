@@ -19,6 +19,7 @@ if __name__ == '__main__':
   parser.add_argument('-d', '--db', default='prep', choices=['prep', 'prod'], help='keyword for the target database -- must be "prep" (default) or "prod"')
   parser.add_argument('-c', '--cache-dir', dest='cache_dir', default='/tmp/'+os.environ['USER'], help='path to directory where files are cached prior to upload')
   parser.add_argument('-t', '--txt', required=True, help='description of payloads')
+  parser.add_argument('--dry-run', dest='dry_run', action='store_true', help='execute in dry-run mode (no upload to db)')
   args, unknown_args = parser.parse_known_args()
 
   if len(unknown_args) > 0:
@@ -45,17 +46,18 @@ if __name__ == '__main__':
       pass
 
   if args.db == 'prod':
-    print '-'*50+'\n'+'>>> uploading to production database'+'\n'+'-'*50
     database = 'oracle://cms_orcon_prod/CMS_CONDITIONS'
+    print '-'*100+'\n'+'>>> '+('would upload' if args.dry_run else 'uploading')+' to production database: '+database+'\n'+'-'*100
   elif args.db == 'prep':
-    print '-'*50+'\n'+'>>> uploading to development database (prep)'+'\n'+'-'*50
     database = 'oracle://cms_orcoff_prep/CMS_CONDITIONS'
+    print '-'*100+'\n'+'>>> '+('would upload' if args.dry_run else 'uploading')+' to development database (prep): '+database+'\n'+'-'*100
 
-  try:
-    os.makedirs(args.cache_dir)
-  except:
-    if not os.path.isdir(args.cache_dir):
-      raise RuntimeError('target cache directory does not exist: '+args.cache_dir)
+  if not args.dry_run:
+    try:
+      os.makedirs(args.cache_dir)
+    except:
+      if not os.path.isdir(args.cache_dir):
+        raise RuntimeError('target cache directory does not exist: '+args.cache_dir)
 
   upload_cmd = 'uploadConditions.py'
 
@@ -64,7 +66,10 @@ if __name__ == '__main__':
   for tagnr, tag in enumerate(tags):
     tag_file_txt = tag_file_txt_format.format(tagnr=tagnr, tag=tag)
     tag_file_db = tag_file_txt[:-3]+'db'
-    shutil.copy2(args.dbfile, tag_file_db)
+
+    if not args.dry_run:
+      shutil.copy2(args.dbfile, tag_file_db)
+
     upload_cmd += ' '+tag_file_db
 
     metadata = {
@@ -75,17 +80,20 @@ if __name__ == '__main__':
       'userText': args.txt,
     }
 
-    print ''
+    print '\n'+'*'*100
     print '.db  :', tag_file_db
     print '.txt :', tag_file_txt
+    print json.dumps(metadata, sort_keys=True, indent=4)
+    print '*'*100
 
-    with open(tag_file_txt, 'w') as ofile:
-      json.dump(metadata, ofile)
-      print json.dumps(metadata, sort_keys=True, indent=4)
+    if not args.dry_run:
+      json.dump(metadata, open(tag_file_txt, 'w'))
 
-  print '\n'+'-'*50
+  print '\n'+'-'*100
   print '>', upload_cmd
-  print '-'*50+'\n'
-  print '>>> will upload in 10 sec'
-  time.sleep(10)
-  subprocess.Popen(upload_cmd.split()).communicate()
+  print '-'*100
+
+  if not args.dry_run:
+    print '\n>>> will upload in 10 sec'
+    time.sleep(10)
+    subprocess.Popen(upload_cmd.split()).communicate()
