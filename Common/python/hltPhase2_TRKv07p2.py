@@ -10,6 +10,15 @@ def customise_hltPhase2_TRKv07p2(process):
         trackerGeometryLabel = cms.untracked.string('')
     )
 
+    process.trackAlgoPriorityOrder = cms.ESProducer("TrackAlgoPriorityOrderESProducer",
+        ComponentName = cms.string('trackAlgoPriorityOrder'),
+        algoOrder = cms.vstring(
+            'initialStep', 
+            'highPtTripletStep'
+        ),
+        appendToDataLabel = cms.string('')
+    )
+
     process.seedFromProtoTracks = cms.PSet(
         ComponentName = cms.string('SeedFromConsecutiveHitsCreator'),
         MinOneOverPtError = cms.double(1.0),
@@ -19,60 +28,6 @@ def customise_hltPhase2_TRKv07p2(process):
         forceKinematicWithRegionDirection = cms.bool(False),
         magneticField = cms.string(''),
         propagator = cms.string('PropagatorWithMaterial')
-    )
-
-    process.pixelTracksSeedLayers = cms.EDProducer("SeedingLayersEDProducer",
-        BPix = cms.PSet(
-            HitProducer = cms.string('siPixelRecHits'),
-            TTRHBuilder = cms.string('WithTrackAngle')
-        ),
-        FPix = cms.PSet(
-            HitProducer = cms.string('siPixelRecHits'),
-            TTRHBuilder = cms.string('WithTrackAngle')
-        ),
-        MTEC = cms.PSet(
-
-        ),
-        MTIB = cms.PSet(
-
-        ),
-        MTID = cms.PSet(
-
-        ),
-        MTOB = cms.PSet(
-
-        ),
-        TEC = cms.PSet(
-
-        ),
-        TIB = cms.PSet(
-
-        ),
-        TID = cms.PSet(
-
-        ),
-        TOB = cms.PSet(
-
-        ),
-        layerList = cms.vstring(
-            'BPix1+BPix2+BPix3+BPix4',
-            'BPix1+BPix2+BPix3+FPix1_pos',
-            'BPix1+BPix2+BPix3+FPix1_neg',
-            'BPix1+BPix2+FPix1_pos+FPix2_pos',
-            'BPix1+BPix2+FPix1_neg+FPix2_neg',
-            'BPix1+FPix1_pos+FPix2_pos+FPix3_pos',
-            'BPix1+FPix1_neg+FPix2_neg+FPix3_neg',
-            'FPix1_pos+FPix2_pos+FPix3_pos+FPix4_pos',
-            'FPix1_neg+FPix2_neg+FPix3_neg+FPix4_neg',
-            'FPix2_pos+FPix3_pos+FPix4_pos+FPix5_pos',
-            'FPix2_neg+FPix3_neg+FPix4_neg+FPix5_neg',
-            'FPix3_pos+FPix4_pos+FPix5_pos+FPix6_pos',
-            'FPix3_neg+FPix4_neg+FPix5_neg+FPix6_neg',
-            'FPix4_pos+FPix5_pos+FPix6_pos+FPix7_pos',
-            'FPix4_neg+FPix5_neg+FPix6_neg+FPix7_neg',
-            'FPix5_pos+FPix6_pos+FPix7_pos+FPix8_pos',
-            'FPix5_neg+FPix6_neg+FPix7_neg+FPix8_neg'
-        )
     )
 
     process.pixelTrackFilterByKinematics = cms.EDProducer("PixelTrackFilterByKinematicsProducer",
@@ -87,7 +42,7 @@ def customise_hltPhase2_TRKv07p2(process):
         scaleErrorsForBPix1 = cms.bool(False),
         scaleFactor = cms.double(0.65)
     )
-
+    
     process.pixelTracksTrackingRegions = cms.EDProducer("GlobalTrackingRegionFromBeamSpotEDProducer",
         RegionPSet = cms.PSet(
             beamSpot = cms.InputTag("offlineBeamSpot"),
@@ -98,8 +53,54 @@ def customise_hltPhase2_TRKv07p2(process):
         )
     )
 
+    process.pixelTracksSeedLayers = cms.EDProducer("SeedingLayersEDProducer",
+        BPix = cms.PSet(
+            HitProducer = cms.string('siPixelRecHits'),
+            TTRHBuilder = cms.string('WithTrackAngle')
+        ),
+        FPix = cms.PSet(
+            HitProducer = cms.string('siPixelRecHits'),
+            TTRHBuilder = cms.string('WithTrackAngle')
+        ),
+        MTEC = cms.PSet(
+        ),
+        MTIB = cms.PSet(
+        ),
+        MTID = cms.PSet(
+        ),
+        MTOB = cms.PSet(
+        ),
+        TEC = cms.PSet(
+        ),
+        TIB = cms.PSet(
+        ),
+        TID = cms.PSet(
+        ),
+        TOB = cms.PSet(
+        ),
+        layerList = cms.vstring(
+            'BPix1+BPix2+BPix3+BPix4', 
+            'BPix1+BPix2+BPix3+FPix1_pos', 
+            'BPix1+BPix2+BPix3+FPix1_neg', 
+            'BPix1+BPix2+FPix1_pos+FPix2_pos', 
+            'BPix1+BPix2+FPix1_neg+FPix2_neg', 
+            'BPix1+FPix1_pos+FPix2_pos+FPix3_pos', 
+            'BPix1+FPix1_neg+FPix2_neg+FPix3_neg', 
+            'FPix1_pos+FPix2_pos+FPix3_pos+FPix4_pos', 
+            'FPix1_neg+FPix2_neg+FPix3_neg+FPix4_neg', 
+            'FPix2_pos+FPix3_pos+FPix4_pos+FPix5_pos', 
+            'FPix2_neg+FPix3_neg+FPix4_neg+FPix5_neg', 
+            'FPix3_pos+FPix4_pos+FPix5_pos+FPix6_pos', 
+            'FPix3_neg+FPix4_neg+FPix5_neg+FPix6_neg', 
+            'FPix4_pos+FPix5_pos+FPix6_pos+FPix7_pos', 
+            'FPix4_neg+FPix5_neg+FPix6_neg+FPix7_neg', 
+            'FPix5_pos+FPix6_pos+FPix7_pos+FPix8_pos', 
+            'FPix5_neg+FPix6_neg+FPix7_neg+FPix8_neg'
+        ),
+    )
+    
     process.pixelTracksHitDoublets = cms.EDProducer("HitPairEDProducer",
-        clusterCheck = cms.InputTag(""),
+        clusterCheck = cms.InputTag("trackerClusterCheck"),
         layerPairs = cms.vuint32(0, 1, 2),
         maxElement = cms.uint32(50000000),
         maxElementTotal = cms.uint32(50000000),
@@ -109,7 +110,7 @@ def customise_hltPhase2_TRKv07p2(process):
         trackingRegions = cms.InputTag("pixelTracksTrackingRegions"),
         trackingRegionsSeedingLayers = cms.InputTag("")
     )
-
+    
     process.pixelTracksHitSeeds = cms.EDProducer("CAHitQuadrupletEDProducer",
         CAHardPtCut = cms.double(0.0),
         CAPhiCut = cms.double(0.2),
@@ -131,6 +132,12 @@ def customise_hltPhase2_TRKv07p2(process):
             value2 = cms.double(50.0)
         ),
         useBendingCorrection = cms.bool(True)
+    )
+
+    process.pixelTrackCleanerBySharedHits = cms.ESProducer("PixelTrackCleanerBySharedHitsESProducer",
+        ComponentName = cms.string('pixelTrackCleanerBySharedHits'),
+        appendToDataLabel = cms.string(''),
+        useQuadrupletAlgo = cms.bool(False)
     )
 
     process.pixelTracks = cms.EDProducer("PixelTrackProducer",
@@ -155,7 +162,7 @@ def customise_hltPhase2_TRKv07p2(process):
         PVcomparer = cms.PSet(
             refToPSet_ = cms.string('pSetPvClusterComparerForIT')
         ),
-        PtMin = cms.double(1.0),
+        PtMin = cms.double(2.0),
         TrackCollection = cms.InputTag("pixelTracks"),
         UseError = cms.bool(True),
         Verbosity = cms.int32(0),
@@ -171,58 +178,80 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         fractionSumPt2 = cms.double(0.1),
         maxVtx = cms.uint32(10),
-        minSumPt2 = cms.double(10.),
+        minSumPt2 = cms.double(10),
         src = cms.InputTag("pixelVertices")
     )
 
-    process.initialStepTrajectoryBuilder = cms.PSet(
-        ComponentType = cms.string('GroupedCkfTrajectoryBuilder'),
-        MeasurementTrackerName = cms.string(''),
+    process.pixelTracksCleaner = cms.EDProducer("TrackWithVertexSelector",
+        copyExtras = cms.untracked.bool(True),
+        copyTrajectories = cms.untracked.bool(False),
+        d0Max = cms.double(999.0),
+        dzMax = cms.double(999.0),
+        etaMax = cms.double(5.0),
+        etaMin = cms.double(0.0),
+        maxOfValidPixelHits = cms.uint32(99),
+        minPt = cms.double(1.0),
+        nSigmaDtVertex = cms.double(0),
+        nVertices = cms.uint32(20),
+        normalizedChi2 = cms.double(999999.0),
+        numberOfLostHits = cms.uint32(999),
+        numberOfValidHits = cms.uint32(0),
+        numberOfValidPixelHits = cms.uint32(4),
+        ptErrorCut = cms.double(9999999.0),
+        ptMax = cms.double(100000.0),
+        ptMin = cms.double(0.0),
+        quality = cms.string('any'),
+        rhoVtx = cms.double(0.25),
+        src = cms.InputTag("pixelTracks"),
+        timeResosTag = cms.InputTag(""),
+        timesTag = cms.InputTag(""),
+        useVtx = cms.bool(True),
+        vertexTag = cms.InputTag("trimmedPixelVertices"),
+        vtxFallback = cms.bool(True),
+        zetaVtx = cms.double(0.5)
+    )
+    
+    process.initialStepSeeds = cms.EDProducer("SeedGeneratorFromProtoTracksEDProducer",
+        InputCollection = cms.InputTag("pixelTracksCleaner"),
+        InputVertexCollection = cms.InputTag(""),
+        SeedCreatorPSet = cms.PSet(
+            refToPSet_ = cms.string('seedFromProtoTracks')
+        ),
         TTRHBuilder = cms.string('WithTrackAngle'),
-        alwaysUseInvalidHits = cms.bool(False),
-        bestHitOnly = cms.bool(True),
-        estimator = cms.string('initialStepChi2Est'),
-        foundHitBonus = cms.double(10.0),
-        inOutTrajectoryFilter = cms.PSet(
-            refToPSet_ = cms.string('initialStepTrajectoryFilter')
-        ),
-        intermediateCleaning = cms.bool(True),
-        keepOriginalIfRebuildFails = cms.bool(True),
-        lockHits = cms.bool(True),
-        lostHitPenalty = cms.double(30.0),
-        maxCand = cms.int32(2),
-        maxDPhiForLooperReconstruction = cms.double(2.0),
-        maxPtForLooperReconstruction = cms.double(0.7),
-        minNrOfHitsForRebuild = cms.int32(1),
-        propagatorAlong = cms.string('PropagatorWithMaterialParabolicMf'),
-        propagatorOpposite = cms.string('PropagatorWithMaterialParabolicMfOpposite'),
-        requireSeedHitsInRebuild = cms.bool(True),
-        seedAs5DHit = cms.bool(False),
-        trajectoryFilter = cms.PSet(
-            refToPSet_ = cms.string('initialStepTrajectoryFilter')
-        ),
-        updator = cms.string('KFUpdator'),
-        useSameTrajFilter = cms.bool(True)
+        includeFourthHit = cms.bool(True),
+        originHalfLength = cms.double(0.3),
+        originRadius = cms.double(0.1),
+        useEventsWithNoVertex = cms.bool(True),
+        usePV = cms.bool(True),
+        useProtoTrackKinematics = cms.bool(False)
     )
-
-
-
-    process.initialStepChi2Est = cms.ESProducer("Chi2ChargeMeasurementEstimatorESProducer",
-        ComponentName = cms.string('initialStepChi2Est'),
-        MaxChi2 = cms.double(9.0),
-        MaxDisplacement = cms.double(0.5),
-        MaxSagitta = cms.double(2),
-        MinPtForHitRecoveryInGluedDet = cms.double(1000000.0),
-        MinimalTolerance = cms.double(0.5),
-        appendToDataLabel = cms.string(''),
-        clusterChargeCut = cms.PSet(
-            refToPSet_ = cms.string('SiStripClusterChargeCutLoose')
-        ),
-        nSigma = cms.double(3.0),
-        pTChargeCutThreshold = cms.double(15.0)
+    
+    process.highPtTripletStepTrajectoryCleanerBySharedHits = cms.ESProducer("TrajectoryCleanerESProducer",
+        ComponentName = cms.string('highPtTripletStepTrajectoryCleanerBySharedHits'),
+        ComponentType = cms.string('TrajectoryCleanerBySharedHits'),
+        MissingHitPenalty = cms.double(20.0),
+        ValidHitBonus = cms.double(5.0),
+        allowSharedFirstHit = cms.bool(True),
+        fractionShared = cms.double(0.16)
     )
-
-
+    
+    process.highPtTripletStepTrackingRegions = cms.EDProducer("GlobalTrackingRegionWithVerticesEDProducer",
+        RegionPSet = cms.PSet(
+            VertexCollection = cms.InputTag("trimmedPixelVertices"),
+            beamSpot = cms.InputTag("offlineBeamSpot"),
+            fixedError = cms.double(0.1),
+            nSigmaZ = cms.double(5.0),
+            originRadius = cms.double(0.25),
+            precise = cms.bool(True),
+            ptMin = cms.double(0.9),
+            sigmaZVertex = cms.double(3.0),
+            useFakeVertices = cms.bool(False),
+            useFixedError = cms.bool(True),
+            useFoundVertices = cms.bool(True),
+            useMultipleScattering = cms.bool(False)
+        ),
+    )
+    
     process.initialStepTrajectoryFilter = cms.PSet(
         ComponentType = cms.string('CkfBaseTrajectoryFilter'),
         chargeSignificance = cms.double(-1.0),
@@ -246,38 +275,6 @@ def customise_hltPhase2_TRKv07p2(process):
         seedExtension = cms.int32(0),
         seedPairPenalty = cms.int32(0),
         strictSeedExtension = cms.bool(False)
-    )
-
-    process.initialStepSeeds = cms.EDProducer("SeedGeneratorFromProtoTracksEDProducer",
-        InputCollection = cms.InputTag("pixelTracks"),
-        InputVertexCollection = cms.InputTag("trimmedPixelVertices"),
-        SeedCreatorPSet = cms.PSet(
-            refToPSet_ = cms.string('seedFromProtoTracks')
-        ),
-        TTRHBuilder = cms.string('WithTrackAngle'),
-        originHalfLength = cms.double(0.3),
-        originRadius = cms.double(0.1),
-        useEventsWithNoVertex = cms.bool(True),
-        usePV = cms.bool(False),
-        useProtoTrackKinematics = cms.bool(False)
-    )
-
-    process.highPtTripletStepTrackingRegions = cms.EDProducer("GlobalTrackingRegionWithVerticesEDProducer",
-        RegionPSet = cms.PSet(
-            VertexCollection = cms.InputTag("trimmedPixelVertices"),
-            beamSpot = cms.InputTag("offlineBeamSpot"),
-            fixedError = cms.double(0.2),
-            nSigmaZ = cms.double(4.0),
-            originRadius = cms.double(0.02),
-            precise = cms.bool(True),
-            ptMin = cms.double(0.9),
-            sigmaZVertex = cms.double(3.0),
-            useFakeVertices = cms.bool(False),
-            useFixedError = cms.bool(True),
-            useFoundVertices = cms.bool(True),
-            useMultipleScattering = cms.bool(False)
-        ),
-        mightGet = cms.optional.untracked.vstring
     )
 
     process.highPtTripletStepTrajectoryFilterInOut = cms.PSet(
@@ -330,6 +327,21 @@ def customise_hltPhase2_TRKv07p2(process):
         strictSeedExtension = cms.bool(False)
     )
 
+    process.initialStepChi2Est = cms.ESProducer("Chi2ChargeMeasurementEstimatorESProducer",
+        ComponentName = cms.string('initialStepChi2Est'),
+        MaxChi2 = cms.double(9.0),
+        MaxDisplacement = cms.double(0.5),
+        MaxSagitta = cms.double(2),
+        MinPtForHitRecoveryInGluedDet = cms.double(1000000.0),
+        MinimalTolerance = cms.double(0.5),
+        appendToDataLabel = cms.string(''),
+        clusterChargeCut = cms.PSet(
+            refToPSet_ = cms.string('SiStripClusterChargeCutLoose')
+        ),
+        nSigma = cms.double(3.0),
+        pTChargeCutThreshold = cms.double(15.0)
+    )
+    
     process.highPtTripletStepChi2Est = cms.ESProducer("Chi2ChargeMeasurementEstimatorESProducer",
         ComponentName = cms.string('highPtTripletStepChi2Est'),
         MaxChi2 = cms.double(16.0),
@@ -344,6 +356,52 @@ def customise_hltPhase2_TRKv07p2(process):
         nSigma = cms.double(3),
         pTChargeCutThreshold = cms.double(-1)
     )
+    
+    process.highPtTripletStepTrajectoryFilter = cms.PSet(
+        ComponentType = cms.string('CompositeTrajectoryFilter'),
+        filters = cms.VPSet(
+            cms.PSet(
+                refToPSet_ = cms.string('highPtTripletStepTrajectoryFilterBase')
+            ), 
+            cms.PSet(
+                refToPSet_ = cms.string('ClusterShapeTrajectoryFilter')
+            )
+        )
+    )
+
+    process.initialStepTrajectoryBuilder = cms.PSet(
+        ComponentType = cms.string('GroupedCkfTrajectoryBuilder'),
+        MeasurementTrackerName = cms.string(''),
+        TTRHBuilder = cms.string('WithTrackAngle'),
+        alwaysUseInvalidHits = cms.bool(False),
+        bestHitOnly = cms.bool(True),
+        estimator = cms.string('initialStepChi2Est'),
+        foundHitBonus = cms.double(10.0),
+        inOutTrajectoryFilter = cms.PSet(
+            refToPSet_ = cms.string('initialStepTrajectoryFilter')
+        ),
+        intermediateCleaning = cms.bool(True),
+        keepOriginalIfRebuildFails = cms.bool(True),
+        lockHits = cms.bool(True),
+        lostHitPenalty = cms.double(30.0),
+        maxCand = cms.int32(2),
+        maxDPhiForLooperReconstruction = cms.double(2.0),
+        maxLostHitsFraction = cms.double(999.0),
+        maxNumberOfHits = cms.int32(100),
+        maxPtForLooperReconstruction = cms.double(0.7),
+        minNrOfHitsForRebuild = cms.int32(1),
+        minPt = cms.double(0.9),
+        propagatorAlong = cms.string('PropagatorWithMaterialParabolicMf'),
+        propagatorOpposite = cms.string('PropagatorWithMaterialParabolicMfOpposite'),
+        requireSeedHitsInRebuild = cms.bool(True),
+        seedAs5DHit = cms.bool(False),
+        seedPairPenalty = cms.int32(0),
+        trajectoryFilter = cms.PSet(
+            refToPSet_ = cms.string('initialStepTrajectoryFilter')
+        ),
+        updator = cms.string('KFUpdator'),
+        useSameTrajFilter = cms.bool(True)
+    )
 
     process.initialStepTrackCandidates = cms.EDProducer("CkfTrackCandidateMaker",
         MeasurementTrackerEvent = cms.InputTag("MeasurementTrackerEvent"),
@@ -356,7 +414,7 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         TrajectoryCleaner = cms.string('TrajectoryCleanerBySharedHits'),
         TransientInitialStateEstimatorParameters = cms.PSet(
-            numberMeasurementsForFit = cms.int32(4),
+            numberMeasurementsForFit = cms.int32(16),
             propagatorAlongTISE = cms.string('PropagatorWithMaterialParabolicMf'),
             propagatorOppositeTISE = cms.string('PropagatorWithMaterialParabolicMfOpposite')
         ),
@@ -370,7 +428,7 @@ def customise_hltPhase2_TRKv07p2(process):
         src = cms.InputTag("initialStepSeeds"),
         useHitsSplitting = cms.bool(False)
     )
-
+    
     process.initialStepTracks = cms.EDProducer("TrackProducer",
         AlgorithmName = cms.string('initialStep'),
         Fitter = cms.string('FlexibleKFFittingSmoother'),
@@ -389,7 +447,7 @@ def customise_hltPhase2_TRKv07p2(process):
         useHitsSplitting = cms.bool(False),
         useSimpleMF = cms.bool(False)
     )
-
+    
     process.initialStepTrackCutClassifier = cms.EDProducer("TrackCutClassifier",
         beamspot = cms.InputTag("offlineBeamSpot"),
         ignoreVertices = cms.bool(False),
@@ -420,10 +478,10 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         qualityCuts = cms.vdouble(-0.7, 0.1, 0.7),
         src = cms.InputTag("initialStepTracks"),
-        vertices = cms.InputTag("trimmedPixelVertices")
+        vertices = cms.InputTag("pixelVertices")
     )
-
-    process.initialStepTrackSelectionHighPurity = cms.EDProducer("TrackCollectionFilterCloner",
+    
+    process.initialStepTracksSelectionHighPurity = cms.EDProducer("TrackCollectionFilterCloner",
         copyExtras = cms.untracked.bool(True),
         copyTrajectories = cms.untracked.bool(False),
         minQuality = cms.string('highPurity'),
@@ -431,20 +489,96 @@ def customise_hltPhase2_TRKv07p2(process):
         originalQualVals = cms.InputTag("initialStepTrackCutClassifier","QualityMasks"),
         originalSource = cms.InputTag("initialStepTracks")
     )
-
+    
     process.highPtTripletStepClusters = cms.EDProducer("TrackClusterRemoverPhase2",
         TrackQuality = cms.string('highPurity'),
         maxChi2 = cms.double(9.0),
-        mightGet = cms.optional.untracked.vstring,
         minNumberOfLayersWithMeasBeforeFiltering = cms.int32(0),
         oldClusterRemovalInfo = cms.InputTag(""),
         overrideTrkQuals = cms.InputTag(""),
         phase2OTClusters = cms.InputTag("siPhase2Clusters"),
         phase2pixelClusters = cms.InputTag("siPixelClusters"),
         trackClassifier = cms.InputTag("","QualityMasks"),
-        trajectories = cms.InputTag("initialStepTrackSelectionHighPurity")
+        trajectories = cms.InputTag("initialStepTracksSelectionHighPurity")
     )
-
+    
+    process.highPtTripletStepSeedLayers = cms.EDProducer("SeedingLayersEDProducer",
+        BPix = cms.PSet(
+            HitProducer = cms.string('siPixelRecHits'),
+            TTRHBuilder = cms.string('WithTrackAngle'),
+            skipClusters = cms.InputTag("highPtTripletStepClusters")
+        ),
+        FPix = cms.PSet(
+            HitProducer = cms.string('siPixelRecHits'),
+            TTRHBuilder = cms.string('WithTrackAngle'),
+            skipClusters = cms.InputTag("highPtTripletStepClusters")
+        ),
+        MTEC = cms.PSet(
+    
+        ),
+        MTIB = cms.PSet(
+    
+        ),
+        MTID = cms.PSet(
+    
+        ),
+        MTOB = cms.PSet(
+    
+        ),
+        TEC = cms.PSet(
+    
+        ),
+        TIB = cms.PSet(
+    
+        ),
+        TID = cms.PSet(
+    
+        ),
+        TOB = cms.PSet(
+    
+        ),
+        layerList = cms.vstring(
+            'BPix1+BPix2+BPix3', 
+            'BPix2+BPix3+BPix4', 
+            'BPix1+BPix3+BPix4', 
+            'BPix1+BPix2+BPix4', 
+            'BPix2+BPix3+FPix1_pos', 
+            'BPix2+BPix3+FPix1_neg', 
+            'BPix1+BPix2+FPix1_pos', 
+            'BPix1+BPix2+FPix1_neg', 
+            'BPix2+FPix1_pos+FPix2_pos', 
+            'BPix2+FPix1_neg+FPix2_neg', 
+            'BPix1+FPix1_pos+FPix2_pos', 
+            'BPix1+FPix1_neg+FPix2_neg', 
+            'FPix1_pos+FPix2_pos+FPix3_pos', 
+            'FPix1_neg+FPix2_neg+FPix3_neg', 
+            'BPix1+FPix2_pos+FPix3_pos', 
+            'BPix1+FPix2_neg+FPix3_neg', 
+            'FPix2_pos+FPix3_pos+FPix4_pos', 
+            'FPix2_neg+FPix3_neg+FPix4_neg', 
+            'FPix3_pos+FPix4_pos+FPix5_pos', 
+            'FPix3_neg+FPix4_neg+FPix5_neg', 
+            'FPix4_pos+FPix5_pos+FPix6_pos', 
+            'FPix4_neg+FPix5_neg+FPix6_neg', 
+            'FPix5_pos+FPix6_pos+FPix7_pos', 
+            'FPix5_neg+FPix6_neg+FPix7_neg', 
+            'FPix6_pos+FPix7_pos+FPix8_pos', 
+            'FPix6_neg+FPix7_neg+FPix8_neg'
+        ),
+    )
+    
+    process.highPtTripletStepHitDoublets = cms.EDProducer("HitPairEDProducer",
+        clusterCheck = cms.InputTag("trackerClusterCheck"),
+        layerPairs = cms.vuint32(0, 1),
+        maxElement = cms.uint32(50000000),
+        maxElementTotal = cms.uint32(50000000),
+        produceIntermediateHitDoublets = cms.bool(True),
+        produceSeedingHitSets = cms.bool(False),
+        seedingLayers = cms.InputTag("highPtTripletStepSeedLayers"),
+        trackingRegions = cms.InputTag("highPtTripletStepTrackingRegions"),
+        trackingRegionsSeedingLayers = cms.InputTag("")
+    )
+    
     process.highPtTripletStepHitTriplets = cms.EDProducer("CAHitTripletEDProducer",
         CAHardPtCut = cms.double(0.5),
         CAPhiCut = cms.double(0.06),
@@ -465,7 +599,7 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         useBendingCorrection = cms.bool(True)
     )
-
+    
     process.highPtTripletStepSeeds = cms.EDProducer("SeedCreatorFromRegionConsecutiveHitsEDProducer",
         MinOneOverPtError = cms.double(1),
         OriginTransverseErrorMultiplier = cms.double(1),
@@ -479,7 +613,7 @@ def customise_hltPhase2_TRKv07p2(process):
         propagator = cms.string('PropagatorWithMaterial'),
         seedingHitSets = cms.InputTag("highPtTripletStepHitTriplets")
     )
-
+    
     process.highPtTripletStepTrajectoryBuilder = cms.PSet(
         ComponentType = cms.string('GroupedCkfTrajectoryBuilder'),
         MeasurementTrackerName = cms.string(''),
@@ -497,12 +631,16 @@ def customise_hltPhase2_TRKv07p2(process):
         lostHitPenalty = cms.double(30.0),
         maxCand = cms.int32(2),
         maxDPhiForLooperReconstruction = cms.double(2.0),
+        maxLostHitsFraction = cms.double(999.0),
+        maxNumberOfHits = cms.int32(100),
         maxPtForLooperReconstruction = cms.double(0.7),
         minNrOfHitsForRebuild = cms.int32(5),
+        minPt = cms.double(0.9),
         propagatorAlong = cms.string('PropagatorWithMaterialParabolicMf'),
         propagatorOpposite = cms.string('PropagatorWithMaterialParabolicMfOpposite'),
         requireSeedHitsInRebuild = cms.bool(True),
         seedAs5DHit = cms.bool(False),
+        seedPairPenalty = cms.int32(0),
         trajectoryFilter = cms.PSet(
             refToPSet_ = cms.string('highPtTripletStepTrajectoryFilter')
         ),
@@ -536,7 +674,7 @@ def customise_hltPhase2_TRKv07p2(process):
         src = cms.InputTag("highPtTripletStepSeeds"),
         useHitsSplitting = cms.bool(False)
     )
-
+    
     process.highPtTripletStepTracks = cms.EDProducer("TrackProducer",
         AlgorithmName = cms.string('highPtTripletStep'),
         Fitter = cms.string('FlexibleKFFittingSmoother'),
@@ -555,7 +693,7 @@ def customise_hltPhase2_TRKv07p2(process):
         useHitsSplitting = cms.bool(False),
         useSimpleMF = cms.bool(False)
     )
-
+    
     process.highPtTripletStepTrackCutClassifier = cms.EDProducer("TrackCutClassifier",
         beamspot = cms.InputTag("offlineBeamSpot"),
         ignoreVertices = cms.bool(False),
@@ -586,10 +724,10 @@ def customise_hltPhase2_TRKv07p2(process):
         ),
         qualityCuts = cms.vdouble(-0.7, 0.1, 0.7),
         src = cms.InputTag("highPtTripletStepTracks"),
-        vertices = cms.InputTag("trimmedPixelVertices")
+        vertices = cms.InputTag("pixelVertices")
     )
-
-    process.highPtTripletStepTrackSelectionHighPurity = cms.EDProducer("TrackCollectionFilterCloner",
+    
+    process.highPtTripletStepTracksSelectionHighPurity = cms.EDProducer("TrackCollectionFilterCloner",
         copyExtras = cms.untracked.bool(True),
         copyTrajectories = cms.untracked.bool(False),
         minQuality = cms.string('highPurity'),
@@ -597,7 +735,7 @@ def customise_hltPhase2_TRKv07p2(process):
         originalQualVals = cms.InputTag("highPtTripletStepTrackCutClassifier","QualityMasks"),
         originalSource = cms.InputTag("highPtTripletStepTracks")
     )
-
+    
     process.generalTracks = cms.EDProducer("TrackListMerger",
         Epsilon = cms.double(-0.001),
         FoundHitBonus = cms.double(5.0),
@@ -605,16 +743,16 @@ def customise_hltPhase2_TRKv07p2(process):
         MaxNormalizedChisq = cms.double(1000.0),
         MinFound = cms.int32(3),
         MinPT = cms.double(0.9),
-        ShareFrac = cms.double(0.19),
-        TrackProducers = cms.VInputTag("initialStepTrackSelectionHighPurity", "highPtTripletStepTrackSelectionHighPurity"),
-        allowFirstHitShare = cms.bool(True),
+        ShareFrac = cms.double(0.2),
+        TrackProducers = cms.VInputTag("initialStepTracksSelectionHighPurity", "highPtTripletStepTracksSelectionHighPurity"),
+        allowFirstHitShare = cms.bool(False),
         copyExtras = cms.untracked.bool(True),
         copyMVA = cms.bool(False),
         hasSelector = cms.vint32(0, 0),
         indivShareFrac = cms.vdouble(1.0, 1.0),
         makeReKeyedSeeds = cms.untracked.bool(False),
         newQuality = cms.string('confirmed'),
-        selectedTrackQuals = cms.VInputTag(cms.InputTag("initialStepTrackSelectionHighPurity"), cms.InputTag("highPtTripletStepTrackSelectionHighPurity")),
+        selectedTrackQuals = cms.VInputTag(cms.InputTag("initialStepTracksSelectionHighPurity"), cms.InputTag("highPtTripletStepTracksSelectionHighPurity")),
         setsToMerge = cms.VPSet(cms.PSet(
             pQual = cms.bool(True),
             tLists = cms.vint32(0, 1)
@@ -659,7 +797,7 @@ def customise_hltPhase2_TRKv07p2(process):
                 maxDistanceToBeam = cms.double(1.0),
                 minNdof = cms.double(0.0),
                 useBeamConstraint = cms.bool(False)
-            ),
+            ), 
             cms.PSet(
                 algorithm = cms.string('AdaptiveVertexFitter'),
                 chi2cutoff = cms.double(2.5),
@@ -670,7 +808,39 @@ def customise_hltPhase2_TRKv07p2(process):
             )
         )
     )
-
+    
+    process.ak4CaloJetsForTrk = cms.EDProducer("FastjetJetProducer",
+        Active_Area_Repeats = cms.int32(1),
+        GhostArea = cms.double(0.01),
+        Ghost_EtaMax = cms.double(5.0),
+        Rho_EtaMax = cms.double(4.4),
+        doAreaDiskApprox = cms.bool(False),
+        doAreaFastjet = cms.bool(False),
+        doPUOffsetCorr = cms.bool(False),
+        doPVCorrection = cms.bool(True),
+        doRhoFastjet = cms.bool(False),
+        inputEMin = cms.double(0.0),
+        inputEtMin = cms.double(0.3),
+        jetAlgorithm = cms.string('AntiKt'),
+        jetPtMin = cms.double(10.0),
+        jetType = cms.string('CaloJet'),
+        maxBadEcalCells = cms.uint32(9999999),
+        maxBadHcalCells = cms.uint32(9999999),
+        maxProblematicEcalCells = cms.uint32(9999999),
+        maxProblematicHcalCells = cms.uint32(9999999),
+        maxRecoveredEcalCells = cms.uint32(9999999),
+        maxRecoveredHcalCells = cms.uint32(9999999),
+        minSeed = cms.uint32(14327),
+        nSigmaPU = cms.double(1.0),
+        puPtMin = cms.double(10),
+        rParam = cms.double(0.4),
+        radiusPU = cms.double(0.5),
+        src = cms.InputTag("caloTowerForTrk"),
+        srcPVs = cms.InputTag("unsortedOfflinePrimaryVertices"),
+        useDeterministicSeed = cms.bool(True),
+        voronoiRfact = cms.double(-0.9)
+    )
+    
     process.trackWithVertexRefSelectorBeforeSorting = cms.EDProducer("TrackWithVertexRefSelector",
         copyExtras = cms.untracked.bool(False),
         copyTrajectories = cms.untracked.bool(False),
@@ -678,6 +848,7 @@ def customise_hltPhase2_TRKv07p2(process):
         dzMax = cms.double(999.0),
         etaMax = cms.double(5.0),
         etaMin = cms.double(0.0),
+        maxOfValidPixelHits = cms.uint32(999),
         nSigmaDtVertex = cms.double(0),
         nVertices = cms.uint32(0),
         normalizedChi2 = cms.double(999999.0),
@@ -697,7 +868,76 @@ def customise_hltPhase2_TRKv07p2(process):
         vtxFallback = cms.bool(True),
         zetaVtx = cms.double(1.0)
     )
-
+    
+    process.trackRefsForJetsBeforeSorting = cms.EDProducer("ChargedRefCandidateProducer",
+        particleType = cms.string('pi+'),
+        src = cms.InputTag("trackWithVertexRefSelectorBeforeSorting")
+    )
+    
+    process.offlinePrimaryVerticesWithBS = cms.EDProducer("RecoChargedRefCandidatePrimaryVertexSorter",
+        assignment = cms.PSet(
+            maxDistanceToJetAxis = cms.double(0.07),
+            maxDtSigForPrimaryAssignment = cms.double(4.0),
+            maxDxyForJetAxisAssigment = cms.double(0.1),
+            maxDxyForNotReconstructedPrimary = cms.double(0.01),
+            maxDxySigForNotReconstructedPrimary = cms.double(2),
+            maxDzErrorForPrimaryAssignment = cms.double(0.05),
+            maxDzForJetAxisAssigment = cms.double(0.1),
+            maxDzForPrimaryAssignment = cms.double(0.1),
+            maxDzSigForPrimaryAssignment = cms.double(5.0),
+            maxJetDeltaR = cms.double(0.5),
+            minJetPt = cms.double(25),
+            preferHighRanked = cms.bool(False),
+            useTiming = cms.bool(False)
+        ),
+        jets = cms.InputTag("ak4CaloJetsForTrk"),
+        particles = cms.InputTag("trackRefsForJetsBeforeSorting"),
+        produceAssociationToOriginalVertices = cms.bool(False),
+        produceNoPileUpCollection = cms.bool(False),
+        producePileUpCollection = cms.bool(False),
+        produceSortedVertices = cms.bool(True),
+        qualityForPrimary = cms.int32(3),
+        sorting = cms.PSet(
+    
+        ),
+        trackTimeResoTag = cms.InputTag(""),
+        trackTimeTag = cms.InputTag(""),
+        usePVMET = cms.bool(True),
+        vertices = cms.InputTag("unsortedOfflinePrimaryVertices","WithBS")
+    )
+    
+    process.offlinePrimaryVertices = cms.EDProducer("RecoChargedRefCandidatePrimaryVertexSorter",
+        assignment = cms.PSet(
+            maxDistanceToJetAxis = cms.double(0.07),
+            maxDtSigForPrimaryAssignment = cms.double(4.0),
+            maxDxyForJetAxisAssigment = cms.double(0.1),
+            maxDxyForNotReconstructedPrimary = cms.double(0.01),
+            maxDxySigForNotReconstructedPrimary = cms.double(2),
+            maxDzErrorForPrimaryAssignment = cms.double(0.05),
+            maxDzForJetAxisAssigment = cms.double(0.1),
+            maxDzForPrimaryAssignment = cms.double(0.1),
+            maxDzSigForPrimaryAssignment = cms.double(5.0),
+            maxJetDeltaR = cms.double(0.5),
+            minJetPt = cms.double(25),
+            preferHighRanked = cms.bool(False),
+            useTiming = cms.bool(False)
+        ),
+        jets = cms.InputTag("ak4CaloJetsForTrk"),
+        particles = cms.InputTag("trackRefsForJetsBeforeSorting"),
+        produceAssociationToOriginalVertices = cms.bool(False),
+        produceNoPileUpCollection = cms.bool(False),
+        producePileUpCollection = cms.bool(False),
+        produceSortedVertices = cms.bool(True),
+        qualityForPrimary = cms.int32(3),
+        sorting = cms.PSet(
+    
+        ),
+        trackTimeResoTag = cms.InputTag(""),
+        trackTimeTag = cms.InputTag(""),
+        usePVMET = cms.bool(True),
+        vertices = cms.InputTag("unsortedOfflinePrimaryVertices")
+    )
+    
     process.inclusiveVertexFinder = cms.EDProducer("InclusiveVertexFinder",
         beamSpot = cms.InputTag("offlineBeamSpot"),
         clusterizer = cms.PSet(
@@ -733,7 +973,13 @@ def customise_hltPhase2_TRKv07p2(process):
             smoothing = cms.bool(True)
         )
     )
-
+    
+    process.vertexMerger = cms.EDProducer("VertexMerger",
+        maxFraction = cms.double(0.7),
+        minSignificance = cms.double(2),
+        secondaryVertices = cms.InputTag("inclusiveVertexFinder")
+    )
+    
     process.trackVertexArbitrator = cms.EDProducer("TrackVertexArbitrator",
         beamSpot = cms.InputTag("offlineBeamSpot"),
         dLenFraction = cms.double(0.333),
@@ -752,7 +998,11 @@ def customise_hltPhase2_TRKv07p2(process):
         tracks = cms.InputTag("generalTracks")
     )
 
-    process.ak4CaloJetsForTrk.srcPVs = 'unsortedOfflinePrimaryVertices'
+    process.inclusiveSecondaryVertices = cms.EDProducer("VertexMerger",
+        maxFraction = cms.double(0.2),
+        minSignificance = cms.double(10.0),
+        secondaryVertices = cms.InputTag("trackVertexArbitrator")
+    )
 
     ###
     ### Sequences
@@ -777,11 +1027,9 @@ def customise_hltPhase2_TRKv07p2(process):
       + process.pixelTracksHitDoublets
       + process.pixelTracksHitSeeds
       + process.pixelTracks
-    )
-
-    process.pixelVerticesSequence = cms.Sequence(
-        process.pixelVertices
+      + process.pixelVertices
       + process.trimmedPixelVertices
+      + process.pixelTracksCleaner
     )
 
     process.initialStepSequence = cms.Sequence(
@@ -789,24 +1037,20 @@ def customise_hltPhase2_TRKv07p2(process):
       + process.initialStepTrackCandidates
       + process.initialStepTracks
       + process.initialStepTrackCutClassifier
-      + process.initialStepTrackSelectionHighPurity
+      + process.initialStepTracksSelectionHighPurity
     )
 
-    process.highPtTripletStepSeeding = cms.Sequence(
+    process.highPtTripletStepSequence = cms.Sequence(
         process.highPtTripletStepClusters
       + process.highPtTripletStepSeedLayers
       + process.highPtTripletStepTrackingRegions
       + process.highPtTripletStepHitDoublets
       + process.highPtTripletStepHitTriplets
       + process.highPtTripletStepSeeds
-    )
-
-    process.highPtTripletStepSequence = cms.Sequence(
-        process.highPtTripletStepSeeding
       + process.highPtTripletStepTrackCandidates
       + process.highPtTripletStepTracks
       + process.highPtTripletStepTrackCutClassifier
-      + process.highPtTripletStepTrackSelectionHighPurity
+      + process.highPtTripletStepTracksSelectionHighPurity
     )
 
     process.vertexReco = cms.Sequence(
@@ -829,7 +1073,6 @@ def customise_hltPhase2_TRKv07p2(process):
       + process.otLocalReco
       + process.trackerClusterCheck
       + process.pixelTracksSequence
-      + process.pixelVerticesSequence
       + process.initialStepSequence
       + process.highPtTripletStepSequence
       + process.generalTracks
