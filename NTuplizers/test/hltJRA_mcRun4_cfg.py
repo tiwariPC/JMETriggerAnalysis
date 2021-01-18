@@ -39,10 +39,10 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
-opts.register('globalTag', None,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.string,
-              'argument of process.GlobalTag.globaltag')
+#opts.register('globalTag', None,
+#              vpo.VarParsing.multiplicity.singleton,
+#              vpo.VarParsing.varType.string,
+#              'argument of process.GlobalTag.globaltag')
 
 opts.register('reco', 'HLT_TRKv06p1_TICL',
               vpo.VarParsing.multiplicity.singleton,
@@ -64,7 +64,10 @@ opts.parseArguments()
 ###
 ### base configuration file
 ###
-if opts.reco == 'HLT_TRKv06p1_TICL': from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
+if opts.reco == 'HLT_TRKv06p1':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_cfg import cms, process
+elif opts.reco == 'HLT_TRKv06p1_TICL':
+  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
 else:
    raise RuntimeError('invalid argument for option "reco": "'+opts.reco+'"')
 
@@ -86,10 +89,10 @@ for algorithm in [
   getattr(process, algorithm).srcRhos = ''
   getattr(process, algorithm).deltaRMax = 0.1
 
-# update process.GlobalTag.globaltag
-if opts.globalTag is not None:
-   from Configuration.AlCa.GlobalTag import GlobalTag
-   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
+## update process.GlobalTag.globaltag
+#if opts.globalTag is not None:
+#   from Configuration.AlCa.GlobalTag import GlobalTag
+#   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
