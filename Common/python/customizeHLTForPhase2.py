@@ -594,25 +594,24 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 
     # schedule
     process.schedule_().extend([
-      process.MC_JME,
+#      process.MC_JME,
 
       process.L1T_SinglePFPuppiJet230off,
-      process.HLT_AK4PFJet550,
-      process.HLT_AK4PFCHSJet550,
+#      process.HLT_AK4PFJet550,
+#      process.HLT_AK4PFCHSJet550,
       process.HLT_AK4PFPuppiJet550,
 
       process.L1T_PFPuppiHT450off,
       process.HLT_PFPuppiHT1050,
 
       process.L1T_PFPuppiMET220off,
-      process.L1T_PFPuppiMET245off,
-      process.HLT_PFMET250,
-      process.HLT_PFCHSMET250,
-      process.HLT_PFPuppiMET250,
-
-      process.HLT_PFPuppiMET120,
+#      process.L1T_PFPuppiMET245off,
+#      process.HLT_PFMET250,
+#      process.HLT_PFCHSMET250,
+#      process.HLT_PFPuppiMET250,
+#      process.HLT_PFPuppiMET120,
       process.HLT_PFPuppiMET120_PFPuppiMHT120,
-      process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60,
+#      process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60,
     ])
 
     return process
