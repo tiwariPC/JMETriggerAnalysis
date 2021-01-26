@@ -371,14 +371,14 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     ## Single-Jet producers+filters
-    process.l1tSinglePFPuppiJet200off = cms.EDFilter('L1TJetFilter',
+    process.l1tSinglePFPuppiJet230off = cms.EDFilter('L1TJetFilter',
       inputTag = cms.InputTag('l1tSlwPFPuppiJetsCorrected', 'Phase1L1TJetFromPfCandidates'),
       Scalings = cms.PSet(
         barrel = cms.vdouble(11.1254, 1.40627, 0),
         overlap = cms.vdouble(24.8375, 1.4152, 0),
         endcap = cms.vdouble(42.4039, 1.33052, 0),
       ),
-      MinPt = cms.double(200.),
+      MinPt = cms.double(230.),
       MinEta = cms.double(-5.),
       MaxEta = cms.double(5.),
       MinN = cms.int32(1),
@@ -457,16 +457,16 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.hltPFPuppiMHT120 = _hltMHT100.clone(mhtLabels = ['hltPFPuppiMHT'], minMht = [120.])
 
     ## MET producers+filters
-    process.l1tPFPuppiMET200off = cms.EDFilter('L1TPFEnergySumFilter',
+    process.l1tPFPuppiMET220off = cms.EDFilter('L1TPFEnergySumFilter',
       inputTag = cms.InputTag('l1PFMetPuppi'),
       Scalings = cms.PSet(
         theScalings = cms.vdouble(54.2859, 1.39739, 0), # PuppiMET090OfflineEtCut
       ),
       TypeOfSum = cms.string('MET'),
-      MinPt = cms.double(200.),
+      MinPt = cms.double(220.),
     )
 
-    process.l1tPFPuppiMET245off = process.l1tPFPuppiMET200off.clone(MinPt = 245.)
+    process.l1tPFPuppiMET245off = process.l1tPFPuppiMET220off.clone(MinPt = 245.)
 
     _hltPFMET200 = cms.EDFilter('HLT1PFMET',
       MaxEta = cms.double(-1.0),
@@ -495,26 +495,26 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltPFPuppiMHT
     )
 
-    process.L1T_SinglePFPuppiJet200off = cms.Path(
-        process.l1tSinglePFPuppiJet200off
+    process.L1T_SinglePFPuppiJet230off = cms.Path(
+        process.l1tSinglePFPuppiJet230off
     )
 
     process.HLT_AK4PFJet550 = cms.Path(
-        process.l1tSinglePFPuppiJet200off
+        process.l1tSinglePFPuppiJet230off
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFJetsReconstruction
       + process.hltSingleAK4PFJet550
     )
 
     process.HLT_AK4PFCHSJet550 = cms.Path(
-        process.l1tSinglePFPuppiJet200off
+        process.l1tSinglePFPuppiJet230off
       + process.HLTParticleFlowCHSSequence
       + process.HLTAK4PFCHSJetsReconstruction
       + process.hltSingleAK4PFCHSJet550
     )
 
     process.HLT_AK4PFPuppiJet550 = cms.Path(
-        process.l1tSinglePFPuppiJet200off
+        process.l1tSinglePFPuppiJet230off
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFPuppiJetsReconstruction
       + process.hltSingleAK4PFPuppiJet550
@@ -534,8 +534,8 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltPFPuppiHT1050
     )
 
-    process.L1T_PFPuppiMET200off = cms.Path(
-        process.l1tPFPuppiMET200off
+    process.L1T_PFPuppiMET220off = cms.Path(
+        process.l1tPFPuppiMET220off
     )
 
     process.L1T_PFPuppiMET245off = cms.Path(
@@ -543,35 +543,35 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     process.HLT_PFMET250 = cms.Path(
-        process.l1tPFPuppiMET200off
+        process.l1tPFPuppiMET220off
       + process.HLTParticleFlowSequence
       + process.hltPFMET
       + process.hltPFMET250
     )
 
     process.HLT_PFCHSMET250 = cms.Path(
-        process.l1tPFPuppiMET200off
+        process.l1tPFPuppiMET220off
       + process.HLTParticleFlowCHSSequence
       + process.HLTPFCHSMETReconstruction
       + process.hltPFCHSMET250
     )
 
     process.HLT_PFPuppiMET250 = cms.Path(
-        process.l1tPFPuppiMET200off
+        process.l1tPFPuppiMET220off
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET250
     )
 
     process.HLT_PFPuppiMET120 = cms.Path(
-        process.l1tPFPuppiMET200off
+        process.l1tPFPuppiMET220off
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET120
     )
 
     process.HLT_PFPuppiMET120_PFPuppiMHT120 = cms.Path(
-        process.l1tPFPuppiMET200off
+        process.l1tPFPuppiMET220off
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET120
@@ -581,7 +581,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     )
 
     process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60 = cms.Path(
-        process.l1tPFPuppiMET200off
+        process.l1tPFPuppiMET220off
       + process.HLTParticleFlowSequence
       + process.HLTPFPuppiMETReconstruction
       + process.hltPFPuppiMET120
@@ -596,7 +596,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.schedule_().extend([
       process.MC_JME,
 
-      process.L1T_SinglePFPuppiJet200off,
+      process.L1T_SinglePFPuppiJet230off,
       process.HLT_AK4PFJet550,
       process.HLT_AK4PFCHSJet550,
       process.HLT_AK4PFPuppiJet550,
@@ -604,7 +604,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       process.L1T_PFPuppiHT450off,
       process.HLT_PFPuppiHT1050,
 
-      process.L1T_PFPuppiMET200off,
+      process.L1T_PFPuppiMET220off,
       process.L1T_PFPuppiMET245off,
       process.HLT_PFMET250,
       process.HLT_PFCHSMET250,
