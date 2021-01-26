@@ -397,9 +397,9 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       triggerType = cms.int32(85),
     )
 
-    process.hltSingleAK4PFJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFJetsCorrected', MinPt = 550., MaxEta = 5.)
-    process.hltSingleAK4PFCHSJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFCHSJetsCorrected', MinPt = 550., MaxEta = 5.)
-    process.hltSingleAK4PFPuppiJet550 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFPuppiJetsCorrected', MinPt = 550., MaxEta = 5.)
+    process.hltSingleAK4PFJet500 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFJetsCorrected', MinPt = 500., MaxEta = 5.)
+    process.hltSingleAK4PFCHSJet500 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFCHSJetsCorrected', MinPt = 500., MaxEta = 5.)
+    process.hltSingleAK4PFPuppiJet500 = _hltSinglePFJet100.clone(inputTag = 'hltAK4PFPuppiJetsCorrected', MinPt = 500., MaxEta = 5.)
 
     ## HT/MHT producers+filters
 
@@ -499,25 +499,25 @@ def customise_hltPhase2_scheduleJMETriggers(process):
         process.l1tSinglePFPuppiJet230off
     )
 
-    process.HLT_AK4PFJet550 = cms.Path(
+    process.HLT_AK4PFJet500 = cms.Path(
         process.l1tSinglePFPuppiJet230off
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFJetsReconstruction
-      + process.hltSingleAK4PFJet550
+      + process.hltSingleAK4PFJet500
     )
 
-    process.HLT_AK4PFCHSJet550 = cms.Path(
+    process.HLT_AK4PFCHSJet500 = cms.Path(
         process.l1tSinglePFPuppiJet230off
       + process.HLTParticleFlowCHSSequence
       + process.HLTAK4PFCHSJetsReconstruction
-      + process.hltSingleAK4PFCHSJet550
+      + process.hltSingleAK4PFCHSJet500
     )
 
-    process.HLT_AK4PFPuppiJet550 = cms.Path(
+    process.HLT_AK4PFPuppiJet500 = cms.Path(
         process.l1tSinglePFPuppiJet230off
       + process.HLTParticleFlowSequence
       + process.HLTAK4PFPuppiJetsReconstruction
-      + process.hltSingleAK4PFPuppiJet550
+      + process.hltSingleAK4PFPuppiJet500
     )
 
     process.L1T_PFPuppiHT450off = cms.Path(
@@ -597,9 +597,9 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 #      process.MC_JME,
 
       process.L1T_SinglePFPuppiJet230off,
-#      process.HLT_AK4PFJet550,
-#      process.HLT_AK4PFCHSJet550,
-      process.HLT_AK4PFPuppiJet550,
+#      process.HLT_AK4PFJet500,
+#      process.HLT_AK4PFCHSJet500,
+      process.HLT_AK4PFPuppiJet500,
 
       process.L1T_PFPuppiHT450off,
       process.HLT_PFPuppiHT1050,
