@@ -11,20 +11,9 @@
 ### Setup
 
 ```shell
-scramv1 project CMSSW CMSSW_11_1_6
-cd CMSSW_11_1_6/src
+scramv1 project CMSSW CMSSW_11_1_7
+cd CMSSW_11_1_7/src
 eval `scramv1 runtime -sh`
-
-# L1T + JME (cms-sw#31607 by L1T accidentaly includes cms-sw#32434 by JME)
-git cms-merge-topic cms-sw:31607
-
-# HLT
-git cms-merge-topic cms-sw:32474
-
-# HGCal
-git cms-merge-topic cms-sw:32527
-cp -r ${CMSSW_DATA_PATH}/data-RecoHGCal-TICL/V00-01-00/RecoHGCal/TICL/data/ ${CMSSW_BASE}/src/RecoHGCal/TICL
-wget https://github.com/rovere/RecoHGCal-TICL/raw/9d2c6f72c86233fa5573e93d5535b32e90c835ee/tf_models/energy_id_v0.pb -O ${CMSSW_BASE}/src/RecoHGCal/TICL/data/tf_models/energy_id_v0.pb
 
 # [optional; required only for PF-Hadron calibrations]
 # workaround for PFSimParticle::trackerSurfaceMomentum

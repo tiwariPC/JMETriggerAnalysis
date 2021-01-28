@@ -184,20 +184,6 @@ def customise_hltPhase2_common(process):
       label = cms.untracked.string('AK4PF'),
     ))
 
-    process.GlobalTag.toGet.append(cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK4PFPuppiHLT'),
-      label = cms.untracked.string('AK4PFPuppiHLT'),
-      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS'),
-    ))
-
-    process.GlobalTag.toGet.append(cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Phase2HLTTDR_V5_MC_AK8PFPuppiHLT'),
-      label = cms.untracked.string('AK8PFPuppiHLT'),
-      connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS'),
-    ))
-
     # prevent access to inputs from RECO step (if available),
     # except for Offline objects to be used saved in the NTuple,
     # or used for validation purposes
