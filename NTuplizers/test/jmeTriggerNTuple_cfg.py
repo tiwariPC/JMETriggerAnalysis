@@ -116,19 +116,11 @@ elif opt_reco == 'HLT_TRKv06':
 elif opt_reco == 'HLT_TRKv06_TICL':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
 
-elif opt_reco == 'HLT_TRKv06_TICL2':
-  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06_TICL_cfg import cms, process
-  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
-
 elif opt_reco == 'HLT_TRKv06p1':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_cfg import cms, process
 
 elif opt_reco == 'HLT_TRKv06p1_TICL':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
-
-elif opt_reco == 'HLT_TRKv06p1_TICL2':
-  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p1_TICL_cfg import cms, process
-  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
 
 elif opt_reco == 'HLT_TRKv06p3':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p3_cfg import cms, process
@@ -136,19 +128,11 @@ elif opt_reco == 'HLT_TRKv06p3':
 elif opt_reco == 'HLT_TRKv06p3_TICL':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p3_TICL_cfg import cms, process
 
-elif opt_reco == 'HLT_TRKv06p3_TICL2':
-  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv06p3_TICL_cfg import cms, process
-  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
-
 elif opt_reco == 'HLT_TRKv07p2':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_cfg import cms, process
 
 elif opt_reco == 'HLT_TRKv07p2_TICL':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
-
-elif opt_reco == 'HLT_TRKv07p2_TICL2':
-  from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
-  process.ticlCandidateFromTracksters.momentumPlugin.plugin = 'TracksterP4FromTrackAndPCA'
 
 else:
   raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
@@ -156,9 +140,7 @@ else:
 ###
 ### analysis sequence
 ###
-#process.setSchedule_(cms.Schedule(
-#  process.MC_JME
-#))
+process.schedule_().append(process.MC_JME)
 
 ## JMETrigger NTuple
 from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
@@ -828,6 +810,8 @@ if opt_skimTracks:
      'hltTrimmedPixelVertices_chi2',
      'hltTrimmedPixelVertices_ndof',
    ]
+
+process.prune()
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
