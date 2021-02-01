@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v4 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv07p2_TICL --customise_commands process.prune()\n --python_filename hltPhase2_TRKv07p2_TICL_cfg.py
+# with command line options: step3 --geometry Extended2026D49 --era Phase2C9 --conditions 111X_mcRun4_realistic_T15_v4 --processName RECO2 --step RAW2DIGI,RECO --eventcontent RECO --datatier RECO --filein /store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root --mc --nThreads 4 --nStreams 4 --no_exec -n 10 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv07p2_TICL --python_filename hltPhase2_TRKv07p2_TICL_cfg.py
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
@@ -125,7 +125,9 @@ process = customise_hltPhase2_scheduleJMETriggers_TRKv07p2_TICL(process)
 
 # Customisation from command line
 
-process.prune()
+#Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
+from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
+process = customiseLogErrorHarvesterUsingOutputCommands(process)
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete

@@ -18,7 +18,7 @@ recos=(
 for reco_i in "${recos[@]}"; do
   cmsDriver.py step3 \
     --geometry Extended2026D49 --era Phase2C9 \
-    --conditions 111X_mcRun4_realistic_T15_v2 \
+    --conditions 111X_mcRun4_realistic_T15_v4 \
     --processName RECO2 \
     --step RAW2DIGI,RECO \
     --eventcontent RECO \
@@ -31,7 +31,6 @@ for reco_i in "${recos[@]}"; do
     -n 10 \
     --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
     --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_${reco_i} \
-    --customise_commands 'process.prune()\n' \
     --python_filename hltPhase2_${reco_i}_cfg.py
 done
 unset reco_i recos
