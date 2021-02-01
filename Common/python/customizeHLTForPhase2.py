@@ -25,6 +25,7 @@ def customise_hltPhase2_enableTICLInHGCalReconstruction(process):
     # remove modules specific to SIM-assisted reconstruction
     del process.tpClusterProducer
     del process.quickTrackAssociatorByHits
+    del process.trackTimeValueMapProducer
     del process.simPFProducer
 
     process.iterTICLSequence = cms.Sequence(process.iterTICLTask)
