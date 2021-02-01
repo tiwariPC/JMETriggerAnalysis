@@ -82,14 +82,14 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      wrapper functions that combine the customisations described above for individual objects (e.g. tracks, PF, jets);
      see the source code for more details, and for the full set of available customisations.
 
- * A set of configuration files for different TRK (v0, v2, v6) and HGCal (with, or without, TICL) inputs can be found in
+ * A set of configuration files for different TRK (v0, v2, v6, v6.1, v7.2) and HGCal (with, or without, TICL) inputs can be found in
    [Common/python/configs/hltPhase2_*_cfg.py](https://github.com/missirol/JMETriggerAnalysis/tree/phase2/Common/python/configs).
 
- * **Example**: configuration file to run HLT reconstruction on RAW using TRK(v06)+TICL:
+ * **Example**: configuration file to run HLT reconstruction on RAW using TRK(v06p1)+TICL:
    ```shell
    cmsDriver.py step3 \
      --geometry Extended2026D49 --era Phase2C9 \
-     --conditions 111X_mcRun4_realistic_T15_v2 \
+     --conditions 111X_mcRun4_realistic_T15_v4 \
      --processName RECO2 \
      --step RAW2DIGI,RECO \
      --eventcontent RECO \
@@ -101,9 +101,9 @@ can be found from the setup commands of a AOD/MINIAOD sample in McM
      --no_exec \
      -n 10 \
      --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,Configuration/DataProcessing/Utils.addMonitoring \
-     --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06_TICL \
+     --customise JMETriggerAnalysis/Common/customizeHLTForPhase2.customise_hltPhase2_scheduleJMETriggers_TRKv06p1_TICL \
      --customise_commands 'process.prune()\n' \
-     --python_filename hltPhase2_TRKv06_TICL_cfg.py
+     --python_filename hltPhase2_TRKv06p1_TICL_cfg.py
    ```
 
 ----------
