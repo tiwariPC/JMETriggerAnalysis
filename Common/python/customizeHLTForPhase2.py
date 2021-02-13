@@ -473,6 +473,7 @@ def customise_hltPhase2_scheduleJMETriggers(process):
     process.hltPFPuppiMET250 = _hltPFMET200.clone(inputTag = 'hltPFPuppiMET', MinPt = 250.)
 
     process.hltPFPuppiMET120 = _hltPFMET200.clone(inputTag = 'hltPFPuppiMET', MinPt = 120.)
+    process.hltPFPuppiMETTypeOne120 = _hltPFMET200.clone(inputTag = 'hltPFPuppiMETTypeOne', MinPt = 120.)
 
     ## Trigger Paths
     process.MC_JME = cms.Path(
@@ -567,6 +568,22 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltPFPuppiMHT120
     )
 
+    process.HLT_PFPuppiMETTypeOne120_PFPuppiMHT120 = cms.Path(
+        process.l1tPFPuppiMET220off
+      + process.HLTParticleFlowSequence
+      + process.HLTPFPuppiMETReconstruction
+      + process.hltPFMETJetCorrectorL1
+      + process.hltPFMETJetCorrectorL2
+      + process.hltPFMETJetCorrectorL3
+      + process.hltPFMETJetCorrector
+      + process.hltPFMETTypeOneCorrector
+      + process.hltPFMETTypeOne
+      + process.hltPFPuppiMETTypeOne120
+      + process.HLTAK4PFPuppiJetsReconstruction
+      + process.hltPFPuppiMHT
+      + process.hltPFPuppiMHT120
+    )
+
     process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60 = cms.Path(
         process.l1tPFPuppiMET220off
       + process.HLTParticleFlowSequence
@@ -597,7 +614,8 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 #      process.HLT_PFCHSMET250,
 #      process.HLT_PFPuppiMET250,
 #      process.HLT_PFPuppiMET120,
-      process.HLT_PFPuppiMET120_PFPuppiMHT120,
+#      process.HLT_PFPuppiMET120_PFPuppiMHT120,
+      process.HLT_PFPuppiMETTypeOne120_PFPuppiMHT120,
 #      process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60,
     ])
 

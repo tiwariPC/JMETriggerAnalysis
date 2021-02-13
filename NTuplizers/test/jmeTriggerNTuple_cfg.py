@@ -134,6 +134,9 @@ elif opt_reco == 'HLT_TRKv07p2':
 elif opt_reco == 'HLT_TRKv07p2_TICL':
   from JMETriggerAnalysis.Common.configs.hltPhase2_TRKv07p2_TICL_cfg import cms, process
 
+elif opt_reco == 'HLT_75e33':
+  from HLTrigger.Phase2.HLT_75e33_cfg import cms, process
+
 else:
   raise RuntimeError('invalid argument for option "reco": "'+opt_reco+'"')
 
@@ -210,6 +213,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     'HLT_PFPuppiMET120',
     'HLT_PFPuppiMET120_PFPuppiMHT120',
     'HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60',
+    'HLT_PFPuppiMETTypeOne120_PFPuppiMHT120',
   ),
 
   fillCollectionConditions = cms.PSet(),
