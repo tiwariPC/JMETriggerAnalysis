@@ -568,22 +568,6 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltPFPuppiMHT120
     )
 
-    process.HLT_PFPuppiMETTypeOne120_PFPuppiMHT120 = cms.Path(
-        process.l1tPFPuppiMET220off
-      + process.HLTParticleFlowSequence
-      + process.HLTPFPuppiMETReconstruction
-      + process.hltPFMETJetCorrectorL1
-      + process.hltPFMETJetCorrectorL2
-      + process.hltPFMETJetCorrectorL3
-      + process.hltPFMETJetCorrector
-      + process.hltPFMETTypeOneCorrector
-      + process.hltPFMETTypeOne
-      + process.hltPFPuppiMETTypeOne120
-      + process.HLTAK4PFPuppiJetsReconstruction
-      + process.hltPFPuppiMHT
-      + process.hltPFPuppiMHT120
-    )
-
     process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60 = cms.Path(
         process.l1tPFPuppiMET220off
       + process.HLTParticleFlowSequence
@@ -594,6 +578,18 @@ def customise_hltPhase2_scheduleJMETriggers(process):
       + process.hltPFPuppiMHT120
       + process.hltPFPuppiHT
       + process.hltPFPuppiHT60
+    )
+
+    process.HLT_PFPuppiMETTypeOne120_PFPuppiMHT120 = cms.Path(
+        process.l1tPFPuppiMET220off
+      + process.HLTParticleFlowSequence
+      + process.HLTAK4PFPuppiJetsReconstruction
+      + process.HLTPFPuppiMETReconstruction
+      + process.hltPFPuppiMETTypeOneCorrector
+      + process.hltPFPuppiMETTypeOne
+      + process.hltPFPuppiMETTypeOne120
+      + process.hltPFPuppiMHT
+      + process.hltPFPuppiMHT120
     )
 
     # schedule
@@ -615,8 +611,8 @@ def customise_hltPhase2_scheduleJMETriggers(process):
 #      process.HLT_PFPuppiMET250,
 #      process.HLT_PFPuppiMET120,
 #      process.HLT_PFPuppiMET120_PFPuppiMHT120,
-      process.HLT_PFPuppiMETTypeOne120_PFPuppiMHT120,
 #      process.HLT_PFPuppiMET120_PFPuppiMHT120_PFPuppiHT60,
+      process.HLT_PFPuppiMETTypeOne120_PFPuppiMHT120,
     ])
 
     return process
