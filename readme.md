@@ -1,6 +1,6 @@
 ### Tools for JME studies on the Run-3 HLT reconstruction
 
-* [Setup](#setup)
+* [PF-Hadron Calibrations](#pf-hadron-calibrations)
 * [Configuration files for HLT Run-3 menus](#configuration-files-for-hlt-run-3-menus)
 * [Configuration with JME trigger paths for testing](#configuration-with-jme-trigger-paths-for-testing)
 * [Inputs for HLT Jet Energy Scale Corrections workflow](#inputs-for-hlt-jet-energy-scale-corrections-workflow)
@@ -10,15 +10,22 @@
 
 ----------
 
-### Setup
-```shell
-cmsrel CMSSW_11_1_0_pre4
-cd CMSSW_11_1_0_pre4/src
-cmsenv
+### PF-Hadron Calibrations
 
+```shell
+cmsrel CMSSW_11_1_7
+cd CMSSW_11_1_7/src
+cmsenv
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 scram b
+
+cd JMETriggerAnalysis/PFHadronCalibration/test
+cmsRun pfHadCalibNTuple_cfg.py maxEvents=1 output=tmp.root
 ```
+
+----------
+
+**INFORMATION IN THE FOLLOWING SECTIONS MAY BE OUT-OF-DATE (UNDER REVIEW)**
 
 ----------
 
