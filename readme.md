@@ -12,6 +12,14 @@
 
 ### PF-Hadron Calibrations
 
+The tools for the PF-Hadron calibrations (PFHC) are
+in the `JMETriggerAnalysis/PFHadronCalibration` package.
+
+The configuration file to create the input NTuple
+for the PF-Hadron calibrations (PFHC)
+is `pfHadCalibNTuple_cfg.py`.
+
+The current Run-3 recipe to produce a PFHC-NTuple is as follows:
 ```shell
 cmsrel CMSSW_11_1_7
 cd CMSSW_11_1_7/src
@@ -22,6 +30,10 @@ scram b
 cd JMETriggerAnalysis/PFHadronCalibration/test
 cmsRun pfHadCalibNTuple_cfg.py maxEvents=1 output=tmp.root
 ```
+
+The available analysis tools to
+derive calibrations from a PFHC NTuple are in
+`JMETriggerAnalysis/PFHadronCalibration/test/macros/`.
 
 ----------
 
