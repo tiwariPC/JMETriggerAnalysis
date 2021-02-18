@@ -44,6 +44,11 @@ opts.register('globalTag', None,
               vpo.VarParsing.varType.string,
               'argument of process.GlobalTag.globaltag')
 
+opts.register('reco', None,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'keyword to define HLT reconstruction')
+
 opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
@@ -59,7 +64,20 @@ opts.parseArguments()
 ###
 ### HLT configuration
 ###
-from JMETriggerAnalysis.Common.configs.hlt_GRun_111X_patatrackPlusSingleIterTRK_jmeMCPaths_configDump import cms, process
+if reco == 'HLT_Run3TRK':
+  # (a) Run-3 tracking: standard
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+  process = customizeHLTRun3Tracking(process)
+
+elif reco == 'HLT_Run3TRKWithPU':
+  # (b) Run-3 tracking: all pixel vertices
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+  process = customizeHLTRun3TrackingAllPixelVertices(process)
+
+else:
+  raise RuntimeError('keyword "reco = '+reco+'" not recognised')
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
@@ -86,13 +104,12 @@ for _modname in process.endpaths_():
 #       process.__delattr__(_modname)
 #       print '> removed cms.Path:', _modname
 
-###
-### customizations
-###
-
-from JMETriggerAnalysis.Common.customise_hlt import *
-process = addPath_MC_AK4PFClusterJets(process)
-process = addPath_MC_AK4PFPuppiJets(process)
+# ###
+# ### customizations
+# ###
+# from JMETriggerAnalysis.Common.customise_hlt import *
+# process = addPath_MC_AK4PFClusterJets(process)
+# process = addPath_MC_AK4PFPuppiJets(process)
 
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
