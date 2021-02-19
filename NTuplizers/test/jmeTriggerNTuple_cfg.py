@@ -104,7 +104,7 @@ print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
     _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
-    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
+#    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
       continue
@@ -117,12 +117,12 @@ print '-'*108
 # remove FastTimerService
 del process.FastTimerService
 
-# ###
-# ### customizations
-# ###
-# from JMETriggerAnalysis.Common.customise_hlt import *
-# process = addPath_MC_AK4PFClusterJets(process)
-# process = addPath_MC_AK4PFPuppiJets(process)
+###
+### customizations
+###
+from JMETriggerAnalysis.Common.customise_hlt import *
+process = addPaths_MC_PFClusterJets(process)
+process = addPaths_MC_PFPuppiJets(process)
 
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
@@ -133,15 +133,67 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResultsFilterAND = cms.vstring(),
   TriggerResultsCollections = cms.vstring(),
   outputBranchesToBeDropped = cms.vstring(),
+
+  doubles = cms.PSet(
+
+    hltFixedGridRhoFastjetAll = cms.InputTag('hltFixedGridRhoFastjetAll'),
+    offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
+    hltPixelClustersMultiplicity = cms.InputTag('hltPixelClustersMultiplicity'),
+  ),
+
   recoVertexCollections = cms.PSet(
+
     hltPixelVertices = cms.InputTag('hltPixelVertices'),
     hltTrimmedPixelVertices = cms.InputTag('hltTrimmedPixelVertices'),
     hltVerticesPF = cms.InputTag('hltVerticesPF'),
     offlinePrimaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
   ),
+
   recoPFCandidateCollections = cms.PSet(
-#   hltPFPuppi = cms.InputTag('hltPFPuppi')
+
+#   hltParticleFlow = cms.InputTag('hltParticleFlow'),
+#   hltPFPuppi = cms.InputTag('hltPFPuppi'),
   )
+
+  recoGenJetCollections = cms.PSet(
+
+    ak4GenJetsNoNu = cms.InputTag('ak4GenJetsNoNu::HLT'),
+    ak8GenJetsNoNu = cms.InputTag('ak8GenJetsNoNu::HLT'),
+  ),
+
+  recoCaloJetCollections = cms.PSet(
+
+    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
+    hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
+  ),
+
+  recoPFClusterJetCollections = cms.PSet(
+
+    hltAK4PFClusterJets = cms.InputTag('hltAK4PFClusterJets'),
+    hltAK8PFClusterJets = cms.InputTag('hltAK8PFClusterJets'),
+  ),
+
+  recoPFJetCollections = cms.PSet(
+
+    hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
+    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
+
+    hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
+    hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
+  ),
+
+  patJetCollections = cms.PSet(
+
+    offlineAK4PFCHSJetsCorrected = cms.InputTag('slimmedJets'),
+    offlineAK4PFPuppiJetsCorrected = cms.InputTag('slimmedJetsPuppi'),
+    offlineAK8PFPuppiJetsCorrected = cms.InputTag('slimmedJetsAK8'),
+  ),
+
+  recoGenMETCollections = cms.PSet(
+
+    genMETCalo = cms.InputTag('genMetCalo::HLT'),
+    genMETTrue = cms.InputTag('genMetTrue::HLT'),
+  ),
 )
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
