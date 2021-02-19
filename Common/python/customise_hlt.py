@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets as _ak4PFClusterJets
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi as _ak4PFJetsPuppi
+from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsPuppi as _ak8PFJetsPuppi
 from CommonTools.PileupAlgos.Puppi_cff import puppi as _puppi
-
 from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
  import multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble as _nSiPixelClusters
 
@@ -60,6 +60,13 @@ def addPaths_MC_PFClusterJets(process):
       doPVCorrection = False,
     )
 
+    process.hltAK8PFClusterJets = _ak4PFClusterJets.clone(
+      src = 'hltParticleFlowClusterRefs',
+      doAreaDiskApprox = True,
+      doPVCorrection = False,
+      rParam = 0.8,
+    )
+
     process.HLTParticleFlowClusterRefsSequence = cms.Sequence(
         process.hltParticleFlowClusterRefsECALUnseeded
       + process.hltParticleFlowClusterRefsHCAL
@@ -96,6 +103,8 @@ def addPaths_MC_PFPuppiJets(process):
       L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
       offset = cms.uint32(0)
     )
+
+    process.hltPreMCAK8PFPuppiJets = process.hltPreMCAK4PFPuppiJets.clone()
 
     process.hltPixelClustersMultiplicity = _nSiPixelClusters.clone(src = 'siPixelClusters', defaultValue = -1.)
 
