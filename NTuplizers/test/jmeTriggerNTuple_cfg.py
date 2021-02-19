@@ -117,6 +117,9 @@ print '-'*108
 # remove FastTimerService
 del process.FastTimerService
 
+# remove MessageLogger
+del process.MessageLogger
+
 ###
 ### customizations
 ###
@@ -153,7 +156,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
 #   hltParticleFlow = cms.InputTag('hltParticleFlow'),
 #   hltPFPuppi = cms.InputTag('hltPFPuppi'),
-  )
+  ),
 
   recoGenJetCollections = cms.PSet(
 
