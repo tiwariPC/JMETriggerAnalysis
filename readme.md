@@ -10,8 +10,8 @@
 cmsrel CMSSW_11_2_0_Patatrack
 cd CMSSW_11_2_0_Patatrack/src
 cmsenv
-git cms-merge-topic missirol:devel_puppiPUProxy_1120patatrack
-git cms-merge-topic mmasciov:tracking-allPVs
+git cms-merge-topic missirol:devel_puppiPUProxy_1120patatrack -u
+git cms-merge-topic mmasciov:tracking-allPVs -u
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3_devel_112X
 scram b -j 12
 ```
