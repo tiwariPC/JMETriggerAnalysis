@@ -62,15 +62,70 @@ opts.register('output', 'out.root',
 opts.parseArguments()
 
 ###
-### HLT configuration file
+### HLT configuration
 ###
+if opts.reco == 'HLT_GRun':
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
 
+elif opts.reco == 'HLT_Run3TRK':
+  # (a) Run-3 tracking: standard
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+  process = customizeHLTRun3Tracking(process)
 
+elif opts.reco == 'HLT_Run3TRKWithPU':
+  # (b) Run-3 tracking: all pixel vertices
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+  process = customizeHLTRun3TrackingAllPixelVertices(process)
 
+else:
+  raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
 
+# remove cms.OutputModule objects from HLT config-dump
+for _modname in process.outputModules_():
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.OutputModule:
+       process.__delattr__(_modname)
+       if opts.verbosity > 0:
+          print '> removed cms.OutputModule:', _modname
 
+# remove cms.EndPath objects from HLT config-dump
+for _modname in process.endpaths_():
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.EndPath:
+       process.__delattr__(_modname)
+       if opts.verbosity > 0:
+          print '> removed cms.EndPath:', _modname
 
+# remove selected cms.Path objects from HLT config-dump
+print '-'*108
+print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
+print '-'*108
+for _modname in sorted(process.paths_()):
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
+#    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
+    if _keepPath:
+      print '{:<99} | {:<4} |'.format(_modname, '+')
+      continue
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.Path:
+      process.__delattr__(_modname)
+      print '{:<99} | {:<4} |'.format(_modname, '')
+print '-'*108
 
+# remove FastTimerService
+del process.FastTimerService
+
+# remove MessageLogger
+del process.MessageLogger
+
+###
+### customizations
+###
+from JMETriggerAnalysis.Common.customise_hlt import *
+process = addPaths_MC_PFClusterJets(process)
+process = addPaths_MC_PFPuppiJets(process)
 
 ###
 ### Jet Response Analyzer (JRA) NTuple
@@ -82,6 +137,10 @@ for algorithm in [
   'ak4pfclusterHLT',
   'ak4pfHLT',
   'ak4puppiHLT',
+  'ak8caloHLT',
+  'ak8pfclusterHLT',
+  'ak8pfHLT',
+  'ak8puppiHLT',
 ]:
   addAlgorithm(process, algorithm, Defaults)
   getattr(process, algorithm).srcRho = 'hltFixedGridRhoFastjetAll'
@@ -248,4 +307,5 @@ del process.FastTimerService
 # from JMETriggerAnalysis.Common.customise_hlt import *
 # process = addPath_MC_AK4PFClusterJets(process)
 # process = addPath_MC_AK4PFPuppiJets(process)
+
 
