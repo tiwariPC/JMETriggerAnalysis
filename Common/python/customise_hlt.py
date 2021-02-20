@@ -3,11 +3,11 @@ import FWCore.ParameterSet.Config as cms
 from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets as _ak4PFClusterJets
 from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi as _ak4PFJetsPuppi
 from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsPuppi as _ak8PFJetsPuppi
-from CommonTools.PileupAlgos.Puppi_cff import puppi as _puppi
+from CommonTools.PileupAlgos.Puppi_cff import puppi as _puppi, puppiNoLep as _puppiNoLep
 from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
  import multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble as _nSiPixelClusters
 
-def addPaths_MC_PFClusterJets(process):
+def addPaths_MC_PFClusterJME(process):
     process.hltPreMCAK4PFClusterJets = cms.EDFilter('HLTPrescaler',
       L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
       offset = cms.uint32(0)
@@ -92,13 +92,37 @@ def addPaths_MC_PFClusterJets(process):
       + process.HLTEndSequence
     )
 
+    ## MET
+    process.hltPreMCPFClusterMET = process.hltPreMCPFMET.clone()
+
+    process.hltPFClusterMET = cms.EDProducer('PFClusterMETProducer',
+      src = cms.InputTag('hltParticleFlowClusterRefs'),
+      globalThreshold = cms.double(0.0),
+      alias = cms.string(''),
+    )
+
+    process.HLTPFClusterMETSequence = cms.Sequence(
+        process.HLTParticleFlowClusterSequence
+      + process.HLTParticleFlowClusterRefsSequence
+      + process.hltPFClusterMET
+    )
+
+    process.MC_PFClusterMET_v1 = cms.Path(
+        process.HLTBeginSequence
+      + process.hltPreMCPFClusterMET
+      + process.HLTPFClusterMETSequence
+      + process.HLTEndSequence
+    )
+
     if process.schedule_():
        process.schedule_().append(process.MC_AK4PFClusterJets_v1)
        process.schedule_().append(process.MC_AK8PFClusterJets_v1)
+       process.schedule_().append(process.MC_PFClusterMET_v1)
 
     return process
 
-def addPaths_MC_PFPuppiJets(process):
+def addPaths_MC_PFPuppiJME(process):
+
     process.hltPreMCAK4PFPuppiJets = cms.EDFilter('HLTPrescaler',
       L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
       offset = cms.uint32(0)
@@ -125,15 +149,6 @@ def addPaths_MC_PFPuppiJets(process):
       + process.hltPixelClustersMultiplicity
       + process.hltPFPuppi
     )
-
-    for mod_i in [process.hltPFPuppi]:
-      for algo_idx in range(len(mod_i.algos)):
-        if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
-          raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
-
-        for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
-          mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 20.7 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
-          mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.000634
 
     ## AK4
     process.hltAK4PFPuppiJets = _ak4PFJetsPuppi.clone(
@@ -224,5 +239,62 @@ def addPaths_MC_PFPuppiJets(process):
 
     if process.schedule_():
        process.schedule_().append(process.MC_AK8PFPuppiJets_v1)
+
+    ## MET
+    process.hltPreMCPFPuppiMET = process.hltPreMCPFMET.clone()
+
+    process.hltPFPuppiNoLep = _puppiNoLep.clone(
+      candName = 'hltParticleFlow',
+      vertexName = 'hltVerticesPF',
+      usePUProxyValue = True,
+      PUProxyValue = 'hltPixelClustersMultiplicity',
+    )
+
+    process.hltPFPuppiMET = cms.EDProducer('PFMETProducer',
+      alias = cms.string(''),
+      applyWeight = cms.bool(True),
+      calculateSignificance = cms.bool(False),
+      globalThreshold = cms.double(0.0),
+      parameters = cms.PSet(),
+      src = cms.InputTag('hltParticleFlow'),
+      srcWeights = cms.InputTag('hltPFPuppiNoLep'),
+    )
+
+    process.HLTPFPuppiMETSequence = cms.Sequence(
+        process.HLTDoCaloSequencePF
+      + process.HLTL2muonrecoSequence
+      + process.HLTL3muonrecoSequence
+      + process.HLTTrackReconstructionForPF
+      + process.HLTParticleFlowSequence
+      + process.hltVerticesPF
+      + process.hltPixelClustersMultiplicity
+      + process.hltPFPuppiNoLep
+      + process.hltPFPuppiMET
+    )
+
+    process.hltPFPuppiMETOpenFilter = process.hltPFMETOpenFilter.clone(
+      inputTag = 'hltPFPuppiMET'
+    )
+
+    process.MC_PFPuppiMET_v1 = cms.Path(
+        process.HLTBeginSequence
+      + process.hltPreMCPFPuppiMET
+      + process.HLTPFPuppiMETSequence
+      + process.hltPFPuppiMETOpenFilter
+      + process.HLTEndSequence
+    )
+
+    if process.schedule_():
+       process.schedule_().append(process.MC_PFPuppiMET_v1)
+
+    ## Puppi parameters
+    for mod_i in [process.hltPFPuppi, process.hltPFPuppiNoLep]:
+      for algo_idx in range(len(mod_i.algos)):
+        if len(mod_i.algos[algo_idx].MinNeutralPt) != len(mod_i.algos[algo_idx].MinNeutralPtSlope):
+          raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
+
+        for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
+          mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 20.7 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+          mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.000634
 
     return process
