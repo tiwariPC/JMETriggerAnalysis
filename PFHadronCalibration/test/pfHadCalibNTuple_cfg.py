@@ -4,6 +4,11 @@
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
 
+opts.register('skipEvents', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'number of events to be skipped')
+
 opts.register('numThreads', 1,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
@@ -156,6 +161,9 @@ process.pfHadCalibNTupleEndPath = cms.EndPath(process.pfHadCalibNTupleSeq)
 
 # number of events
 process.maxEvents.input = opts.maxEvents
+
+# number of events to be skipped
+process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
 # number of threads/streams
 process.options.numberOfThreads = opts.numThreads
