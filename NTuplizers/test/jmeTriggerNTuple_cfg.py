@@ -124,8 +124,8 @@ del process.MessageLogger
 ### customizations
 ###
 from JMETriggerAnalysis.Common.customise_hlt import *
-process = addPaths_MC_PFClusterJets(process)
-process = addPaths_MC_PFPuppiJets(process)
+process = addPaths_MC_PFClusterJME(process)
+process = addPaths_MC_PFPuppiJME(process)
 
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
@@ -196,6 +196,29 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
     genMETCalo = cms.InputTag('genMetCalo::HLT'),
     genMETTrue = cms.InputTag('genMetTrue::HLT'),
+  ),
+
+  recoCaloMETCollections = cms.PSet(
+
+    hltCaloMET = cms.InputTag('hltMet'),
+  ),
+
+  recoPFClusterMETCollections = cms.PSet(
+
+    hltPFClusterMET = cms.InputTag('hltPFClusterMET'),
+  ),
+
+  recoPFMETCollections = cms.PSet(
+
+    hltPFMET = cms.InputTag('hltPFMETProducer'),
+    hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
+    hltPFPuppiMET = cms.InputTag('hltPFPuppiMET'),
+  ),
+
+  patMETCollections = cms.PSet(
+
+    offlinePFMET = cms.InputTag('slimmedMETs'),
+    offlinePFPuppiMET = cms.InputTag('slimmedMETsPuppi'),
   ),
 )
 
