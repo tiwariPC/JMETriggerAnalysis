@@ -1789,7 +1789,7 @@ void Calibration::drawCoeffGraph(string graph, string tag, string outFileName)
 
 		//  leg->AddEntry(
 
-		saveString = "ACoefficient" + tag + ".eps";
+		saveString = "ACoefficient" + tag + ".png";
 		canvas->SaveAs(saveString.c_str());
 		graphB_->Write();
 	}
@@ -1810,7 +1810,7 @@ void Calibration::drawCoeffGraph(string graph, string tag, string outFileName)
 
 		//  leg->AddEntry(
 
-		saveString = "BCoefficient" + tag + ".eps";
+		saveString = "BCoefficient" + tag + ".png";
 		canvas->SaveAs(saveString.c_str());
 		graphC_->Write();
 	}
@@ -1834,7 +1834,7 @@ void Calibration::drawCoeffGraph(string graph, string tag, string outFileName)
 		// 	//    	fcBarrel52x->Draw("Lsame+");
 		// }
 
-		saveString = "CCoefficient" + tag + ".eps";
+		saveString = "CCoefficient" + tag + ".png";
 		canvas->SaveAs(saveString.c_str());
 		graphC_->Write();
 	}
@@ -1852,7 +1852,7 @@ void Calibration::drawCoeffGraph(string graph, string tag, string outFileName)
 		faEtaBarrel->Draw("Lsame+");
 		//   faEtaBarrel52x->Draw("Lsame+");
 
-		saveString = "AlphaCoefficient" + tag + ".eps";
+		saveString = "AlphaCoefficient" + tag + ".png";
 		canvas->SaveAs(saveString.c_str());
 		graphAlpha_->Write();
 	}
@@ -1870,7 +1870,7 @@ void Calibration::drawCoeffGraph(string graph, string tag, string outFileName)
 		fbEtaBarrel->Draw("Lsame+");
 		//    fbEtaBarrel52x->Draw("Lsame+");
 
-		saveString = "BetaCoefficient" + tag + ".eps";
+		saveString = "BetaCoefficient" + tag + ".png";
 		canvas->SaveAs(saveString.c_str());
 		graphBeta_->Write();
 	}  
@@ -1888,7 +1888,7 @@ void Calibration::drawCoeffGraph(string graph, string tag, string outFileName)
 		// fbEtaBarrel->Draw("Lsame+");
 		// fbEtaBarrel52x->Draw("Lsame+");
 
-		saveString = "GammaCoefficient" + tag + ".eps";
+		saveString = "GammaCoefficient" + tag + ".png";
 		canvas->SaveAs(saveString.c_str());
 		graphGamma_->Write();
 	}  
@@ -2006,7 +2006,7 @@ void Calibration::printGammas()
 //the TGraphs will not draw correctly without passing the TGraphs as references
 //to the function.
 
-void drawGausFit(TH2F* inHisto, TGraph& response, TGraph& resolution, TString resolution_out)
+void drawGausFit(TH2F* inHisto, TGraph* response, TGraph* resolution, TString resolution_out)
 {
 
 	if(inHisto->GetEntries() == 0) return;
@@ -2037,8 +2037,8 @@ void drawGausFit(TH2F* inHisto, TGraph& response, TGraph& resolution, TString re
 
 
 
-	TGraph averages;
-	TGraph rmss;
+	TGraph* averages;
+	TGraph* rmss;
 
 	vector<double> ETrue;
 	vector<double> gausMean; 
@@ -2194,43 +2194,50 @@ here1:
 	file1->Close();
 	// delete cccc;
 
-	response = TGraph(ETrue.size(), &ETrue[0], &gausMean[0]); //Fill the graphs
-	resolution = TGraph(ETrue.size(),&ETrue[0], &gausSigma[0]);
-	averages =  TGraph(ETrue.size(), &ETrue[0], &average[0]);
-	rmss = TGraph(ETrue.size(), &ETrue[0], &rms[0]);
+	int temp1 = ETrue.size();
+	float temp2[90]={0,};
+	float temp3[90]={0,};
+	float temp4[90]={0,};
+	float temp5[90]={0,};
+	float temp6[90]={0,};
+
+	for(int i=0;i<ETrue.size();++i) {
+		temp2[i] = ETrue.at(i);
+		temp3[i] = gausMean.at(i);
+		temp4[i] = gausSigma.at(i);
+		temp5[i] = average.at(i);
+		temp6[i] = rms.at(i);
+	}
+
+	response   = new TGraph(temp1, temp2, temp3);
+	resolution = new TGraph(temp1, temp2, temp4);
+	averages   = new TGraph(temp1, temp2, temp5);
+	rmss       = new TGraph(temp1, temp2, temp6);
 
 	TFile *fresol = new TFile(resolution_out+".root","RECREATE");
 	//Set up the graphs to look how you want them to.
-	response.SetMarkerStyle(22);
-	response.SetMarkerSize(0.8);
-	response.SetMarkerColor(4);
+	response->SetMarkerStyle(22);
+	response->SetMarkerSize(0.8);
+	response->SetMarkerColor(4);
 
-	resolution.SetMarkerStyle(22);
-	resolution.SetMarkerSize(0.8);
-	resolution.SetMarkerColor(4);
+	resolution->SetMarkerStyle(22);
+	resolution->SetMarkerSize(0.8);
+	resolution->SetMarkerColor(4);
 
-	averages.SetMarkerStyle(22);
-	averages.SetMarkerSize(0.8);
-	averages.SetMarkerColor(4);
+	averages->SetMarkerStyle(22);
+	averages->SetMarkerSize(0.8);
+	averages->SetMarkerColor(4);
 
-	rmss.SetMarkerStyle(22);
-	rmss.SetMarkerSize(0.8);
-	rmss.SetMarkerColor(4);
+	rmss->SetMarkerStyle(22);
+	rmss->SetMarkerSize(0.8);
+	rmss->SetMarkerColor(4);
 
 	line->SetLineStyle(1);
 	line->SetLineWidth(2);
 	line->SetLineColor(2);
 
 
-	//  gStyle->SetOptStat(0); 
-	//gStyle->SetOptFit(0);
-	//canvas = new TCanvas(("canvas "+ (string)(inHisto->GetName()) ).c_str(), ("Response and Resolution "+ (string)(inHisto->GetName())).c_str(), 1000, 500);
-	//spandey
-	//canvas = new TCanvas(("canvas "+ (string)(inHisto->GetName()) ).c_str(), ("Response and Resolution "+ (string)(inHisto->GetName())).c_str(), 800, 400);
 	canvas = new TCanvas(("canvas "+ (string)(inHisto->GetName()) ).c_str(), ("Response and Resolution "+ (string)(inHisto->GetName())).c_str(), 1000, 500);
-
-
-
 	canvas->Divide(2, 1);
 	temp->~TCanvas();  //destroy the TCanvas 
 
@@ -2240,8 +2247,8 @@ here1:
 	respHisto->SetStats(0);
 	respHisto->SetTitle("Response");
 	respHisto->Draw();
-	response.Draw("P");
-	//response.Write();
+	response->Draw("P");
+	//response->Write();
 	line->Draw();
 
 	canvas->cd(2);
@@ -2250,8 +2257,8 @@ here1:
 	resoHisto->SetStats(0);
 	resoHisto->SetTitle("Resolution");
 	resoHisto->Draw();
-	resolution.Draw("P");
-	//resolution.Write();
+	resolution->Draw("P");
+	//resolution->Write();
 
 	respHisto->GetYaxis()->SetTitle("(E_{cor}-E_{true})/E_{true}");
 	respHisto->GetXaxis()->SetTitle("E_{true} [GeV]");
@@ -2259,8 +2266,8 @@ here1:
 	resoHisto->GetYaxis()->SetTitle("#sigma(E)/E_{true}");
 	resoHisto->GetXaxis()->SetTitle("E_{true} [GeV]");
 
-	response.Write("response");
-	resolution.Write();
+	response->Write("response");
+	resolution->Write();
 	fresol->Write();
 	fresol->Close();
 
@@ -2353,9 +2360,9 @@ here1:
 			f->FixParameter(2, 1.3701e-05);
 		}
 
-		resolution.Fit(("ResoFit"+ (string)(inHisto->GetName())).c_str(),"QR");
-		resolution.Fit(("ResoFit"+ (string)(inHisto->GetName())).c_str(),"QR");
-		resolution.Fit(("ResoFit"+ (string)(inHisto->GetName())).c_str(),"R");
+		resolution->Fit(("ResoFit"+ (string)(inHisto->GetName())).c_str(),"QR");
+		resolution->Fit(("ResoFit"+ (string)(inHisto->GetName())).c_str(),"QR");
+		resolution->Fit(("ResoFit"+ (string)(inHisto->GetName())).c_str(),"R");
 
 
 
@@ -2398,7 +2405,7 @@ here1:
 
 		legend += text;
 		TLegend *leg=new TLegend(0.30,0.75,0.85,0.85);
-		leg->AddEntry((&resolution),legend.c_str(),"lp");
+		leg->AddEntry((resolution),legend.c_str(),"lp");
 		leg->SetTextSize(0.04);
 		leg->Draw();
 
@@ -2406,9 +2413,9 @@ here1:
 	}
 
 	if (saveCanvas) {
-		TString saveName = resolution_out+".eps";
+		TString saveName = resolution_out+".png";
 		canvas->SaveAs(saveName);
-		//  //string cname = ((string)(inHisto->GetName()) ) + ".eps";
+		//  //string cname = ((string)(inHisto->GetName()) ) + ".png";
 		//  char  cname[200];
 		//  sprintf(cname,  "%s_JME_GT_sample.C",inHisto->GetName());
 		//  canvas->Print(cname);
@@ -2417,7 +2424,7 @@ here1:
 
 }
 
-void drawEtaDependence(TH2F* inHisto, TGraph& responseEta)
+void drawEtaDependence(TH2F* inHisto, TGraph* responseEta)
 {
 	if(inHisto->GetEntries() == 0) return;
 
@@ -2434,8 +2441,8 @@ void drawEtaDependence(TH2F* inHisto, TGraph& responseEta)
 	TH2F* respHisto = new TH2F("respHisto", "", 30, 0.0, 3.00, 100, -1.0, 1.0);
 	//TH2F* respHisto = new TH2F("respHisto", "", 60, -3.0, 3.00, 100, -1.0, 1.0);
 
-	TGraph averages;
-	TGraph rmss;
+	//TGraph* averages;
+	//TGraph* rmss;
 
 	vector<double> etaAverage;
 	vector<double> gausMean; 
@@ -2536,16 +2543,16 @@ void drawEtaDependence(TH2F* inHisto, TGraph& responseEta)
 
 	//  delete cccc;
 	file1->Close();
-	responseEta = TGraph(etaAverage.size(), &etaAverage[0], &gausMean[0]); 
+	responseEta = new TGraph(etaAverage.size(), &etaAverage[0], &gausMean[0]); 
 	//&etaRms[0], &gausSigma[0]); 
 
-	responseEta.SetMarkerStyle(22);
-	responseEta.SetMarkerSize(1);
-	responseEta.SetMarkerColor(4);   
+	responseEta->SetMarkerStyle(22);
+	responseEta->SetMarkerSize(1);
+	responseEta->SetMarkerColor(4);   
 
 	if(changeRange) {
-		responseEta.SetMinimum(-1.0);
-		responseEta.SetMaximum(1.0);
+		responseEta->SetMinimum(-1.0);
+		responseEta->SetMaximum(1.0);
 	}
 
 	line->SetLineStyle(1);
@@ -2566,7 +2573,7 @@ void drawEtaDependence(TH2F* inHisto, TGraph& responseEta)
 	respHisto->SetStats(0);
 	respHisto->SetTitle("Response");
 	respHisto->Draw();
-	responseEta.Draw("P");
+	responseEta->Draw("P");
 	line->Draw();   
 	respHisto->GetXaxis()->SetRangeUser(0,3);
 	//respHisto->GetXaxis()->SetRangeUser(-3,3);
@@ -2581,7 +2588,7 @@ void drawEtaDependence(TH2F* inHisto, TGraph& responseEta)
 	// f_eta->SetParameter(0,0.18);//,-0.16,0.0);
 	// f_eta->SetParameter(1,-0.16);//,-0.16,0.0);
 	// f_eta->SetParameter(2,0.0);//,-0.16,0.0);
-	// responseEta.Fit("etaFit","","", 1.5, 2.85);
+	// responseEta->Fit("etaFit","","", 1.5, 2.85);
 
 	//Spread
 	//cout<<" Endcap spread and mean for "<<inHisto->GetName()<<endl;
@@ -2593,7 +2600,7 @@ void drawEtaDependence(TH2F* inHisto, TGraph& responseEta)
 
 
 	char  cname[200];
-	sprintf(cname,  "%s_JME_GT_sample.eps",inHisto->GetName());
+	sprintf(cname,  "%s_JME_GT_sample.png",inHisto->GetName());
 	canvas->Print(cname);
 
 
@@ -2685,15 +2692,15 @@ vector<float> assignvalues(vector<float> *pfcID_, vector<float> *Ecalenergy_,
 
 	//Takes apart a TTree from a root file and puts the wanted information into 
 	//vectors. 
-	void getValuesFromTree(TTree* tree, vector<double>& ETrueEnergies, 
+	void getValuesFromTree(vector<double>& ETrueEnergies, 
 			vector<double>& ecalEnergies, 
 			vector<double>& hcalEnergies, vector<double>& etas, 
 			vector<double>& phis)
 	{
-   vector<float>*         true_=0;
-   vector<float>*         p_=0;
-   vector<float>*         eta_=0;
-   vector<float>*         phi_=0;
+		vector<float>*         true_=0;
+		vector<float>*         p_=0;
+		vector<float>*         eta_=0;
+		vector<float>*         phi_=0;
 		TBranch        *b_true; 
 		TBranch        *b_p;   
 		TBranch        *b_eta;    
@@ -2708,28 +2715,15 @@ vector<float> assignvalues(vector<float> *pfcID_, vector<float> *Ecalenergy_,
 		TBranch        *b_E_hcal;
 		TBranch        *b_dr;
 
-/*
-		vector<float>  *true_energy_;
-		TBranch        *b_true_energy_;   
-		vector<float>  *true_eta_;
-		TBranch        *b_true_eta_;   
-		vector<float>  *true_phi_;
-		TBranch        *b_true_phi_;   
-		vector<float>  *pfc_ecal_;
-		TBranch        *b_pfc_ecal_;   
-		vector<float>  *pfc_hcal_;
-		TBranch        *b_pfc_hcal_;   
-*/
 		vector<float>  *pfc_eta_=0;
 		TBranch        *b_pfc_eta_=0;   
 		vector<float>  *pfc_phi_=0;
 		TBranch        *b_pfc_phi_=0;   
 
-    TFile *ftemp = new TFile("SinglePion_PT0to200/PFHadCalibration.root");
-    TTree* sTree=(TTree*)ftemp->Get("pfHadCalibNTuple/Candidates");
+		TFile *ftemp = new TFile("SinglePion_PT0to200/PFHadCalibration.root");
+		TTree* sTree=(TTree*)ftemp->Get("pfHadCalibNTuple/Candidates");
 
 		sTree->SetMakeClass(1);
-		//if(sTree->GetBranchStatus("true"))
 
 		sTree->SetBranchAddress("true_energy", &true_);
 		sTree->SetBranchAddress("true_eta", &eta_);
@@ -2740,55 +2734,22 @@ vector<float> assignvalues(vector<float> *pfcID_, vector<float> *Ecalenergy_,
 		sTree->SetBranchAddress("pfc_trackRef_phi", &pfc_phi_);
 		sTree->SetBranchAddress("pfc_ecal", &E_ecal_);
 		sTree->SetBranchAddress("pfc_hcal", &E_hcal_);
-/*
-		sTree->SetBranchAddress("true", &true_, &b_true);
-		sTree->SetBranchAddress("p", &p_, &b_p);
-		sTree->SetBranchAddress("eta", &eta_, &b_eta);
-		sTree->SetBranchAddress("phi", &phi_, &b_phi);
-		sTree->SetBranchAddress("pfcs", &pfcs_, &b_pfcs);
-		sTree->SetBranchAddress("pfc_eta", &pfc_eta_, &b_pfc_eta_);
-		sTree->SetBranchAddress("pfc_phi", &pfc_phi_, &b_pfc_phi_);
-		sTree->SetBranchAddress("Eecal", &E_ecal_, &b_E_ecal);
-		sTree->SetBranchAddress("Ehcal", &E_hcal_, &b_E_hcal);
-*/
 
-		/*
-			 if(sTree->GetBranchStatus("true"))
-			 sTree->SetBranchAddress("true", &true_, &b_true);
-			 sTree->SetBranchAddress("p", &p_, &b_p);
-			 sTree->SetBranchAddress("ecal", &ecal_, &b_ecal);
-			 sTree->SetBranchAddress("hcal", &hcal_, &b_hcal);
-			 sTree->SetBranchAddress("eta", &eta_, &b_eta);
-			 sTree->SetBranchAddress("phi", &phi_, &b_phi);
-			 sTree->SetBranchAddress("pfcs", &pfcs_, &b_pfcs);
-			 sTree->SetBranchAddress("Eecal", &E_ecal_, &b_E_ecal);
-			 sTree->SetBranchAddress("Ehcal", &E_hcal_, &b_E_hcal);
-			 sTree->SetBranchAddress("dr", &dr_, &b_dr);
-			 */
-/*
-		sTree->SetBranchAddress("true_energy", &true_energy_, &b_true_energy_);
-		sTree->SetBranchAddress("true_eta", &true_eta_, &b_true_eta_);
-		sTree->SetBranchAddress("true_phi", &true_phi_, &b_true_phi_);
-		sTree->SetBranchAddress("pfc_ecal", &pfc_ecal_, &b_pfc_ecal_);
-		sTree->SetBranchAddress("pfc_hcal", &pfc_hcal_, &b_pfc_hcal_);
-		sTree->SetBranchAddress("pfc_eta", &pfc_eta_, &b_pfc_eta_);
-		sTree->SetBranchAddress("pfc_phi", &pfc_phi_, &b_pfc_phi_);
-*/
 		double sigmaEcalHcal=1;
 		long veto = 0 ;
 		//int count = 0;
 		bool flag[10] = {0,0,0,0,0,0,0,0,0,0};
 		float e_true, ecal, hcal, minDr, Dr, true_index;
 
-    cout << sTree->GetEntries() << endl;
+		cout << sTree->GetEntries() << endl;
 
 		//for( unsigned entry = 0; entry < std::min((unsigned)500000000,(unsigned)(sTree->GetEntriesFast()) ); entry++) {
-    for(int entry = 0; entry < sTree->GetEntries(); entry++) { 
+		for(int entry = 0; entry < sTree->GetEntries(); entry++) { 
 			sTree->GetEntry(entry);
 			//sTree->GetEntry(1266);
 
 			//if (fabs(eta_) < 2.4 && p_ == 0) continue;
-      if(pfcs_->size() == 0 || true_->size() == 0) continue;
+			if(pfcs_->size() == 0 || true_->size() == 0) continue;
 
 			for(int i = 0; i < (int)pfcs_->size(); ++i){
 				minDr = 99.;  Dr = 999.; true_index = -1;
@@ -2815,37 +2776,37 @@ vector<float> assignvalues(vector<float> *pfcID_, vector<float> *Ecalenergy_,
 				}
 			}
 
-/*
-			if(sTree->GetBranchStatus("true"))
-				ETrueEnergies.push_back(true_);
-			else
-				ETrueEnergies.push_back(p_);
+			/*
+				 if(sTree->GetBranchStatus("true"))
+				 ETrueEnergies.push_back(true_);
+				 else
+				 ETrueEnergies.push_back(p_);
 			//if(pfcs_->size() != 0) {
 			if(pfcs_->size() == 0) {
-				//vector<float> tmp = assignvalues(pfcs_, E_ecal_, E_hcal_, dr_);
-				vector<float> tmp = assignvalues(pfcs_, E_ecal_, E_hcal_, 0);
-				ecalEnergies.push_back(tmp.at(0));
-				hcalEnergies.push_back(tmp.at(1));
+			//vector<float> tmp = assignvalues(pfcs_, E_ecal_, E_hcal_, dr_);
+			vector<float> tmp = assignvalues(pfcs_, E_ecal_, E_hcal_, 0);
+			ecalEnergies.push_back(tmp.at(0));
+			hcalEnergies.push_back(tmp.at(1));
 			}
 			else {
-				ecalEnergies.push_back(ecal_);
-				hcalEnergies.push_back(hcal_);
+			ecalEnergies.push_back(ecal_);
+			hcalEnergies.push_back(hcal_);
 			}
 			etas.push_back(eta_);
 			phis.push_back(phi_);
 
 
 			if(fabs(eta_)<1.5) 
-				sigmaEcalHcal = sqrt(0.08*0.08 + 1.04*1.04*(std::max((double)(ecal_ + hcal_), 1.0)));
+			sigmaEcalHcal = sqrt(0.08*0.08 + 1.04*1.04*(std::max((double)(ecal_ + hcal_), 1.0)));
 			else
-				sigmaEcalHcal = sqrt(0.04*0.04 + 1.80*1.80*(std::max((double)(ecal_ + hcal_), 1.0)));
+			sigmaEcalHcal = sqrt(0.04*0.04 + 1.80*1.80*(std::max((double)(ecal_ + hcal_), 1.0)));
 
 			sigmas.push_back(sigmaEcalHcal);
 
 
 			if(fabs(eta_) > 2.5 && ecalEnergies.back() != 0 && false) {
-				cout<<"***************"<<endl;
-				cout<<fabs(eta_)<<" "<<ecalEnergies.back()<<endl;
+			cout<<"***************"<<endl;
+			cout<<fabs(eta_)<<" "<<ecalEnergies.back()<<endl;
 
 			}
 			//cout<< "**************" << endl;
@@ -2855,7 +2816,7 @@ vector<float> assignvalues(vector<float> *pfcID_, vector<float> *Ecalenergy_,
 			// for(int ii = 0; ii < pfcID_->size() && entry < 20; ii++) {
 			// 	 cout<<" pfcID_:" << pfcID_->at(ii) << endl;
 			// }
-*/
+			*/
 
 
 			unsigned N = sTree->GetEntriesFast();
@@ -3109,63 +3070,63 @@ vector<float> assignvalues(vector<float> *pfcID_, vector<float> *Ecalenergy_,
 		TH2F* bcplot= new TH2F("bcplot","bcplot",1000,-1.,1.,1000,-1.,1.);
 
 		//Temporary TGraphs to passed drawGausFit
-		TGraph response;
-		TGraph resolution;
+		TGraph* response;
+		TGraph* resolution;
 		/////
-		TGraph responseRaw;
-		TGraph resolutionRaw;
+		TGraph* responseRaw;
+		TGraph* resolutionRaw;
 
-		TGraph responseRawH;
-		TGraph resolutionRawH;
+		TGraph* responseRawH;
+		TGraph* resolutionRawH;
 
-		TGraph responseRawEH;
-		TGraph resolutionRawEH;
+		TGraph* responseRawEH;
+		TGraph* resolutionRawEH;
 		/////
-		TGraph responseCorBar;
-		TGraph resolutionCorBar;
+		TGraph* responseCorBar;
+		TGraph* resolutionCorBar;
 		/////
-		TGraph responseCorBarH;
-		TGraph resolutionCorBarH;
+		TGraph* responseCorBarH;
+		TGraph* resolutionCorBarH;
 
-		TGraph responseCorEtaBarH;
-		TGraph resolutionCorEtaBarH;
+		TGraph* responseCorEtaBarH;
+		TGraph* resolutionCorEtaBarH;
 		/////
-		TGraph responseCorBarEH;
-		TGraph resolutionCorBarEH;
+		TGraph* responseCorBarEH;
+		TGraph* resolutionCorBarEH;
 
-		TGraph responseCorEtaBarEH;
-		TGraph resolutionCorEtaBarEH;
+		TGraph* responseCorEtaBarEH;
+		TGraph* resolutionCorEtaBarEH;
 		/////
-		TGraph responseRawEndH;
-		TGraph resolutionRawEndH;
+		TGraph* responseRawEndH;
+		TGraph* resolutionRawEndH;
 
-		TGraph responseRawEndEH;
-		TGraph resolutionRawEndEH;
+		TGraph* responseRawEndEH;
+		TGraph* resolutionRawEndEH;
 		/////
-		TGraph responseCorEnd;
-		TGraph resolutionCorEnd;
+		TGraph* responseCorEnd;
+		TGraph* resolutionCorEnd;
 		/////
-		TGraph responseCorEndH;
-		TGraph resolutionCorEndH;
+		TGraph* responseCorEndH;
+		TGraph* resolutionCorEndH;
 
-		TGraph responseCorEtaEndH;
-		TGraph resolutionCorEtaEndH;
+		TGraph* responseCorEtaEndH;
+		TGraph* resolutionCorEtaEndH;
 		/////
-		TGraph responseCorEndEH;
-		TGraph resolutionCorEndEH;
+		TGraph* responseCorEndEH;
+		TGraph* resolutionCorEndEH;
 
-		TGraph responseCorEtaEndEH;
-		TGraph resolutionCorEtaEndEH;
+		TGraph* responseCorEtaEndEH;
+		TGraph* resolutionCorEtaEndEH;
 		/////
 
-		TGraph responseEta;
-		TGraph resolutionEta;
+		TGraph* responseEta;
+		TGraph* resolutionEta;
 
-		TGraph responseEtaEtaEH;
-		TGraph responseEtaHCorrEtaEH;
+		TGraph* responseEtaEtaEH;
+		TGraph* responseEtaHCorrEtaEH;
 
-		TGraph responseEtaEtaH;
-		TGraph responseEtaHCorrEtaH;
+		TGraph* responseEtaEtaH;
+		TGraph* responseEtaHCorrEtaH;
 
 		///////////////////////////////////////////////////////////////////////////////
 		//This is the main of the macro. Everything that you want output must be added 
@@ -3202,12 +3163,13 @@ vector<float> assignvalues(vector<float> *pfcID_, vector<float> *Ecalenergy_,
 			//chain->Add("/d0/scratch/cghuh3811/PFHadCalibration/CMSSW_10_4_0_pre4/src/Offline/SinglePion_PT0to200/PFHadCalibration.root");
 
 			//sTree = (TTree*)chain;
-      TFile *f1 = new TFile("SinglePion_PT0to200/PFHadCalibration.root");
-      sTree=(TTree*)f1->Get("s");
+			//TFile *f1 = new TFile("SinglePion_PT0to200/PFHadCalibration.root");
+			//sTree=(TTree*)f1->Get("s");
 
 
 			cout<<"Reading input tree..."<<endl;
-			getValuesFromTree(sTree, ETrueEnergies, ecalEnergies, 
+			//getValuesFromTree(sTree, ETrueEnergies, ecalEnergies, 
+			getValuesFromTree(ETrueEnergies, ecalEnergies, 
 					hcalEnergies, etas, phis);
 
 
