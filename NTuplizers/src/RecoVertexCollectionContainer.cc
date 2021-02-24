@@ -1,12 +1,12 @@
 #include <JMETriggerAnalysis/NTuplizers/interface/RecoVertexCollectionContainer.h>
 
-RecoVertexCollectionContainer::RecoVertexCollectionContainer(
-  const std::string& name, const std::string& inputTagLabel, const edm::EDGetToken& token, const std::string& strCut
-) : VCollectionContainer(name, inputTagLabel, token, strCut) {
-}
+RecoVertexCollectionContainer::RecoVertexCollectionContainer(const std::string& name,
+                                                             const std::string& inputTagLabel,
+                                                             const edm::EDGetToken& token,
+                                                             const std::string& strCut)
+    : VCollectionContainer(name, inputTagLabel, token, strCut) {}
 
-void RecoVertexCollectionContainer::clear(){
-
+void RecoVertexCollectionContainer::clear() {
   tracksSize_.clear();
   isFake_.clear();
   chi2_.clear();
@@ -19,8 +19,7 @@ void RecoVertexCollectionContainer::clear(){
   zError_.clear();
 }
 
-void RecoVertexCollectionContainer::reserve(const size_t vec_size){
-
+void RecoVertexCollectionContainer::reserve(const size_t vec_size) {
   tracksSize_.reserve(vec_size);
   isFake_.reserve(vec_size);
   chi2_.reserve(vec_size);
@@ -33,8 +32,7 @@ void RecoVertexCollectionContainer::reserve(const size_t vec_size){
   zError_.reserve(vec_size);
 }
 
-void RecoVertexCollectionContainer::emplace_back(const reco::Vertex& obj){
-
+void RecoVertexCollectionContainer::emplace_back(const reco::Vertex& obj) {
   tracksSize_.emplace_back(obj.tracksSize());
   isFake_.emplace_back(obj.isFake());
   chi2_.emplace_back(obj.chi2());

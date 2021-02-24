@@ -4,6 +4,11 @@
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
 
+opts.register('skipEvents', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'number of events to be skipped')
+
 opts.register('numThreads', 1,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
@@ -19,18 +24,82 @@ opts.register('dumpPython', None,
               vpo.VarParsing.varType.string,
               'path to python file with content of cms.Process')
 
+opts.register('reco', 'HLT_GRun',
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.string,
+              'keyword to define HLT reconstruction')
+
 opts.register('output', 'pfHCNTuple.root',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'path to output ROOT file')
 
+opts.register('verbosity', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'verbosity level')
+
 opts.parseArguments()
 
 ###
-### base configuration file
+### HLT configuration
 ###
-from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_1_0_GRun_V11_configDump import cms, process
+if opts.reco == 'HLT_GRun':
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
 
+elif opts.reco == 'HLT_Run3TRK':
+  # (a) Run-3 tracking: standard
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
+  process = customizeHLTRun3Tracking(process)
+
+elif opts.reco == 'HLT_Run3TRKWithPU':
+  # (b) Run-3 tracking: all pixel vertices
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
+  process = customizeHLTRun3TrackingAllPixelVertices(process)
+
+else:
+  raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
+
+# remove cms.OutputModule objects from HLT config-dump
+for _modname in process.outputModules_():
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.OutputModule:
+       process.__delattr__(_modname)
+       if opts.verbosity > 0:
+          print '> removed cms.OutputModule:', _modname
+
+# remove cms.EndPath objects from HLT config-dump
+for _modname in process.endpaths_():
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.EndPath:
+       process.__delattr__(_modname)
+       if opts.verbosity > 0:
+          print '> removed cms.EndPath:', _modname
+
+# remove selected cms.Path objects from HLT config-dump
+print '-'*108
+print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
+print '-'*108
+for _modname in sorted(process.paths_()):
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
+    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
+    if _keepPath:
+      print '{:<99} | {:<4} |'.format(_modname, '+')
+      continue
+    _mod = getattr(process, _modname)
+    if type(_mod) == cms.Path:
+      process.__delattr__(_modname)
+      print '{:<99} | {:<4} |'.format(_modname, '')
+print '-'*108
+
+# remove FastTimerService
+del process.FastTimerService
+
+###
+### PFHC-specific paths
+###
 process.particleFlowSimParticle = cms.EDProducer('PFSimParticleProducer',
   Fitter = cms.string('KFFittingSmoother'),
   MCTruthMatchingInfo = cms.untracked.bool(False),
@@ -80,20 +149,11 @@ process.pfHadCalibNTuple = cms.EDAnalyzer('PFHadCalibNTuple',
   usePFBlockElements = cms.bool(True),
 )
 
-###
-### schedule
-###
 process.pfSimParticleSeq = cms.Sequence(process.particleFlowSimParticle)
 process.pfSimParticlePath = cms.Path(process.pfSimParticleSeq)
 
 process.pfHadCalibNTupleSeq = cms.Sequence(process.pfHadCalibNTuple)
 process.pfHadCalibNTupleEndPath = cms.EndPath(process.pfHadCalibNTupleSeq)
-
-process.setSchedule_(cms.Schedule(
-  process.MC_AK4PFJets_v17,
-  process.pfSimParticlePath,
-  process.pfHadCalibNTupleEndPath,
-))
 
 ###
 ### options
@@ -102,9 +162,14 @@ process.setSchedule_(cms.Schedule(
 # number of events
 process.maxEvents.input = opts.maxEvents
 
+# number of events to be skipped
+process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
+
 # number of threads/streams
 process.options.numberOfThreads = opts.numThreads
 process.options.numberOfStreams = opts.numStreams
+
+process.options.wantSummary = cms.untracked.bool(False)
 
 # input files
 if opts.inputFiles:
