@@ -137,6 +137,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResultsCollections = cms.vstring(),
   outputBranchesToBeDropped = cms.vstring(),
 
+  HepMCProduct = cms.InputTag('generatorSmeared'),
+  GenEventInfoProduct = cms.InputTag('generator'),
+  PileupSummaryInfo = cms.InputTag('addPileupInfo'),
+
   doubles = cms.PSet(
 
     hltFixedGridRhoFastjetAll = cms.InputTag('hltFixedGridRhoFastjetAll'),
