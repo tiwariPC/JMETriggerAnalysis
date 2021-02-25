@@ -130,7 +130,7 @@ def addPaths_MC_PFPuppiJME(process):
 
     process.hltPreMCAK8PFPuppiJets = process.hltPreMCAK4PFPuppiJets.clone()
 
-    process.hltPixelClustersMultiplicity = _nSiPixelClusters.clone(src = 'siPixelClusters', defaultValue = -1.)
+    process.hltPixelClustersMultiplicity = _nSiPixelClusters.clone(src = 'hltSiPixelClusters', defaultValue = -1.)
 
     process.hltPFPuppi = _puppi.clone(
       candName = 'hltParticleFlow',
