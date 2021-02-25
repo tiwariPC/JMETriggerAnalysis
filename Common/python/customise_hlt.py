@@ -294,7 +294,7 @@ def addPaths_MC_PFPuppiJME(process):
           raise RuntimeError('instance of PuppiProducer is misconfigured:\n\n'+str(mod_i)+' = '+mod_i.dumpPython())
 
         for algoReg_idx in range(len(mod_i.algos[algo_idx].MinNeutralPt)):
-          mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 20.7 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
-          mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.000634
+          mod_i.algos[algo_idx].MinNeutralPt[algoReg_idx] += 2.56 * mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx]
+          mod_i.algos[algo_idx].MinNeutralPtSlope[algoReg_idx] *= 0.00271
 
     return process
