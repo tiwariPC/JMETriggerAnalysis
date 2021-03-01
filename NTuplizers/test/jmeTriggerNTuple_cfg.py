@@ -170,8 +170,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoCaloJetCollections = cms.PSet(
 
-    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
-    hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
+    hltAK4CaloJetsCorrected = cms.InputTag('hltAK4CaloJetsCorrected'),
+    hltAK8CaloJetsCorrected = cms.InputTag('hltAK8CaloJetsCorrected'),
   ),
 
   recoPFClusterJetCollections = cms.PSet(
@@ -185,8 +185,10 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
     hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
 
-    hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
-    hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
+    hltAK4PFPuppiJets = cms.InputTag('hltAK4PFPuppiJets'),
+#    hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
+    hltAK8PFPuppiJets = cms.InputTag('hltAK8PFPuppiJets'),
+#    hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
   ),
 
   patJetCollections = cms.PSet(

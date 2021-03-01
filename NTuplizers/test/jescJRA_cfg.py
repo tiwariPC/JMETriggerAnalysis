@@ -124,8 +124,8 @@ del process.MessageLogger
 ### customizations
 ###
 from JMETriggerAnalysis.Common.customise_hlt import *
-process = addPaths_MC_PFClusterJets(process)
-process = addPaths_MC_PFPuppiJets(process)
+process = addPaths_MC_PFClusterJME(process)
+process = addPaths_MC_PFPuppiJME(process)
 
 ###
 ### Jet Response Analyzer (JRA) NTuple
