@@ -124,8 +124,8 @@ del process.MessageLogger
 ### customizations
 ###
 from JMETriggerAnalysis.Common.customise_hlt import *
-process = addPaths_MC_PFClusterJets(process)
-process = addPaths_MC_PFPuppiJets(process)
+process = addPaths_MC_PFClusterJME(process)
+process = addPaths_MC_PFPuppiJME(process)
 
 ###
 ### Jet Response Analyzer (JRA) NTuple
@@ -133,13 +133,13 @@ process = addPaths_MC_PFPuppiJets(process)
 import JetMETAnalysis.JetAnalyzers.DefaultsHLT_cff as Defaults
 from JetMETAnalysis.JetAnalyzers.addAlgorithmHLT import addAlgorithm
 for algorithm in [
-  'ak4caloHLT',
-  'ak4pfclusterHLT',
-  'ak4pfHLT',
+  #'ak4caloHLT',
+  #'ak4pfclusterHLT',
+  #'ak4pfHLT',
   'ak4puppiHLT',
-  'ak8caloHLT',
-  'ak8pfclusterHLT',
-  'ak8pfHLT',
+  #'ak8caloHLT',
+  #'ak8pfclusterHLT',
+  #'ak8pfHLT',
   'ak8puppiHLT',
 ]:
   addAlgorithm(process, algorithm, Defaults)
@@ -224,7 +224,7 @@ if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
    process.source.fileNames = [
-     '/store/mc/Phase2HLTTDRSummer20ReRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/FEVT/PU200_111X_mcRun4_realistic_T15_v1-v2/280000/015FB6F1-59B4-304C-B540-2392A983A97D.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/NoPU_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/07569899-8384-6444-AD42-613509DEE3E1.root',
    ]
 
 # dump content of cms.Process to python file
