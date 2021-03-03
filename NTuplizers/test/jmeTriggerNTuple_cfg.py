@@ -179,8 +179,8 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFCandidateCollections = cms.PSet(
 
-    hltParticleFlow = cms.InputTag('hltParticleFlow'),
-#   hltPFPuppi = cms.InputTag('hltPFPuppi'),
+#    hltParticleFlow = cms.InputTag('hltParticleFlow'),
+#    hltPFPuppi = cms.InputTag('hltPFPuppi'),
   ),
 
   recoGenJetCollections = cms.PSet(
