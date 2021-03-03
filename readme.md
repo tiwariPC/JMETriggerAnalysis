@@ -14,6 +14,11 @@ git cms-merge-topic missirol:devel_1120pa_kineParticleFilter -u
 git cms-merge-topic missirol:devel_puppiPUProxy_1120patatrack -u
 git cms-merge-topic mmasciov:tracking-allPVs -u
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
+
+# Run-3 PFHC: copy preliminary HLT-PFHC for Run-3
+mkdir -p ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data
+cp /afs/cern.ch/user/c/chuh/public/PFCalibration/run3/PFCalibration.db ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db
+
 scram b -j 12
 ```
 
