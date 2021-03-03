@@ -19,7 +19,7 @@ opts.register('numThreads', 1,
               vpo.VarParsing.varType.int,
               'number of threads')
 
-opts.register('numStreams', 1,
+opts.register('numStreams', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
               'number of streams')
@@ -34,15 +34,10 @@ opts.register('wantSummary', False,
               vpo.VarParsing.varType.bool,
               'show cmsRun summary at job completion')
 
-opts.register('printSummaries', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'show summaries from HLT services')
-
-opts.register('globalTag', None,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.string,
-              'argument of process.GlobalTag.globaltag')
+#opts.register('globalTag', None,
+#              vpo.VarParsing.multiplicity.singleton,
+#              vpo.VarParsing.varType.string,
+#              'argument of process.GlobalTag.globaltag')
 
 opts.register('reco', 'HLT_GRun',
               vpo.VarParsing.multiplicity.singleton,
@@ -57,7 +52,12 @@ opts.register('output', 'out.root',
 opts.register('verbosity', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
-              'verbosity level')
+              'level of output verbosity')
+
+#opts.register('printSummaries', False,
+#              vpo.VarParsing.multiplicity.singleton,
+#              vpo.VarParsing.varType.bool,
+#              'show summaries from HLT services')
 
 opts.parseArguments()
 
@@ -115,18 +115,39 @@ for _modname in sorted(process.paths_()):
 print '-'*108
 
 # remove FastTimerService
-del process.FastTimerService
+if hasattr(process, 'FastTimerService'):
+  del process.FastTimerService
 
 # remove MessageLogger
-del process.MessageLogger
+if hasattr(process, 'MessageLogger'):
+  del process.MessageLogger
 
 ###
-### customizations
+### customisations
 ###
+
+## customised JME collections
 from JMETriggerAnalysis.Common.customise_hlt import *
 process = addPaths_MC_PFClusterJME(process)
 process = addPaths_MC_PFPuppiJME(process)
 
+## ES modules for PF-Hadron Calibrations
+import os
+from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
+process.pfhcESSource = cms.ESSource('PoolDBESSource',
+  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+  toGet = cms.VPSet(
+    cms.PSet(
+      record = cms.string('PFCalibrationRcd'),
+      tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
+      label = cms.untracked.string('HLT'),
+    ),
+  ),
+)
+process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
+#process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
+
+## Output NTuple
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
 process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
@@ -158,7 +179,7 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoPFCandidateCollections = cms.PSet(
 
-#   hltParticleFlow = cms.InputTag('hltParticleFlow'),
+    hltParticleFlow = cms.InputTag('hltParticleFlow'),
 #   hltPFPuppi = cms.InputTag('hltPFPuppi'),
   ),
 
@@ -231,19 +252,15 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 #process.HLTSchedule.extend([process.analysisNTupleEndPath])
 
-if opts.printSummaries:
-   process.FastTimerService.printEventSummary = False
-   process.FastTimerService.printRunSummary = False
-   process.FastTimerService.printJobSummary = True
-   process.ThroughputService.printEventSummary = False
+#if opts.printSummaries:
+#   process.FastTimerService.printEventSummary = False
+#   process.FastTimerService.printRunSummary = False
+#   process.FastTimerService.printJobSummary = True
+#   process.ThroughputService.printEventSummary = False
 
 ###
-### standard I/O options
+### standard options
 ###
-
-# update process.GlobalTag.globaltag
-if opts.globalTag is not None:
-   process.GlobalTag.globaltag = opts.globalTag
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
@@ -252,13 +269,16 @@ process.maxEvents.input = opts.maxEvents
 process.source.skipEvents = cms.untracked.uint32(opts.skipEvents)
 
 # multi-threading settings
-process.options.numberOfThreads = cms.untracked.uint32(opts.numThreads if (opts.numThreads > 1) else 1)
-process.options.numberOfStreams = cms.untracked.uint32(opts.numStreams if (opts.numStreams > 1) else 1)
-#if hasattr(process, 'DQMStore'):
-#   process.DQMStore.enableMultiThread = (process.options.numberOfThreads > 1)
+process.options.numberOfThreads = max(opts.numThreads, 1)
+process.options.numberOfStreams = max(opts.numStreams, 0)
 
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
+
+## update process.GlobalTag.globaltag
+#if opts.globalTag is not None:
+#   from Configuration.AlCa.GlobalTag import GlobalTag
+#   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
 
 # select luminosity sections from .json file
 if opts.lumis is not None:
@@ -285,6 +305,7 @@ if opts.verbosity > 0:
    print '--- jmeTriggerNTuple_cfg.py ---'
    print ''
    print 'option: output =', opts.output
+   print 'option: reco =', opts.reco
    print 'option: dumpPython =', opts.dumpPython
    print ''
    print 'process.GlobalTag =', process.GlobalTag.dumpPython()

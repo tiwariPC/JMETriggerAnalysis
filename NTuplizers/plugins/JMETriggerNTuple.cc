@@ -521,6 +521,10 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
                     &recoPFCandidateCollectionContainer_i.vec_rawEcalEnergy());
     this->addBranch(recoPFCandidateCollectionContainer_i.name() + "_rawHcalEnergy",
                     &recoPFCandidateCollectionContainer_i.vec_rawHcalEnergy());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name() + "_ecalEnergy",
+                    &recoPFCandidateCollectionContainer_i.vec_ecalEnergy());
+    this->addBranch(recoPFCandidateCollectionContainer_i.name() + "_hcalEnergy",
+                    &recoPFCandidateCollectionContainer_i.vec_hcalEnergy());
     this->addBranch(recoPFCandidateCollectionContainer_i.name() + "_vx",
                     &recoPFCandidateCollectionContainer_i.vec_vx());
     this->addBranch(recoPFCandidateCollectionContainer_i.name() + "_vy",

@@ -29,11 +29,6 @@ opts.register('lumis', None,
               vpo.VarParsing.varType.string,
               'path to .json with list of luminosity sections')
 
-opts.register('logs', False,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.bool,
-              'create log files configured via MessageLogger')
-
 opts.register('wantSummary', False,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.bool,
@@ -47,17 +42,17 @@ opts.register('wantSummary', False,
 opts.register('reco', 'HLT_GRun',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
-              'keyword defining HLT reconstruction')
-
-opts.register('verbosity', 0,
-              vpo.VarParsing.multiplicity.singleton,
-              vpo.VarParsing.varType.int,
-              'level of output verbosity')
+              'keyword to define HLT reconstruction')
 
 opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'path to output ROOT file')
+
+opts.register('verbosity', 0,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.int,
+              'level of output verbosity')
 
 opts.parseArguments()
 
@@ -114,21 +109,37 @@ for _modname in sorted(process.paths_()):
       print '{:<99} | {:<4} |'.format(_modname, '')
 print '-'*108
 
-# remove FastTimerService
-#
-# SPS removing the removal of FastTimeService - not needed? caused crash...
-#
-#del process.FastTimerService
+if hasattr(process, 'FastTimerService'):
+  del process.FastTimerService
 
 # remove MessageLogger
-del process.MessageLogger
+if hasattr(process, 'MessageLogger'):
+  del process.MessageLogger
 
 ###
-### customizations
+### customisations
 ###
+
+## customised JME collections
 from JMETriggerAnalysis.Common.customise_hlt import *
 process = addPaths_MC_PFClusterJME(process)
 process = addPaths_MC_PFPuppiJME(process)
+
+## ES modules for PF-Hadron Calibrations
+import os
+from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
+process.pfhcESSource = cms.ESSource('PoolDBESSource',
+  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+  toGet = cms.VPSet(
+    cms.PSet(
+      record = cms.string('PFCalibrationRcd'),
+      tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
+      label = cms.untracked.string('HLT'),
+    ),
+  ),
+)
+process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
+#process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 
 ###
 ### Jet Response Analyzer (JRA) NTuple
@@ -151,10 +162,9 @@ for algorithm in [
   getattr(process, algorithm).srcRhos = ''
   getattr(process, algorithm).deltaRMax = 0.2
 
-## update process.GlobalTag.globaltag
-#if opts.globalTag is not None:
-#   from Configuration.AlCa.GlobalTag import GlobalTag
-#   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
+###
+### standard options
+###
 
 # max number of events to be processed
 process.maxEvents.input = opts.maxEvents
@@ -169,64 +179,17 @@ process.options.numberOfStreams = max(opts.numStreams, 0)
 # show cmsRun summary at job completion
 process.options.wantSummary = cms.untracked.bool(opts.wantSummary)
 
+## update process.GlobalTag.globaltag
+#if opts.globalTag is not None:
+#   from Configuration.AlCa.GlobalTag import GlobalTag
+#   process.GlobalTag = GlobalTag(process.GlobalTag, opts.globalTag, '')
+
 # select luminosity sections from .json file
 if opts.lumis is not None:
    import FWCore.PythonUtilities.LumiList as LumiList
    process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
 
-# create TFileService to be accessed by JRA-NTuple plugin
-process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
-
-# MessageLogger
-if opts.logs:
-   process.MessageLogger = cms.Service('MessageLogger',
-     destinations = cms.untracked.vstring(
-       'cerr',
-       'logError',
-       'logInfo',
-       'logDebug',
-     ),
-     # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
-     debugModules = cms.untracked.vstring(
-     ),
-     categories = cms.untracked.vstring(
-       'FwkReport',
-     ),
-     cerr = cms.untracked.PSet(
-       threshold = cms.untracked.string('WARNING'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logError = cms.untracked.PSet(
-       threshold = cms.untracked.string('ERROR'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logInfo = cms.untracked.PSet(
-       threshold = cms.untracked.string('INFO'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-     logDebug = cms.untracked.PSet(
-       threshold = cms.untracked.string('DEBUG'),
-       extension = cms.untracked.string('.txt'),
-       FwkReport = cms.untracked.PSet(
-         reportEvery = cms.untracked.int32(1),
-       ),
-     ),
-   )
-
 # input EDM files
-
-#
-# SPS removing secondaryFileNames - not found when running, not needed?
-#
-#process.source.secondaryFileNames = []
 if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
@@ -236,13 +199,22 @@ else:
      '/store/mc/Run3Winter20DRMiniAOD/DoublePhoton_FlatPt-5To300/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6-v2/40000/7BA83802-8EF6-B246-893F-09A1657B7CC7.root'
    ]
 
+
+#
+# SPS removing secondaryFileNames - not found when running, not needed?
+#
+#process.source.secondaryFileNames = []
+
+# create TFileService to be accessed by JRA-NTuple plugin
+process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
+
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
    open(opts.dumpPython, 'w').write(process.dumpPython())
 
-# print-outs
+# printouts
 if opts.verbosity > 0:
-   print '--- hltJRA_mcRun4_cfg.py ---'
+   print '--- jescJRA_cfg.py ---'
    print ''
    print 'option: output =', opts.output
    print 'option: reco =', opts.reco
@@ -319,5 +291,3 @@ print '-'*108
 # from JMETriggerAnalysis.Common.customise_hlt import *
 # process = addPath_MC_AK4PFClusterJets(process)
 # process = addPath_MC_AK4PFPuppiJets(process)
-
-
