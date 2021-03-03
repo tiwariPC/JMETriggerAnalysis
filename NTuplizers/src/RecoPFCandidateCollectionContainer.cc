@@ -15,6 +15,8 @@ void RecoPFCandidateCollectionContainer::clear() {
   mass_.clear();
   rawEcalEnergy_.clear();
   rawHcalEnergy_.clear();
+  ecalEnergy_.clear();
+  hcalEnergy_.clear();
   vx_.clear();
   vy_.clear();
   vz_.clear();
@@ -28,6 +30,8 @@ void RecoPFCandidateCollectionContainer::reserve(const size_t vec_size) {
   mass_.reserve(vec_size);
   rawEcalEnergy_.reserve(vec_size);
   rawHcalEnergy_.reserve(vec_size);
+  ecalEnergy_.reserve(vec_size);
+  hcalEnergy_.reserve(vec_size);
   vx_.reserve(vec_size);
   vy_.reserve(vec_size);
   vz_.reserve(vec_size);
@@ -41,6 +45,8 @@ void RecoPFCandidateCollectionContainer::emplace_back(const reco::PFCandidate& o
   mass_.emplace_back(obj.mass());
   rawEcalEnergy_.emplace_back(obj.rawEcalEnergy());
   rawHcalEnergy_.emplace_back(obj.rawHcalEnergy());
+  ecalEnergy_.emplace_back(obj.ecalEnergy());
+  hcalEnergy_.emplace_back(obj.hcalEnergy());
   vx_.emplace_back(obj.vx());
   vy_.emplace_back(obj.vy());
   vz_.emplace_back(obj.vz());
