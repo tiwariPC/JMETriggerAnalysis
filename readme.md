@@ -19,6 +19,8 @@ git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 mkdir -p ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data
 cp /afs/cern.ch/user/c/chuh/public/PFCalibration/run3/PFCalibration.db ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db
 
+git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b run3_jrantuples
+
 scram b -j 12
 ```
 
