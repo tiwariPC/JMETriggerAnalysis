@@ -103,8 +103,7 @@ print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
-#    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'AK8Calo' in _modname)
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
       continue
