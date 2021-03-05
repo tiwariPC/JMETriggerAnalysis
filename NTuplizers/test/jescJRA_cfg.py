@@ -98,8 +98,7 @@ print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
-#    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
+    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'AK8Calo' in _modname)
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
       continue
@@ -190,7 +189,10 @@ if opts.lumis is not None:
    import FWCore.PythonUtilities.LumiList as LumiList
    process.source.lumisToProcess = LumiList.LumiList(filename = opts.lumis).getVLuminosityBlockRange()
 
-# input EDM files
+# create TFileService to be accessed by JRA-NTuple plugin
+process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
+
+# input EDM files [primary]
 if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
@@ -198,10 +200,11 @@ else:
      '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6-v1/100000/07634100-A880-4E4D-BAA3-D9C0B5356C2D.root',
    ]
 
-process.source.secondaryFileNames = []
-
-# create TFileService to be accessed by JRA-NTuple plugin
-process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
+# input EDM files [secondary]
+if not hasattr(process.source, 'secondaryFileNames'):
+   process.source.secondaryFileNames = cms.untracked.vstring()
+if opts.secondaryInputFiles:
+   process.source.secondaryFileNames = opts.secondaryInputFiles
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
