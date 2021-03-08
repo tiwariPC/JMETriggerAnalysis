@@ -31,6 +31,7 @@
 #include "JMETriggerAnalysis/NTuplizers/interface/PATMETCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/PATMuonCollectionContainer.h"
 #include "JMETriggerAnalysis/NTuplizers/interface/PATElectronCollectionContainer.h"
+#include "JMETriggerAnalysis/NTuplizers/interface/PATPhotonCollectionContainer.h"
 
 #include <string>
 #include <vector>
@@ -99,6 +100,7 @@ protected:
   std::vector<PATMETCollectionContainer> v_patMETCollectionContainer_;
   std::vector<PATMuonCollectionContainer> v_patMuonCollectionContainer_;
   std::vector<PATElectronCollectionContainer> v_patElectronCollectionContainer_;
+  std::vector<PATPhotonCollectionContainer> v_patPhotonCollectionContainer_;
 
   TTree* ttree_ = nullptr;
 
@@ -399,6 +401,16 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
                                                                          "pat::ElectronCollection",
                                                                          stringCutObjectSelectors_map_);
   for (auto& cc_i : v_patElectronCollectionContainer_) {
+    cc_i.orderByHighestPt(true);
+  }
+
+  // pat::PhotonCollection
+  initCollectionContainer<PATPhotonCollectionContainer, pat::Photon>(iConfig,
+                                                                     v_patPhotonCollectionContainer_,
+                                                                     "patPhotonCollections",
+                                                                     "pat::PhotonCollection",
+                                                                     stringCutObjectSelectors_map_);
+  for (auto& cc_i : v_patPhotonCollectionContainer_) {
     cc_i.orderByHighestPt(true);
   }
 
@@ -796,6 +808,23 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patElectronCollectionContainer_i.name() + "_etaSC", &patElectronCollectionContainer_i.vec_etaSC());
   }
 
+  for (auto &patPhotonCollectionContainer_i : v_patPhotonCollectionContainer_)
+  {
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_pdgId", &patPhotonCollectionContainer_i.vec_pdgId());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_pt", &patPhotonCollectionContainer_i.vec_pt());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_eta", &patPhotonCollectionContainer_i.vec_eta());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_phi", &patPhotonCollectionContainer_i.vec_phi());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_mass", &patPhotonCollectionContainer_i.vec_mass());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_vx", &patPhotonCollectionContainer_i.vec_vx());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_vy", &patPhotonCollectionContainer_i.vec_vy());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_vz", &patPhotonCollectionContainer_i.vec_vz());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_dxyPV", &patPhotonCollectionContainer_i.vec_dxyPV());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_dzPV", &patPhotonCollectionContainer_i.vec_dzPV());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_id", &patPhotonCollectionContainer_i.vec_id());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_pfIso", &patPhotonCollectionContainer_i.vec_pfIso());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_etaSC", &patPhotonCollectionContainer_i.vec_etaSC());
+  }
+
   // settings for output TFile and TTree
   fs->file().SetCompressionAlgorithm(ROOT::ECompressionAlgorithm::kLZ4);
   fs->file().SetCompressionLevel(4);
@@ -1009,6 +1038,10 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   // pat::ElectronCollection
   this->fillCollectionContainer<PATElectronCollectionContainer, pat::Electron>(
       iEvent, v_patElectronCollectionContainer_, fillCollectionConditionMap_);
+
+  // pat::PhotonCollection
+  this->fillCollectionContainer<PATPhotonCollectionContainer, pat::Photon>(
+      iEvent, v_patPhotonCollectionContainer_, fillCollectionConditionMap_);
 
   // fill TTree
   ttree_->Fill();
