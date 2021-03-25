@@ -1,6 +1,7 @@
 ###
 ### command-line arguments
 ###
+import sys
 import FWCore.ParameterSet.VarParsing as vpo
 opts = vpo.VarParsing('analysis')
 
@@ -79,6 +80,13 @@ elif opts.reco == 'HLT_Run3TRKWithPU':
   from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
   process = customizeHLTRun3TrackingAllPixelVertices(process)
 
+elif opts.reco == 'HLT_Run3Photon':
+    # import JMETriggerAnalysis.Common.configs.setup_dev_CMSSW_11_3_0_GRun_V9_cff as setup_dev_CMSSW_11_3_0_GRun_V9_cff
+    # from JMETriggerAnalysis.Common.configs.hlt_JetMET_V1 import cms, process
+    sys.path.append('../../Common/python/configs')
+    import setup_dev_CMSSW_11_3_0_GRun_V9_cff
+    from hlt_JetMET_V1 import cms, process
+
 else:
   raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
 
@@ -120,7 +128,7 @@ if hasattr(process, 'FastTimerService'):
 # remove MessageLogger
 if hasattr(process, 'MessageLogger'):
   del process.MessageLogger
-
+'''
 ###
 ### customisations
 ###
@@ -143,6 +151,7 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
     ),
   ),
 )
+'''
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 
