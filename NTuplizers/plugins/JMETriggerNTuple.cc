@@ -823,6 +823,19 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
     this->addBranch(patPhotonCollectionContainer_i.name() + "_id", &patPhotonCollectionContainer_i.vec_id());
     this->addBranch(patPhotonCollectionContainer_i.name() + "_pfIso", &patPhotonCollectionContainer_i.vec_pfIso());
     this->addBranch(patPhotonCollectionContainer_i.name() + "_etaSC", &patPhotonCollectionContainer_i.vec_etaSC());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_HoverE", &patPhotonCollectionContainer_i.vec_HoverE());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_sigmaIetaIeta", &patPhotonCollectionContainer_i.vec_sigmaIetaIeta());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_chargedHadronIso", &patPhotonCollectionContainer_i.vec_chargedHadronIso());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_neutralHadronIso", &patPhotonCollectionContainer_i.vec_neutralHadronIso());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_photonIso", &patPhotonCollectionContainer_i.vec_photonIso());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_r9", &patPhotonCollectionContainer_i.vec_r9());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_hasPixelSeed", &patPhotonCollectionContainer_i.vec_hasPixelSeed());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_passElectronVeto", &patPhotonCollectionContainer_i.vec_passElectronVeto());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_hOVERe", &patPhotonCollectionContainer_i.vec_hOVERe());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_full5x5_r9", &patPhotonCollectionContainer_i.vec_full5x5_r9());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_full5x5_sigmaIetaIeta", &patPhotonCollectionContainer_i.vec_full5x5_sigmaIetaIeta());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_full5x5_e5x5", &patPhotonCollectionContainer_i.vec_full5x5_e5x5());
+    this->addBranch(patPhotonCollectionContainer_i.name() + "_scEnergy", &patPhotonCollectionContainer_i.vec_scEnergy());
   }
 
   // settings for output TFile and TTree

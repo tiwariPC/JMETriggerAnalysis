@@ -255,6 +255,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlinePFMET = cms.InputTag('slimmedMETs'),
     offlinePFPuppiMET = cms.InputTag('slimmedMETsPuppi'),
   ),
+
+  patPhotonCollections=cms.PSet(
+
+      offlinePhotons=cms.InputTag('slimmedPhotons'),
+  ),
 )
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)

@@ -30,6 +30,19 @@ public:
   std::vector<uint>& vec_id() { return id_; }
   std::vector<float>& vec_pfIso() { return pfIso_; }
   std::vector<float>& vec_etaSC() { return etaSC_; }
+  std::vector<float> &vec_HoverE() { return HoverE_; }
+  std::vector<float> &vec_sigmaIetaIeta() { return sigmaIetaIeta_; }
+  std::vector<float> &vec_chargedHadronIso() { return chargedHadronIso_; }
+  std::vector<float> &vec_neutralHadronIso() { return neutralHadronIso_; }
+  std::vector<float> &vec_photonIso() { return photonIso_; }
+  std::vector<float> &vec_r9() { return r9_; }
+  std::vector<bool> &vec_hasPixelSeed() { return hasPixelSeed_; }
+  std::vector<bool> &vec_passElectronVeto() { return passElectronVeto_; }
+  std::vector<float> &vec_hOVERe() { return hOVERe_; }
+  std::vector<float> &vec_full5x5_r9() { return full5x5_r9_; }
+  std::vector<float> &vec_full5x5_sigmaIetaIeta() { return full5x5_sigmaIetaIeta_; }
+  std::vector<float> &vec_full5x5_e5x5() { return full5x5_e5x5_; }
+  std::vector<float> &vec_scEnergy() { return scEnergy_; }
 
 protected:
   std::vector<int> pdgId_;
@@ -45,6 +58,19 @@ protected:
   std::vector<uint> id_;
   std::vector<float> pfIso_;
   std::vector<float> etaSC_;
+  std::vector<float> HoverE_;
+  std::vector<float> sigmaIetaIeta_;
+  std::vector<float> chargedHadronIso_;
+  std::vector<float> neutralHadronIso_;
+  std::vector<float> photonIso_;
+  std::vector<float> r9_;
+  std::vector<bool> hasPixelSeed_;
+  std::vector<bool> passElectronVeto_;
+  std::vector<float> hOVERe_;
+  std::vector<float> full5x5_r9_;
+  std::vector<float> full5x5_sigmaIetaIeta_;
+  std::vector<float> full5x5_e5x5_;
+  std::vector<float> scEnergy_;
 };
 
 #endif

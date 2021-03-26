@@ -21,6 +21,22 @@ void PATPhotonCollectionContainer::clear() {
   id_.clear();
   pfIso_.clear();
   etaSC_.clear();
+  HoverE_.clear();
+  sigmaIetaIeta_.clear();
+  chargedHadronIso_.clear();
+  neutralHadronIso_.clear();
+  photonIso_.clear();
+  r9_.clear();
+  hasPixelSeed_.clear();
+  passElectronVeto_.clear();
+  hOVERe_.clear();
+  full5x5_.clear();
+  r9_.clear();
+  full5x5_.clear();
+  sigmaIetaIeta_.clear();
+  full5x5_.clear();
+  e5x5_.clear();
+  scEnergy_.clear();
 }
 
 void PATPhotonCollectionContainer::reserve(const size_t vec_size) {
@@ -37,6 +53,22 @@ void PATPhotonCollectionContainer::reserve(const size_t vec_size) {
   id_.reserve(vec_size);
   pfIso_.reserve(vec_size);
   etaSC_.reserve(vec_size);
+  HoverE_.reserve(vec_size);
+  sigmaIetaIeta_.reserve(vec_size);
+  chargedHadronIso_.reserve(vec_size);
+  neutralHadronIso_.reserve(vec_size);
+  photonIso_.reserve(vec_size);
+  r9_.reserve(vec_size);
+  hasPixelSeed_.reserve(vec_size);
+  passElectronVeto_.reserve(vec_size);
+  hOVERe_.reserve(vec_size);
+  full5x5_.reserve(vec_size);
+  r9_.reserve(vec_size);
+  full5x5_.reserve(vec_size);
+  sigmaIetaIeta_.reserve(vec_size);
+  full5x5_.reserve(vec_size);
+  e5x5_.reserve(vec_size);
+  scEnergy_.reserve(vec_size);
 }
 
 void PATPhotonCollectionContainer::emplace_back(const pat::Photon& obj) {
@@ -48,6 +80,19 @@ void PATPhotonCollectionContainer::emplace_back(const pat::Photon& obj) {
   vx_.emplace_back(obj.vx());
   vy_.emplace_back(obj.vy());
   vz_.emplace_back(obj.vz());
+  HoverE_.emplace_back(obj.hadronicOverEm());
+  sigmaIetaIeta_.emplace_back(obj.sigmaIetaIeta());
+  chargedHadronIso_.emplace_back(obj.chargedHadronIso());
+  neutralHadronIso_.emplace_back(obj.neutralHadronIso());
+  photonIso_.emplace_back(obj.photonIso());
+  r9_.emplace_back(obj.r9());
+  hasPixelSeed_.emplace_back(obj.hasPixelSeed());
+  passElectronVeto_.emplace_back(obj.passElectronVeto());
+  hOVERe_.emplace_back(obj.hadTowOverEm());
+  full5x5_r9_.emplace_back(obj.full5x5_r9());
+  full5x5_sigmaIetaIeta_.emplace_back(obj.full5x5_sigmaIetaIeta());
+  full5x5_e5x5_.emplace_back(obj.full5x5_e5x5());
+  scEnergy_.emplace_back(obj.superCluster()->energy());
 
   dxyPV_.emplace_back(obj.hasUserFloat("dxyPV") ? obj.userFloat("dxyPV") : -9999.);
   dzPV_.emplace_back(obj.hasUserFloat("dzPV") ? obj.userFloat("dzPV") : -9999.);
