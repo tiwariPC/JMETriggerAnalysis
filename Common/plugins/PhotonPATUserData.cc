@@ -216,7 +216,7 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       pho.addUserFloat(out, pho.userFloat(ref));
     }
     // -----------------
-
+    /*
     // Impact Parameter(s)
     const float dxyPV((PV && pho.gsfTrack().isNonnull()) ? pho.gsfTrack()->dxy(PV->position()) : -9999.);
     const float dzPV ((PV && pho.gsfTrack().isNonnull()) ? pho.gsfTrack()->dz (PV->position()) : -9999.);
@@ -244,7 +244,7 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     pho.addUserFloat("pfIso_rA", pfIso_rA);
     pho.addUserFloat("pfIso", pfIso);
     // -----------------
-
+    */
     // Selectors [int]
     for(const auto& i_strNfunc : userInt_stringSelects_)
     {

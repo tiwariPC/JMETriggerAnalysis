@@ -19,7 +19,7 @@ void PATPhotonCollectionContainer::clear() {
   dxyPV_.clear();
   dzPV_.clear();
   id_.clear();
-  pfIso_.clear();
+  // pfIso_.clear();
   etaSC_.clear();
   HoverE_.clear();
   sigmaIetaIeta_.clear();
@@ -48,7 +48,7 @@ void PATPhotonCollectionContainer::reserve(const size_t vec_size) {
   dxyPV_.reserve(vec_size);
   dzPV_.reserve(vec_size);
   id_.reserve(vec_size);
-  pfIso_.reserve(vec_size);
+  // pfIso_.reserve(vec_size);
   etaSC_.reserve(vec_size);
   HoverE_.reserve(vec_size);
   sigmaIetaIeta_.reserve(vec_size);
@@ -88,8 +88,8 @@ void PATPhotonCollectionContainer::emplace_back(const pat::Photon& obj) {
   full5x5_e5x5_.emplace_back(obj.full5x5_e5x5());
   scEnergy_.emplace_back(obj.superCluster()->energy());
 
-  dxyPV_.emplace_back(obj.hasUserFloat("dxyPV") ? obj.userFloat("dxyPV") : -9999.);
-  dzPV_.emplace_back(obj.hasUserFloat("dzPV") ? obj.userFloat("dzPV") : -9999.);
+  // dxyPV_.emplace_back(obj.hasUserFloat("dxyPV") ? obj.userFloat("dxyPV") : -9999.);
+  // dzPV_.emplace_back(obj.hasUserFloat("dzPV") ? obj.userFloat("dzPV") : -9999.);
 
   uint obj_id(0);
   if (obj.hasUserInt("IDCutBasedVeto") && (obj.userInt("IDCutBasedVeto") > 0)) {
@@ -112,7 +112,7 @@ void PATPhotonCollectionContainer::emplace_back(const pat::Photon& obj) {
   }
   id_.emplace_back(obj_id);
 
-  pfIso_.emplace_back(obj.hasUserFloat("pfIso") ? obj.userFloat("pfIso") : -9999.);
+  // pfIso_.emplace_back(obj.hasUserFloat("pfIso") ? obj.userFloat("pfIso") : -9999.);
 
-  etaSC_.emplace_back(obj.superCluster()->eta());
+  // etaSC_.emplace_back(obj.superCluster()->eta());
 }
