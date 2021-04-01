@@ -30,12 +30,9 @@ void PATPhotonCollectionContainer::clear() {
   hasPixelSeed_.clear();
   passElectronVeto_.clear();
   hOVERe_.clear();
-  full5x5_.clear();
-  r9_.clear();
-  full5x5_.clear();
-  sigmaIetaIeta_.clear();
-  full5x5_.clear();
-  e5x5_.clear();
+  full5x5_r9_.clear();
+  full5x5_sigmaIetaIeta_.clear();
+  full5x5_e5x5_.clear();
   scEnergy_.clear();
 }
 
@@ -62,12 +59,9 @@ void PATPhotonCollectionContainer::reserve(const size_t vec_size) {
   hasPixelSeed_.reserve(vec_size);
   passElectronVeto_.reserve(vec_size);
   hOVERe_.reserve(vec_size);
-  full5x5_.reserve(vec_size);
-  r9_.reserve(vec_size);
-  full5x5_.reserve(vec_size);
-  sigmaIetaIeta_.reserve(vec_size);
-  full5x5_.reserve(vec_size);
-  e5x5_.reserve(vec_size);
+  full5x5_r9_.reserve(vec_size);
+  full5x5_sigmaIetaIeta_.reserve(vec_size);
+  full5x5_e5x5_.reserve(vec_size);
   scEnergy_.reserve(vec_size);
 }
 

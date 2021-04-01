@@ -151,12 +151,12 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
   for(unsigned int i_ele=0; i_ele<patElecs->size(); ++i_ele){
 
     newElecs->emplace_back(patElecs->at(i_ele));
-    pat::Photon& ele = newElecs->back();
+    pat::Photon& pho = newElecs->back();
 
     // ValueMaps [bool]
     for(unsigned int i=0; i<v_vmap_bool.size(); ++i)
     {
-      if(ele.hasUserInt(vmaps_bool_.at(i)))
+      if(pho.hasUserInt(vmaps_bool_.at(i)))
       {
         throw cms::Exception("InputError")
 	  << "@@@ PhotonPATUserData::produce -- PAT user-int label already exists: " << vmaps_bool_.at(i);
@@ -165,7 +165,7 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       if(v_vmap_bool.at(i)->contains(patElecs->refAt(i_ele).id()))
       {
         const bool val = (*(v_vmap_bool.at(i)))[patElecs->refAt(i_ele)];
-        ele.addUserInt(vmaps_bool_.at(i), int(val));
+        pho.addUserInt(vmaps_bool_.at(i), int(val));
       }
       else
       {
@@ -178,7 +178,7 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     // ValueMaps [float]
     for(unsigned int i=0; i<v_vmap_float.size(); ++i)
     {
-      if(ele.hasUserFloat(vmaps_float_.at(i)))
+      if(pho.hasUserFloat(vmaps_float_.at(i)))
       {
         throw cms::Exception("InputError")
 	  << "@@@ PhotonPATUserData::produce -- PAT user-float label already exists: " << vmaps_float_.at(i);
@@ -187,7 +187,7 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       if(v_vmap_float.at(i)->contains(patElecs->refAt(i_ele).id()))
       {
         const float val = (*(v_vmap_float.at(i)))[patElecs->refAt(i_ele)];
-        ele.addUserFloat(vmaps_float_.at(i), val);
+        pho.addUserFloat(vmaps_float_.at(i), val);
       }
       else
       {
@@ -203,46 +203,46 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       const std::string& ref = userfloat_copycat.second;
       const std::string& out = userfloat_copycat.first;
 
-      if(ele.hasUserFloat(ref) == false)
+      if(pho.hasUserFloat(ref) == false)
       {
         throw cms::Exception("InputError") << "@@@ PhotonPATUserData::produce -- PAT user-float key \""+ref+"\" not found";
       }
 
-      if(ele.hasUserFloat(out) == true)
+      if(pho.hasUserFloat(out) == true)
       {
         throw cms::Exception("InputError") << "@@@ PhotonPATUserData::produce -- target PAT user-float key \""+out+"\" already exists";
       }
 
-      ele.addUserFloat(out, ele.userFloat(ref));
+      pho.addUserFloat(out, pho.userFloat(ref));
     }
     // -----------------
 
     // Impact Parameter(s)
-    const float dxyPV((PV && ele.gsfTrack().isNonnull()) ? ele.gsfTrack()->dxy(PV->position()) : -9999.);
-    const float dzPV ((PV && ele.gsfTrack().isNonnull()) ? ele.gsfTrack()->dz (PV->position()) : -9999.);
+    const float dxyPV((PV && pho.gsfTrack().isNonnull()) ? pho.gsfTrack()->dxy(PV->position()) : -9999.);
+    const float dzPV ((PV && pho.gsfTrack().isNonnull()) ? pho.gsfTrack()->dz (PV->position()) : -9999.);
 
-    ele.addUserFloat("dxyPV", dxyPV);
-    ele.addUserFloat("dzPV", dzPV);
+    pho.addUserFloat("dxyPV", dxyPV);
+    pho.addUserFloat("dzPV", dzPV);
 
-    const float SIP3D = ((ele.edB(pat::Photon::PV3D) != 0.) ? (ele.dB(pat::Photon::PV3D) / ele.edB(pat::Photon::PV3D)) : +9999.);
-    ele.addUserFloat("SIP3D", SIP3D);
+    const float SIP3D = ((pho.edB(pat::Photon::PV3D) != 0.) ? (pho.dB(pat::Photon::PV3D) / pho.edB(pat::Photon::PV3D)) : +9999.);
+    pho.addUserFloat("SIP3D", SIP3D);
     // -----------------
 
     // PF-Isolation used for EGamma Cut-Based ID
     //  * "${CMSSW_BASE}"/src/RecoEgamma/PhotonIdentification/python/Identification/cutBasedPhotonID_tools.py
     //  * "${CMSSW_BASE}"/src/RecoEgamma/PhotonIdentification/plugins/cuts/GsfEleEffAreaPFIsoCut.cc
-    const float pfIso_CH(ele.pfIsolationVariables().sumChargedHadronPt);
-    const float pfIso_NH(ele.pfIsolationVariables().sumNeutralHadronEt);
-    const float pfIso_Ph(ele.pfIsolationVariables().sumPhotonEt);
-    const float pfIso_rA(rho * effAreas_.getEffectiveArea(fabs(ele.superCluster()->eta())));
+    const float pfIso_CH(pho.pfIsolationVariables().sumChargedHadronPt);
+    const float pfIso_NH(pho.pfIsolationVariables().sumNeutralHadronEt);
+    const float pfIso_Ph(pho.pfIsolationVariables().sumPhotonEt);
+    const float pfIso_rA(rho * effAreas_.getEffectiveArea(fabs(pho.superCluster()->eta())));
 
-    const float pfIso = (ele.pt() != 0.) ? ((pfIso_CH + std::max(0.0f, pfIso_NH + pfIso_Ph - pfIso_rA)) / ele.pt()) : -1.;
+    const float pfIso = (pho.pt() != 0.) ? ((pfIso_CH + std::max(0.0f, pfIso_NH + pfIso_Ph - pfIso_rA)) / pho.pt()) : -1.;
 
-    ele.addUserFloat("pfIso_CH", pfIso_CH);
-    ele.addUserFloat("pfIso_NH", pfIso_NH);
-    ele.addUserFloat("pfIso_Ph", pfIso_Ph);
-    ele.addUserFloat("pfIso_rA", pfIso_rA);
-    ele.addUserFloat("pfIso", pfIso);
+    pho.addUserFloat("pfIso_CH", pfIso_CH);
+    pho.addUserFloat("pfIso_NH", pfIso_NH);
+    pho.addUserFloat("pfIso_Ph", pfIso_Ph);
+    pho.addUserFloat("pfIso_rA", pfIso_rA);
+    pho.addUserFloat("pfIso", pfIso);
     // -----------------
 
     // Selectors [int]
@@ -251,12 +251,12 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       const auto& i_str  = i_strNfunc.first;
       const auto& i_func = i_strNfunc.second;
 
-      if(ele.hasUserInt(i_str))
+      if(pho.hasUserInt(i_str))
       {
         throw cms::Exception("InputError") << "@@@ PhotonPATUserData::produce -- PAT user-int label already exists: " << i_str;
       }
 
-      ele.addUserInt(i_str, int(i_func(ele)));
+      pho.addUserInt(i_str, int(i_func(pho)));
     }
     // -----------------
 
@@ -266,12 +266,12 @@ void PhotonPATUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       const auto& i_str  = i_strNfunc.first;
       const auto& i_func = i_strNfunc.second;
 
-      if(ele.hasUserFloat(i_str))
+      if(pho.hasUserFloat(i_str))
       {
         throw cms::Exception("InputError") << "@@@ PhotonPATUserData::produce -- PAT user-float label already exists: " << i_str;
       }
 
-      ele.addUserFloat(i_str, float(i_func(ele)));
+      pho.addUserFloat(i_str, float(i_func(pho)));
     }
     // -----------------
   }

@@ -151,8 +151,8 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
     ),
   ),
 )
-'''
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
+'''
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 
 ## Output NTuple
