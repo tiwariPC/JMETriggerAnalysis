@@ -80,12 +80,9 @@ elif opts.reco == 'HLT_Run3TRKWithPU':
   from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
   process = customizeHLTRun3TrackingAllPixelVertices(process)
 
-elif opts.reco == 'HLT_Run3Photon':
-    # import JMETriggerAnalysis.Common.configs.setup_dev_CMSSW_11_3_0_GRun_V9_cff as setup_dev_CMSSW_11_3_0_GRun_V9_cff
-    # from JMETriggerAnalysis.Common.configs.hlt_JetMET_V1 import cms, process
-    sys.path.append('../../Common/python/configs')
-    import setup_dev_CMSSW_11_3_0_GRun_V9_cff
-    from hlt_JetMET_V1 import cms, process
+elif opts.reco == 'HLT_Run3Photon20':
+    import JMETriggerAnalysis.Common.configs.setup_dev_CMSSW_11_3_0_GRun_V9_cff as setup_dev_CMSSW_11_3_0_GRun_V9_cff
+    from JMETriggerAnalysis.Common.configs.hltRun3_Photon20_v2_cfg import cms, process
 
 else:
   raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
